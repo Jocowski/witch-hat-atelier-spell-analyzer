@@ -9,7 +9,13 @@ function Glyph({ def }) {
         const rad = (s.angle * Math.PI) / 180
         return <circle key={i} cx={r * Math.sin(rad)} cy={-r * Math.cos(rad)} r="3.5" fill="currentColor" />
       })}
-      <path d={def.svgPath} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      {def.text ? (
+        <text x="0" y="15" textAnchor="middle" fontSize="58" fontWeight="700" fill="currentColor">{def.text}</text>
+      ) : def.render === 'fill' ? (
+        <path d={def.svgPath} fill="currentColor" fillRule="evenodd" />
+      ) : (
+        <path d={def.svgPath} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      )}
     </svg>
   )
 }
@@ -29,29 +35,39 @@ function Item({ def, kind, onAdd }) {
   )
 }
 
+// Sigil families, in display order, per the Sigils doc.
+const SIGIL_FAMILIES = [
+  { id: 'fire', title: 'Fire' },
+  { id: 'water', title: 'Water' },
+  { id: 'earth', title: 'Earth' },
+  { id: 'air', title: 'Air' },
+  { id: 'time', title: 'Time' },
+  { id: 'decorative', title: 'Decorative' },
+  { id: 'misc', title: 'Misc' },
+  { id: 'special', title: 'Special (sign-as-sigil)' },
+]
+
 export default function Palette({ onAdd }) {
-  const mainSigils = SIGILS.filter((s) => ['main', 'variant', 'minor'].includes(s.category))
-  const specialSigils = SIGILS.filter((s) => s.category === 'sign-as-sigil')
   const usableSigns = SIGNS.filter((s) => s.id !== 'unknown_sign')
+  const byFamily = (fam) => SIGILS.filter((s) => (s.family || 'misc') === fam)
 
   return (
     <div className="panel palette">
       <h2>Palette</h2>
       <p className="hint">Drag onto the canvas or click to add. Sigils go to the center; signs to the rings.</p>
 
-      <div className="palette-section">
-        <h3>Sigils (elements)</h3>
-        <div className="palette-grid">
-          {mainSigils.map((d) => <Item key={d.id} def={d} kind="sigil" onAdd={onAdd} />)}
-        </div>
-      </div>
-
-      <div className="palette-section">
-        <h3>Special sigils (sign-as-sigil)</h3>
-        <div className="palette-grid">
-          {specialSigils.map((d) => <Item key={d.id} def={d} kind="sigil" onAdd={onAdd} />)}
-        </div>
-      </div>
+      {SIGIL_FAMILIES.map(({ id, title }) => {
+        const items = byFamily(id)
+        if (!items.length) return null
+        return (
+          <div className="palette-section" key={id}>
+            <h3>{title} sigils</h3>
+            <div className="palette-grid">
+              {items.map((d) => <Item key={d.id} def={d} kind="sigil" onAdd={onAdd} />)}
+            </div>
+          </div>
+        )
+      })}
 
       <div className="palette-section">
         <h3>Signs (keystones)</h3>

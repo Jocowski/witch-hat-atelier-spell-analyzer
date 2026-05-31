@@ -18,6 +18,7 @@
 
   "elements": {
     "fire":          { "substance": "flame",                 "raw": "burns, giving off heat and light", "qualities": ["hot", "luminous"] },
+    "unburning_flame":{ "substance": "heatless flame",        "raw": "burns as flame that gives off no heat", "qualities": ["luminous"] },
     "water":         { "substance": "water",                 "raw": "pours and flows outward",          "qualities": ["fluid"] },
     "earth":         { "substance": "earth, stone, and sand","raw": "rises up as rock and sand",         "qualities": ["solid", "heavy"] },
     "air":           { "substance": "air",                   "raw": "stirs into moving wind",            "qualities": ["mobile", "invisible"] },
@@ -25,6 +26,10 @@
     "crystal":       { "substance": "crystal",               "raw": "forms into hard crystal",           "qualities": ["solid", "rigid"] },
     "transmutation": { "substance": "the affected matter",   "raw": "is transmuted",                     "qualities": [] },
     "time":          { "substance": "the flow of time",      "raw": "reverts what it touches to an earlier state", "qualities": [] },
+    "smoke":         { "substance": "smoke",                 "raw": "billows out as smoke",              "qualities": ["airy"] },
+    "decorative":    { "substance": "the spell's magic",     "raw": "takes the shape of the living thing it depicts", "qualities": [] },
+    "guidance":      { "substance": "a gathering pull",      "raw": "draws matching objects toward the glyph", "qualities": [] },
+    "calling":       { "substance": "a recorded sound",      "raw": "echoes back a recorded phrase",     "qualities": [] },
     "mind":          { "substance": "memory",                "raw": "acts upon the mind",                "qualities": ["forbidden-adjacent"] },
     "space":         { "substance": "space itself",          "raw": "links two distant points",          "qualities": [] },
     "forbidden":     { "substance": "forbidden power",       "raw": "warps its target in a forbidden way","qualities": ["forbidden"] },

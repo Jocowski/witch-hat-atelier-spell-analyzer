@@ -35,7 +35,13 @@ function ComponentGlyph({ comp, selected, onPointerDown }) {
         const rad = (sat.angle * Math.PI) / 180
         return <circle key={i} cx={r * Math.sin(rad)} cy={-r * Math.cos(rad)} r="3.5" fill={color} />
       })}
-      <path d={def.svgPath} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      {def.text ? (
+        <text x="0" y="15" textAnchor="middle" fontSize="58" fontWeight="700" fill={color}>{def.text}</text>
+      ) : def.render === 'fill' ? (
+        <path d={def.svgPath} fill={color} fillRule="evenodd" stroke="none" />
+      ) : (
+        <path d={def.svgPath} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      )}
     </g>
   )
 }
