@@ -42,8 +42,44 @@ body {
 .panel h2 { margin: 0 0 10px; font-size: 0.95rem; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
 
 /* ---------- Palette ---------- */
-.palette-section + .palette-section { margin-top: 14px; }
-.palette-section h3 { margin: 0 0 6px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-dim); }
+.palette-search { position: relative; margin-bottom: 10px; }
+.palette-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 26px 7px 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+}
+.palette-search input:focus { outline: none; border-color: var(--accent); }
+.palette-search .clear {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--ink-dim); font-size: 1.1rem;
+  line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.palette-group {
+  margin: 16px 0 6px; font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 4px;
+}
+.palette-section + .palette-section { margin-top: 6px; }
+.palette-section-head {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  margin: 0 0 6px; padding: 3px 2px;
+  background: none; border: none; cursor: pointer;
+  font: inherit; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--ink-dim); text-align: left;
+}
+.palette-section-head:hover:not(:disabled) { color: var(--ink); }
+.palette-section-head:disabled { cursor: default; }
+.palette-section-head .caret { font-size: 0.7rem; width: 10px; color: var(--ink-dim); }
+.palette-section-head .sec-title { flex: 1; }
+.palette-section-head .sec-count {
+  font-size: 0.65rem; color: var(--ink-dim); background: var(--panel-2);
+  border-radius: 8px; padding: 1px 6px; letter-spacing: 0;
+}
 .palette-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .palette-item {
   background: var(--panel-2);
