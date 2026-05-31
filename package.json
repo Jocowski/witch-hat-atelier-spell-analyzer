@@ -1,0 +1,21 @@
+{
+  "name": "spell-analyzer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Simulador do sistema mágico de Witch Hat Atelier — compõe glyphs por arrasto e reconhece/valida spells.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}

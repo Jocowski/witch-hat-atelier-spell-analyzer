@@ -1,0 +1,143 @@
+{
+  "$schema": "./schema/rules.schema.json",
+  "version": "1.0.0",
+  "title": "Witch Hat Atelier - Regras do Sistema Mágico",
+  "description": "Regras meta do sistema. Consumidas pelo validador/motor lógico do simulador. Cada regra tem um id, severidade e uma condição declarativa que o engine avalia sobre o objeto 'composition' montado pelo usuário.",
+
+  "coordinateModel": {
+    "description": "Toda composição é descrita em coordenadas polares relativas ao centro do glyph. O centro (raio 0) é reservado ao sigil. Signs ocupam anéis concêntricos.",
+    "space": "polar",
+    "origin": "center",
+    "angle": { "unit": "degrees", "range": [0, 360], "zero": "north", "direction": "clockwise" },
+    "radius": { "unit": "normalized", "range": [0, 1], "note": "0 = centro do glyph; 1 = ring externo" },
+    "componentFields": {
+      "type": "id do sign/sigil",
+      "role": "sigil | sign | ring | link",
+      "ring": "índice do anel concêntrico (0 = centro)",
+      "angle": "posição angular em graus",
+      "radius": "distância normalizada do centro",
+      "rotation": "rotação do próprio símbolo em graus (afeta direção do efeito)",
+      "scale": "tamanho relativo (afeta balanço/direção e potência)",
+      "inverted": "boolean - símbolo espelhado/virado"
+    }
+  },
+
+  "rules": [
+    {
+      "id": "ring-closed",
+      "name": "Ring completo",
+      "severity": "blocking",
+      "description": "A magia só ativa quando o ring que envolve o glyph está completo. Um gap intencional deixa o spell preparado mas inativo.",
+      "condition": { "ring.closed": true },
+      "onFail": "Spell preparado mas INATIVO: o ring está aberto. Feche o ring (ou una as duas metades) para ativar.",
+      "reference": "ring.md"
+    },
+    {
+      "id": "has-center",
+      "name": "Núcleo presente",
+      "severity": "blocking",
+      "description": "Todo glyph precisa de um sigil no centro OU de um sign que pode ocupar o centro (vision, repetition, billowing, weave, rain, bird, dancing_puppet, enlarge).",
+      "condition": { "anyOf": [ { "center.isSigil": true }, { "center.signCanBeCenter": true } ] },
+      "onFail": "Glyph sem núcleo: coloque um sigil (fogo, água, terra, vento, luz) ou um sign capaz de ocupar o centro.",
+      "reference": "sigils.md, signs.md"
+    },
+    {
+      "id": "has-signs",
+      "name": "Pelo menos um sign",
+      "severity": "warning",
+      "description": "Um sigil sozinho (sem signs) tipicamente não produz efeito direcionado. Signs determinam a forma do efeito.",
+      "condition": { "signs.count": { ">=": 1 } },
+      "onFail": "Sem signs ao redor do sigil o elemento não tem forma definida — efeito nulo ou bruto."
+    },
+    {
+      "id": "symmetry-stability",
+      "name": "Simetria e estabilidade",
+      "severity": "info",
+      "description": "Signs em simetria radial ou bilateral geram spells estáveis. Arranjos assimétricos ainda são válidos, mas podem ser instáveis.",
+      "evaluator": "computeSymmetry",
+      "outcomes": {
+        "radial": "Estável (simetria radial).",
+        "bilateral": "Estável (simetria bilateral).",
+        "asymmetric": "Válido, porém potencialmente instável (assimétrico)."
+      },
+      "reference": "signs.md"
+    },
+    {
+      "id": "balance-direction",
+      "name": "Balanço define direção",
+      "severity": "info",
+      "description": "Se os signs não estão balanceados em tamanho/quantidade, o efeito manifesta na direção com mais (ou maiores) signs. Ex.: um column keystone desenhado mais longo desvia o jato para aquele lado (lição do Watershot).",
+      "evaluator": "computeDirectionalBias",
+      "reference": "signs.md (Column), Watershot Seal"
+    },
+    {
+      "id": "size-power",
+      "name": "Tamanho e potência",
+      "severity": "info",
+      "description": "Seals maiores são mais fortes; seals bem desenhados duram mais. Alguns spells (Water Bolt, Skysoaring) só são eficazes quando grandes.",
+      "evaluator": "computePower",
+      "factors": ["overallScale", "neatness", "linkCount"],
+      "reference": "magic.md"
+    }
+  ],
+
+  "mechanics": {
+    "reversedSigns": {
+      "name": "Signs Invertidos",
+      "description": "Virar um sign produz o efeito oposto. Dois spells idênticos exceto por inversão se cancelam.",
+      "examples": [
+        { "normal": "floating-expansion", "inverted": "spell-of-reduction", "effect": "crescer vs encolher" },
+        { "normal": "wall-breaker-seal", "inverted": "integration", "effect": "pulverizar vs reintegrar" }
+      ],
+      "engineEffect": "negateEffect(sign) quando inverted=true; cancelComposition(a,b) quando a e b são iguais e opostos.",
+      "caveat": "Exceção narrativa: a maldição scalewolf NÃO é revertida apenas invertendo (precisa de spell diferente). Modelar via flag 'reversibleByInversion'.",
+      "reference": "advanced-magic.md"
+    },
+    "linkedSpells": {
+      "name": "Spells Ligados",
+      "description": "Spells conectados por uma linha somam efeitos; se idênticos/similares, multiplicam potência. Vários spells pequenos ligados podem superar um grande.",
+      "engineEffect": "power *= linkBonus(count, similarity)",
+      "reference": "advanced-magic.md"
+    },
+    "spellToggling": {
+      "name": "Toggle por Ring",
+      "description": "Spell desenhado em duas metades em objetos separados; ativa quando as metades se tocam (ring fecha) e desativa ao separar.",
+      "examples": ["sylph-shoes-seal", "glowstone-path"],
+      "engineEffect": "active = (halfA.touches(halfB)) => ring.closed",
+      "reference": "advanced-magic.md"
+    },
+    "nestedGlyphs": {
+      "name": "Glyphs Aninhados",
+      "description": "Spells dentro de outros spells; efeitos combinam. Permite spells complexos (Serpent's Bed of Sand combina billowing-collection + wall-breaker + repetition-seal).",
+      "engineEffect": "composeEffects(outer, inner[]) — efeito resultante é a combinação ordenada.",
+      "reference": "advanced-magic.md"
+    },
+    "secondRing": {
+      "name": "Anel Duplo / Spell entre Anéis",
+      "description": "Um spell pode ser envolvido por um segundo ring, e o espaço entre os anéis preenchido com outro spell, combinando efeitos mesmo entre objetos diferentes.",
+      "reference": "ring.md"
+    }
+  },
+
+  "validationFlow": [
+    "1. Identificar o núcleo (sigil ou sign-central).",
+    "2. Coletar e classificar os signs por tipo, anel, ângulo, rotação, escala e inversão.",
+    "3. Calcular simetria, balanço direcional e potência.",
+    "4. Aplicar regras 'blocking' (ring fechado, núcleo presente) -> se falhar, spell INVÁLIDO/INATIVO.",
+    "5. Gerar a 'assinatura' da composição (recipe).",
+    "6. Comparar a assinatura com o banco de spells (spells.json) -> melhor match + score.",
+    "7. Se match >= threshold: retornar nome + efeito do spell. Senão: efeito derivado pela combinação sigil+signs (composição livre).",
+    "8. Anotar avisos (instabilidade, desbalanço, inversões, links)."
+  ],
+
+  "matching": {
+    "threshold": 0.7,
+    "weights": {
+      "sigilMatch": 0.4,
+      "signSetMatch": 0.4,
+      "symmetryMatch": 0.1,
+      "placementMatch": 0.1
+    },
+    "note": "signSetMatch usa similaridade de multiconjunto (tipos + contagens). placementMatch compara anéis/ângulos relativos. Inversões contam como variante (pode apontar para o spell invertido correspondente)."
+  }
+}

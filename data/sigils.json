@@ -1,0 +1,173 @@
+{
+  "$schema": "./schema/sigils.schema.json",
+  "version": "1.0.0",
+  "title": "Sigils (Elements)",
+  "description": "Sigil = central core of the glyph; defines the element. SVG in viewBox '-50 -50 100 100', stroke in currentColor, no fill unless noted. Shapes are consistent stylizations (not exact manga copies) intended for rendering and recognition.",
+  "renderDefaults": { "viewBox": "-50 -50 100 100", "stroke": "currentColor", "strokeWidth": 4, "fill": "none", "strokeLinecap": "round", "strokeLinejoin": "round" },
+
+  "sigils": [
+    {
+      "id": "fire",
+      "name": "Fire",
+      "category": "main",
+      "element": "fire",
+      "color": "#d64523",
+      "description": "Fire/heat element. Light is technically a variant of fire.",
+      "svgPath": "M0,-34 L20,-2 L10,-2 L24,22 L-24,22 L-10,-2 L-20,-2 Z",
+      "centerHint": "Flame/tree shape pointing upward.",
+      "variants": ["light"],
+      "reference": "sigils.md"
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "category": "main",
+      "element": "water",
+      "color": "#2f7fd6",
+      "description": "Water element.",
+      "svgPath": "M-6,-30 C-26,-22 -2,-10 -2,2 C-2,14 -26,20 -10,30 M6,-30 C26,-22 2,-10 2,2 C2,14 26,20 10,30",
+      "centerHint": "Interlocking 'S' curve / double wave.",
+      "variants": [],
+      "reference": "sigils.md, Watershot Seal"
+    },
+    {
+      "id": "earth",
+      "name": "Earth",
+      "category": "main",
+      "element": "earth",
+      "color": "#9c6b3f",
+      "description": "Earth/stone/sand element.",
+      "svgPath": "M-26,-14 L26,-14 M0,-14 L0,28 M-18,2 L0,20 L18,2 Z",
+      "centerHint": "Horizontal bar with a stem; inverted triangle below, with two side dots (·▽·).",
+      "satellites": [ { "shape": "dot", "angle": 0, "radius": 0.18 }, { "shape": "dot", "angle": 180, "radius": 0.18 } ],
+      "variants": ["crystal"],
+      "reference": "sigils.md, Wall Breaker Seal"
+    },
+    {
+      "id": "wind",
+      "name": "Wind",
+      "category": "main",
+      "element": "air",
+      "color": "#5aa86f",
+      "description": "Directs air. Basis of wind spells.",
+      "svgPath": "M-4,-30 C-22,-24 -22,-6 -4,-2 C14,2 14,20 -4,26 M4,-30 C20,-24 18,-8 6,-4",
+      "centerHint": "Elongated airflow spiral/'S'.",
+      "variants": ["wind_underfoot", "aeriforms", "whorling_wind"],
+      "reference": "sigils.md"
+    },
+    {
+      "id": "light",
+      "name": "Light",
+      "category": "main",
+      "element": "light",
+      "color": "#e0c94a",
+      "description": "Technically a variant of fire, distinct enough for its own category.",
+      "svgPath": "M0,-22 L0,22 M-22,0 L22,0 M-15,-15 L15,15 M15,-15 L-15,15 M-9,0 L0,-9 L9,0 L0,9 Z",
+      "centerHint": "8-ray asterisk with a small central diamond.",
+      "variants": [],
+      "reference": "sigils.md, Light Beam"
+    },
+
+    {
+      "id": "wind_underfoot",
+      "name": "Wind Underfoot",
+      "category": "variant",
+      "element": "air",
+      "parent": "wind",
+      "color": "#5aa86f",
+      "description": "Wind variant used in the Sylph Shoes (float above the ground).",
+      "svgPath": "M-2,-28 C-20,-22 -18,-6 -2,-2 C16,2 18,18 2,26 M2,-28 C18,-22 16,-8 4,-4 M-2,-2 a6,6 0 1,0 4,0",
+      "centerHint": "Interlocking double spiral (∞/S-within-S).",
+      "variants": [],
+      "reference": "Sylph Shoes Seal, Pegasus Carriage Spell"
+    },
+    {
+      "id": "aeriforms",
+      "name": "Aeriforms",
+      "category": "variant",
+      "element": "air",
+      "parent": "wind",
+      "color": "#7fc99a",
+      "description": "Maintains/creates air (vs. only directing it). Keeps the Great Hall's mist; used in 'make air'.",
+      "svgPath": "M-4,-28 C-22,-22 -22,-4 -4,0 C14,4 14,22 -4,28 M4,-26 C18,-20 16,-6 6,-2",
+      "centerHint": "Wind variant with an extra loop (sustains air).",
+      "variants": [],
+      "reference": "Make air"
+    },
+    {
+      "id": "whorling_wind",
+      "name": "Whorling Wind",
+      "category": "variant",
+      "element": "air",
+      "parent": "wind",
+      "color": "#5aa86f",
+      "description": "Wind variant similar but not identical; used in the Pegasus Carriage.",
+      "svgPath": "M0,-26 C-20,-20 -20,0 0,4 C18,8 18,24 2,28 M0,4 a5,5 0 1,0 2,0",
+      "centerHint": "Wind with a central whorl.",
+      "variants": [],
+      "reference": "Pegasus Carriage Spell"
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "category": "minor",
+      "element": "crystal",
+      "color": "#8a6fd6",
+      "description": "Crystal sigil. Can replace earth in ribbon spells (theoretical Crystal Ribbon) and generates shards (Crystal Shard).",
+      "svgPath": "M0,-30 L16,-10 L10,24 L-10,24 L-16,-10 Z M0,-30 L0,24 M-16,-10 L16,-10",
+      "centerHint": "Faceted crystal (elongated diamond with facets).",
+      "variants": [],
+      "reference": "Crystal Shard, Crystal Ribbon"
+    },
+
+    {
+      "id": "repetition_sigil",
+      "name": "Repetition (as sigil)",
+      "category": "sign-as-sigil",
+      "element": "time",
+      "color": "#b05ad6",
+      "description": "The repetition sign can occupy the center as a sigil (Repetition Seal family). Reverts objects to their original state.",
+      "svgPath": "M0,0 m0,-4 a4,4 0 1,1 -4,4 a8,8 0 1,1 8,8 a12,12 0 1,1 -12,-12 M-2,-26 L-2,26",
+      "centerHint": "Spiral with a vertical line through it.",
+      "aliasOfSign": "repetition",
+      "reference": "Repetition Seal, Serpent's Bed of Sand"
+    },
+    {
+      "id": "vision_sigil",
+      "name": "Vision (as sigil)",
+      "category": "sign-as-sigil",
+      "element": "light",
+      "color": "#c9a84a",
+      "description": "The vision sign at the center (needs no elemental sigil). Basis of Gathering Shadows and Cloak Spell.",
+      "svgPath": "M0,-24 L0,24 M-24,0 L24,0 M-17,-17 L17,17 M17,-17 L-17,17",
+      "centerHint": "8-pointed asterisk.",
+      "aliasOfSign": "vision",
+      "reference": "Gathering Shadows, Cloak Spell"
+    },
+    {
+      "id": "billowing_sigil",
+      "name": "Billowing (as sigil)",
+      "category": "sign-as-sigil",
+      "element": "transmutation",
+      "color": "#7a9ab0",
+      "description": "The billowing sign at the center converts material into a cloud (Billowing Collection).",
+      "svgPath": "M0,-6 C-14,-26 -30,-10 -14,-2 C-30,6 -14,26 0,6 C14,26 30,6 14,-2 C30,-10 14,-26 0,-6 Z",
+      "centerHint": "4-petal flower/clover.",
+      "aliasOfSign": "billowing",
+      "reference": "Billowing Collection"
+    },
+
+    {
+      "id": "unknown_sigil",
+      "name": "Unknown / Forbidden Sigil",
+      "category": "unknown",
+      "element": "unknown",
+      "color": "#777777",
+      "description": "Placeholder for unidentified sigils (Beast Repellent center, Forbidden Flames, Scalewolf Curse, etc.).",
+      "svgPath": "M-18,-18 L18,18 M18,-18 L-18,18 M0,-24 L0,24",
+      "centerHint": "Unknown — rendered as a neutral mark.",
+      "variants": [],
+      "reference": "spells.md (Unknown/Forbidden)"
+    }
+  ]
+}
