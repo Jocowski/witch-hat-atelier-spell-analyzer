@@ -2,13 +2,14 @@ import { useMemo, useState } from 'react'
 import Palette from './components/Palette.jsx'
 import GlyphCanvas from './components/GlyphCanvas.jsx'
 import ResultPanel from './components/ResultPanel.jsx'
+import InkPanel from './components/InkPanel.jsx'
 import { analyze } from './engine/analyze.js'
 import { canBeCore, isSigilType, getComponentDef } from './engine/data.js'
 
 let _id = 1
 const nextId = () => `c${_id++}`
 
-const EMPTY = { ring: { closed: false, doubled: false }, core: null, components: [], linkCount: 0 }
+const EMPTY = { ring: { closed: false, doubled: false }, core: null, components: [], linkCount: 0, dyes: [] }
 
 export default function App() {
   const [composition, setComposition] = useState(EMPTY)
@@ -77,6 +78,13 @@ export default function App() {
     setSelectedId(null)
   }
 
+  function toggleDye(id) {
+    setComposition((prev) => {
+      const dyes = prev.dyes || []
+      return { ...prev, dyes: dyes.includes(id) ? dyes.filter((d) => d !== id) : [...dyes, id] }
+    })
+  }
+
   function promoteToCore() {
     if (!selected || selected.role === 'sigil') return
     if (!canBeCore(selected.type)) return
@@ -134,6 +142,8 @@ export default function App() {
             </button>
             <button className="danger" onClick={() => { setComposition(EMPTY); setSelectedId(null) }}>Clear all</button>
           </div>
+
+          <InkPanel dyes={composition.dyes} onToggle={toggleDye} />
         </div>
 
         <ResultPanel result={result} />

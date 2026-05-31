@@ -1,6 +1,6 @@
 // Orquestra: validação -> geometria -> assinatura -> matching -> interpretação.
 import grammar from '../../data/grammar.json'
-import { RULES, SIGNS, SPELLS, SIGN_MAP, SIGIL_MAP, getComponentDef, isSigilType, signCanBeCenter } from './data.js'
+import { RULES, SIGNS, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef, isSigilType, signCanBeCenter } from './data.js'
 import { computeSymmetry, computeDirectionalBias, computePower, directionLabel } from './geometry.js'
 import { deduceWith } from './deduce.js'
 
@@ -152,6 +152,8 @@ export function analyze(composition) {
     match: null,
     freeform: null,
     deduction: composition.core ? deduce(composition) : null, // explicação por partes
+    dyes: (composition.dyes || []).map((id) => DYE_MAP[id]).filter(Boolean)
+      .map((d) => ({ id: d.id, name: d.name, effect: d.effect, kind: d.kind, color: d.color })),
   }
 
   // Mesmo com ring aberto/sem núcleo, ainda mostramos o melhor palpite de identidade.

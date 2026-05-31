@@ -64,9 +64,27 @@ function Deduction({ deduction, match }) {
   )
 }
 
+function InkEffects({ dyes }) {
+  if (!dyes?.length) return null
+  return (
+    <div className="spell-card ink">
+      <div className="name">Conjuring ink</div>
+      <div className="meta">{dyes.length} magical {dyes.length === 1 ? 'dye' : 'dyes'} mixed in</div>
+      <ul className="ink-effects">
+        {dyes.map((d) => (
+          <li key={d.id}>
+            <span className="swatch" style={{ background: d.color }} />
+            <b>{d.name}</b> — {d.effect}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function ResultPanel({ result }) {
   if (!result) return null
-  const { valid, active, issues, match, freeform, geometry, nearest, deduction } = result
+  const { valid, active, issues, match, freeform, geometry, nearest, deduction, dyes } = result
 
   let statusClass = 'invalid'
   let statusText = 'Invalid'
@@ -83,6 +101,8 @@ export default function ResultPanel({ result }) {
       {active
         ? <Deduction deduction={deduction} match={match} />
         : <Comparison match={match} freeform={freeform} nearest={nearest} />}
+
+      <InkEffects dyes={dyes} />
 
       {issues.length > 0 && (
         <ul className="issues">

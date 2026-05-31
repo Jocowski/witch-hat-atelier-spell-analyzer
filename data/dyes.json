@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "title": "Magical Dyes",
+  "description": "Substances mixed into conjuring ink to modify a drawn spell. Cosmetic or practical; see docs/magical-dye.md.",
+  "dyes": [
+    {
+      "id": "azuremoon_flower",
+      "name": "Azuremoon Flower",
+      "kind": "duration",
+      "color": "#5a78d6",
+      "effect": "Increases the duration of the drawn magic."
+    },
+    {
+      "id": "blood",
+      "name": "Blood",
+      "kind": "power",
+      "color": "#a01b1b",
+      "effect": "Greatly increases the power of the drawn spell."
+    },
+    {
+      "id": "blushing_bride_scales",
+      "name": "Blushing Bride Scales",
+      "kind": "visibility",
+      "color": "#e7b6c8",
+      "effect": "Makes the drawn seal invisible."
+    },
+    {
+      "id": "golden_blaze_wyrm_scales",
+      "name": "Golden Blaze Wyrm Scales",
+      "kind": "glow",
+      "color": "#e0c94a",
+      "effect": "Makes the ink glow in the dark."
+    },
+    {
+      "id": "roaming_scallop_shells",
+      "name": "Roaming Scallop Shells",
+      "kind": "durability",
+      "color": "#6fb0c9",
+      "effect": "Makes the drawn seal waterproof."
+    }
+  ]
+}
