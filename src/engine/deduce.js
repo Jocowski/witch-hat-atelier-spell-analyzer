@@ -52,6 +52,18 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   const el = g.elements[elementId] || g.elements.unknown
   const substance = el.substance
 
+  // Additional sigils (mixed spells): components with role 'sigil' beyond the core.
+  const extraSigils = (composition.components || []).filter((c) => c.role === 'sigil')
+  const extra = extraSigils.map((c) => {
+    const d = sigilMap[c.type] || signMap[c.type] || null
+    const e = (d && g.elements[d.element]) || g.elements.unknown
+    return { type: c.type, def: d, el: e }
+  })
+  // Combined substance phrase for the summary (deduped, core first).
+  const substancePhrase = joinList(
+    [substance, ...extra.map((x) => x.el.substance)].filter((v, i, a) => a.indexOf(v) === i),
+  )
+
   const groups = groupSigns(composition.components)
   const types = new Set(groups.map((x) => x.type))
 
@@ -71,17 +83,26 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     label: coreDef?.name || core.type,
     text: `Provides the substance: ${substance} (${el.raw}).`,
   })
+  // Extra sigils each add their own substance line.
+  for (const x of extra) {
+    breakdown.push({
+      part: x.type,
+      role: 'core',
+      label: x.def?.name || x.type,
+      text: `Also provides the substance: ${x.el.substance} (${x.el.raw}).`,
+    })
+  }
 
   // ----- Primary clause: transmute outranks form, else raw element -----
   let primary
   const transmute = byKind.transmute?.[0]
   const form = byKind.form?.[0]
   if (transmute) {
-    primary = `The ${substance} ${opVerb(transmute.op, transmute.inverted)}`
+    primary = `The ${substancePhrase} ${opVerb(transmute.op, transmute.inverted)}`
   } else if (form) {
-    primary = `The ${substance} ${opVerb(form.op, form.inverted)}`
+    primary = `The ${substancePhrase} ${opVerb(form.op, form.inverted)}`
   } else {
-    primary = `The ${substance} ${el.raw}`
+    primary = `The ${substancePhrase} ${el.raw}`
   }
 
   // ----- Direction -----
@@ -124,7 +145,7 @@ export function deduceWith(g, sigilMap, signMap, composition) {
         part: item.type,
         role: kind,
         label: (signMap[item.type]?.name || item.type) + (item.inverted ? ' (inverted)' : '') + (item.count > 1 ? ` ×${item.count}` : ''),
-        text: capitalize(`the ${substance} ${opVerb(item.op, item.inverted)}.`),
+        text: capitalize(`the ${substancePhrase} ${opVerb(item.op, item.inverted)}.`),
       })
     }
   }

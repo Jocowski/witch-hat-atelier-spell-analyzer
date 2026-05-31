@@ -107,6 +107,15 @@ body {
 }
 .canvas-toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 
+.spell-name {
+  width: 100%; box-sizing: border-box; margin-bottom: 10px;
+  background: transparent; border: none; border-bottom: 1px dashed var(--line);
+  color: var(--parchment); font-size: 1.15rem; font-weight: 600; text-align: center;
+  padding: 4px 6px;
+}
+.spell-name::placeholder { color: var(--ink-dim); font-weight: 400; font-style: italic; }
+.spell-name:focus { outline: none; border-bottom-color: var(--accent); }
+
 /* ---------- Conjuring Ink (magical dyes) ---------- */
 .ink-panel {
   width: 100%; box-sizing: border-box; margin-top: 12px;
@@ -136,6 +145,32 @@ button:hover { border-color: var(--accent); }
 button.primary { background: var(--accent); color: #1b1814; border-color: var(--accent); font-weight: 600; }
 button.danger:hover { border-color: var(--err); color: var(--err); }
 button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ---------- Toast + Import modal ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+  background: var(--panel-2); color: var(--ink); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 9px 16px; font-size: 0.85rem; z-index: 50;
+  box-shadow: 0 6px 24px rgba(0,0,0,.4);
+}
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  display: flex; align-items: center; justify-content: center; z-index: 60; padding: 20px;
+}
+.modal {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px; width: min(560px, 92vw); box-shadow: 0 10px 40px rgba(0,0,0,.5);
+}
+.modal h3 { margin: 0 0 4px; }
+.modal .hint { margin: 0 0 10px; }
+.modal textarea {
+  width: 100%; box-sizing: border-box; background: var(--panel-2); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-family: ui-monospace, monospace;
+  font-size: 0.8rem; resize: vertical;
+}
+.modal textarea:focus { outline: none; border-color: var(--accent); }
+.modal-error { color: var(--err); font-size: 0.8rem; margin-top: 8px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 
 .selected-toolbar {
   display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
