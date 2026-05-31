@@ -80,6 +80,60 @@ export function computeDirectionalBias(components) {
   return { biased: magnitude > 0.25, angle, magnitude }
 }
 
+// Diferença angular mínima entre dois ângulos (0..180).
+function angleDelta(a, b) {
+  let d = Math.abs(((a - b) % 360) + 360) % 360
+  if (d > 180) d = 360 - d
+  return d
+}
+
+// Direção para a qual um sign "aponta" (0 = norte, horário), a partir da sua própria
+// rotação. Se for invertível e estiver invertido, a frente vira 180°.
+export function signFacing(c, invertible = false) {
+  let f = (((c.rotation || 0) % 360) + 360) % 360
+  if (c.inverted && invertible) f = (f + 180) % 360
+  return f
+}
+
+// AIM por ORIENTAÇÃO: resultante dos vetores de "frente" (rotação) dos signs direcionais.
+// Diferente de computeDirectionalBias, que usa a POSIÇÃO (centro de massa) — este lê para
+// onde os signs apontam. { aimed, angle, magnitude } (magnitude 0 = frentes se cancelam).
+export function computeOrientationAim(signs, invertibleOf = () => false) {
+  if (!signs.length) return { aimed: false, angle: 0, magnitude: 0 }
+  let vx = 0
+  let vy = 0
+  for (const c of signs) {
+    const f = signFacing(c, invertibleOf(c.type))
+    const rad = (f * Math.PI) / 180
+    vx += Math.sin(rad)
+    vy += -Math.cos(rad)
+  }
+  const magnitude = Math.hypot(vx, vy) / signs.length
+  let angle = (Math.atan2(vx, -vy) * 180) / Math.PI
+  if (angle < 0) angle += 360
+  return { aimed: magnitude > 0.34, angle, magnitude }
+}
+
+// Classifica um grupo de signs de "direção" (region/pull) nas 4 configurações canônicas
+// (signs.md, Region): todos na mesma direção => dispara para lá; todos para dentro =>
+// contido no ring; todos para fora => fora do ring; opostos (frentes se cancelam) =>
+// só na linha do ring. Retorna { mode, angle? } ou null.
+export function classifyRegion(signs, invertibleOf = () => true, tol = 35) {
+  if (!signs.length) return null
+  const items = signs.map((c) => ({
+    facing: signFacing(c, invertibleOf(c.type)),
+    pos: toPolar(c.x, c.y).angle,
+  }))
+  const aim = computeOrientationAim(signs, invertibleOf)
+  const isInward = items.every((it) => angleDelta(it.facing, (it.pos + 180) % 360) <= tol)
+  const isOutward = items.every((it) => angleDelta(it.facing, it.pos) <= tol)
+  if (aim.aimed && !isInward && !isOutward) return { mode: 'aligned', angle: aim.angle }
+  if (isInward) return { mode: 'inward' }
+  if (isOutward) return { mode: 'outward' }
+  if (!aim.aimed) return { mode: 'opposed' }
+  return { mode: 'aligned', angle: aim.angle }
+}
+
 // Potência relativa: escala média dos componentes × nitidez (assumida) × bônus de link.
 export function computePower(components, { neatness = 1, linkCount = 0 } = {}) {
   const all = components.filter((c) => c.role === 'sign' || c.role === 'sigil')

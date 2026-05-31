@@ -3,7 +3,7 @@
 // dyes (tinta) · outras informações geométricas. Tudo derivado das docs/.
 import grammar from '../../data/grammar.json'
 import { RULES, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef, isSigilType, signCanBeCenter } from './data.js'
-import { computeSymmetry, computeDirectionalBias, computePower, directionLabel } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, computeOrientationAim, classifyRegion, computePower, directionLabel } from './geometry.js'
 import { deduceWith } from './deduce.js'
 
 const deduce = (composition) => deduceWith(grammar, SIGIL_MAP, SIGN_MAP, composition)
@@ -83,9 +83,31 @@ export function analyze(composition) {
 
   // ----- Geometria -----
   const symmetry = computeSymmetry(components)
-  const bias = computeDirectionalBias(components)
   const power = computePower(components, { linkCount: comp.linkCount || 0 })
   const tilted = signComps.some((c) => (((c.rotation || 0) % 360) + 360) % 360 !== 0)
+
+  // AIM (para onde a magia vai) vem da ORIENTAÇÃO dos signs direcionais; BALANCE (desbalanço
+  // posicional do column) é uma questão de estabilidade/desvio, não a direção em si.
+  const invertibleOf = (t) => !!SIGN_MAP[t]?.invertible
+  const aimSigns = signComps.filter((c) => grammar.operators[c.type]?.kind === 'direction')
+  const region = aimSigns.length ? classifyRegion(aimSigns, invertibleOf) : null
+  const formDirSigns = signComps.filter((c) => {
+    const op = grammar.operators[c.type]
+    return op?.kind === 'form' && op.directional
+  })
+  const formBalance = computeDirectionalBias(formDirSigns)
+  const formBiased = formBalance.biased && formDirSigns.length >= 2
+  let aimLabel = null
+  if (region) {
+    aimLabel = region.mode === 'aligned' ? directionLabel(region.angle)
+      : region.mode === 'inward' ? 'contained within the ring'
+      : region.mode === 'outward' ? 'outside the ring'
+      : 'along the ring'
+  } else if (formBiased) {
+    aimLabel = directionLabel(formBalance.angle)
+  } else if (signComps.some((c) => grammar.operators[c.type]?.directional)) {
+    aimLabel = 'up'
+  }
 
   // ----- Validade (regras das docs) -----
   const issues = []
@@ -97,7 +119,8 @@ export function analyze(composition) {
     if (symmetry === 'asymmetric') issues.push({ severity: 'warning', message: 'Asymmetric signs — the spell may be unstable. At least bilateral symmetry is recommended for stability.' })
     else issues.push({ severity: 'info', message: `Stable: ${symmetry} symmetry.` })
   }
-  if (bias.biased && signComps.length >= 2) issues.push({ severity: 'info', message: `Unbalanced signs: the effect will skew ${directionLabel(bias.angle)} (bigger/more signs pull the manifestation their way).` })
+  if (formBiased) issues.push({ severity: 'info', message: `Unbalanced projection signs: the beam skews ${directionLabel(formBalance.angle)} (bigger/more column signs pull it that way).` })
+  else if (aimLabel) issues.push({ severity: 'info', message: `Aim: the effect is directed ${aimLabel} (from the orientation of the directional signs).` })
   if (tilted) issues.push({ severity: 'info', message: 'Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach).' })
 
   const valid = hasCore
@@ -161,7 +184,8 @@ export function analyze(composition) {
   const analysis = {
     symmetry,
     stability: grammar.stability[symmetry] || grammar.stability.none,
-    balance: bias.biased ? `skewed ${directionLabel(bias.angle)}` : 'balanced',
+    balance: formBiased ? `skewed ${directionLabel(formBalance.angle)}` : 'balanced',
+    aim: aimLabel || 'undirected',
     power,
     powerLabel,
     tilted,

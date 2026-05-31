@@ -5,7 +5,7 @@
 // deduceWith(...) is pure (grammar + maps injected) so it can be unit-tested in
 // plain Node. The app binds the real JSON via deduce() in engine/analyze.js.
 // NOTE: keep this module free of JSON imports so Node can load it without import attributes.
-import { computeSymmetry, computeDirectionalBias, directionLabel } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, computeOrientationAim, classifyRegion, directionLabel } from './geometry.js'
 
 const KIND_ORDER = ['transmute', 'form', 'motion', 'direction', 'target', 'power', 'special', 'support', 'none']
 
@@ -105,18 +105,41 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     primary = `The ${substancePhrase} ${el.raw}`
   }
 
-  // ----- Direction -----
-  const bias = computeDirectionalBias(composition.components)
-  const signCount = composition.components.filter((c) => c.role === 'sign').length
+  // ----- Direction: AIM por orientação (region/pull) supera o BALANÇO posicional (column) -----
+  // O aim verdadeiro vem de para onde os signs APONTAM (rotação/arranjo), não do centro de
+  // massa. O balanço posicional só inclina o jato de um column (lição do Watershot).
+  const signComps = composition.components.filter((c) => c.role === 'sign')
+  const invertibleOf = (t) => !!signMap[t]?.invertible
+
+  // region/pull — direção controlada por orientação/arranjo (kind 'direction').
+  const aimSigns = signComps.filter((c) => g.operators[c.type]?.kind === 'direction')
+  const region = aimSigns.length ? classifyRegion(aimSigns, invertibleOf) : null
+
+  // column/dispersion — FORM direcional; desbalanço de POSIÇÃO desvia o jato.
+  const formDirSigns = signComps.filter((c) => {
+    const op = g.operators[c.type]
+    return op?.kind === 'form' && op.directional
+  })
+  const formBalance = computeDirectionalBias(formDirSigns)
+  const formBiased = formBalance.biased && formDirSigns.length >= 2
+
   let directionClause = ''
-  const directionalForm = transmute ? null : form
-  // Só reportar "skew" com >=2 signs (um único sign não desbalanceia de forma significativa).
-  if (bias.biased && signCount >= 2) {
-    directionClause = `, skewed toward ${directionLabel(bias.angle)} (unbalanced signs)`
-  } else if (byKind.motion?.some((m) => m.op.directional) || directionalForm?.op?.directional) {
-    directionClause = `, directed upward`
-  } else if (directionalForm?.op?.defaultDirection === 'outward') {
-    directionClause = `, spreading outward`
+  let aimLabel = 'balanced'
+  if (!transmute) {
+    if (region) {
+      if (region.mode === 'aligned') { aimLabel = directionLabel(region.angle); directionClause = `, fired ${aimLabel}` }
+      else if (region.mode === 'inward') { aimLabel = 'contained'; directionClause = `, contained within the ring` }
+      else if (region.mode === 'outward') { aimLabel = 'outward'; directionClause = `, manifesting outside the ring` }
+      else { aimLabel = 'on the ring'; directionClause = `, emerging only along the ring` }
+      if (region.mode === 'aligned' && formBiased) directionClause += ` (pulled toward ${directionLabel(formBalance.angle)} by uneven signs)`
+    } else if (form?.op?.directional) {
+      if (formBiased) { aimLabel = directionLabel(formBalance.angle); directionClause = `, skewed toward ${aimLabel} (unbalanced signs)` }
+      else { aimLabel = 'up'; directionClause = `, directed upward` }
+    } else if (byKind.motion?.some((m) => m.op.directional)) {
+      aimLabel = 'up'; directionClause = `, directed upward`
+    } else if (form?.op?.defaultDirection === 'outward') {
+      aimLabel = 'outward'; directionClause = `, spreading outward`
+    }
   }
 
   // ----- Motion (lift/float/dart) -----
@@ -176,7 +199,7 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     warnings,
     stability,
     power: powerLabel,
-    direction: bias.biased ? directionLabel(bias.angle) : (directionClause ? directionClause.replace(/^,\s*/, '') : 'balanced'),
+    direction: aimLabel,
   }
 }
 

@@ -91,6 +91,41 @@ test('breakdown lists the core and each sign', () => {
   assert.ok(roles.includes('transmute')) // crush
 })
 
+test('fire + column + forward-pointing region walls => fired up, not down (Flame Shot Seal)', () => {
+  // Regression: the fire core sits low and the region walls hang slightly low, so the
+  // positional centroid points DOWN — but the signs all point north, so the aim is UP.
+  const walls = [[55, -35], [58, 60], [56, 35], [-67, 32], [-66, 12], [-65, -11], [-70, -33], [52, -11], [54, 14], [-66, 55]]
+  const components = [
+    { id: 'col', type: 'column', role: 'sign', x: 0, y: 0, rotation: 0, scale: 2.5, inverted: false },
+    ...walls.map(([x, y], i) => ({ id: `r${i}`, type: 'direction', role: 'sign', x, y, rotation: 0, scale: 1, inverted: false })),
+  ]
+  const r = deduceWith(grammar, sigilMap, signMap, {
+    ring: { closed: true },
+    core: { id: 'c', type: 'fire', x: 0, y: 48, rotation: 0, scale: 1.4, inverted: false },
+    components,
+  })
+  assert.match(r.summary, /column or beam/i)
+  assert.match(r.summary, /fired up/i)
+  assert.doesNotMatch(r.summary, /down/i)
+  assert.equal(r.direction, 'up')
+})
+
+test('region signs all pointing inward => contained within the ring', () => {
+  const components = [0, 90, 180, 270].map((a, i) => {
+    const { x, y } = toCartesian(a, 0.6)
+    return { id: `r${i}`, type: 'direction', role: 'sign', x, y, rotation: (a + 180) % 360, scale: 1, inverted: false }
+  })
+  const r = deduceWith(grammar, sigilMap, signMap, { ring: { closed: true }, core: { id: 'c', type: 'water' }, components })
+  assert.match(r.summary, /contained within the ring/i)
+})
+
+test('opposed region signs => magic emerges only along the ring', () => {
+  const { x, y } = toCartesian(90, 0.6)
+  const components = [0, 0, 180, 180].map((rot, i) => ({ id: `r${i}`, type: 'direction', role: 'sign', x, y, rotation: rot, scale: 1, inverted: false }))
+  const r = deduceWith(grammar, sigilMap, signMap, { ring: { closed: true }, core: { id: 'c', type: 'water' }, components })
+  assert.match(r.summary, /along the ring/i)
+})
+
 test('every sign id has a grammar operator (coverage)', () => {
   for (const s of require('../data/signs.json').signs) {
     assert.ok(grammar.operators[s.id], `missing grammar operator for sign "${s.id}"`)
