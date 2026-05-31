@@ -4,7 +4,7 @@ import GlyphCanvas from './components/GlyphCanvas.jsx'
 import ResultPanel from './components/ResultPanel.jsx'
 import InkPanel from './components/InkPanel.jsx'
 import { analyze } from './engine/analyze.js'
-import { canBeCore, getComponentDef } from './engine/data.js'
+import { canBeCore, getComponentDef, DYE_MAP, DYES } from './engine/data.js'
 
 let _id = 1
 const nextId = () => `c${_id++}`
@@ -12,15 +12,35 @@ const nextId = () => `c${_id++}`
 const EMPTY = { ring: { closed: false, doubled: false, size: 'medium' }, core: null, components: [], linkCount: 0, dyes: [], name: '' }
 const SIGIL = { rotation: 0, scale: 1, inverted: false }
 
+// Reverse lookup: ink color (hex) -> dye id, so we can derive the dyes used from the
+// colors stamped onto parts at draw time.
+const COLOR_TO_DYE = Object.fromEntries(DYES.map((d) => [d.color.toLowerCase(), d.id]))
+
 export default function App() {
   const [composition, setComposition] = useState(EMPTY)
   const [selectedId, setSelectedId] = useState(null)
+  const [activeInk, setActiveInk] = useState(null) // current "pen": a dye id, or null = default ink
   const [notice, setNotice] = useState(null)
   const [importOpen, setImportOpen] = useState(false)
   const [importText, setImportText] = useState('')
   const [importError, setImportError] = useState(null)
 
-  const result = useMemo(() => analyze(composition), [composition])
+  // The active ink colors NEW parts as they're drawn. Each part remembers its own color.
+  const inkColor = activeInk ? DYE_MAP[activeInk]?.color : undefined
+  const withInk = (part) => (inkColor ? { ...part, color: inkColor } : part)
+
+  // Dyes used = the set of inks actually drawn with (matched by color). Falls back to the
+  // composition's own dyes array for older/imported spells whose parts carry no color.
+  const usedDyes = useMemo(() => {
+    const ids = new Set()
+    for (const p of [composition.core, ...composition.components]) {
+      const id = p?.color && COLOR_TO_DYE[p.color.toLowerCase()]
+      if (id) ids.add(id)
+    }
+    return ids.size ? [...ids] : (composition.dyes || [])
+  }, [composition])
+
+  const result = useMemo(() => analyze({ ...composition, dyes: usedDyes }), [composition, usedDyes])
 
   const isCore = composition.core?.id === selectedId
   const selected = useMemo(() => {
@@ -35,11 +55,9 @@ export default function App() {
     flash._t = window.setTimeout(() => setNotice(null), 2500)
   }
 
-  function toggleDye(id) {
-    setComposition((prev) => {
-      const dyes = prev.dyes || []
-      return { ...prev, dyes: dyes.includes(id) ? dyes.filter((d) => d !== id) : [...dyes, id] }
-    })
+  // Select an ink (pen). Clicking the active one deselects it (back to default ink).
+  function selectInk(id) {
+    setActiveInk((cur) => (cur === id ? null : id))
   }
 
   // Conta sigils extra (componentes role 'sigil', sem o core) p/ posicionar novos.
@@ -56,13 +74,13 @@ export default function App() {
     const id = nextId()
     setComposition((prev) => {
       if (kind === 'sigil') {
-        if (!prev.core) return { ...prev, core: { id, type, x: 0, y: 0, ...SIGIL } }
+        if (!prev.core) return { ...prev, core: withInk({ id, type, x: 0, y: 0, ...SIGIL }) }
         const pos = placeExtraSigil(prev, x, y)
-        return { ...prev, components: [...prev.components, { id, type, role: 'sigil', ...pos, ...SIGIL }] }
+        return { ...prev, components: [...prev.components, withInk({ id, type, role: 'sigil', ...pos, ...SIGIL })] }
       }
       const px = x ?? 0
       const py = y ?? -150
-      return { ...prev, components: [...prev.components, { id, type, role: 'sign', x: px, y: py, ...SIGIL }] }
+      return { ...prev, components: [...prev.components, withInk({ id, type, role: 'sign', x: px, y: py, ...SIGIL })] }
     })
     setSelectedId(id)
   }
@@ -79,7 +97,7 @@ export default function App() {
       setSelectedId(id)
       return {
         ...prev,
-        components: [...prev.components, { id, type, role: 'sign', x: r * Math.sin(rad), y: -r * Math.cos(rad), ...SIGIL }],
+        components: [...prev.components, withInk({ id, type, role: 'sign', x: r * Math.sin(rad), y: -r * Math.cos(rad), ...SIGIL })],
       }
     })
   }
@@ -150,8 +168,9 @@ export default function App() {
 
   // ---------- Export / Import / Copy image ----------
   function exportObject() {
-    const { ring, core, components, linkCount, dyes, name } = composition
-    return { format: 'wha-spell@1', name: name || '', ring, core, components, linkCount: linkCount || 0, dyes: dyes || [] }
+    const { ring, core, components, linkCount, name } = composition
+    // Parts carry their own ink color; dyes are derived from the inks actually used.
+    return { format: 'wha-spell@1', name: name || '', ring, core, components, linkCount: linkCount || 0, dyes: usedDyes }
   }
 
   async function copyJSON() {
@@ -309,7 +328,7 @@ export default function App() {
             <button className="danger" onClick={() => { setComposition(EMPTY); setSelectedId(null) }}>Clear all</button>
           </div>
 
-          <InkPanel dyes={composition.dyes} onToggle={toggleDye} />
+          <InkPanel activeInk={activeInk} onSelect={selectInk} />
         </div>
 
         <ResultPanel result={result} />

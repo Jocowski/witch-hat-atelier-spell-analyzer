@@ -22,7 +22,8 @@ function ComponentGlyph({ comp, selected, onPointerDown }) {
   const s = size / 100 // svgPath está em -50..50
   // translate -> rotate -> scale; inversão = espelho no eixo vertical.
   const t = `translate(${comp.x} ${comp.y}) rotate(${comp.rotation || 0}) scale(${s} ${comp.inverted ? -s : s})`
-  const color = comp.role === 'sigil' ? '#c0521f' : '#3a2a16'
+  // Ink color stamped at draw time wins; otherwise the default per-role color.
+  const color = comp.color || (comp.role === 'sigil' ? '#c0521f' : '#3a2a16')
 
   return (
     <g
