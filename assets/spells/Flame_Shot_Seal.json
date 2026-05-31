@@ -1,0 +1,132 @@
+{
+  "format": "wha-spell@1",
+  "name": "Flame Shot Seal",
+  "ring": {
+    "closed": true,
+    "doubled": false,
+    "size": "small"
+  },
+  "core": {
+    "id": "c9",
+    "type": "fire",
+    "x": 0,
+    "y": 48.16053295135498,
+    "rotation": 0,
+    "scale": 1.4499999999999997,
+    "inverted": false
+  },
+  "components": [
+    {
+      "id": "c11",
+      "type": "column",
+      "role": "sign",
+      "x": 0,
+      "y": 0.5016736984252361,
+      "rotation": 0,
+      "scale": 2.5,
+      "inverted": false
+    },
+    {
+      "id": "c13",
+      "type": "direction",
+      "role": "sign",
+      "x": 52.646291799355254,
+      "y": -36.87291336059572,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c15",
+      "type": "direction",
+      "role": "sign",
+      "x": 58.666345662880644,
+      "y": 62.9598693847656,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c17",
+      "type": "direction",
+      "role": "sign",
+      "x": 56.18729090690615,
+      "y": 35.61872863769531,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c19",
+      "type": "direction",
+      "role": "sign",
+      "x": -67.6964512537009,
+      "y": 32.85953140258796,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c21",
+      "type": "direction",
+      "role": "sign",
+      "x": -66.693105764199,
+      "y": 12.290966987609849,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c23",
+      "type": "direction",
+      "role": "sign",
+      "x": -65.2173923254013,
+      "y": -11.538460731506348,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c25",
+      "type": "direction",
+      "role": "sign",
+      "x": -70.76508133907248,
+      "y": -33.86287689208986,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c27",
+      "type": "direction",
+      "role": "sign",
+      "x": 52.64627654056619,
+      "y": -11.287621498107939,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c29",
+      "type": "direction",
+      "role": "sign",
+      "x": 54.1806026697159,
+      "y": 14.548492431640625,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c31",
+      "type": "direction",
+      "role": "sign",
+      "x": -66.69310576419895,
+      "y": 55.93645477294929,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    }
+  ],
+  "linkCount": 0,
+  "dyes": []
+}

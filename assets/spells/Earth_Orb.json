@@ -1,0 +1,16 @@
+{
+  "format": "wha-spell@1",
+  "name": "Earth Orb",
+  "ring": { "closed": true, "doubled": false, "size": "medium" },
+  "core": { "id": "c8", "type": "earth", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false },
+  "components": [
+    { "id": "c2", "type": "orb", "role": "sign", "x": -62.20735692977905, "y": -97.82608795166016, "rotation": 330, "scale": 1, "inverted": false },
+    { "id": "c3", "type": "orb", "role": "sign", "x": 73.71651656131814, "y": -91.0535125732422, "rotation": 30, "scale": 1, "inverted": false },
+    { "id": "c4", "type": "orb", "role": "sign", "x": 69.7031498620994, "y": 97.07357788085935, "rotation": 330, "scale": 1, "inverted": false },
+    { "id": "c5", "type": "orb", "role": "sign", "x": -74.24749135971068, "y": 100.83612060546875, "rotation": 30, "scale": 1, "inverted": false },
+    { "id": "c6", "type": "column", "role": "sign", "x": -108.83357436161106, "y": -3.260871171951223, "rotation": 90, "scale": 1, "inverted": false },
+    { "id": "c7", "type": "column", "role": "sign", "x": 108.89217179317404, "y": 0.25083780288689184, "rotation": 270, "scale": 1, "inverted": false }
+  ],
+  "linkCount": 0,
+  "dyes": []
+}
