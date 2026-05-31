@@ -9,7 +9,7 @@ import { canBeCore, getComponentDef } from './engine/data.js'
 let _id = 1
 const nextId = () => `c${_id++}`
 
-const EMPTY = { ring: { closed: false, doubled: false }, core: null, components: [], linkCount: 0, dyes: [], name: '' }
+const EMPTY = { ring: { closed: false, doubled: false, size: 'medium' }, core: null, components: [], linkCount: 0, dyes: [], name: '' }
 const SIGIL = { rotation: 0, scale: 1, inverted: false }
 
 export default function App() {
@@ -267,6 +267,19 @@ export default function App() {
               <button className="danger" onClick={deleteSelected}>delete</button>
             </div>
           )}
+
+          <div className="ring-size" role="group" aria-label="Ring size">
+            <span className="rs-label">Ring size</span>
+            {['small', 'medium', 'big'].map((sz) => (
+              <button
+                key={sz}
+                className={`rs-btn ${(composition.ring.size || 'medium') === sz ? 'on' : ''}`}
+                onClick={() => setComposition((p) => ({ ...p, ring: { ...p.ring, size: sz } }))}
+              >
+                {sz}
+              </button>
+            ))}
+          </div>
 
           <div className="canvas-toolbar">
             <button

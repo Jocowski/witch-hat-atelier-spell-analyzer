@@ -1,8 +1,9 @@
 import { useRef } from 'react'
 import { getComponentDef } from '../engine/data.js'
-import { CANVAS_RADIUS } from '../engine/geometry.js'
 
 const VIEW = 600 // viewBox 600x600, origem central via -300
+// Raio visual do ring por tamanho escolhido (não afeta a geometria/análise).
+export const RING_RADII = { small: 150, medium: 200, big: 260 }
 
 // Converte coords de clientes -> coords do SVG (origem no centro).
 function clientToLocal(svg, clientX, clientY) {
@@ -49,6 +50,8 @@ function ComponentGlyph({ comp, selected, onPointerDown }) {
 export default function GlyphCanvas({ composition, selectedId, onSelect, onMove, onDropAdd }) {
   const svgRef = useRef(null)
   const dragRef = useRef(null)
+
+  const R = RING_RADII[composition.ring?.size] ?? RING_RADII.medium
 
   const allComponents = [
     ...(composition.core ? [{ ...composition.core, role: 'sigil' }] : []),
@@ -101,19 +104,19 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
       onDrop={handleDrop}
     >
       {/* Anéis-guia */}
-      <circle cx="0" cy="0" r={CANVAS_RADIUS * 0.45} fill="none" stroke="rgba(90,60,30,.18)" strokeWidth="1" strokeDasharray="3 5" />
-      <circle cx="0" cy="0" r={CANVAS_RADIUS * 0.75} fill="none" stroke="rgba(90,60,30,.18)" strokeWidth="1" strokeDasharray="3 5" />
+      <circle cx="0" cy="0" r={R * 0.45} fill="none" stroke="rgba(90,60,30,.18)" strokeWidth="1" strokeDasharray="3 5" />
+      <circle cx="0" cy="0" r={R * 0.75} fill="none" stroke="rgba(90,60,30,.18)" strokeWidth="1" strokeDasharray="3 5" />
       {/* eixos */}
-      <line x1="0" y1={-CANVAS_RADIUS} x2="0" y2={CANVAS_RADIUS} stroke="rgba(90,60,30,.1)" />
-      <line x1={-CANVAS_RADIUS} y1="0" x2={CANVAS_RADIUS} y2="0" stroke="rgba(90,60,30,.1)" />
+      <line x1="0" y1={-R} x2="0" y2={R} stroke="rgba(90,60,30,.1)" />
+      <line x1={-R} y1="0" x2={R} y2="0" stroke="rgba(90,60,30,.1)" />
 
       {/* Ring externo (ativação) */}
       {composition.ring.closed ? (
-        <circle cx="0" cy="0" r={CANVAS_RADIUS} fill="none" stroke="#5a3b1e" strokeWidth="6" />
+        <circle cx="0" cy="0" r={R} fill="none" stroke="#5a3b1e" strokeWidth="6" />
       ) : (
         // ring aberto: arco com gap no topo
         <path
-          d={describeArc(0, 0, CANVAS_RADIUS, 18, 342)}
+          d={describeArc(0, 0, R, 18, 342)}
           fill="none"
           stroke="#9c7a4a"
           strokeWidth="6"
@@ -121,7 +124,7 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
         />
       )}
       {!composition.ring.closed && (
-        <text x="0" y={-CANVAS_RADIUS - 12} textAnchor="middle" fontSize="13" fill="#9c7a4a">ring open — inactive</text>
+        <text x="0" y={-R - 12} textAnchor="middle" fontSize="13" fill="#9c7a4a">ring open — inactive</text>
       )}
 
       {/* marca central se sem núcleo */}

@@ -1,73 +1,42 @@
-// Orquestra: validação -> geometria -> assinatura -> matching -> interpretação.
+// Orquestra a análise completa de uma composição, em seções:
+// validade (regras) · sigils · signs · efeito deduzido · spells similares ·
+// dyes (tinta) · outras informações geométricas. Tudo derivado das docs/.
 import grammar from '../../data/grammar.json'
-import { RULES, SIGNS, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef, isSigilType, signCanBeCenter } from './data.js'
+import { RULES, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef, isSigilType, signCanBeCenter } from './data.js'
 import { computeSymmetry, computeDirectionalBias, computePower, directionLabel } from './geometry.js'
 import { deduceWith } from './deduce.js'
 
-// Bind the grammar + maps for the app.
 const deduce = (composition) => deduceWith(grammar, SIGIL_MAP, SIGN_MAP, composition)
 
-// ---------- 1. Validação (regras blocking/warning) ----------
-export function validate(composition) {
-  const issues = []
-  const { ring, core, components } = composition
-  const signs = components.filter((c) => c.role === 'sign')
-
-  // blocking: core present
-  const hasCore = core && (isSigilType(core.type) || signCanBeCenter(core.type))
-  if (!hasCore) {
-    issues.push({ id: 'has-center', severity: 'blocking', message: 'Glyph has no core: place a sigil or a sign that can occupy the center.' })
-  }
-
-  // blocking: ring closed
-  if (!ring?.closed) {
-    issues.push({ id: 'ring-closed', severity: 'blocking', message: 'Ring open: spell prepared but INACTIVE. Close the ring to activate.' })
-  }
-
-  // warning: at least one sign
-  if (signs.length === 0) {
-    issues.push({ id: 'has-signs', severity: 'warning', message: 'No signs around the core: the element has no defined form.' })
-  }
-
-  return issues
-}
-
-// ---------- 2. Assinatura (recipe) da composição ----------
+// ---------- Assinatura (recipe) da composição, p/ o matcher ----------
 export function buildSignature(composition) {
   const { core, components } = composition
-  const signs = components.filter((c) => c.role === 'sign')
-
+  const signs = (components || []).filter((c) => c.role === 'sign')
   const multiset = {}
   for (const s of signs) {
     const key = s.inverted ? `${s.type}!inv` : s.type
     multiset[key] = (multiset[key] || 0) + 1
   }
-
   return {
     core: core?.type ?? null,
     coreElement: core ? getComponentDef(core.type)?.element ?? null : null,
     signMultiset: multiset,
     signCount: signs.length,
-    symmetry: computeSymmetry(components),
+    symmetry: computeSymmetry(components || []),
   }
 }
 
-// ---------- 3. Matching contra spells.json ----------
+// ---------- Matching contra spells.json ----------
 function multisetSimilarity(a, b) {
-  // Jaccard ponderado sobre contagens (ignora marca !inv vs base parcialmente).
   const keys = new Set([...Object.keys(a), ...Object.keys(b)])
   if (keys.size === 0) return 1
-  let inter = 0
-  let union = 0
+  let inter = 0, union = 0
   for (const k of keys) {
-    const av = a[k] || 0
-    const bv = b[k] || 0
-    inter += Math.min(av, bv)
-    union += Math.max(av, bv)
+    inter += Math.min(a[k] || 0, b[k] || 0)
+    union += Math.max(a[k] || 0, b[k] || 0)
   }
   return union === 0 ? 1 : inter / union
 }
-
 function spellSignMultiset(spell) {
   const m = {}
   for (const s of spell.composition?.signs ?? []) {
@@ -76,24 +45,21 @@ function spellSignMultiset(spell) {
   }
   return m
 }
-
+function sameElement(coreA, coreB) {
+  const a = getComponentDef(coreA)?.element
+  const b = getComponentDef(coreB)?.element
+  return a && b && a === b
+}
 const CONFIDENCE_WEIGHT = { high: 1, medium: 0.9, low: 0.7, theoretical: 0.6, unknown: 0.4 }
 
 export function matchSpell(signature) {
   const w = RULES.matching.weights
   const results = SPELLS.map((spell) => {
     const comp = spell.composition || {}
-    const sigilMatch = comp.core && signature.core ? (comp.core === signature.core ? 1 : sameElement(comp.core, signature.core) ? 0.5 : 0) : comp.core === signature.core ? 1 : 0
+    const sigilMatch = comp.core === signature.core ? 1 : sameElement(comp.core, signature.core) ? 0.5 : 0
     const signSetMatch = multisetSimilarity(signature.signMultiset, spellSignMultiset(spell))
     const symmetryMatch = comp.symmetry === signature.symmetry ? 1 : 0
-    const placementMatch = 0.5 // placeholder: refinar com posições reais
-
-    let score =
-      w.sigilMatch * sigilMatch +
-      w.signSetMatch * signSetMatch +
-      w.symmetryMatch * symmetryMatch +
-      w.placementMatch * placementMatch
-
+    let score = w.sigilMatch * sigilMatch + w.signSetMatch * signSetMatch + w.symmetryMatch * symmetryMatch + w.placementMatch * 0.5
     score *= CONFIDENCE_WEIGHT[spell.confidence] ?? 0.5
     return { spell, score: Number(score.toFixed(3)), parts: { sigilMatch, signSetMatch, symmetryMatch } }
   })
@@ -101,81 +67,111 @@ export function matchSpell(signature) {
   return results
 }
 
-function sameElement(coreA, coreB) {
-  const a = getComponentDef(coreA)?.element
-  const b = getComponentDef(coreB)?.element
-  return a && b && a === b
-}
-
-// ---------- 4. Interpretação livre (sem match) ----------
-export function interpretFreeform(composition, signature) {
-  const coreDef = composition.core ? getComponentDef(composition.core.type) : null
-  const element = coreDef?.name || coreDef?.element || 'unknown element'
-
-  const signs = composition.components.filter((c) => c.role === 'sign')
-  const tags = new Set()
-  const signNames = []
-  for (const s of signs) {
-    const def = SIGN_MAP[s.type]
-    if (!def) continue
-    signNames.push(def.name + (s.inverted ? ' (inverted)' : ''))
-    for (const t of def.effectTags || []) tags.add(t + (s.inverted ? ':inv' : ''))
-  }
-
-  const bias = computeDirectionalBias(composition.components)
-  let phrase = `Freeform composition: ${element} element`
-  if (signNames.length) phrase += ` shaped by ${unique(signNames).join(', ')}`
-  if (bias.biased) phrase += `, with the effect skewing ${directionLabel(bias.angle)}`
-  phrase += '.'
-
-  return { phrase, element, tags: [...tags] }
-}
-
-const unique = (arr) => [...new Set(arr)]
-
 // ---------- Orquestrador ----------
 export function analyze(composition) {
-  const issues = validate(composition)
-  const blocking = issues.filter((i) => i.severity === 'blocking')
-  const signature = buildSignature(composition)
+  const comp = composition || {}
+  const core = comp.core || null
+  const components = comp.components || []
+  const signComps = components.filter((c) => c.role === 'sign')
+  const sigilComps = [
+    ...(core ? [{ ...core, role: 'core' }] : []),
+    ...components.filter((c) => c.role === 'sigil').map((c) => ({ ...c, role: 'sigil' })),
+  ]
 
-  const symmetry = signature.symmetry
-  const bias = computeDirectionalBias(composition.components)
-  const power = computePower(composition.components, { linkCount: composition.linkCount || 0 })
+  const hasCore = !!(core && (isSigilType(core.type) || signCanBeCenter(core.type)))
+  const ringClosed = !!comp.ring?.closed
 
-  const result = {
-    valid: blocking.length === 0,
-    active: blocking.length === 0, // sem blocking => ring fechado + núcleo => ativo
-    issues,
-    signature,
-    geometry: { symmetry, bias, power },
-    match: null,
-    freeform: null,
-    deduction: composition.core ? deduce(composition) : null, // explicação por partes
-    dyes: (composition.dyes || []).map((id) => DYE_MAP[id]).filter(Boolean)
-      .map((d) => ({ id: d.id, name: d.name, effect: d.effect, kind: d.kind, color: d.color })),
+  // ----- Geometria -----
+  const symmetry = computeSymmetry(components)
+  const bias = computeDirectionalBias(components)
+  const power = computePower(components, { linkCount: comp.linkCount || 0 })
+  const tilted = signComps.some((c) => (((c.rotation || 0) % 360) + 360) % 360 !== 0)
+
+  // ----- Validade (regras das docs) -----
+  const issues = []
+  if (!hasCore) issues.push({ severity: 'blocking', message: 'No core: place a sigil (or a sign that can occupy the center) so the seal has a substance.' })
+  if (!ringClosed) issues.push({ severity: 'inactive', message: 'Ring open: the spell is prepared but INACTIVE. Close the ring to activate.' })
+  if (ringClosed && !hasCore && signComps.length === 0) issues.push({ severity: 'warning', message: 'A closed ring with nothing inside discharges raw energy — an explosion.' })
+  if (hasCore && signComps.length === 0) issues.push({ severity: 'warning', message: 'No signs around the core: the element has no defined form (raw, undirected discharge).' })
+  if (signComps.length >= 2) {
+    if (symmetry === 'asymmetric') issues.push({ severity: 'warning', message: 'Asymmetric signs — the spell may be unstable. At least bilateral symmetry is recommended for stability.' })
+    else issues.push({ severity: 'info', message: `Stable: ${symmetry} symmetry.` })
   }
+  if (bias.biased && signComps.length >= 2) issues.push({ severity: 'info', message: `Unbalanced signs: the effect will skew ${directionLabel(bias.angle)} (bigger/more signs pull the manifestation their way).` })
+  if (tilted) issues.push({ severity: 'info', message: 'Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach).' })
 
-  // Mesmo com ring aberto/sem núcleo, ainda mostramos o melhor palpite de identidade.
-  const ranked = matchSpell(signature)
+  const valid = hasCore
+  const active = hasCore && ringClosed
+  let status
+  if (!hasCore) status = { class: 'invalid', text: 'Invalid — no core' }
+  else if (!ringClosed) status = { class: 'inactive', text: '◔ Prepared (ring open — inactive)' }
+  else status = { class: 'ok', text: '✦ Spell active' }
+
+  // ----- Sigils -----
+  const sigils = sigilComps.map((c) => {
+    const d = getComponentDef(c.type)
+    return { id: c.type, name: d?.name || c.type, role: c.role, family: d?.family || null, element: d?.element || null, description: d?.description || '' }
+  })
+
+  // ----- Signs (agrupados por tipo + inversão) -----
+  const grouped = new Map()
+  for (const c of signComps) {
+    const key = c.type + (c.inverted ? '!inv' : '')
+    if (!grouped.has(key)) grouped.set(key, { type: c.type, inverted: !!c.inverted, count: 0 })
+    grouped.get(key).count++
+  }
+  const signs = [...grouped.values()].map((g) => {
+    const d = SIGN_MAP[g.type]
+    return { id: g.type, name: d?.name || g.type, category: d?.family || 'other', effect: d?.effect || '', count: g.count, inverted: g.inverted, invertible: !!d?.invertible }
+  })
+
+  // ----- Efeito deduzido (gramática) -----
+  const deduction = hasCore ? deduce(composition) : null
+
+  // ----- Spells similares (catálogo) -----
+  const signature = buildSignature(composition)
+  const ranked = SPELLS.length ? matchSpell(signature) : []
   const best = ranked[0]
   const threshold = RULES.matching.threshold
-
+  let match = null
+  let nearest = []
   if (best && best.score >= threshold && signature.signCount > 0) {
-    result.match = {
-      id: best.spell.id,
-      name: best.spell.name,
-      effect: best.spell.effect,
-      category: best.spell.category,
-      confidence: best.spell.confidence,
-      forbidden: Boolean(best.spell.forbidden),
-      score: best.score,
-      alternatives: ranked.slice(1, 4).filter((r) => r.score > 0.3).map((r) => ({ name: r.spell.name, score: r.score })),
+    match = {
+      id: best.spell.id, name: best.spell.name, effect: best.spell.effect,
+      category: best.spell.category, confidence: best.spell.confidence,
+      forbidden: Boolean(best.spell.forbidden), score: best.score,
     }
+    nearest = ranked.slice(1, 4).filter((r) => r.score > 0.3).map((r) => ({ name: r.spell.name, score: r.score }))
   } else {
-    result.freeform = interpretFreeform(composition, signature)
-    result.nearest = ranked.slice(0, 3).filter((r) => r.score > 0.2).map((r) => ({ name: r.spell.name, score: r.score }))
+    nearest = ranked.slice(0, 3).filter((r) => r.score > 0.2).map((r) => ({ name: r.spell.name, score: r.score }))
+  }
+  const similar = { catalogEmpty: SPELLS.length === 0, match, nearest }
+
+  // ----- Dyes (conjuring ink) -----
+  const dyes = (comp.dyes || []).map((id) => DYE_MAP[id]).filter(Boolean)
+    .map((d) => ({ id: d.id, name: d.name, effect: d.effect, kind: d.kind, color: d.color }))
+
+  // ----- Outras informações -----
+  const types = new Set(signComps.map((c) => c.type))
+  let powerLabel = grammar.power.balanced
+  if (types.has('radial')) powerLabel = grammar.power.tempered
+  else if (types.has('convergence')) powerLabel = grammar.power.focused
+  else if (power > 1.3 || (comp.linkCount || 0) > 0) powerLabel = grammar.power.amplified
+
+  const analysis = {
+    symmetry,
+    stability: grammar.stability[symmetry] || grammar.stability.none,
+    balance: bias.biased ? `skewed ${directionLabel(bias.angle)}` : 'balanced',
+    power,
+    powerLabel,
+    tilted,
+    inverted: signs.some((s) => s.inverted),
+    decorative: sigils.some((s) => s.family === 'decorative'),
+    sigilCount: sigils.length,
+    signCount: signComps.length,
+    linkCount: comp.linkCount || 0,
+    ring: ringClosed ? 'closed (active)' : 'open (inactive)',
   }
 
-  return result
+  return { name: comp.name || '', valid, active, status, issues, sigils, signs, deduction, similar, dyes, analysis }
 }
