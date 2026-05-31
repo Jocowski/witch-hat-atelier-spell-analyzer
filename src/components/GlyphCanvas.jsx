@@ -53,6 +53,14 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
 
   const R = RING_RADII[composition.ring?.size] ?? RING_RADII.medium
 
+  // Mantém o ponto dentro do círculo de ativação (não deixa arrastar símbolos p/ fora).
+  function clampToRing(x, y) {
+    const d = Math.hypot(x, y)
+    if (d <= R) return { x, y }
+    const k = R / d
+    return { x: x * k, y: y * k }
+  }
+
   const allComponents = [
     ...(composition.core ? [{ ...composition.core, role: 'sigil' }] : []),
     ...composition.components,
@@ -71,7 +79,8 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
   function handlePointerMove(e) {
     if (!dragRef.current) return
     const loc = clientToLocal(svgRef.current, e.clientX, e.clientY)
-    onMove(dragRef.current.id, loc.x - dragRef.current.dx, loc.y - dragRef.current.dy)
+    const { x, y } = clampToRing(loc.x - dragRef.current.dx, loc.y - dragRef.current.dy)
+    onMove(dragRef.current.id, x, y)
   }
 
   function handlePointerUp(e) {
@@ -87,7 +96,8 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
     if (!raw) return
     const { type, kind } = JSON.parse(raw)
     const loc = clientToLocal(svgRef.current, e.clientX, e.clientY)
-    onDropAdd(type, kind, loc.x, loc.y)
+    const { x, y } = clampToRing(loc.x, loc.y)
+    onDropAdd(type, kind, x, y)
   }
 
   return (

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Palette from './components/Palette.jsx'
 import GlyphCanvas from './components/GlyphCanvas.jsx'
 import ResultPanel from './components/ResultPanel.jsx'
@@ -118,6 +118,21 @@ export default function App() {
     })
     setSelectedId(null)
   }
+
+  // Apaga o selecionado com a tecla Delete/Backspace (ignora se estiver digitando num campo).
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return
+      const el = document.activeElement
+      const tag = el?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable) return
+      if (!selectedId) return
+      e.preventDefault()
+      deleteSelected()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [selectedId])
 
   // Leva o selecionado para o centro (core). Funciona p/ sigils extras e signs-centro.
   function promoteToCore() {
@@ -264,7 +279,7 @@ export default function App() {
               {!isCore && (selected.role === 'sigil' || canBeCore(selected.type)) && (
                 <button onClick={promoteToCore}>↦ to center</button>
               )}
-              <button className="danger" onClick={deleteSelected}>delete</button>
+              <button className="danger" onClick={deleteSelected} title="Delete (Del)">delete</button>
             </div>
           )}
 
