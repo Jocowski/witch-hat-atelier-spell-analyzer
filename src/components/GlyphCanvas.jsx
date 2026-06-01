@@ -1,7 +1,10 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getComponentDef } from '../engine/data.js'
 
 const VIEW = 600 // viewBox 600x600, origem central via -300
+const ZOOM_MIN = 1 // 1 = enquadramento padrão; <1 só mostraria pergaminho vazio
+const ZOOM_MAX = 8
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 // Raio visual do ring por tamanho escolhido (não afeta a geometria/análise).
 export const RING_RADII = { small: 150, medium: 200, big: 260 }
 
@@ -51,6 +54,46 @@ function ComponentGlyph({ comp, selected, onPointerDown }) {
 export default function GlyphCanvas({ composition, selectedId, onSelect, onMove, onDropAdd }) {
   const svgRef = useRef(null)
   const dragRef = useRef(null)
+  const panRef = useRef(null) // pan ativo: { x, y } em px de tela (right-drag)
+
+  // Viewport (zoom/pan). cx/cy = ponto do conteúdo no centro da view; zoom = fator.
+  const [view, setView] = useState({ cx: 0, cy: 0, zoom: 1 })
+  const [panning, setPanning] = useState(false)
+  const viewRef = useRef(view)
+  viewRef.current = view
+  const vw = VIEW / view.zoom // largura/altura do viewBox em coords de conteúdo
+  const viewBox = `${view.cx - vw / 2} ${view.cy - vw / 2} ${vw} ${vw}`
+
+  // Mantém o conteúdo enquadrado: no zoom 1 trava no centro; quanto mais zoom, mais pan.
+  function clampView(cx, cy, zoom) {
+    const half = Math.max(0, VIEW / 2 - VIEW / (2 * zoom))
+    return { cx: clamp(cx, -half, half), cy: clamp(cy, -half, half), zoom }
+  }
+
+  // Ctrl + scroll = zoom centrado no cursor. Listener nativo (não-passivo) p/ poder
+  // dar preventDefault e impedir o zoom da página.
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!svg) return
+    function onWheel(e) {
+      if (!e.ctrlKey) return // scroll normal continua rolando a página
+      e.preventDefault()
+      const rect = svg.getBoundingClientRect()
+      const fx = (e.clientX - rect.left) / rect.width // fração do cursor na view
+      const fy = (e.clientY - rect.top) / rect.height
+      setView((v) => {
+        const zoom = clamp(v.zoom * Math.exp(-e.deltaY * 0.0015), ZOOM_MIN, ZOOM_MAX)
+        const w0 = VIEW / v.zoom
+        const w1 = VIEW / zoom
+        // ponto do conteúdo sob o cursor (antes) deve continuar sob o cursor (depois)
+        const px = v.cx - w0 / 2 + fx * w0
+        const py = v.cy - w0 / 2 + fy * w0
+        return clampView(px - (fx - 0.5) * w1, py - (fy - 0.5) * w1, zoom)
+      })
+    }
+    svg.addEventListener('wheel', onWheel, { passive: false })
+    return () => svg.removeEventListener('wheel', onWheel)
+  }, [])
 
   const R = RING_RADII[composition.ring?.size] ?? RING_RADII.medium
 
@@ -68,6 +111,7 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
   ]
 
   function handlePointerDown(e, id) {
+    if (e.button !== 0) return // botão direito/meio: deixa borbulhar p/ o pan do SVG
     e.stopPropagation()
     onSelect(id)
     const svg = svgRef.current
@@ -77,7 +121,28 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
     svg.setPointerCapture(e.pointerId)
   }
 
+  // Pointerdown no fundo do SVG: botão direito = pan (só com zoom); esquerdo = desselecionar.
+  function handleSvgPointerDown(e) {
+    if (e.button === 2) {
+      if (viewRef.current.zoom <= 1) return // sem zoom não há p/ onde arrastar
+      panRef.current = { x: e.clientX, y: e.clientY }
+      setPanning(true)
+      try { svgRef.current.setPointerCapture(e.pointerId) } catch {}
+      return
+    }
+    if (e.button === 0) onSelect(null)
+  }
+
   function handlePointerMove(e) {
+    if (panRef.current) {
+      const rect = svgRef.current.getBoundingClientRect()
+      const k = VIEW / viewRef.current.zoom / rect.width // px de tela -> coords de conteúdo
+      const dx = (e.clientX - panRef.current.x) * k
+      const dy = (e.clientY - panRef.current.y) * k
+      panRef.current = { x: e.clientX, y: e.clientY }
+      setView((v) => clampView(v.cx - dx, v.cy - dy, v.zoom)) // "agarra" o conteúdo
+      return
+    }
     if (!dragRef.current) return
     const loc = clientToLocal(svgRef.current, e.clientX, e.clientY)
     const { x, y } = clampToRing(loc.x - dragRef.current.dx, loc.y - dragRef.current.dy)
@@ -85,10 +150,12 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
   }
 
   function handlePointerUp(e) {
-    if (dragRef.current) {
+    if (dragRef.current || panRef.current) {
       try { svgRef.current.releasePointerCapture(e.pointerId) } catch {}
     }
     dragRef.current = null
+    panRef.current = null
+    setPanning(false)
   }
 
   function handleDrop(e) {
@@ -102,15 +169,18 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
   }
 
   return (
+    <div className="glyph-stage">
     <svg
       ref={svgRef}
       className="glyph-svg"
       width={VIEW}
       height={VIEW}
-      viewBox={`${-VIEW / 2} ${-VIEW / 2} ${VIEW} ${VIEW}`}
+      viewBox={viewBox}
+      style={{ cursor: panning ? 'grabbing' : undefined }}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerDown={() => onSelect(null)}
+      onPointerDown={handleSvgPointerDown}
+      onContextMenu={(e) => e.preventDefault()}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
@@ -152,6 +222,16 @@ export default function GlyphCanvas({ composition, selectedId, onSelect, onMove,
         />
       ))}
     </svg>
+
+      <div className="zoom-hud">
+        {view.zoom > 1.01 && (
+          <button className="zoom-reset" onClick={() => setView({ cx: 0, cy: 0, zoom: 1 })} title="Reset zoom">
+            {view.zoom.toFixed(1)}× · reset
+          </button>
+        )}
+        <span className="zoom-hint">Ctrl + scroll to zoom · right-drag to pan</span>
+      </div>
+    </div>
   )
 }
 

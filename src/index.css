@@ -111,6 +111,23 @@ body {
 .glyph-svg text, .palette-item { user-select: none; -webkit-user-select: none; }
 .canvas-toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 
+/* Zoom/pan stage + HUD */
+.glyph-stage { position: relative; display: inline-block; max-width: 100%; }
+.zoom-hud {
+  position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 8px;
+  pointer-events: none; /* the hint never blocks the canvas */
+}
+.zoom-hud .zoom-reset {
+  pointer-events: auto;
+  font-size: 0.7rem; padding: 3px 9px; border-radius: 999px;
+  background: rgba(38,32,25,.82); color: var(--ink); border: 1px solid var(--line); cursor: pointer;
+}
+.zoom-hud .zoom-reset:hover { border-color: var(--accent); }
+.zoom-hud .zoom-hint {
+  font-size: 0.68rem; color: var(--parchment-ink); opacity: .55;
+  background: rgba(243,234,212,.5); padding: 2px 7px; border-radius: 999px;
+}
+
 /* Ring-size selector */
 .ring-size { display: flex; align-items: center; gap: 6px; justify-content: center; margin-bottom: 8px; }
 .ring-size .rs-label { font-size: 0.72rem; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 1px; margin-right: 2px; }

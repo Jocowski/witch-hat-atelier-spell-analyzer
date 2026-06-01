@@ -218,6 +218,8 @@ export default function App() {
     if (!svg) return
     const clone = svg.cloneNode(true)
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    // reset zoom/pan: capture the whole glyph regardless of the on-screen view
+    clone.setAttribute('viewBox', '-300 -300 600 600')
     // drop the selection highlight (dashed "4 3" ring) so the image is clean
     clone.querySelectorAll('[stroke-dasharray="4 3"]').forEach((el) => el.remove())
     const xml = new XMLSerializer().serializeToString(clone)
@@ -289,6 +291,8 @@ export default function App() {
             <div className="selected-toolbar">
               <span className="title">{selDef?.name} {isCore ? '(core)' : selected.role === 'sigil' ? '(sigil)' : ''}</span>
               <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) - 30 + 360) % 360 })}>⟲ -30°</button>
+              <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) - 5 + 360) % 360 })} title="Fine rotate">⟲ -5°</button>
+              <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) + 5) % 360 })} title="Fine rotate">⟳ +5°</button>
               <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) + 30) % 360 })}>⟳ +30°</button>
               <button onClick={() => updateSelected({ scale: Math.max(0.4, (selected.scale ?? 1) - 0.15) })}>− smaller</button>
               <button onClick={() => updateSelected({ scale: Math.min(2.5, (selected.scale ?? 1) + 0.15) })}>+ larger</button>
