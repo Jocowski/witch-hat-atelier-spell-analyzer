@@ -78,7 +78,7 @@ The two Columns sit left/right (horizontal) and cancel to "balanced," so they ch
 - **Defense** — a hovering mass of earth as a movable shield or counterweight.
 
 ## Similar spells
-- **Water Orb** (canon) — the direct analogue; same recipe with a water sigil. Self-sufficient (creates its own water) and forms a clean fluid sphere. *(Note: the engine's spell catalog is empty, so this comparison is drawn from the docs, not an engine catalog match.)*
+- **Water Orb** (canon) — the direct analogue; same recipe with a water sigil. Self-sufficient (creates its own water) and forms a clean fluid sphere. *(Note: this comparison is drawn from the docs, not an engine catalog match — Earth Orb is a community spell and isn't in the engine catalog.)*
 - **Sand Bridge / Sand Cage / Serpent's Bed of Sand** (canon earth spells) — share the "manipulate loose sand" basis, illustrating that granular earth is the most fluid-like, controllable form of the element.
 
 ## Notes & limitations

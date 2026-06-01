@@ -37,9 +37,10 @@ Stay upstream. End by pointing the user at the next skill for any idea they like
 
 ## Know the magic system first (lightly)
 
-So your ideas feel like *Witch Hat Atelier* and not generic fantasy, skim the cheat-sheet
-once: [../spell-analyzer/references/magic-system.md](../spell-analyzer/references/magic-system.md).
-You only need the *flavor*, not the rules in depth:
+So your ideas feel like *Witch Hat Atelier* and not generic fantasy, you only need the
+*flavor* below — **don't read the full ruleset** (that's /spell-creator's job; loading it
+here just burns tokens on rules you won't use). If you ever need depth, the cheat-sheet is
+[../spell-analyzer/references/magic-system.md](../spell-analyzer/references/magic-system.md).
 
 - Magic = **substance × form × activation × ink**. A spell takes some **element/substance**
   and gives it a **form/behavior**.

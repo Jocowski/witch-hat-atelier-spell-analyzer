@@ -105,7 +105,7 @@ The canon glyph draws the water sigil inverted, but the effect of inverting a *w
 - **Watershot Seal / Water Bolt:** water + *column* (unopposed) → a projected jet/bolt; Water Orb pairs the columns so they brace instead of shoot.
 - **Rising Platform of Water:** directional water shaping, but aimed (asymmetric) rather than contained.
 
-*(Note: the engine's spell catalog is empty, so these comparisons are drawn from the docs, not an engine catalog match.)*
+*(Note: these comparisons are drawn from the docs, not engine catalog matches.)*
 
 ## Notes & limitations
 

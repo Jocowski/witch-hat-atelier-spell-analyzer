@@ -78,7 +78,7 @@ Physically, fire is buoyant and expansive — left alone it billows up and out, 
 - **With dyes** — **Blood** turns the jet into a roaring blast; **Azuremoon Flower** extends the burn for sustained work.
 
 ## Similar spells
-- **Watershot Seal** (canon) — water + column, the direct analogue; a directional jet without the Region cage. *(The engine's spell catalog is empty, so this is from the docs, not an engine catalog match.)*
+- **Watershot Seal** (canon) — water + column, the direct analogue; a directional jet without the Region cage. *(Comparison drawn from the docs; the Watershot Seal isn't in the engine catalog yet, so this isn't an engine catalog match.)*
 - **Water Bolt** (canon) — region + bolt; same "region aims/confines the output" idea, but fires discrete projectiles rather than a continuous beam.
 - **Spiraling Flame** (canon) — fire + column + Sights Set + Sign of Wind; the same fire+column basis put to a guided, spinning use.
 

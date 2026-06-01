@@ -37,7 +37,7 @@ The engine has almost no hardcoded domain knowledge — everything lives in JSON
 - `signs.json` — 38 signs (operators on the substance). Each documented sign has a `family` = one of the 4 doc categories (directional/semi-directional/non-directional/asymmetric); 3 (`bird`, `animal_signs`, `unknown_sign`) are kept but hidden. Carries `effectTags`, `invertible`, `canBeCenter`, `surrounds`.
 - `dyes.json` — magical dyes mixed into the conjuring ink (kind/color/effect).
 - `grammar.json` — the **deduction grammar**: per-element `substance`, per-sign `operator` (`kind` + `verb`/`invertedVerb`), and `interactions` (synergies/warnings). This is what lets the app explain novel combinations.
-- `spells.json` — catalog of "recipes" for the matcher. **Currently empty** (to be repopulated with valid spells); the engine handles an empty catalog gracefully.
+- `spells.json` — catalog of "recipes" for the matcher. **Populated with the canon spells** documented so far (`origin:canon` only — community/fan-made spells are excluded so they can't produce false "canon match" results). The engine still handles an empty catalog gracefully (`catalogEmpty`).
 
 ### Sigil/sign artwork is auto-vectorized
 

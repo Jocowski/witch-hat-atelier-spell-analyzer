@@ -208,8 +208,10 @@ export function classifyRegion(signs, familyOf = () => 'directional', tol = 35, 
     // ring the seal evenly. Covering just one arc (positional resultant > coverTol) biases
     // the surge toward that cluster (Rising Wave: inward regions on the top half ⇒ the water
     // surges out toward the top rather than staying contained).
+    // A single sign trivially has coverage magnitude 1 (one vector), which is not a
+    // meaningful "one arc" — needs at least two signs to read as a one-sided ring.
     const cover = computeRegionCoverage(signs, familyOf)
-    if (cover.magnitude > coverTol) return { mode: 'biased', angle: cover.centroidAngle }
+    if (items.length >= 2 && cover.magnitude > coverTol) return { mode: 'biased', angle: cover.centroidAngle }
     return { mode: 'inward' }
   }
   if (isOutward) return { mode: 'outward' }

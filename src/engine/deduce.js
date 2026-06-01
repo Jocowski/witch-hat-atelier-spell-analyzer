@@ -160,6 +160,8 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   // ----- Motion (lift/float/dart) -----
   const motionClauses = (byKind.motion || []).map((m) => opVerb(m.op, m.inverted))
 
+  // ----- Support (collection/gather: feed the spell) -----
+  const supportClause = (byKind.support || []).map((s) => opVerb(s.op, s.inverted))
   // ----- Target scope -----
   const targetClause = (byKind.target || []).map((t) => opVerb(t.op, t.inverted))
   // ----- Power -----
@@ -170,6 +172,7 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   // Assemble summary.
   let summary = primary + directionClause
   if (motionClauses.length) summary += `; it ${joinList(motionClauses)}`
+  if (supportClause.length) summary += `; it ${joinList(supportClause)}`
   if (specialClause.length) summary += `; it ${joinList(specialClause)}`
   if (powerClause.length) summary += `. The effect ${joinList(powerClause)}`
   if (targetClause.length) summary += `. It ${joinList(targetClause)}`
