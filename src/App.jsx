@@ -5,6 +5,7 @@ import ResultPanel from './components/ResultPanel.jsx'
 import InkPanel from './components/InkPanel.jsx'
 import { analyze } from './engine/analyze.js'
 import { toComposition } from './engine/compose.js'
+import { inwardRotation } from './engine/geometry.js'
 import { canBeCore, getComponentDef, DYE_MAP, DYES } from './engine/data.js'
 
 let _id = 1
@@ -91,7 +92,9 @@ export default function App() {
         const pos = x != null && y != null ? { x, y } : placeExtraSigil(c)
         return { ...c, components: [...c.components, withInk({ id, type, role: 'sigil', ...pos, ...SIGIL })] }
       }
-      return { ...c, components: [...c.components, withInk({ id, type, role: 'sign', x: x ?? 0, y: y ?? -100, ...SIGIL })] }
+      const sx = x ?? 0, sy = y ?? -100
+      // Default a sign to its neutral orientation: top facing the center of the seal.
+      return { ...c, components: [...c.components, withInk({ id, type, role: 'sign', x: sx, y: sy, ...SIGIL, rotation: inwardRotation(sx, sy) })] }
     })
     setActiveCircleId(circleId)
     setSelected({ circleId, partId: id })
@@ -318,10 +321,17 @@ export default function App() {
           {selectedPart && (
             <div className="selected-toolbar">
               <span className="title">{selDef?.name} {isCore ? '(core)' : selectedPart.role === 'sigil' ? '(sigil)' : ''}</span>
-              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) - 30 + 360) % 360 })}>⟲ -30°</button>
-              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) - 5 + 360) % 360 })} title="Fine rotate">⟲ -5°</button>
-              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) + 5) % 360 })} title="Fine rotate">⟳ +5°</button>
-              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) + 30) % 360 })}>⟳ +30°</button>
+              <label className="rot-field" title="Rotation in degrees (0° = north). Reset points the sign's top at the center.">
+                ∠
+                <input type="number" step="1" value={Math.round(selectedPart.rotation || 0)}
+                  onChange={(e) => {
+                    const v = Number(e.target.value)
+                    if (Number.isFinite(v)) updateSelected({ rotation: ((v % 360) + 360) % 360 })
+                  }} />
+                °
+              </label>
+              <button onClick={() => updateSelected({ rotation: isCore ? 0 : inwardRotation(selectedPart.x, selectedPart.y) })}
+                title="Reset rotation: a sign's top faces the center of the seal (a core resets to 0°).">⟲ reset</button>
               <button onClick={() => updateSelected({ scale: Math.max(0.4, (selectedPart.scale ?? 1) - 0.15) })}>− smaller</button>
               <button onClick={() => updateSelected({ scale: Math.min(2.5, (selectedPart.scale ?? 1) + 0.15) })}>+ larger</button>
               {selDef?.invertible && (

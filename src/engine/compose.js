@@ -13,7 +13,7 @@
 // Each circle's component coords are relative to THAT circle's center, so the per-circle
 // geometry (geometry.js) is reused unchanged.
 
-import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert, computeSpin } from './geometry.js'
 import { deduceWith } from './deduce.js'
 
 // ---------- Normalize / migrate any input to the v2 shape ----------
@@ -79,11 +79,13 @@ export function analyzeCircleWith(deps, circle) {
   // ----- Geometry -----
   const symmetry = computeSymmetry(components)
   const power = computePower(components, { linkCount: circle.linkCount || 0 })
-  const tilted = signComps.some((c) => (((c.rotation || 0) % 360) + 360) % 360 !== 0)
-
   // AIM (where the magic goes) from sign ORIENTATION; "above the seal" is the out-of-plane
   // default for a column beam / levitation lift — not compass north.
   const familyOf = (t) => signMap[t]?.family
+  // SPIN: only signs canted tangentially off their radial axis spin the spell. A ring of
+  // signs aimed inward/outward is oriented, not spinning (so a normal inward-facing ring
+  // like the Pyreball Seal must NOT read as "tilted → spin").
+  const tilted = computeSpin(components, familyOf).spinning
   const aimSigns = signComps.filter((c) => grammar.operators[c.type]?.kind === 'direction')
   const region = aimSigns.length ? classifyRegion(aimSigns, familyOf) : null
   const liftSigns = signComps.filter((c) => {

@@ -207,6 +207,8 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px; width: 100%;
 }
 .selected-toolbar .title { width: 100%; text-align: center; font-size: 0.8rem; color: var(--accent); margin-bottom: 2px; }
+.selected-toolbar .rot-field { display: inline-flex; align-items: center; gap: 2px; font-size: 0.85rem; }
+.selected-toolbar .rot-field input { width: 4em; padding: 2px 4px; background: var(--bg); color: inherit; border: 1px solid var(--line); border-radius: 6px; text-align: right; }
 
 /* ---------- Circles panel (multi-circle) ---------- */
 .circles-panel {

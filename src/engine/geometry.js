@@ -111,6 +111,32 @@ export function signFacing(c, family) {
   return f
 }
 
+// Rotation (deg, 0 = north CW) that makes a sign's TOP face the center of the seal, given
+// its position. This is the "neutral" orientation for a sign in the ring (the canon
+// arrow-tip-faces-inward default). The UI uses it as the default/reset rotation.
+export function inwardRotation(x, y) {
+  return ((Math.atan2(x, -y) * 180) / Math.PI + 180 + 360) % 360
+}
+
+// SPIN = tangential cant of a sign's facing off its radial (inward/outward) axis. A sign
+// aimed inward or outward is ORIENTED (steering the spell), not spinning; one canted toward
+// the tangent (~90° off radial) spins the spell. Only signs with a front (directional) can
+// cant — non-directional rotation is meaningless and ignored. Returns { spinning, cant }
+// where cant is the max tangential deviation in degrees (0 = radial, 90 = fully tangential).
+export function computeSpin(components, familyOf = () => null, { tolDeg = 15 } = {}) {
+  const signs = components.filter((c) => c.role === 'sign')
+  let cant = 0
+  for (const c of signs) {
+    const facing = signFacing(c, familyOf(c.type))
+    if (facing == null) continue // no front → rotation is meaningless, never "spin"
+    const pos = toPolar(c.x, c.y).angle // radial axis (outward); inward = pos + 180
+    let off = angleDelta(facing, pos)
+    if (off > 90) off = 180 - off // fold: inward AND outward both count as "aligned"
+    cant = Math.max(cant, off)
+  }
+  return { spinning: cant > tolDeg, cant }
+}
+
 // AIM por ORIENTAÇÃO: resultante dos vetores de "frente" (rotação) dos signs direcionais.
 // Diferente de computeDirectionalBias, que usa a POSIÇÃO (centro de massa) — este lê para
 // onde os signs apontam. Signs sem frente (signFacing === null) são ignorados.
