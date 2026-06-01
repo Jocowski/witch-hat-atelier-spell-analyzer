@@ -208,6 +208,37 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 }
 .selected-toolbar .title { width: 100%; text-align: center; font-size: 0.8rem; color: var(--accent); margin-bottom: 2px; }
 
+/* ---------- Circles panel (multi-circle) ---------- */
+.circles-panel {
+  display: flex; flex-direction: column; gap: 6px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px; width: 100%; box-sizing: border-box; margin-bottom: 8px;
+}
+.cp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.cp-label { font-size: 0.72rem; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 1px; margin-right: 2px; }
+.cp-sub { font-size: 0.72rem; color: var(--ink-dim); margin-left: 4px; }
+.cp-chip { padding: 4px 10px; font-size: 0.78rem; border-radius: 14px; }
+.cp-chip.on { background: var(--accent); color: #1b1814; border-color: var(--accent); font-weight: 600; }
+.cp-add { padding: 4px 10px; font-size: 0.78rem; }
+.cp-name { background: transparent; border: none; border-bottom: 1px dashed var(--line); color: var(--parchment); font-size: 0.85rem; padding: 2px 4px; min-width: 90px; }
+.cp-name:focus { outline: none; border-bottom-color: var(--accent); }
+.circles-panel select { background: var(--panel-2); color: var(--parchment); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; font-size: 0.78rem; }
+.cp-size { flex: 1 1 90px; max-width: 180px; accent-color: var(--accent); }
+.cp-sizeval { font-size: 0.74rem; color: var(--ink-dim); min-width: 28px; text-align: right; }
+.cp-ink { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; }
+.cp-ink .swatch { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--line); display: inline-block; }
+.cp-rels { display: flex; flex-wrap: wrap; gap: 6px; }
+.rel-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 0.74rem; padding: 2px 6px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); }
+.rel-chip.nest { border-left: 3px solid var(--accent); }
+.rel-chip.link { border-left: 3px solid var(--ok); }
+.rel-chip button { background: none; border: none; color: var(--ink-dim); cursor: pointer; padding: 0 2px; font-size: 0.9rem; }
+.rel-chip button:hover { color: var(--err); }
+
+/* per-circle report blocks in the analysis panel */
+.circle-report { border-top: 1px dashed var(--line); margin-top: 6px; padding-top: 4px; }
+.circle-report:first-of-type { border-top: none; }
+.circle-heading { font-size: 0.85rem; font-weight: 700; color: var(--accent); margin: 6px 0 2px; }
+
 /* ---------- Result ---------- */
 .result .status { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 .result .status.ok { color: var(--ok); }

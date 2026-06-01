@@ -1,269 +1,293 @@
 import { useEffect, useMemo, useState } from 'react'
 import Palette from './components/Palette.jsx'
-import GlyphCanvas from './components/GlyphCanvas.jsx'
+import GlyphCanvas, { RING_RADII } from './components/GlyphCanvas.jsx'
 import ResultPanel from './components/ResultPanel.jsx'
 import InkPanel from './components/InkPanel.jsx'
 import { analyze } from './engine/analyze.js'
+import { toComposition } from './engine/compose.js'
 import { canBeCore, getComponentDef, DYE_MAP, DYES } from './engine/data.js'
 
 let _id = 1
 const nextId = () => `c${_id++}`
+let _cid = 1
+const nextCircleId = () => `k${_cid++}`
 
-const EMPTY = { ring: { closed: false, doubled: false, size: 'medium' }, core: null, components: [], linkCount: 0, dyes: [], name: '' }
 const SIGIL = { rotation: 0, scale: 1, inverted: false }
+const newCircle = (over = {}) => ({ id: nextCircleId(), name: '', center: { x: 0, y: 0 }, radius: 170, ring: { closed: false }, core: null, components: [], dyes: [], inkColor: null, ...over })
 
-// Reverse lookup: ink color (hex) -> dye id, so we can derive the dyes used from the
-// colors stamped onto parts at draw time.
+const FIRST = newCircle({ name: 'Circle 1' })
+const EMPTY = { name: '', circles: [FIRST], relations: [] }
+
 const COLOR_TO_DYE = Object.fromEntries(DYES.map((d) => [d.color.toLowerCase(), d.id]))
+// Free-value ring radius: min is below the old 'small' (110), max above the old 'big' (240).
+const RADIUS_MIN = 50
+const RADIUS_MAX = 460
+const radiusOf = (c) => c.radius ?? RING_RADII[c.ring?.size] ?? RING_RADII.medium
 
 export default function App() {
   const [composition, setComposition] = useState(EMPTY)
-  const [selectedId, setSelectedId] = useState(null)
-  const [activeInk, setActiveInk] = useState(null) // current "pen": a dye id, or null = default ink
+  const [activeCircleId, setActiveCircleId] = useState(FIRST.id)
+  const [selected, setSelected] = useState(null) // { circleId, partId }
+  const [activeInk, setActiveInk] = useState(null)
   const [notice, setNotice] = useState(null)
   const [importOpen, setImportOpen] = useState(false)
   const [importText, setImportText] = useState('')
   const [importError, setImportError] = useState(null)
 
-  // The active ink colors NEW parts as they're drawn. Each part remembers its own color.
   const inkColor = activeInk ? DYE_MAP[activeInk]?.color : undefined
   const withInk = (part) => (inkColor ? { ...part, color: inkColor } : part)
 
-  // Dyes used = the set of inks actually drawn with (matched by color). Falls back to the
-  // composition's own dyes array for older/imported spells whose parts carry no color.
-  const usedDyes = useMemo(() => {
+  // Derive each circle's dyes from the inks its parts were drawn with (fallback: stored dyes).
+  function circleDyes(c) {
     const ids = new Set()
-    for (const p of [composition.core, ...composition.components]) {
+    for (const p of [c.core, ...c.components]) {
       const id = p?.color && COLOR_TO_DYE[p.color.toLowerCase()]
       if (id) ids.add(id)
     }
-    return ids.size ? [...ids] : (composition.dyes || [])
-  }, [composition])
+    const ringDye = c.inkColor && COLOR_TO_DYE[c.inkColor.toLowerCase()]
+    if (ringDye) ids.add(ringDye)
+    return ids.size ? [...ids] : (c.dyes || [])
+  }
+  const compForAnalysis = useMemo(
+    () => ({ ...composition, circles: composition.circles.map((c) => ({ ...c, dyes: circleDyes(c) })) }),
+    [composition],
+  )
+  const result = useMemo(() => analyze(compForAnalysis), [compForAnalysis])
 
-  const result = useMemo(() => analyze({ ...composition, dyes: usedDyes }), [composition, usedDyes])
+  const activeCircle = composition.circles.find((c) => c.id === activeCircleId) || composition.circles[0]
+  const otherCircles = composition.circles.filter((c) => c.id !== activeCircle?.id)
 
-  const isCore = composition.core?.id === selectedId
-  const selected = useMemo(() => {
-    if (!selectedId) return null
-    if (composition.core?.id === selectedId) return { ...composition.core, role: 'sigil' }
-    return composition.components.find((c) => c.id === selectedId) || null
-  }, [selectedId, composition])
+  const selectedCircle = selected ? composition.circles.find((c) => c.id === selected.circleId) : null
+  const selectedPart = selected && selectedCircle
+    ? (selectedCircle.core?.id === selected.partId ? { ...selectedCircle.core, role: 'core' } : selectedCircle.components.find((p) => p.id === selected.partId))
+    : null
+  const isCore = selectedPart?.role === 'core'
+  const selDef = selectedPart ? getComponentDef(selectedPart.type) : null
 
   function flash(msg) {
     setNotice(msg)
     window.clearTimeout(flash._t)
     flash._t = window.setTimeout(() => setNotice(null), 2500)
   }
+  function selectInk(id) { setActiveInk((cur) => (cur === id ? null : id)) }
 
-  // Select an ink (pen). Clicking the active one deselects it (back to default ink).
-  function selectInk(id) {
-    setActiveInk((cur) => (cur === id ? null : id))
+  // ---- circle helpers ----
+  function patchCircle(id, fn) {
+    setComposition((prev) => ({ ...prev, circles: prev.circles.map((c) => (c.id === id ? fn(c) : c)) }))
   }
-
-  // Conta sigils extra (componentes role 'sigil', sem o core) p/ posicionar novos.
-  function placeExtraSigil(prev, x, y) {
-    if (x != null && y != null) return { x, y }
-    const n = prev.components.filter((c) => c.role === 'sigil').length
+  function placeExtraSigil(c) {
+    const n = c.components.filter((p) => p.role === 'sigil').length
     const angle = ((n * 72) % 360) * (Math.PI / 180)
-    const r = 80
+    const r = 60
     return { x: r * Math.sin(angle), y: -r * Math.cos(angle) }
   }
 
-  // Adiciona componente. 1º sigil -> core; sigils extras e signs -> components.
-  function addComponent(type, kind, x, y) {
+  // ---- add / move / edit parts (scoped to a circle) ----
+  function addComponent(circleId, type, kind, x, y) {
     const id = nextId()
-    setComposition((prev) => {
+    patchCircle(circleId, (c) => {
       if (kind === 'sigil') {
-        if (!prev.core) return { ...prev, core: withInk({ id, type, x: 0, y: 0, ...SIGIL }) }
-        const pos = placeExtraSigil(prev, x, y)
-        return { ...prev, components: [...prev.components, withInk({ id, type, role: 'sigil', ...pos, ...SIGIL })] }
+        if (!c.core) return { ...c, core: withInk({ id, type, x: 0, y: 0, ...SIGIL }) }
+        const pos = x != null && y != null ? { x, y } : placeExtraSigil(c)
+        return { ...c, components: [...c.components, withInk({ id, type, role: 'sigil', ...pos, ...SIGIL })] }
       }
-      const px = x ?? 0
-      const py = y ?? -150
-      return { ...prev, components: [...prev.components, withInk({ id, type, role: 'sign', x: px, y: py, ...SIGIL })] }
+      return { ...c, components: [...c.components, withInk({ id, type, role: 'sign', x: x ?? 0, y: y ?? -100, ...SIGIL })] }
     })
-    setSelectedId(id)
+    setActiveCircleId(circleId)
+    setSelected({ circleId, partId: id })
   }
-
-  // Adicionar por clique (sem coords) — signs em anel automático; sigils via addComponent.
   function addByClick(type, kind) {
-    if (kind === 'sigil') return addComponent(type, kind)
-    setComposition((prev) => {
-      const n = prev.components.filter((c) => c.role === 'sign').length
-      const angle = (n * 60) % 360
-      const rad = (angle * Math.PI) / 180
-      const r = 150
-      const id = nextId()
-      setSelectedId(id)
-      return {
-        ...prev,
-        components: [...prev.components, withInk({ id, type, role: 'sign', x: r * Math.sin(rad), y: -r * Math.cos(rad), ...SIGIL })],
-      }
+    const cid = activeCircle?.id
+    if (!cid) return
+    if (kind === 'sigil') return addComponent(cid, type, kind)
+    const n = (activeCircle.components || []).filter((p) => p.role === 'sign').length
+    const angle = (n * 60) % 360
+    const rad = (angle * Math.PI) / 180
+    const r = radiusOf(activeCircle) * 0.65
+    addComponent(cid, type, kind, r * Math.sin(rad), -r * Math.cos(rad))
+  }
+  function movePart(circleId, partId, x, y) {
+    patchCircle(circleId, (c) => {
+      if (c.core?.id === partId) return { ...c, core: { ...c.core, x, y } }
+      return { ...c, components: c.components.map((p) => (p.id === partId ? { ...p, x, y } : p)) }
     })
   }
-
-  function moveComponent(id, x, y) {
-    setComposition((prev) => {
-      if (prev.core?.id === id) return { ...prev, core: { ...prev.core, x, y } }
-      return { ...prev, components: prev.components.map((c) => (c.id === id ? { ...c, x, y } : c)) }
-    })
-  }
-
   function updateSelected(patch) {
-    if (!selectedId) return
-    setComposition((prev) => {
-      if (prev.core?.id === selectedId) return { ...prev, core: { ...prev.core, ...patch } }
-      return { ...prev, components: prev.components.map((c) => (c.id === selectedId ? { ...c, ...patch } : c)) }
+    if (!selected) return
+    patchCircle(selected.circleId, (c) => {
+      if (c.core?.id === selected.partId) return { ...c, core: { ...c.core, ...patch } }
+      return { ...c, components: c.components.map((p) => (p.id === selected.partId ? { ...p, ...patch } : p)) }
     })
   }
-
   function deleteSelected() {
-    if (!selectedId) return
-    setComposition((prev) => {
-      if (prev.core?.id === selectedId) {
-        // Ao apagar o core, promove o próximo sigil (se houver) para manter o spell coerente.
-        const nextSigil = prev.components.find((c) => c.role === 'sigil')
-        if (nextSigil) {
-          return {
-            ...prev,
-            core: { id: nextSigil.id, type: nextSigil.type, x: 0, y: 0, rotation: nextSigil.rotation || 0, scale: nextSigil.scale ?? 1, inverted: !!nextSigil.inverted },
-            components: prev.components.filter((c) => c.id !== nextSigil.id),
-          }
-        }
-        return { ...prev, core: null }
+    if (!selected) return
+    patchCircle(selected.circleId, (c) => {
+      if (c.core?.id === selected.partId) {
+        const next = c.components.find((p) => p.role === 'sigil')
+        if (next) return { ...c, core: { id: next.id, type: next.type, x: 0, y: 0, rotation: next.rotation || 0, scale: next.scale ?? 1, inverted: !!next.inverted, color: next.color }, components: c.components.filter((p) => p.id !== next.id) }
+        return { ...c, core: null }
       }
-      return { ...prev, components: prev.components.filter((c) => c.id !== selectedId) }
+      return { ...c, components: c.components.filter((p) => p.id !== selected.partId) }
     })
-    setSelectedId(null)
+    setSelected(null)
+  }
+  function promoteToCore() {
+    if (!selectedPart || isCore) return
+    if (!(selectedPart.role === 'sigil' || canBeCore(selectedPart.type))) return
+    patchCircle(selected.circleId, (c) => {
+      const np = { id: selectedPart.id, type: selectedPart.type, x: 0, y: 0, rotation: selectedPart.rotation || 0, scale: selectedPart.scale ?? 1, inverted: !!selectedPart.inverted, color: selectedPart.color }
+      let components = c.components.filter((p) => p.id !== selectedPart.id)
+      if (c.core && c.core.id !== selectedPart.id) components = [...components, { ...c.core, role: 'sigil', x: 80, y: 0 }]
+      return { ...c, core: np, components }
+    })
   }
 
-  // Apaga o selecionado com a tecla Delete/Backspace (ignora se estiver digitando num campo).
+  // ---- circle management ----
+  function addCircle(concentric) {
+    const act = activeCircle
+    let center = { x: 0, y: 0 }
+    let radius = 170
+    if (concentric && act) {
+      center = { ...act.center }
+      radius = Math.max(RADIUS_MIN, Math.round(radiusOf(act) * 0.55))
+    } else if (act) {
+      center = { x: act.center.x + radiusOf(act) + 200, y: act.center.y }
+    }
+    const c = newCircle({ name: `Circle ${composition.circles.length + 1}`, center, radius, inkColor: inkColor || null })
+    setComposition((prev) => ({
+      ...prev,
+      circles: [...prev.circles, c],
+      relations: concentric && act ? [...prev.relations, { type: 'nest', outer: act.id, inner: c.id }] : prev.relations,
+    }))
+    setActiveCircleId(c.id)
+    setSelected(null)
+  }
+  function deleteCircle(id) {
+    if (composition.circles.length <= 1) { flash('A spell needs at least one circle'); return }
+    const circle = composition.circles.find((c) => c.id === id)
+    const partIds = new Set(circle ? [circle.core?.id, ...circle.components.map((p) => p.id)].filter(Boolean) : [])
+    const remaining = composition.circles.filter((c) => c.id !== id)
+    setComposition((prev) => ({
+      ...prev,
+      circles: prev.circles.filter((c) => c.id !== id),
+      relations: prev.relations.filter((r) => (r.type === 'nest' ? r.outer !== id && r.inner !== id : r.a !== id && r.b !== id && !partIds.has(r.a) && !partIds.has(r.b))),
+    }))
+    if (activeCircleId === id) setActiveCircleId(remaining[0].id)
+    if (selected?.circleId === id) setSelected(null)
+  }
+  const setRingClosed = (id, closed) => patchCircle(id, (c) => ({ ...c, ring: { ...c.ring, closed } }))
+  const setCircleName = (id, name) => patchCircle(id, (c) => ({ ...c, name }))
+
+  // ---- relations ----
+  function addRelation(rel) {
+    setComposition((prev) => {
+      const dup = prev.relations.some((r) => JSON.stringify(r) === JSON.stringify(rel))
+      return dup ? prev : { ...prev, relations: [...prev.relations, rel] }
+    })
+  }
+  function removeRelation(idx) {
+    setComposition((prev) => ({ ...prev, relations: prev.relations.filter((_, i) => i !== idx) }))
+  }
+
+  // ---- selection from canvas ----
+  const selectPart = (circleId, partId) => { setActiveCircleId(circleId); setSelected({ circleId, partId }) }
+  const selectCircle = (circleId) => { setActiveCircleId(circleId); setSelected(null) }
+  const clearSelect = () => setSelected(null)
+
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key !== 'Delete' && e.key !== 'Backspace') return
       const el = document.activeElement
       const tag = el?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable) return
-      if (!selectedId) return
+      if (!selected) return
       e.preventDefault()
       deleteSelected()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [selectedId])
+  }, [selected])
 
-  // Leva o selecionado para o centro (core). Funciona p/ sigils extras e signs-centro.
-  function promoteToCore() {
-    if (!selected || isCore) return
-    if (!(selected.role === 'sigil' || canBeCore(selected.type))) return
-    setComposition((prev) => {
-      const newCore = { id: selected.id, type: selected.type, x: 0, y: 0, rotation: selected.rotation || 0, scale: selected.scale ?? 1, inverted: !!selected.inverted }
-      let components = prev.components.filter((c) => c.id !== selected.id)
-      if (prev.core && prev.core.id !== selected.id) {
-        components = [...components, { ...prev.core, role: 'sigil', x: 80, y: 0 }]
-      }
-      return { ...prev, core: newCore, components }
-    })
-  }
-
-  // ---------- Export / Import / Copy image ----------
+  // ---- export / import / image ----
   function exportObject() {
-    const { ring, core, components, linkCount, name } = composition
-    // Parts carry their own ink color; dyes are derived from the inks actually used.
-    return { format: 'wha-spell@1', name: name || '', ring, core, components, linkCount: linkCount || 0, dyes: usedDyes }
+    return { format: 'wha-spell@2', name: composition.name || '', circles: compForAnalysis.circles, relations: composition.relations }
   }
-
   async function copyJSON() {
-    const json = JSON.stringify(exportObject(), null, 2)
-    try {
-      await navigator.clipboard.writeText(json)
-      flash('Spell JSON copied to clipboard')
-    } catch {
-      flash('Clipboard blocked — could not copy JSON')
-    }
+    try { await navigator.clipboard.writeText(JSON.stringify(exportObject(), null, 2)); flash('Spell JSON copied to clipboard') }
+    catch { flash('Clipboard blocked — could not copy JSON') }
   }
-
   function applyImport() {
     let data
-    try {
-      data = JSON.parse(importText)
-    } catch (e) {
-      setImportError('Invalid JSON: ' + e.message)
-      return
-    }
-    if (!data || typeof data !== 'object' || (!data.core && !(data.components || []).some((c) => c.role === 'sigil'))) {
-      setImportError('JSON must describe a spell with at least one sigil (a "core" or a role:"sigil" component).')
-      return
-    }
-    // Re-id everything so it never collides with the running id counter.
-    const core = data.core ? { ...data.core, id: nextId() } : null
-    const components = (data.components || []).map((c) => ({ ...c, id: nextId() }))
-    setComposition({
-      ring: data.ring && typeof data.ring === 'object' ? data.ring : { closed: false },
-      core,
-      components,
-      linkCount: data.linkCount || 0,
-      dyes: Array.isArray(data.dyes) ? data.dyes : [],
-      name: typeof data.name === 'string' ? data.name : '',
+    try { data = JSON.parse(importText) } catch (e) { setImportError('Invalid JSON: ' + e.message); return }
+    let norm
+    try { norm = toComposition(data.composition || data) } catch { norm = null }
+    if (!norm || !norm.circles.length) { setImportError('Could not read a spell (need a wha-spell@1 or @2 composition).'); return }
+    const idMap = {}
+    const circles = norm.circles.map((c) => {
+      const ncid = nextCircleId(); idMap[c.id] = ncid
+      const core = c.core ? { ...c.core, id: (idMap[c.core.id] = nextId()) } : null
+      const components = (c.components || []).map((p) => ({ ...p, id: (idMap[p.id] = nextId()) }))
+      return { id: ncid, name: c.name || '', center: c.center || { x: 0, y: 0 }, radius: c.radius ?? null, ring: c.ring || { closed: false }, core, components, dyes: c.dyes || [], inkColor: c.inkColor || null }
     })
-    setSelectedId(null)
-    setImportOpen(false)
-    setImportText('')
-    setImportError(null)
-    flash('Spell imported')
+    const relations = (norm.relations || []).map((r) => (r.type === 'nest'
+      ? { type: 'nest', outer: idMap[r.outer] || r.outer, inner: idMap[r.inner] || r.inner }
+      : { type: 'link', a: idMap[r.a] || r.a, b: idMap[r.b] || r.b }))
+    setComposition({ name: norm.name || '', circles, relations })
+    setActiveCircleId(circles[0].id)
+    setSelected(null); setImportOpen(false); setImportText(''); setImportError(null); flash('Spell imported')
   }
 
+  function spellViewBox() {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+    for (const c of composition.circles) {
+      const R = RING_RADII[c.ring?.size] ?? RING_RADII.medium
+      minX = Math.min(minX, c.center.x - R); minY = Math.min(minY, c.center.y - R)
+      maxX = Math.max(maxX, c.center.x + R); maxY = Math.max(maxY, c.center.y + R)
+    }
+    if (!isFinite(minX)) return '-300 -300 600 600'
+    const pad = 50, cx = (minX + maxX) / 2, cy = (minY + maxY) / 2
+    const side = Math.max(maxX - minX, maxY - minY) + pad * 2
+    return `${cx - side / 2} ${cy - side / 2} ${side} ${side}`
+  }
   async function copyImage() {
     const svg = document.querySelector('.glyph-svg')
     if (!svg) return
     const clone = svg.cloneNode(true)
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    // reset zoom/pan: capture the whole glyph regardless of the on-screen view
-    clone.setAttribute('viewBox', '-300 -300 600 600')
-    // drop the selection highlight (dashed "4 3" ring) so the image is clean
-    clone.querySelectorAll('[stroke-dasharray="4 3"]').forEach((el) => el.remove())
+    clone.setAttribute('viewBox', spellViewBox())
+    clone.querySelectorAll('[stroke-dasharray="4 3"], [stroke-dasharray="6 4"]').forEach((el) => el.remove())
     const xml = new XMLSerializer().serializeToString(clone)
     const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml)
-    const out = 1200 // px (2× the 600 viewBox for crispness)
+    const out = 1200
     const title = (composition.name || '').trim()
-    const band = title ? Math.round(out * 0.12) : 0 // dedicated strip above the glyph
+    const band = title ? Math.round(out * 0.12) : 0
     const img = new Image()
     img.onload = () => {
       const canvas = document.createElement('canvas')
-      canvas.width = out
-      canvas.height = out + band
+      canvas.width = out; canvas.height = out + band
       const ctx = canvas.getContext('2d')
-      ctx.fillStyle = '#efe2c4' // parchment (the SVG's CSS bg isn't serialized)
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      // Title in its own strip so it never overlaps the ring.
+      ctx.fillStyle = '#efe2c4'; ctx.fillRect(0, 0, canvas.width, canvas.height)
       if (title) {
         ctx.fillStyle = '#3a2a16'
         ctx.font = `700 ${Math.round(out * 0.05)}px Georgia, "Times New Roman", serif`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
         ctx.fillText(title, out / 2, band / 2, out * 0.9)
       }
       ctx.drawImage(img, 0, band, out, out)
       canvas.toBlob(async (blob) => {
-        try {
-          await navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })])
-          flash('Spell image copied to clipboard')
-        } catch {
-          flash('Image copy not supported in this browser')
-        }
+        try { await navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })]); flash('Spell image copied to clipboard') }
+        catch { flash('Image copy not supported in this browser') }
       }, 'image/png')
     }
     img.onerror = () => flash('Could not render the spell image')
     img.src = url
   }
 
-  const selDef = selected ? getComponentDef(selected.type) : null
-
   return (
     <div className="app">
       <header className="app-header">
         <h1>⬡ Witch Hat Atelier — Spell Analyzer</h1>
-        <p>Compose a glyph: drag sigils to the center and signs around them. Close the ring to activate.</p>
+        <p>Compose glyphs across one or more circles: drag a sigil to a circle's center and signs around it. Nest or link circles to combine spells.</p>
       </header>
 
       <div className="layout">
@@ -281,55 +305,118 @@ export default function App() {
 
           <GlyphCanvas
             composition={composition}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onMove={moveComponent}
+            activeCircleId={activeCircleId}
+            selected={selected}
+            onSelectCircle={selectCircle}
+            onSelectPart={selectPart}
+            onClearSelect={clearSelect}
+            onMovePart={movePart}
+            onMoveCircle={(id, x, y) => patchCircle(id, (c) => ({ ...c, center: { x, y } }))}
             onDropAdd={addComponent}
           />
 
-          {selected && (
+          {selectedPart && (
             <div className="selected-toolbar">
-              <span className="title">{selDef?.name} {isCore ? '(core)' : selected.role === 'sigil' ? '(sigil)' : ''}</span>
-              <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) - 30 + 360) % 360 })}>⟲ -30°</button>
-              <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) - 5 + 360) % 360 })} title="Fine rotate">⟲ -5°</button>
-              <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) + 5) % 360 })} title="Fine rotate">⟳ +5°</button>
-              <button onClick={() => updateSelected({ rotation: ((selected.rotation || 0) + 30) % 360 })}>⟳ +30°</button>
-              <button onClick={() => updateSelected({ scale: Math.max(0.4, (selected.scale ?? 1) - 0.15) })}>− smaller</button>
-              <button onClick={() => updateSelected({ scale: Math.min(2.5, (selected.scale ?? 1) + 0.15) })}>+ larger</button>
+              <span className="title">{selDef?.name} {isCore ? '(core)' : selectedPart.role === 'sigil' ? '(sigil)' : ''}</span>
+              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) - 30 + 360) % 360 })}>⟲ -30°</button>
+              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) - 5 + 360) % 360 })} title="Fine rotate">⟲ -5°</button>
+              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) + 5) % 360 })} title="Fine rotate">⟳ +5°</button>
+              <button onClick={() => updateSelected({ rotation: ((selectedPart.rotation || 0) + 30) % 360 })}>⟳ +30°</button>
+              <button onClick={() => updateSelected({ scale: Math.max(0.4, (selectedPart.scale ?? 1) - 0.15) })}>− smaller</button>
+              <button onClick={() => updateSelected({ scale: Math.min(2.5, (selectedPart.scale ?? 1) + 0.15) })}>+ larger</button>
               {selDef?.invertible && (
-                <button onClick={() => updateSelected({ inverted: !selected.inverted })}>{selected.inverted ? 'un-invert' : 'invert'}</button>
+                <button onClick={() => updateSelected({ inverted: !selectedPart.inverted })}>{selectedPart.inverted ? 'un-invert' : 'invert'}</button>
               )}
-              {!isCore && (selected.role === 'sigil' || canBeCore(selected.type)) && (
+              {!isCore && (selectedPart.role === 'sigil' || canBeCore(selectedPart.type)) && (
                 <button onClick={promoteToCore}>↦ to center</button>
               )}
               <button className="danger" onClick={deleteSelected} title="Delete (Del)">delete</button>
             </div>
           )}
 
-          <div className="ring-size" role="group" aria-label="Ring size">
-            <span className="rs-label">Ring size</span>
-            {['small', 'medium', 'big'].map((sz) => (
-              <button
-                key={sz}
-                className={`rs-btn ${(composition.ring.size || 'medium') === sz ? 'on' : ''}`}
-                onClick={() => setComposition((p) => ({ ...p, ring: { ...p.ring, size: sz } }))}
-              >
-                {sz}
-              </button>
-            ))}
+          {/* ---- Circles panel ---- */}
+          <div className="circles-panel">
+            <div className="cp-row">
+              <span className="cp-label">Circles</span>
+              {composition.circles.map((c) => (
+                <button
+                  key={c.id}
+                  className={`cp-chip ${c.id === activeCircleId ? 'on' : ''}`}
+                  onClick={() => selectCircle(c.id)}
+                  title="Select / activate this circle"
+                >
+                  {c.name || c.id}
+                </button>
+              ))}
+              <button className="cp-add" onClick={() => addCircle(false)} title="Add a separate circle">+ circle</button>
+              <button className="cp-add" onClick={() => addCircle(true)} title="Add a smaller ring nested inside the active circle">+ inner ring</button>
+            </div>
+
+            {activeCircle && (
+              <div className="cp-row">
+                <input
+                  className="cp-name"
+                  type="text"
+                  value={activeCircle.name || ''}
+                  placeholder={activeCircle.id}
+                  onChange={(e) => setCircleName(activeCircle.id, e.target.value)}
+                  aria-label="Active circle name"
+                />
+                <span className="cp-sub">size</span>
+                <input type="range" className="cp-size" min={RADIUS_MIN} max={RADIUS_MAX} step={2}
+                  value={radiusOf(activeCircle)}
+                  onChange={(e) => patchCircle(activeCircle.id, (c) => ({ ...c, radius: Number(e.target.value) }))}
+                  aria-label="Circle size" />
+                <span className="cp-sizeval">{Math.round(radiusOf(activeCircle))}</span>
+                <button className={activeCircle.ring?.closed ? '' : 'primary'} onClick={() => setRingClosed(activeCircle.id, !activeCircle.ring?.closed)}>
+                  {activeCircle.ring?.closed ? 'open ring' : 'close ring'}
+                </button>
+                <button className="cp-ink" onClick={() => patchCircle(activeCircle.id, (c) => ({ ...c, inkColor: inkColor || null }))}
+                  title={inkColor ? 'Tint this ring with the selected ink' : 'Reset ring to default ink (pick an ink below first)'}>
+                  <span className="swatch" style={{ background: activeCircle.inkColor || '#5a3b1e' }} /> ink ring
+                </button>
+                {composition.circles.length > 1 && (
+                  <button className="danger" onClick={() => deleteCircle(activeCircle.id)}>delete circle</button>
+                )}
+              </div>
+            )}
+
+            {activeCircle && otherCircles.length > 0 && (
+              <div className="cp-row">
+                <span className="cp-sub">nest inside</span>
+                <select value="" onChange={(e) => { if (e.target.value) addRelation({ type: 'nest', outer: e.target.value, inner: activeCircle.id }) }}>
+                  <option value="">choose outer…</option>
+                  {otherCircles.map((c) => <option key={c.id} value={c.id}>{c.name || c.id}</option>)}
+                </select>
+                <span className="cp-sub">link to</span>
+                <select value="" onChange={(e) => { if (e.target.value) addRelation({ type: 'link', a: activeCircle.id, b: e.target.value }) }}>
+                  <option value="">choose circle…</option>
+                  {otherCircles.map((c) => <option key={c.id} value={c.id}>{c.name || c.id}</option>)}
+                </select>
+              </div>
+            )}
+
+            {composition.relations.length > 0 && (
+              <div className="cp-rels">
+                {composition.relations.map((r, i) => {
+                  const nm = (id) => composition.circles.find((c) => c.id === id)?.name || id
+                  const label = r.type === 'nest' ? `${nm(r.inner)} ⊂ ${nm(r.outer)}` : `${nm(r.a)} ↔ ${nm(r.b)}`
+                  return (
+                    <span key={i} className={`rel-chip ${r.type}`}>
+                      {r.type === 'nest' ? '▣ ' : '∿ '}{label}
+                      <button onClick={() => removeRelation(i)} title="Remove relation">×</button>
+                    </span>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           <div className="canvas-toolbar">
-            <button
-              className={composition.ring.closed ? '' : 'primary'}
-              onClick={() => setComposition((p) => ({ ...p, ring: { ...p.ring, closed: !p.ring.closed } }))}
-            >
-              {composition.ring.closed ? 'Open ring (deactivate)' : 'Close ring (activate)'}
-            </button>
             <button onClick={copyJSON}>Export (JSON)</button>
             <button onClick={() => { setImportText(''); setImportError(null); setImportOpen(true) }}>Import (JSON)</button>
             <button onClick={copyImage}>Copy image</button>
-            <button className="danger" onClick={() => { setComposition(EMPTY); setSelectedId(null) }}>Clear all</button>
+            <button className="danger" onClick={() => { const c = newCircle({ name: 'Circle 1' }); setComposition({ name: '', circles: [c], relations: [] }); setActiveCircleId(c.id); setSelected(null) }}>Clear all</button>
           </div>
 
           <InkPanel activeInk={activeInk} onSelect={selectInk} />
@@ -344,11 +431,11 @@ export default function App() {
         <div className="modal-overlay" onClick={() => setImportOpen(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3>Import spell (JSON)</h3>
-            <p className="hint">Paste a spell JSON (as produced by “Export (JSON)”).</p>
+            <p className="hint">Paste a spell JSON (wha-spell@1 or @2, as produced by “Export (JSON)”).</p>
             <textarea
               value={importText}
               onChange={(e) => { setImportText(e.target.value); setImportError(null) }}
-              placeholder='{ "format": "wha-spell@1", "core": { ... }, "components": [ ... ] }'
+              placeholder='{ "format": "wha-spell@2", "circles": [ ... ], "relations": [ ... ] }'
               rows={12}
               spellCheck={false}
             />
