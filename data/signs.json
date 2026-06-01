@@ -118,6 +118,7 @@
       "invertedEffect": "Reintegrates pulverized material (see Integration).",
       "canBeCenter": false,
       "surrounds": false,
+      "defaultFacing": "outward",
       "pairsBestWith": [
         "earth"
       ],

@@ -36,6 +36,17 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Crush facing — default orientation = Wall Breaker (outward), NOT Integration.** Canon:
+  non-inverted Crush = Wall Breaker (peaks point **outward**, destroys → dust); inverted Crush =
+  **Integration** (peaks point **inward**, reassembles powder to its source shape *temporarily* —
+  Tartah ID'd powdered herbs by their original form). The engine verbs are canon-correct
+  (`verb`=pulverize, `invertedVerb`=reassemble) — do NOT swap them or Wall Breaker breaks. The real
+  bug was the app drawing Crush **inward by default** (`inwardRotation`, "top faces center") so a
+  fresh non-inverted Crush *looked* like Integration but deduced destroy. Fix: gave Crush
+  `defaultFacing:"outward"` (signs.json) so default render = peaks-outward = Wall Breaker = matches
+  `inverted:false`; inverting then flips both art (inward) and effect (reassemble) together. Integration
+  also works on ANY powder (herbs), not just earth's stone/sand — "manipulate not create" = it only
+  rearranges existing particles, never conjures matter.
 - 2026-06-01: **Boulder Stretch Rope (canon, earth)** — Richeh's spell: Earth core + a SINGLE large
   Weave keystone *wrapped around* it (not a ring of several — Weave "is supposed to surround the central
   sigil", signs.md:139). Transmutes rigid stone into a long flexible ribbon/rope. Runs in earth's
