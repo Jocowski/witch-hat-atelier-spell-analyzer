@@ -32,8 +32,20 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "purify", "count": 10, "placement": "around", "orientation": "outward", "inverted": false },
-          { "id": "collection", "count": 2, "placement": "sides", "orientation": "outward", "inverted": false }
+          {
+            "id": "purify",
+            "count": 10,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "collection",
+            "count": 2,
+            "placement": "sides",
+            "orientation": "outward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       }
@@ -48,8 +60,20 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "orb", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
-          { "id": "column", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false }
+          {
+            "id": "orb",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "sides",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       }
@@ -64,7 +88,13 @@
       "composition": {
         "core": "fire",
         "signs": [
-          { "id": "levitation", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+          {
+            "id": "levitation",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       }
@@ -79,8 +109,20 @@
       "composition": {
         "core": "fire",
         "signs": [
-          { "id": "radial", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
-          { "id": "column", "count": 4, "placement": "alternating", "orientation": "outward", "inverted": true }
+          {
+            "id": "radial",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "outward",
+            "inverted": true
+          }
         ],
         "symmetry": "radial"
       }
@@ -95,8 +137,20 @@
       "composition": {
         "core": "fire",
         "signs": [
-          { "id": "column", "count": 1, "placement": "center", "orientation": "front", "inverted": false },
-          { "id": "direction", "count": 10, "placement": "sides", "orientation": "front", "inverted": false }
+          {
+            "id": "column",
+            "count": 1,
+            "placement": "center",
+            "orientation": "front",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 10,
+            "placement": "sides",
+            "orientation": "front",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       }
@@ -111,9 +165,27 @@
       "composition": {
         "core": "fire",
         "signs": [
-          { "id": "column", "count": 2, "placement": "around", "orientation": "outward", "inverted": false },
-          { "id": "sign_of_wind", "count": 2, "placement": "around", "orientation": "outward", "inverted": false },
-          { "id": "sights_set", "count": 1, "placement": "satellite", "orientation": "outward", "inverted": false }
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "sign_of_wind",
+            "count": 2,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "sights_set",
+            "count": 1,
+            "placement": "satellite",
+            "orientation": "outward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       }
@@ -128,7 +200,13 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "rain", "count": 1, "placement": "surrounds", "orientation": "outward", "inverted": false }
+          {
+            "id": "rain",
+            "count": 1,
+            "placement": "surrounds",
+            "orientation": "outward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       }
@@ -143,8 +221,20 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "column", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
-          { "id": "levitation", "count": 4, "placement": "alternating", "orientation": "front", "inverted": false }
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "levitation",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "front",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       }
@@ -159,8 +249,20 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false },
-          { "id": "direction", "count": 4, "placement": "alternating", "orientation": "inward", "inverted": false }
+          {
+            "id": "column",
+            "count": 8,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       }
@@ -175,8 +277,20 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "bolt", "count": 5, "placement": "center", "orientation": "outward", "inverted": false },
-          { "id": "direction", "count": 4, "placement": "back", "orientation": "front", "inverted": false }
+          {
+            "id": "bolt",
+            "count": 5,
+            "placement": "center",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 4,
+            "placement": "back",
+            "orientation": "front",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       }
@@ -191,10 +305,34 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "column", "count": 2, "placement": "top", "orientation": "front", "inverted": false },
-          { "id": "direction", "count": 2, "placement": "bottom", "orientation": "front", "inverted": false },
-          { "id": "unknown_01", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false },
-          { "id": "unknown_02", "count": 3, "placement": "bottom", "orientation": "inward", "inverted": false }
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "top",
+            "orientation": "front",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 2,
+            "placement": "bottom",
+            "orientation": "front",
+            "inverted": false
+          },
+          {
+            "id": "unknown_01",
+            "count": 2,
+            "placement": "sides",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_02",
+            "count": 3,
+            "placement": "bottom",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       },
@@ -210,10 +348,34 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "dispersion", "count": 1, "placement": "top", "orientation": "inward", "inverted": false },
-          { "id": "column", "count": 2, "placement": "top", "orientation": "front", "inverted": false },
-          { "id": "unknown_04", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false },
-          { "id": "unknown_03", "count": 1, "placement": "bottom", "orientation": "inward", "inverted": false }
+          {
+            "id": "dispersion",
+            "count": 1,
+            "placement": "top",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "top",
+            "orientation": "front",
+            "inverted": false
+          },
+          {
+            "id": "unknown_04",
+            "count": 2,
+            "placement": "sides",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_03",
+            "count": 1,
+            "placement": "bottom",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       },
@@ -229,11 +391,53 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false }
+          {
+            "id": "column",
+            "count": 8,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
       "notes": "Coco's first spell at Qifrey's Atelier (unofficial name). A water core ringed by eight inward Column signs. Balanced ⇒ straight-up jet; this documented build enlarges the south column (scale 2.35) so the jet leans toward it — the direction-by-size lesson (signs.md:34) that becomes the Skysoaring Seal. The lone oversized column reads as directional-bias magnitude ~0.18 toward the column, just under the engine's 0.25 'biased' threshold, so the engine reports it 'balanced' — override per canon."
+    },
+    {
+      "id": "vapor_bubble_spell",
+      "name": "Vapor Bubble Spell",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "A two-circle dew-still: the outer Wind ring draws in humid air (Gather), channels it (Column) and chills it past its dew point (Cool); the nested Water core collects the condensate into a single globule of fresh water.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          {
+            "id": "gather",
+            "count": 2,
+            "placement": "inner-ring",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "cool",
+            "count": 4,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Canon (volume 12 bonus; introduces the Cool and Gather signs). A nested two-circle spell: inner closed circle = Water core (collection basin); outer open circle = Wind ×2 sigils + 2 Gather + 4 Column + 4 Cool. Harvests atmospheric moisture in water's cheap collect mode. The matcher keys on core + sign multiset, so the two outer Wind sigils (role:sigil) are recorded here in notes, not the sign list. NOTE: multi-circle spells currently skip the catalog matcher, so this entry will not surface as a match until the multi-circle matching fix lands."
     }
   ]
 }

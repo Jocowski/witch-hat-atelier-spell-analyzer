@@ -22,6 +22,18 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Vapor Bubble Spell (canon, water; vol.12 bonus)** — a **nested two-circle**
+  dew-still and the debut of the **Cool** (signs.md:147, "to help it condense from the air")
+  and **Gather** (signs.md:197, "actively draw material in") signs. Inner closed circle =
+  bare Water core acting as a *collection basin* (the engine's "no signs around core" warning
+  is intended here, not a defect). Outer open circle = Wind ×2 sigils + 2 Gather + 4 balanced
+  Column + 4 Cool = an air-conditioning plant (circulate → draw vapor in → channel → chill
+  past dew point). Runs in water's CHEAP collect mode (sigils.md:41): harvests atmospheric
+  humidity rather than creating water — a true air/water hybrid. Engine artifacts: balanced
+  Columns read as "beam above seal" (they actually just confine airflow); multi-circle spells
+  skip the catalog matcher (analyze.js:120 returns empty `similar`), so it won't self-match
+  until the multi-circle matching fix lands. Closest canon kin: Purify (air-sourced cousin),
+  Rainbringer (keeps the water instead of dropping it as rain).
 - 2026-06-01: **Water Pen (canon, water)** — a water **tool** spell, not a weapon: a water core with
   **Dispersion + 2 horizontal Columns** at the top and two new unknown signs (Unknown 4 = arc, mirrored
   side pair; Unknown 3 = triangle, bottom). KEY pairing: Dispersion ("leaks/meters outward", signs.md:45)
