@@ -624,6 +624,37 @@
       "render": "fill"
     },
     {
+      "id": "unknown_05",
+      "name": "Unknown Sign 5",
+      "glyph": "⌒",
+      "svgPath": "M-9.92 -6.76 C-15.35 -4.06 -21.00 2.85 -21.00 6.79 C-21.00 9.77 -18.13 8.82 -16.64 5.34 C-13.72 -1.48 -7.33 -5.41 0.81 -5.41 C7.95 -5.40 13.10 -1.78 17.00 5.96 C17.83 7.60 19.06 9.13 19.75 9.35 C22.00 10.08 21.10 5.14 18.12 0.43 C14.52 -5.24 6.85 -9.41 0.00 -9.41 C-2.98 -9.41 -6.48 -8.47 -9.92 -6.76",
+      "effect": "Unidentified half-circle (semicircular arc) sign. In the Sand Cage spell it appears as a top/bottom pair at the seal's north and south points, flanking the central earth sigil along the vertical axis.",
+      "effectTags": [
+        "unknown"
+      ],
+      "invertible": false,
+      "canBeCenter": false,
+      "surrounds": false,
+      "family": "unknown",
+      "status": "unidentified",
+      "appearsIn": [
+        "sand_cage"
+      ],
+      "observations": [
+        "Shaped like a half circle (a semicircular arc). In Sand Cage it appears as a vertical top/bottom pair (north and south), the two copies mirrored across the horizontal.",
+        "Orientation: the arc's CONVEX (closed) side faces the core; its OPEN mouth faces outward toward the ring. It curves AROUND the core's poles rather than capping an outer shell.",
+        "Sits outboard of the inverted Crush signs on the north-south axis, between them and the ring — at the two poles the side Column 'bars' do not cover."
+      ],
+      "theories": [
+        "Closing hoop/band: the top and bottom rings that bind the side Column 'bars' into a closed, RIGID cage frame (like the hoops of a barrel or birdcage) — the element that turns open bars into a sealed enclosure. Fits Sand Cage's 'rigid cage' result.",
+        "Inward-recurving lip (anti-escape): the cage wall folds back inward at the poles (like the recurved rim of a jar) to seal the weak top/bottom points so a struggling captive cannot push out — consistent with caging the thrashing Scalewolf.",
+        "NOTE: an earlier guess that this is the SAME sign as unknown_04 (Water Pen arc) is withdrawn — unknown_04 traces a body's OUTWARD-bulging flank (convex outward), whereas unknown_05's convex faces the core (opposite concavity), so they likely encode different roles.",
+        "Low confidence: seen in only one spell (Sand Cage); the wiki lists it as function-unknown. A second appearance is needed to confirm."
+      ],
+      "reference": "signs.md (Unknown Signs), Sand Cage",
+      "render": "fill"
+    },
+    {
       "id": "sights_set",
       "name": "Sights Set",
       "glyph": "◎",

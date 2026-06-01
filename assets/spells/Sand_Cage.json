@@ -1,0 +1,39 @@
+{
+  "format": "wha-spell@2",
+  "name": "Sand Cage",
+  "circles": [
+    {
+      "id": "k3",
+      "name": "Circle 1",
+      "center": { "x": 0, "y": 0 },
+      "radius": 170,
+      "ring": { "closed": false },
+      "core": { "id": "c3", "type": "earth", "x": -1.6053543090820312, "y": -0.80267333984375, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+      "components": [
+        { "id": "c4", "type": "column", "role": "sign", "x": -122.98677696681325, "y": -2.5426422357558707, "rotation": 91.18437056401109, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c5", "type": "column", "role": "sign", "x": -90.8797518203289, "y": -2.2734129428863667, "rotation": 89.40910019964258, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c6", "type": "column", "role": "sign", "x": 74.64883089065552, "y": -60.73411178588867, "rotation": 229.36026779498002, "scale": 1.15, "inverted": false, "mirrored": false },
+        { "id": "c7", "type": "direction", "role": "sign", "x": 90.87975944972344, "y": -62.47407913208009, "rotation": 240, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c8", "type": "direction", "role": "sign", "x": 79.6422945449383, "y": -76.38880157470706, "rotation": 224.45431048732416, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c9", "type": "column", "role": "sign", "x": 85.70887885594065, "y": 0.6680684089661142, "rotation": 268.89886699956514, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c10", "type": "column", "role": "sign", "x": 118.61857734226875, "y": 0.1346139907836772, "rotation": 270.06502194173186, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c11", "type": "column", "role": "sign", "x": 64.21404379606247, "y": 62.07524871826172, "rotation": 313.32312994108486, "scale": 1.15, "inverted": false, "mirrored": false },
+        { "id": "c12", "type": "crush", "role": "sign", "x": 0, "y": -86.41973876953125, "rotation": 0, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c13", "type": "crush", "role": "sign", "x": 0.9800858089954403, "y": 87.62626266479491, "rotation": 179.35918254165608, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c14", "type": "column", "role": "sign", "x": -73.22089256739919, "y": 63.27675628662114, "rotation": 49.16675497025517, "scale": 1.15, "inverted": false, "mirrored": false },
+        { "id": "c15", "type": "column", "role": "sign", "x": -81.24764122462578, "y": -60.86873245239259, "rotation": 126.8396474215021, "scale": 1.15, "inverted": false, "mirrored": false },
+        { "id": "c16", "type": "direction", "role": "sign", "x": 68.22742348909378, "y": 78.1287612915039, "rotation": 320.8055393982022, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c17", "type": "direction", "role": "sign", "x": -86.51154456638984, "y": -76.92224121093751, "rotation": 130.52177876295673, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c18", "type": "direction", "role": "sign", "x": 80.44497551417658, "y": 65.68478393554685, "rotation": 300, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c19", "type": "direction", "role": "sign", "x": -78.66220712661742, "y": 79.1956558227539, "rotation": 43.30713494831389, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c20", "type": "direction", "role": "sign", "x": -89.27439751124685, "y": 64.88211441040045, "rotation": 59.99999999999994, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c21", "type": "direction", "role": "sign", "x": -97.30115379786797, "y": -62.47407913208009, "rotation": 120, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c24", "type": "unknown_05", "role": "sign", "x": 0.9800907561809709, "y": -121.33863067626956, "rotation": 180.82006076418088, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c25", "type": "unknown_05", "role": "sign", "x": -0.802673816680894, "y": 121.73745727539062, "rotation": 0.37777325577587817, "scale": 1, "inverted": false, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

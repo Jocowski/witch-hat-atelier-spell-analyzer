@@ -404,6 +404,30 @@ function is unknown.
 
 **Spells Using Unknown Sign 4:** Water Pen
 
+### Unknown Sign 5
+
+![Unknown Sign 5](../assets/images/signs/unknown/Unknown_05.png)
+
+A **half-circle** (semicircular arc) mark, catalogued from the **Sand Cage** spell, where it appears as a
+**top/bottom pair at the seal's north and south points**, on the vertical axis just outboard of the inverted
+Crush signs (between them and the ring). Its function is unknown.
+
+- **Observations:** The arc's **convex (closed) side faces the core** and its **open mouth faces outward**
+  toward the ring — it curves *around* the core's poles rather than capping an outer shell. It sits exactly at
+  the two poles that the side Column "bars" leave uncovered. The two copies are horizontal mirror images of one
+  another.
+- **Theories (unconfirmed):**
+  - *Closing hoop/band* — the top and bottom rings that bind the side Columns into a closed, **rigid** cage
+    frame (like the hoops of a barrel or birdcage), turning open bars into a sealed enclosure. This fits Sand
+    Cage's "rigid cage" result.
+  - *Inward-recurving lip (anti-escape)* — the cage wall folding back inward at the poles (like the recurved rim
+    of a jar) to seal the weak top/bottom points so a struggling captive cannot push out.
+  - It is **not** assumed to be the same sign as Unknown Sign 4: that arc traces a body's *outward*-bulging flank
+    (convex outward), whereas this one's convex faces the core (opposite concavity), so they likely differ.
+- **Caveat:** seen in only one spell (Sand Cage) — insufficient data; a second appearance is needed to confirm.
+
+**Spells Using Unknown Sign 5:** Sand Cage
+
 ---
 
 Source: <https://witchhatatelier.telepedia.net/wiki/Signs_Explained>

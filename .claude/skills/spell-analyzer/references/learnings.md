@@ -36,6 +36,25 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Sand Cage (canon, earth)** — Tetia's spell to cage the Scalewolf Euini; the **rigid sibling of
+  the Serpent's Bed of Sand** ("if sand can be made soft as a bed, it can also be made rigid as a cage").
+  Earth core + inverted **Crush ×2** (N/S, supply the RIGIDITY by reintegrating loose grains, temporarily,
+  signs.md:73) + **Column ×8** (E/W pairs one-normal-one-inverted + 4 intercardinal, the cage bars) + **Region
+  ×8** (aim/contain) + the NEW **half-circle Unknown Sign 5 ×2** at the N/S poles. Runs in earth's
+  manipulate-not-create mode (sigils.md:53) — needs real sand present; the cage is TEMPORARY (inverted Crush).
+  Self-matches the catalog ~0.86 once added. LESSON: a fresh app export that uses `radial` at the N/S poles was a
+  **placeholder** for a sign the app lacked — the canon "half circle signs" are a distinct unknown sign, not
+  Radial; mis-reading them injected a spurious "tempered/gentle" power clause. Always check whether an odd sign
+  is a stand-in for a missing one. The intercardinal "fusion of 1 Column + 2 Region" is one canon sign modelled
+  as its 3 components.
+- 2026-06-01: **Unknown Sign 5 (`unknown_05`) catalogued** — a half-circle/arc from Sand Cage, vertical N/S
+  pair, **convex side toward the core, open mouth outward** (curves AROUND the poles, does NOT cap an outer
+  shell). Best theories: a closing hoop/band that binds the Column bars into a rigid cage, or an inward-recurving
+  anti-escape lip. NOT the same as `unknown_04` (Water Pen arc traces an outward-bulging flank = opposite
+  concavity). Seen in one spell only → low confidence. New-unknown-sign workflow works: add the signs.json entry
+  FIRST (placeholder svgPath), drop `Unknown_NN.png` in assets/images/signs/unknown/, run `vectorize:signs`
+  (fills the path), add the grammar operator, run `unknown:report`.
+
 - 2026-06-01: **Crush facing — default orientation = Wall Breaker (outward), NOT Integration.** Canon:
   non-inverted Crush = Wall Breaker (peaks point **outward**, destroys → dust); inverted Crush =
   **Integration** (peaks point **inward**, reassembles powder to its source shape *temporarily* —

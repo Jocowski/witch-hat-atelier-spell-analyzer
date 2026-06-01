@@ -500,6 +500,26 @@
         "symmetry": "radial"
       },
       "notes": "Canon earth spell (unofficial name); the inverse of the Wall Breaker Seal — same Earth core + ring of Crush keystones, but the Crush signs are INVERTED so the effect runs backwards: instead of pulverizing matter to dust, it pulls existing particles back into their source object's form. The reassembly is TEMPORARY — once the spell lapses the powder slumps back to a pile (signs.md:73). Created by Tartah & Coco to identify unlabeled powdered medicinal herbs by their reconstructed shape, after Tartah's silverwash (total colour-blindness) prevented him telling them apart. Works on ANY solid powder, not just earth's stone/sand, because earth only manipulates/rearranges existing particles — it never conjures matter (sigils.md:53)."
+    },
+    {
+      "id": "sand_cage",
+      "name": "Sand Cage",
+      "category": "earth",
+      "origin": "canon",
+      "confidence": "medium",
+      "effect": "Builds a rigid cage of sand around a target to trap it; the rigid counterpart of the Serpent's Bed of Sand ('if sand can be made soft as a bed, it can also be made rigid as a cage').",
+      "composition": {
+        "core": "earth",
+        "signs": [
+          { "id": "crush", "count": 2, "placement": "north-south axis", "orientation": "inward", "inverted": true },
+          { "id": "column", "count": 6, "placement": "sides + intercardinals", "orientation": "inward", "inverted": false },
+          { "id": "column", "count": 2, "placement": "east-west outer", "orientation": "outward", "inverted": true },
+          { "id": "direction", "count": 8, "placement": "intercardinals", "orientation": "inward", "inverted": false },
+          { "id": "unknown_05", "count": 2, "placement": "north-south poles", "orientation": "convex-inward", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Canon earth spell (unofficial name); used by Tetia to trap the Scaled Wolf Euini so the atelier could attempt the inverted Scalewolf Curse. Earth manipulates, does not create (sigils.md:53), so it needs real sand/earth present. RIGIDITY comes from the INVERTED Crush signs reintegrating loose grains into a cohesive solid (temporarily; signs.md:73) — the rigid sibling of the Serpent's Bed of Sand (soft). The canon construction (per the wiki): Earth core; a pair of Columns at east and west each pointing at one another (one normal + one inverted); inverted Crush on the N-S axis between the core and the half-circle signs; an Unknown half-circle sign (catalogued here as unknown_05) at the N and S poles; and a fusion of one Column + two Region (direction) signs at each intercardinal point (modelled here as the 3 component signs). Two unknown signs => the deduced effect is flagged incomplete. confidence=medium (leans on the unidentified unknown_05 and the column/region 'fusion' decomposition)."
     }
   ]
 }
