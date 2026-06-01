@@ -1,8 +1,20 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, CANVAS_RADIUS } from '../src/engine/geometry.js'
+import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, classifyZone, CANVAS_RADIUS } from '../src/engine/geometry.js'
 
 const directional = () => 'directional'
+
+test('classifyZone: inside / ring band / outside relative to radius', () => {
+  const R = 100
+  assert.equal(classifyZone(0, -50, R), 'inside') // 0.5R
+  assert.equal(classifyZone(0, -90, R), 'ring') // 0.9R within 0.85..1.05
+  assert.equal(classifyZone(0, -130, R), 'outside') // 1.3R
+})
+
+test('classifyZone: missing position or radius defaults to inside', () => {
+  assert.equal(classifyZone(null, null, 100), 'inside')
+  assert.equal(classifyZone(undefined, undefined, 100), 'inside')
+})
 
 test('toPolar: norte = 0°', () => {
   const { angle } = toPolar(0, -100)

@@ -117,7 +117,10 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   //   column/dispersion (FORM directional) — beams ABOVE the seal by default; positional
   //     imbalance skews the beam (the Watershot lesson). "Above the seal" is the out-of-plane
   //     default, NOT a compass north — only a genuine lateral bias gets a compass label.
-  const signComps = composition.components.filter((c) => c.role === 'sign')
+  // Aim/region/balance read only INSIDE-ring signs — an outside mark (zone 'outside') is an
+  // external protrusion and must not steer the spell. (Components are zone-tagged in compose.js;
+  // pure deduce tests pass no zone, so everything counts as inside there.)
+  const signComps = composition.components.filter((c) => c.role === 'sign' && c.zone !== 'outside')
   const familyOf = (t) => signMap[t]?.family
 
   const aimSigns = signComps.filter((c) => g.operators[c.type]?.kind === 'direction')
@@ -210,8 +213,8 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     )
   }
 
-  // ----- Stability & power labels -----
-  const symmetry = computeSymmetry(composition.components)
+  // ----- Stability & power labels (inside-ring signs only) -----
+  const symmetry = computeSymmetry(composition.components.filter((c) => c.zone !== 'outside'))
   const stability = g.stability[symmetry] || g.stability.none
   let powerLabel = g.power.balanced
   if (types.has('radial')) powerLabel = g.power.tempered

@@ -130,6 +130,13 @@
     "8. Anotar avisos (instabilidade, desbalanço, inversões, links)."
   ],
 
+  "zones": {
+    "note": "A component's zone comes from its distance to the circle center as a fraction of the ring radius: inside (<= ringBandFrac), ring (the band ringBandFrac..outsideFrac), outside (> outsideFrac). outerMaxFrac is how far outside the ring the canvas lets a part be dragged. Outside signs are external marks/protrusions: they do NOT skew the inside-ring aim/symmetry/balance.",
+    "ringBandFrac": 0.85,
+    "outsideFrac": 1.05,
+    "outerMaxFrac": 1.7
+  },
+
   "matching": {
     "threshold": 0.7,
     "weights": {
@@ -138,6 +145,6 @@
       "symmetryMatch": 0.1,
       "placementMatch": 0.1
     },
-    "note": "signSetMatch usa similaridade de multiconjunto (tipos + contagens). placementMatch compara anéis/ângulos relativos. Inversões contam como variante (pode apontar para o spell invertido correspondente)."
+    "note": "signSetMatch usa similaridade de multiconjunto (tipos + contagens, com sufixo @out para signs na zona externa). placementMatch compara anéis/ângulos relativos. Inversões contam como variante (pode apontar para o spell invertido correspondente). Spells multi-círculo usam uma assinatura combinada (união dos signs de todos os círculos + conjunto de cores)."
   }
 }

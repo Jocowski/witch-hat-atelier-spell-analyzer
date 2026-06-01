@@ -19,6 +19,23 @@ export function toCartesian(angle, radius) {
   return { x: r * Math.sin(rad), y: -r * Math.cos(rad) }
 }
 
+// Zone of a component relative to its circle's ring: 'inside' | 'ring' | 'outside'.
+// Read from its distance to the circle center as a fraction of the ring radius (px).
+// Components with no position (catalog recipes) or no radius default to 'inside'.
+// `zones` is the rules.json block { ringBandFrac, outsideFrac } (defaults are conservative).
+const DEFAULT_ZONES = { ringBandFrac: 0.85, outsideFrac: 1.05, outerMaxFrac: 1.7 }
+export function classifyZone(x, y, radius, zones = DEFAULT_ZONES) {
+  if (x == null || y == null) return 'inside'
+  const R = radius || CANVAS_RADIUS
+  if (!R) return 'inside'
+  const frac = Math.hypot(x, y) / R
+  const ringBand = zones.ringBandFrac ?? DEFAULT_ZONES.ringBandFrac
+  const outside = zones.outsideFrac ?? DEFAULT_ZONES.outsideFrac
+  if (frac > outside) return 'outside'
+  if (frac > ringBand) return 'ring'
+  return 'inside'
+}
+
 // Agrupa ângulos em N setores e mede a distribuição para inferir simetria.
 export function computeSymmetry(components) {
   const signs = components.filter((c) => c.role === 'sign')

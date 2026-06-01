@@ -437,7 +437,7 @@
         ],
         "symmetry": "bilateral"
       },
-      "notes": "Canon (volume 12 bonus; introduces the Cool and Gather signs). A nested two-circle spell: inner closed circle = Water core (collection basin); outer open circle = Wind ×2 sigils + 2 Gather + 4 Column + 4 Cool. Harvests atmospheric moisture in water's cheap collect mode. The matcher keys on core + sign multiset, so the two outer Wind sigils (role:sigil) are recorded here in notes, not the sign list. NOTE: multi-circle spells currently skip the catalog matcher, so this entry will not surface as a match until the multi-circle matching fix lands."
+      "notes": "Canon (volume 12 bonus; introduces the Cool and Gather signs). A nested two-circle spell: inner closed circle = Water core (collection basin); outer open circle = Wind ×2 sigils + 2 Gather + 4 Column + 4 Cool. Harvests atmospheric moisture in water's cheap collect mode. The matcher keys on core + sign multiset, so the two outer Wind sigils (role:sigil) are recorded here in notes, not the sign list."
     }
   ]
 }

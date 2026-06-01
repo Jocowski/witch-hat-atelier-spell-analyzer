@@ -49,6 +49,22 @@ test('analyzeCircleWith reproduces the single-ring pipeline (fire + columns => a
   assert.equal(r.analysis.aim, 'above the seal')
 })
 
+test('analyzeCircleWith: an outside-ring sign is listed but does not skew the aim/balance', () => {
+  // Two balanced columns inside the ring (left/right) + one column far OUTSIDE on the right.
+  const radius = 100
+  const mk = (type, x, y) => ({ id: `s${id++}`, type, role: 'sign', x, y, rotation: 0, scale: 1, inverted: false })
+  const c = {
+    id: 'k0', name: '', ring: { closed: true }, radius,
+    core: { id: `c${id++}`, type: 'water', x: 0, y: 0 },
+    components: [mk('column', -50, 0), mk('column', 50, 0), mk('column', 150, 0)], // 1.5R = outside
+  }
+  const r = analyzeCircleWith(deps, c)
+  assert.equal(r.analysis.signCount, 3)                 // outside sign still counted/listed
+  assert.equal(r.analysis.balance, 'balanced')          // but the outside one does NOT bias the beam
+  const cols = r.signs.find((s) => s.id === 'column')
+  assert.equal(cols.count, 3)
+})
+
 test('analyzeCircleWith: no core => invalid (blocking issue), no deduction', () => {
   const c = circle({ id: 'k0' }, null, [{ type: 'column' }])
   const r = analyzeCircleWith(deps, c)

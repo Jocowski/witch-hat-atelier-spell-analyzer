@@ -147,9 +147,6 @@ distinctive one for sourcing its water from atmospheric humidity via the Cool + 
   to help it condense" (signs.md:147); the Gather + Wind context makes condensation the
   load-bearing reading here.
 - The "no signs around the inner core" warning is intended (the core is a basin).
-- Multi-circle spells currently skip the engine's catalog matcher, so the analyzer reports
-  no "similar" match for this spell even though it is now catalogued — see the planned
-  multi-circle matching fix.
 - Not forbidden: pure elemental utility, nothing body- or reality-affecting.
 
 ## Reproduction

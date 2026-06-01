@@ -13,7 +13,7 @@
 // Each circle's component coords are relative to THAT circle's center, so the per-circle
 // geometry (geometry.js) is reused unchanged.
 
-import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert, computeSpin } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert, computeSpin, classifyZone } from './geometry.js'
 import { deduceWith } from './deduce.js'
 
 // ---------- Normalize / migrate any input to the v2 shape ----------
@@ -60,14 +60,18 @@ export function toComposition(input) {
 // ---------- Per-circle analysis (the single-ring pipeline), data injected ----------
 // deps = { grammar, sigilMap, signMap, dyeMap }. Returns one circle's structured analysis.
 export function analyzeCircleWith(deps, circle) {
-  const { grammar, sigilMap, signMap, dyeMap } = deps
+  const { grammar, sigilMap, signMap, dyeMap, zones } = deps
   const getDef = (t) => sigilMap[t] || signMap[t] || null
   const isSigil = (t) => !!sigilMap[t]
   const canCenter = (t) => !!signMap[t]?.canBeCenter
 
   const core = circle.core || null
-  const components = circle.components || []
+  // Tag every component with its ring zone (inside | ring | outside). Outside signs are
+  // external marks/protrusions: they still appear in the signs list and deduction, but they
+  // must NOT skew the inside-ring aim/symmetry/balance (geometry below uses ring-only signs).
+  const components = (circle.components || []).map((c) => ({ ...c, zone: classifyZone(c.x, c.y, circle.radius, zones) }))
   const signComps = components.filter((c) => c.role === 'sign')
+  const ringSignComps = signComps.filter((c) => c.zone !== 'outside')
   const sigilComps = [
     ...(core ? [{ ...core, role: 'core' }] : []),
     ...components.filter((c) => c.role === 'sigil').map((c) => ({ ...c, role: 'sigil' })),
@@ -76,8 +80,9 @@ export function analyzeCircleWith(deps, circle) {
   const hasCore = !!(core && (isSigil(core.type) || canCenter(core.type)))
   const ringClosed = !!circle.ring?.closed
 
-  // ----- Geometry -----
-  const symmetry = computeSymmetry(components)
+  // ----- Geometry (inside-ring signs only; outside marks don't steer the spell) -----
+  const ringComps = components.filter((c) => c.zone !== 'outside')
+  const symmetry = computeSymmetry(ringComps)
   const power = computePower(components, { linkCount: circle.linkCount || 0 })
   // AIM (where the magic goes) from sign ORIENTATION; "above the seal" is the out-of-plane
   // default for a column beam / levitation lift — not compass north.
@@ -85,15 +90,15 @@ export function analyzeCircleWith(deps, circle) {
   // SPIN: only signs canted tangentially off their radial axis spin the spell. A ring of
   // signs aimed inward/outward is oriented, not spinning (so a normal inward-facing ring
   // like the Pyreball Seal must NOT read as "tilted → spin").
-  const tilted = computeSpin(components, familyOf).spinning
-  const aimSigns = signComps.filter((c) => grammar.operators[c.type]?.kind === 'direction')
+  const tilted = computeSpin(ringComps, familyOf).spinning
+  const aimSigns = ringSignComps.filter((c) => grammar.operators[c.type]?.kind === 'direction')
   const region = aimSigns.length ? classifyRegion(aimSigns, familyOf) : null
-  const liftSigns = signComps.filter((c) => {
+  const liftSigns = ringSignComps.filter((c) => {
     const op = grammar.operators[c.type]
     return op?.kind === 'motion' && canSteer(familyOf(c.type))
   })
   const lift = liftSigns.length ? classifyRegion(liftSigns, familyOf) : null
-  const formDirSigns = signComps.filter((c) => {
+  const formDirSigns = ringSignComps.filter((c) => {
     const op = grammar.operators[c.type]
     return op?.kind === 'form' && op.directional
   })
@@ -146,8 +151,8 @@ export function analyzeCircleWith(deps, circle) {
     return { id: g.type, name: d?.name || g.type, category: d?.family || 'other', effect: d?.effect || '', count: g.count, inverted: g.inverted, invertible: canInvert(d?.family) }
   })
 
-  // ----- Deduced effect (a circle is a v1-shaped composition) -----
-  const deduction = hasCore ? deduceWith(grammar, sigilMap, signMap, circle) : null
+  // ----- Deduced effect (a circle is a v1-shaped composition; pass zone-tagged components) -----
+  const deduction = hasCore ? deduceWith(grammar, sigilMap, signMap, { ...circle, components }) : null
 
   // ----- Dyes -----
   const dyes = (circle.dyes || []).map((id) => dyeMap[id]).filter(Boolean)
