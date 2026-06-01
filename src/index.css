@@ -210,6 +210,47 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .selected-toolbar .rot-field { display: inline-flex; align-items: center; gap: 2px; font-size: 0.85rem; }
 .selected-toolbar .rot-field input { width: 4em; padding: 2px 4px; background: var(--bg); color: inherit; border: 1px solid var(--line); border-radius: 6px; text-align: right; }
 
+/* ---------- Inspector (selected-part editor) ---------- */
+.inspector {
+  display: flex; flex-direction: column; gap: 7px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 9px; width: 100%; box-sizing: border-box;
+}
+.inspector.empty { color: var(--ink-dim); }
+.inspector .insp-head { display: flex; align-items: center; gap: 7px; border-bottom: 1px solid var(--line); padding-bottom: 5px; }
+.insp-title { font-size: 0.88rem; color: var(--accent); font-weight: 600; }
+.insp-role { font-size: 0.68rem; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 1px; }
+.insp-zone { font-size: 0.66rem; padding: 1px 6px; border-radius: 10px; margin-left: auto; border: 1px solid var(--line); }
+.insp-zone.z-inside { color: var(--ink-dim); }
+.insp-zone.z-ring { color: var(--accent); border-color: var(--accent); }
+.insp-zone.z-outside { color: var(--accent-2); border-color: var(--accent-2); }
+.insp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.insp-sub { font-size: 0.72rem; color: var(--ink-dim); }
+.insp-val { font-size: 0.78rem; color: var(--parchment); min-width: 38px; text-align: center; }
+.insp-field { display: inline-flex; align-items: center; gap: 3px; font-size: 0.82rem; }
+.insp-field input { width: 4.2em; padding: 2px 4px; background: var(--bg); color: inherit; border: 1px solid var(--line); border-radius: 6px; text-align: right; }
+.inspector button { padding: 3px 9px; font-size: 0.78rem; }
+.inspector button.on { background: var(--accent); color: #1b1814; border-color: var(--accent); }
+.inspector select { background: var(--panel-2); color: var(--parchment); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; font-size: 0.78rem; }
+
+/* ---------- Right rail (tree + result) ---------- */
+.right-rail { display: flex; flex-direction: column; gap: 12px; }
+.spell-tree .tree { list-style: none; margin: 0; padding: 0; font-size: 0.82rem; }
+.spell-tree .tree-parts { list-style: none; margin: 0 0 4px; padding: 0 0 0 14px; border-left: 1px dashed var(--line); }
+.tree-row { display: flex; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 6px; cursor: pointer; }
+.tree-row.part:hover, .tree-row .tree-label:hover { background: var(--panel-2); }
+.tree-row.part.sel { background: rgba(201,162,74,.18); }
+.tree-row.circle { gap: 4px; }
+.tree-row.circle.active .tree-label { color: var(--accent); }
+.tree-label { display: flex; align-items: center; gap: 6px; flex: 1; background: none; border: none; color: inherit; font: inherit; cursor: pointer; text-align: left; padding: 2px 4px; border-radius: 6px; }
+.tree-eye { background: none; border: none; color: var(--ink-dim); cursor: pointer; font-size: 0.9rem; padding: 0 2px; }
+.tree-eye:hover { color: var(--accent); }
+.tree-icon { color: var(--ink-dim); width: 1em; text-align: center; }
+.tree-icon.core { color: var(--accent); }
+.tree-icon.sigil { color: var(--accent-2); }
+.tree-meta { margin-left: auto; font-size: 0.68rem; color: var(--ink-dim); }
+.tree-row.empty { color: var(--ink-dim); font-style: italic; font-size: 0.74rem; }
+.tree-rels { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
 /* ---------- Circles panel (multi-circle) ---------- */
 .circles-panel {
   display: flex; flex-direction: column; gap: 6px;

@@ -34,7 +34,7 @@ function clientToLocal(svg, clientX, clientY) {
   return { x: loc.x, y: loc.y }
 }
 
-function ComponentGlyph({ comp, circleId, selected, onPointerDown }) {
+function ComponentGlyph({ comp, circleId, selected, hovered, onPointerDown }) {
   const def = getComponentDef(comp.type)
   if (!def) return null
   const size = 56 * (comp.scale ?? 1)
@@ -45,6 +45,7 @@ function ComponentGlyph({ comp, circleId, selected, onPointerDown }) {
   return (
     <g transform={t} onPointerDown={(e) => onPointerDown(e, circleId, comp.id)} style={{ cursor: 'grab' }}>
       {selected && <circle cx="0" cy="0" r="42" fill="rgba(201,162,74,.18)" stroke="#c9a24a" strokeWidth="2" strokeDasharray="4 3" />}
+      {hovered && !selected && <circle cx="0" cy="0" r="42" fill="none" stroke="#d6713a" strokeWidth="2" strokeDasharray="3 3" />}
       {def.text ? (
         <text x="0" y="15" textAnchor="middle" fontSize="58" fontWeight="700" fill={color}>{def.text}</text>
       ) : def.render === 'fill' ? (
@@ -57,14 +58,15 @@ function ComponentGlyph({ comp, circleId, selected, onPointerDown }) {
 }
 
 // One circle (its own ring + core + components), drawn relative to the circle's center.
-function CircleGroup({ circle, isActive, selectedPartId, onCircleActivate, onCircleMove, onPartDown }) {
+function CircleGroup({ circle, isActive, selectedPartId, hoveredPartId, hoveredCircle, dim, onCircleActivate, onCircleMove, onPartDown }) {
   const R = ringRadiusOf(circle)
   const ringColor = circle.inkColor || '#5a3b1e'
   const openColor = circle.inkColor || '#9c7a4a'
   const core = circle.core ? { ...circle.core, role: 'core' } : null
   const parts = [...(core ? [core] : []), ...circle.components]
   return (
-    <g transform={`translate(${circle.center.x} ${circle.center.y})`}>
+    <g transform={`translate(${circle.center.x} ${circle.center.y})`} style={{ opacity: dim ? 0.2 : 1 }}>
+      {hoveredCircle && <circle cx="0" cy="0" r={R + 8} fill="none" stroke="#d6713a" strokeWidth="2" strokeDasharray="2 4" pointerEvents="none" />}
       {/* interior: clicking it selects/activates the circle, but never moves it */}
       <circle cx="0" cy="0" r={R} fill="transparent" pointerEvents="all"
         onPointerDown={(e) => onCircleActivate(e, circle.id)} />
@@ -100,13 +102,13 @@ function CircleGroup({ circle, isActive, selectedPartId, onCircleActivate, onCir
       )}
 
       {parts.map((p) => (
-        <ComponentGlyph key={p.id} comp={p} circleId={circle.id} selected={p.id === selectedPartId} onPointerDown={onPartDown} />
+        <ComponentGlyph key={p.id} comp={p} circleId={circle.id} selected={p.id === selectedPartId} hovered={p.id === hoveredPartId} onPointerDown={onPartDown} />
       ))}
     </g>
   )
 }
 
-export default function GlyphCanvas({ composition, activeCircleId, selected, onSelectCircle, onSelectPart, onClearSelect, onMovePart, onMoveCircle, onDropAdd }) {
+export default function GlyphCanvas({ composition, activeCircleId, selected, hovered, focusedCircleId, onSelectCircle, onSelectPart, onClearSelect, onMovePart, onMoveCircle, onDropAdd }) {
   const svgRef = useRef(null)
   const dragRef = useRef(null) // { kind:'part'|'circle', circleId, partId?, dx, dy }
   const panRef = useRef(null)
@@ -351,6 +353,9 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, onS
             circle={c}
             isActive={c.id === activeCircleId}
             selectedPartId={selected?.circleId === c.id ? selected.partId : null}
+            hoveredPartId={hovered?.circleId === c.id ? hovered.partId : null}
+            hoveredCircle={hovered?.circleId === c.id && !hovered.partId}
+            dim={focusedCircleId && focusedCircleId !== c.id}
             onCircleActivate={handleCircleActivate}
             onCircleMove={handleCircleMove}
             onPartDown={handlePartDown}

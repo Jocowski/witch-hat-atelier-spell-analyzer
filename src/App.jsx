@@ -3,10 +3,12 @@ import Palette from './components/Palette.jsx'
 import GlyphCanvas, { RING_RADII } from './components/GlyphCanvas.jsx'
 import ResultPanel from './components/ResultPanel.jsx'
 import InkPanel from './components/InkPanel.jsx'
+import Inspector from './components/Inspector.jsx'
+import SpellTree from './components/SpellTree.jsx'
 import { analyze } from './engine/analyze.js'
 import { toComposition } from './engine/compose.js'
-import { inwardRotation, outwardRotation } from './engine/geometry.js'
-import { canBeCore, getComponentDef, DYE_MAP, DYES } from './engine/data.js'
+import { inwardRotation, outwardRotation, classifyZone } from './engine/geometry.js'
+import { canBeCore, getComponentDef, DYE_MAP, DYES, RULES } from './engine/data.js'
 
 let _id = 1
 const nextId = () => `c${_id++}`
@@ -34,6 +36,8 @@ export default function App() {
   const [composition, setComposition] = useState(EMPTY)
   const [activeCircleId, setActiveCircleId] = useState(FIRST.id)
   const [selected, setSelected] = useState(null) // { circleId, partId }
+  const [hovered, setHovered] = useState(null) // { circleId, partId? } from the tree
+  const [focusedCircleId, setFocusedCircleId] = useState(null) // dim the other circles
   const [activeInk, setActiveInk] = useState(null)
   const [notice, setNotice] = useState(null)
   const [importOpen, setImportOpen] = useState(false)
@@ -69,6 +73,9 @@ export default function App() {
     : null
   const isCore = selectedPart?.role === 'core'
   const selDef = selectedPart ? getComponentDef(selectedPart.type) : null
+  const selectedZone = selectedPart && !isCore && selectedCircle
+    ? classifyZone(selectedPart.x, selectedPart.y, radiusOf(selectedCircle), RULES.zones) : null
+  const canPromoteSel = !!selectedPart && !isCore && (selectedPart.role === 'sigil' || canBeCore(selectedPart.type))
 
   function flash(msg) {
     setNotice(msg)
@@ -140,6 +147,25 @@ export default function App() {
     })
     setSelected(null)
   }
+  // Move a non-core component (sign or extra sigil) from one circle to another, keeping its
+  // local x,y (so it lands in the same spot relative to the new circle's center).
+  function movePartToCircle(fromId, partId, toId) {
+    if (fromId === toId) return
+    let moved = null
+    setComposition((prev) => {
+      const circles = prev.circles.map((c) => {
+        if (c.id !== fromId) return c
+        const comp = c.components.find((p) => p.id === partId)
+        if (!comp) return c
+        moved = comp
+        return { ...c, components: c.components.filter((p) => p.id !== partId) }
+      })
+      if (!moved) return prev
+      return { ...prev, circles: circles.map((c) => (c.id === toId ? { ...c, components: [...c.components, moved] } : c)) }
+    })
+    if (moved) { setActiveCircleId(toId); setSelected({ circleId: toId, partId }) }
+  }
+
   function promoteToCore() {
     if (!selectedPart || isCore) return
     if (!(selectedPart.role === 'sigil' || canBeCore(selectedPart.type))) return
@@ -317,6 +343,8 @@ export default function App() {
             composition={composition}
             activeCircleId={activeCircleId}
             selected={selected}
+            hovered={hovered}
+            focusedCircleId={focusedCircleId}
             onSelectCircle={selectCircle}
             onSelectPart={selectPart}
             onClearSelect={clearSelect}
@@ -325,33 +353,19 @@ export default function App() {
             onDropAdd={addComponent}
           />
 
-          {selectedPart && (
-            <div className="selected-toolbar">
-              <span className="title">{selDef?.name} {isCore ? '(core)' : selectedPart.role === 'sigil' ? '(sigil)' : ''}</span>
-              <label className="rot-field" title="Rotation in degrees (0° = north). Reset points the sign's top at the center.">
-                ∠
-                <input type="number" step="1" value={Math.round(selectedPart.rotation || 0)}
-                  onChange={(e) => {
-                    const v = Number(e.target.value)
-                    if (Number.isFinite(v)) updateSelected({ rotation: ((v % 360) + 360) % 360 })
-                  }} />
-                °
-              </label>
-              <button onClick={() => updateSelected({ rotation: isCore ? 0 : neutralRotation(selectedPart.type, selectedPart.x, selectedPart.y) })}
-                title="Reset rotation: a sign's top faces the center of the seal — or outward for signs like Sights Set (a core resets to 0°).">⟲ reset</button>
-              <button onClick={() => updateSelected({ scale: Math.max(0.4, (selectedPart.scale ?? 1) - 0.15) })}>− smaller</button>
-              <button onClick={() => updateSelected({ scale: Math.min(2.5, (selectedPart.scale ?? 1) + 0.15) })}>+ larger</button>
-              {selDef?.invertible && (
-                <button onClick={() => updateSelected({ inverted: !selectedPart.inverted })}>{selectedPart.inverted ? 'un-invert' : 'invert'}</button>
-              )}
-              <button onClick={() => updateSelected({ mirrored: !selectedPart.mirrored })}
-                title="Mirror the glyph left↔right (flip horizontally). Visual only — does not change the deduced effect.">{selectedPart.mirrored ? 'un-mirror' : '⇆ mirror'}</button>
-              {!isCore && (selectedPart.role === 'sigil' || canBeCore(selectedPart.type)) && (
-                <button onClick={promoteToCore}>↦ to center</button>
-              )}
-              <button className="danger" onClick={deleteSelected} title="Delete (Del)">delete</button>
-            </div>
-          )}
+          <Inspector
+            part={selectedPart}
+            def={selDef}
+            isCore={isCore}
+            zone={selectedZone}
+            otherCircles={otherCircles}
+            canPromote={canPromoteSel}
+            onUpdate={updateSelected}
+            onResetRotation={() => updateSelected({ rotation: isCore ? 0 : neutralRotation(selectedPart.type, selectedPart.x, selectedPart.y) })}
+            onPromoteToCore={promoteToCore}
+            onMoveToCircle={(toId) => movePartToCircle(selected.circleId, selected.partId, toId)}
+            onDelete={deleteSelected}
+          />
 
           {/* ---- Circles panel ---- */}
           <div className="circles-panel">
@@ -441,7 +455,19 @@ export default function App() {
           <InkPanel activeInk={activeInk} onSelect={selectInk} />
         </div>
 
-        <ResultPanel result={result} />
+        <div className="right-rail">
+          <SpellTree
+            composition={composition}
+            activeCircleId={activeCircleId}
+            selected={selected}
+            focusedCircleId={focusedCircleId}
+            onSelectCircle={selectCircle}
+            onSelectPart={selectPart}
+            onHover={setHovered}
+            onToggleFocus={(id) => setFocusedCircleId((cur) => (cur === id ? null : id))}
+          />
+          <ResultPanel result={result} />
+        </div>
       </div>
 
       {notice && <div className="toast">{notice}</div>}
