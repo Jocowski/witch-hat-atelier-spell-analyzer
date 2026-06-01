@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getComponentDef } from '../engine/data.js'
+import { getComponentDef, RULES } from '../engine/data.js'
 
 const VIEW = 600 // viewBox 600x600, origin centered via -300
 const ZOOM_MIN = 0.5
@@ -8,6 +8,22 @@ const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 // Visual ring radius per chosen size (does not affect geometry/analysis).
 export const RING_RADII = { small: 110, medium: 170, big: 240 }
 const ringRadiusOf = (c) => c.radius ?? RING_RADII[c.ring?.size] ?? RING_RADII.medium
+
+// Zone fractions (rules.json): a part may be dragged out to outerMaxFrac × R (outside marks),
+// and snaps onto the ring when within ringSnapTol of R for easy on-ring placement.
+const OUTER_MAX_FRAC = RULES.zones?.outerMaxFrac ?? 1.7
+const RING_SNAP_TOL = 0.08 // ±8% of R snaps to the ring
+// Clamp a part's local position to ≤ outerMaxFrac×R, with a gentle snap onto the ring band.
+function clampToReach(lx, ly, R) {
+  const dist = Math.hypot(lx, ly)
+  if (dist === 0) return { x: lx, y: ly }
+  const max = R * OUTER_MAX_FRAC
+  let target = dist
+  if (dist > max) target = max
+  else if (Math.abs(dist - R) <= R * RING_SNAP_TOL) target = R // magnet onto the ring
+  const k = target / dist
+  return { x: lx * k, y: ly * k }
+}
 
 // Client coords -> SVG content coords (origin centered).
 function clientToLocal(svg, clientX, clientY) {
@@ -59,6 +75,8 @@ function CircleGroup({ circle, isActive, selectedPartId, onCircleActivate, onCir
       {/* guide rings + axes */}
       <circle cx="0" cy="0" r={R * 0.45} fill="none" stroke="rgba(90,60,30,.16)" strokeWidth="1" strokeDasharray="3 5" pointerEvents="none" />
       <circle cx="0" cy="0" r={R * 0.75} fill="none" stroke="rgba(90,60,30,.16)" strokeWidth="1" strokeDasharray="3 5" pointerEvents="none" />
+      {/* outer guide ring: the "outside" zone, where parts become external marks/protrusions */}
+      {isActive && <circle cx="0" cy="0" r={R * OUTER_MAX_FRAC} fill="none" stroke="rgba(192,82,31,.18)" strokeWidth="1" strokeDasharray="2 6" pointerEvents="none" />}
       <line x1="0" y1={-R} x2="0" y2={R} stroke="rgba(90,60,30,.08)" pointerEvents="none" />
       <line x1={-R} y1="0" x2={R} y2="0" stroke="rgba(90,60,30,.08)" pointerEvents="none" />
 
@@ -105,9 +123,11 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, onS
     if (!circles.length) return { cx: 0, cy: 0, size: VIEW }
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
     for (const c of circles) {
-      const R = ringRadiusOf(c)
-      minX = Math.min(minX, c.center.x - R); minY = Math.min(minY, c.center.y - R)
-      maxX = Math.max(maxX, c.center.x + R); maxY = Math.max(maxY, c.center.y + R)
+      // Reach = the ring, or farther if a part sits outside it (outside marks).
+      let reach = ringRadiusOf(c)
+      for (const p of c.components || []) reach = Math.max(reach, Math.hypot(p.x || 0, p.y || 0))
+      minX = Math.min(minX, c.center.x - reach); minY = Math.min(minY, c.center.y - reach)
+      maxX = Math.max(maxX, c.center.x + reach); maxY = Math.max(maxY, c.center.y + reach)
     }
     const pad = 70
     return { cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, size: Math.max(maxX - minX, maxY - minY, 280) + pad * 2 }
@@ -186,6 +206,22 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, onS
     return best
   }
 
+  // Nearest circle whose OUTSIDE band still reaches the point (for dropping an external mark
+  // just past a ring) — picks the circle the point is closest to relative to its radius.
+  function nearestCircle(loc) {
+    let best = null
+    let bestExcess = Infinity
+    for (const c of circles) {
+      const R = ringRadiusOf(c)
+      const d = Math.hypot(loc.x - c.center.x, loc.y - c.center.y)
+      if (d <= R * OUTER_MAX_FRAC) {
+        const excess = d - R // how far outside the ring (negative = inside)
+        if (excess < bestExcess) { best = c; bestExcess = excess }
+      }
+    }
+    return best
+  }
+
   function handlePartDown(e, circleId, partId) {
     if (e.button !== 0) return
     e.stopPropagation()
@@ -243,13 +279,10 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, onS
       onMoveCircle(d.circleId, loc.x - d.dx, loc.y - d.dy)
       return
     }
-    // part: clamp to its circle's ring (local coords)
+    // part: allow placement out to the outside-mark band; snap onto the ring near R (local coords)
     const c = circles.find((x) => x.id === d.circleId)
     const R = ringRadiusOf(c)
-    let lx = loc.x - d.dx - c.center.x
-    let ly = loc.y - d.dy - c.center.y
-    const dist = Math.hypot(lx, ly)
-    if (dist > R) { lx = (lx * R) / dist; ly = (ly * R) / dist }
+    const { x: lx, y: ly } = clampToReach(loc.x - d.dx - c.center.x, loc.y - d.dy - c.center.y, R)
     onMovePart(d.circleId, d.partId, lx, ly)
   }
 
@@ -268,13 +301,10 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, onS
     if (!raw) return
     const { type, kind } = JSON.parse(raw)
     const loc = clientToLocal(svgRef.current, e.clientX, e.clientY)
-    const target = circleAt(loc) || circles.find((c) => c.id === activeCircleId) || circles[0]
+    const target = circleAt(loc) || nearestCircle(loc) || circles.find((c) => c.id === activeCircleId) || circles[0]
     if (!target) return
     const R = ringRadiusOf(target)
-    let lx = loc.x - target.center.x
-    let ly = loc.y - target.center.y
-    const dist = Math.hypot(lx, ly)
-    if (dist > R) { lx = (lx * R) / dist; ly = (ly * R) / dist }
+    const { x: lx, y: ly } = clampToReach(loc.x - target.center.x, loc.y - target.center.y, R)
     onDropAdd(target.id, type, kind, lx, ly)
   }
 

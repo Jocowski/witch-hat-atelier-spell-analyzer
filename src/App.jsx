@@ -249,9 +249,10 @@ export default function App() {
   function spellViewBox() {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
     for (const c of composition.circles) {
-      const R = RING_RADII[c.ring?.size] ?? RING_RADII.medium
-      minX = Math.min(minX, c.center.x - R); minY = Math.min(minY, c.center.y - R)
-      maxX = Math.max(maxX, c.center.x + R); maxY = Math.max(maxY, c.center.y + R)
+      let reach = radiusOf(c)
+      for (const p of c.components || []) reach = Math.max(reach, Math.hypot(p.x || 0, p.y || 0))
+      minX = Math.min(minX, c.center.x - reach); minY = Math.min(minY, c.center.y - reach)
+      maxX = Math.max(maxX, c.center.x + reach); maxY = Math.max(maxY, c.center.y + reach)
     }
     if (!isFinite(minX)) return '-300 -300 600 600'
     const pad = 50, cx = (minX + maxX) / 2, cy = (minY + maxY) / 2
