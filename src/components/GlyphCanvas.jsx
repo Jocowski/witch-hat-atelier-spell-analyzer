@@ -112,7 +112,7 @@ function CircleGroup({ circle, isActive, selectedPartId, hoveredPartId, hoveredC
   )
 }
 
-export default function GlyphCanvas({ composition, activeCircleId, selected, hovered, focusedCircleId, onSelectCircle, onSelectPart, onClearSelect, onMovePart, onMoveCircle, onDropAdd, onBeginInteraction, onFocusCircle }) {
+export default function GlyphCanvas({ composition, activeCircleId, selected, hovered, focusedCircleId, onSelectCircle, onSelectPart, onClearSelect, onMovePart, onMoveCircle, onDropAdd, onBeginInteraction, onFocusCircle, onAutoNest }) {
   const svgRef = useRef(null)
   const dragRef = useRef(null) // { kind:'part'|'circle', circleId, partId?, dx, dy }
   const panRef = useRef(null)
@@ -295,6 +295,22 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, hov
   }
 
   function handlePointerUp(e) {
+    const d = dragRef.current
+    // Auto-nest: a circle dropped (mostly) inside a larger one wires the nest relation.
+    if (d?.kind === 'circle' && onAutoNest) {
+      const moved = circles.find((c) => c.id === d.circleId)
+      if (moved) {
+        const R = ringRadiusOf(moved)
+        let outer = null
+        for (const c of circles) {
+          if (c.id === moved.id) continue
+          const Rc = ringRadiusOf(c)
+          const dist = Math.hypot(moved.center.x - c.center.x, moved.center.y - c.center.y)
+          if (Rc > R && dist + R * 0.5 < Rc && (!outer || Rc < ringRadiusOf(outer))) outer = c
+        }
+        if (outer) onAutoNest(moved.id, outer.id)
+      }
+    }
     if (dragRef.current || panRef.current) {
       try { svgRef.current.releasePointerCapture(e.pointerId) } catch {}
     }
@@ -376,7 +392,7 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, hov
             {zoom.toFixed(1)}× · reset
           </button>
         )}
-        <span className="zoom-hint">Ctrl + scroll to zoom · right-drag to pan · drag a ring to move a circle</span>
+        <span className="zoom-hint">Ctrl + scroll to zoom · right-drag to pan · drag a ring to move a circle (drop inside another to nest) · double-click a circle to focus</span>
       </div>
     </div>
   )

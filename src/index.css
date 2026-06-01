@@ -234,6 +234,9 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ---------- Right rail (tree + result) ---------- */
 .right-rail { display: flex; flex-direction: column; gap: 12px; }
+.rail-tabs { display: flex; gap: 4px; }
+.rail-tabs button { flex: 1; padding: 6px 10px; font-size: 0.82rem; background: var(--panel); border: 1px solid var(--line); border-radius: 8px 8px 0 0; color: var(--ink-dim); cursor: pointer; }
+.rail-tabs button.on { background: var(--panel-2); color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
 .spell-tree .tree { list-style: none; margin: 0; padding: 0; font-size: 0.82rem; }
 .spell-tree .tree-parts { list-style: none; margin: 0 0 4px; padding: 0 0 0 14px; border-left: 1px dashed var(--line); }
 .tree-row { display: flex; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 6px; cursor: pointer; }

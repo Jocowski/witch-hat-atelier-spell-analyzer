@@ -38,6 +38,7 @@ export default function App() {
   const [selected, setSelected] = useState(null) // { circleId, partId }
   const [hovered, setHovered] = useState(null) // { circleId, partId? } from the tree
   const [focusedCircleId, setFocusedCircleId] = useState(null) // dim the other circles
+  const [rightTab, setRightTab] = useState('structure') // right rail: structure | analysis
   const [activeInk, setActiveInk] = useState(null)
   const [notice, setNotice] = useState(null)
   const [importOpen, setImportOpen] = useState(false)
@@ -303,6 +304,30 @@ export default function App() {
     setActiveCircleId(c.id)
     setSelected(null)
   }
+  // Wrap the active circle in a new, larger OUTER ring (nesting the active circle inside it) —
+  // the complement of "+ inner ring", for building nested spells from the inside out.
+  function addOuterRing() {
+    const act = activeCircle
+    if (!act) return
+    checkpoint()
+    const radius = Math.min(RADIUS_MAX, Math.round(radiusOf(act) * 1.8))
+    const c = newCircle({ name: `Circle ${composition.circles.length + 1}`, center: { ...act.center }, radius, inkColor: inkColor || null })
+    setComposition((prev) => ({
+      ...prev,
+      circles: [...prev.circles, c],
+      relations: [...prev.relations, { type: 'nest', outer: c.id, inner: act.id }],
+    }))
+    setActiveCircleId(c.id); setSelected(null)
+  }
+  // Auto-nest: when a circle is dragged inside a larger one, wire the nest relation.
+  function autoNest(innerId, outerId) {
+    if (composition.relations.some((r) => r.type === 'nest' && r.inner === innerId)) return // already nested
+    checkpoint()
+    addRelation({ type: 'nest', outer: outerId, inner: innerId })
+    const nm = (id) => composition.circles.find((c) => c.id === id)?.name || id
+    flash(`Nested ${nm(innerId)} inside ${nm(outerId)}`)
+  }
+
   function deleteCircle(id) {
     if (composition.circles.length <= 1) { flash('A spell needs at least one circle'); return }
     checkpoint()
@@ -468,6 +493,7 @@ export default function App() {
             onDropAdd={addComponent}
             onBeginInteraction={checkpoint}
             onFocusCircle={(id) => setFocusedCircleId((cur) => (cur === id ? null : id))}
+            onAutoNest={autoNest}
           />
 
           <Inspector
@@ -504,6 +530,7 @@ export default function App() {
               ))}
               <button className="cp-add" onClick={() => addCircle(false)} title="Add a separate circle">+ circle</button>
               <button className="cp-add" onClick={() => addCircle(true)} title="Add a smaller ring nested inside the active circle">+ inner ring</button>
+              <button className="cp-add" onClick={addOuterRing} title="Wrap the active circle in a larger outer ring">+ outer ring</button>
             </div>
 
             {activeCircle && (
@@ -581,17 +608,24 @@ export default function App() {
         </div>
 
         <div className="right-rail">
-          <SpellTree
-            composition={composition}
-            activeCircleId={activeCircleId}
-            selected={selected}
-            focusedCircleId={focusedCircleId}
-            onSelectCircle={selectCircle}
-            onSelectPart={selectPart}
-            onHover={setHovered}
-            onToggleFocus={(id) => setFocusedCircleId((cur) => (cur === id ? null : id))}
-          />
-          <ResultPanel result={result} />
+          <div className="rail-tabs">
+            <button className={rightTab === 'structure' ? 'on' : ''} onClick={() => setRightTab('structure')}>Structure</button>
+            <button className={rightTab === 'analysis' ? 'on' : ''} onClick={() => setRightTab('analysis')}>Analysis</button>
+          </div>
+          {rightTab === 'structure' ? (
+            <SpellTree
+              composition={composition}
+              activeCircleId={activeCircleId}
+              selected={selected}
+              focusedCircleId={focusedCircleId}
+              onSelectCircle={selectCircle}
+              onSelectPart={selectPart}
+              onHover={setHovered}
+              onToggleFocus={(id) => setFocusedCircleId((cur) => (cur === id ? null : id))}
+            />
+          ) : (
+            <ResultPanel result={result} />
+          )}
         </div>
       </div>
 
