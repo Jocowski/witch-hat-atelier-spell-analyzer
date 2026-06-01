@@ -230,6 +230,7 @@
       "invertible": true,
       "canBeCenter": false,
       "surrounds": true,
+      "defaultFacing": "outward",
       "reference": "signs.md, Billowing Collection, Serpent's Bed of Sand",
       "family": "directional",
       "render": "fill"
@@ -725,6 +726,7 @@
       "invertible": false,
       "canBeCenter": false,
       "surrounds": false,
+      "defaultFacing": "outward",
       "reference": "signs.md",
       "family": "asymmetric",
       "render": "fill"

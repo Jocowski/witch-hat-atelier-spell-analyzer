@@ -21,5 +21,102 @@
     "bilateral",
     "asymmetric"
   ],
-  "spells": []
+  "spells": [
+    {
+      "id": "purify",
+      "name": "Purify",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Draws in wastewater and separates the impurities out of it; the contaminants pile up near the seal, leaving the water clean.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "purify", "count": 10, "placement": "around", "orientation": "outward", "inverted": false },
+          { "id": "collection", "count": 2, "placement": "sides", "orientation": "outward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "water_orb",
+      "name": "Water Orb",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Gathers water into a free-floating spherical container held above the glyph, with no physical vessel.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "orb", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
+          { "id": "column", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "pyreball_seal",
+      "name": "Pyreball Seal",
+      "category": "fire",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Hovers a self-fueling ball of flame above the glyph and lifts light objects set over it — a floating stove.",
+      "composition": {
+        "core": "fire",
+        "signs": [
+          { "id": "levitation", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "snugstone_spell",
+      "name": "Snugstone Spell",
+      "category": "fire",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Radiates gentle, flameless warmth evenly in all directions, calibrated to the seal size so it never burns.",
+      "composition": {
+        "core": "fire",
+        "signs": [
+          { "id": "radial", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
+          { "id": "column", "count": 4, "placement": "alternating", "orientation": "outward", "inverted": true }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "flame_shot_seal",
+      "name": "Flame Shot Seal",
+      "category": "fire",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Throws a directed column of flame forward; flanking Region signs confine the magic to the space ahead so it reaches farther.",
+      "composition": {
+        "core": "fire",
+        "signs": [
+          { "id": "column", "count": 1, "placement": "center", "orientation": "front", "inverted": false },
+          { "id": "direction", "count": 10, "placement": "sides", "orientation": "front", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      }
+    },
+    {
+      "id": "spiraling_flame",
+      "name": "Spiraling Flame",
+      "category": "fire",
+      "origin": "canon",
+      "confidence": "medium",
+      "effect": "Produces an aimable, spiraling column of flame — a mind-guided jet of fire that corkscrews as it travels (the sign of wind acts as a 'whirlwind keystone').",
+      "composition": {
+        "core": "fire",
+        "signs": [
+          { "id": "column", "count": 2, "placement": "around", "orientation": "outward", "inverted": false },
+          { "id": "sign_of_wind", "count": 2, "placement": "around", "orientation": "outward", "inverted": false },
+          { "id": "sights_set", "count": 1, "placement": "satellite", "orientation": "outward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      }
+    }
+  ]
 }

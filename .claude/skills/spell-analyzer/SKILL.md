@@ -101,10 +101,13 @@ not in enumerating swaps.
 
 **Distinguish engine output from your own narrative.** Validity, the deduced effect,
 geometry, and any catalog `similar` matches come from the engine — label them as such.
-Anything you add from the docs (e.g. related/comparable canon spells when the catalog is
-empty) is *your reading*; mark it clearly (e.g. "Related spells (from the docs)") so it's
-never mistaken for an engine catalog match. The catalog (`data/spells.json`) is currently
-empty, so the engine returns **no** `similar` matches and reports `catalogEmpty: true`.
+Anything you add from the docs (e.g. related/comparable canon spells beyond what the
+catalog returns) is *your reading*; mark it clearly (e.g. "Related spells (from the
+docs)") so it's never mistaken for an engine catalog match. The catalog
+(`data/spells.json`) is **populated with the canon spells** (each archived canon doc is
+added to it — see step 6a), so the CLI now reports a "Similar spells" section with a
+**Match** or **Nearest** list. A spell will usually match **itself** once archived; that's
+expected. If `catalogEmpty` is ever true again, the catalog was reset — fall back to docs.
 
 ### 5. Get the user's approval before archiving
 **Do NOT write the `.md` file yet.** After presenting the analysis (step 4), explicitly
@@ -129,6 +132,41 @@ reproduction later:
 
 If the user provides them, save to `assets/spells/<Spell_Name>.{png,json}` and update
 the doc's frontmatter `image:`/`json:` fields and the Reproduction section.
+
+#### 6a. If the spell is CANON, add it to the engine catalog (`data/spells.json`)
+The catalog is what makes the analyzer **cumulative**: the engine matches each new
+composition against it and reports "Similar spells." So whenever you archive a doc whose
+**`origin` is `canon`** (skip `community`/fan-made spells), also append a recipe entry to
+`data/spells.json` so future analyses can match against it.
+
+- **Only canon spells.** Community variants don't go in the catalog (they'd produce false
+  "canon match" results). If unsure whether it's canon, ask.
+- **Don't duplicate.** Check `data/spells.json` for an existing entry with the same `id`
+  first; update it instead of adding a second.
+- **Use real ids.** Every `composition.core` and `composition.signs[].id` must be an
+  actual id from `data/sigils.json`/`data/signs.json` (e.g. Region's id is `direction`,
+  not `region`) — the data-integrity test fails otherwise. Verify before writing.
+- **Entry shape** (see the file's own `description`/`placementVocab`/`symmetryVocab`):
+  ```json
+  {
+    "id": "<unique_snake_case>", "name": "<Display Name>",
+    "category": "<element, e.g. fire|water>", "origin": "canon",
+    "confidence": "high|medium|low|theoretical|unknown",
+    "effect": "<one-line effect>",
+    "composition": {
+      "core": "<sigil/sign id>",
+      "signs": [ { "id": "<sign id>", "count": N, "placement": "<vocab>", "orientation": "inward|outward|front|...", "inverted": false } ],
+      "symmetry": "radial|bilateral|asymmetric"
+    }
+  }
+  ```
+  `confidence` lowers the match score for less-certain spells (e.g. one leaning on an
+  ambiguous sign like `sign_of_wind` → `medium`). The matcher reads `core`, the sign
+  multiset (`id`+`count`+`inverted`), `symmetry`, and `confidence`; `placement`/
+  `orientation` are informational. Required by tests: unique `id`, `effect`, `category`.
+- **Verify after writing:** run `node --test test/data-integrity.test.js` (id integrity)
+  and re-run the CLI on the spell — it should now report a "Similar spells" **Match** to
+  itself near the top of the ranking.
 
 ### 7. Record what you learned
 This skill should get smarter over time. When the user corrects you, or you discover a
@@ -156,6 +194,7 @@ Append dated, one-line insights from real analyses (corrections, clarified mecha
 limitations of certain magic types). Newest at the top.
 
 <!-- e.g. - 2026-05-31: Inverted column ≈ dispersion per docs; treat the difference as unresolved in canon. -->
+- 2026-06-01: **Purify Spell (CANON, debuted by Coco) — Purify & Collection also default top-OUTWARD (same fix as Sights Set), and the inverted Collection in exports was a false artifact.** Water core + 10 **Purify** (asymmetric, separates impurities; they pile up near the seal) + 2 **Collection** (intake, open side faces inward) = a standing wastewater purifier. Canon: Coco debuts it at the Silver Eve festival (Silver Eve Procession) drawn on the **Portable Waste Purification Pot**; also the sewer-grate purifier (signs.md:319). Engine reads it perfectly: valid, radial, stable, aim=undirected, power=1. Two takeaways: (1) **Added `defaultFacing:"outward"` to `purify` AND `collection` in signs.json** — both are drawn top-away-from-center like Sights Set, so the app's old inward default forced the user's Collection signs to export `inverted:true` when they were actually in natural/canon orientation. With the flag, `neutralRotation` (App.jsx, already generic) places them top-outward → `inverted:false`; engine effect is identical either way. **Lesson: when an export shows a directional sign `inverted:true`, check whether it just lacks a `defaultFacing:"outward"` flag before reporting it as a deliberate inversion.** (2) Element-physics: Purify pairs best with **water because dirty water is a fluid suspension** — separation is a real settling/filtering process and freed contaminants "accumulate near the spell" like sediment; and it runs in water's cheaper **collect/manipulate** mode (sigils.md:41), making it a "filter with an intake," not a faucet. Doc: docs/spells/Purify.md.
 - 2026-06-01: **Spiraling Flame (CANON, by Agott) — resolves the Sign of Wind + fixes Sights Set's default orientation.** Fire core + 2 Column (barrel/beam) + 2 **Sign of Wind** + Sights Set = an *aimable spiraling column of flame* (Agott fires it at the dragon in the Illusory Labyrinth to stall it). Two takeaways now baked into the engine: (1) **Sign of Wind = "whirlwind keystone"** — Agott literally says "if I use this fire rune spell with a whirlwind keystone…", so for THIS spell its otherwise-"unclear" role is the *spin*: it twists the column into a spiral. Updated grammar.json `sign_of_wind` from kind `none`/"ties to wind (unclear)" → kind **motion**/"is set whirling into a spinning spiral (a 'whirlwind keystone')"; added the note to signs.md + signs.json. Hedge: in the Pegasus Carriage Spell the same sign acts as a plain wind sigil, so spin may not generalize. (2) **Sights Set faces OUTWARD by default, not inward** — the app's "top-toward-center" default made it read `inverted:true`; canon shows the tip pointing away from the seal. Added `outwardRotation(x,y)` (geometry.js) + a `defaultFacing:"outward"` flag on sights_set in signs.json; App.jsx now picks inward/outward per `neutralRotation(type,x,y)` for both add-sign and the reset button. Engine still can't *measure* the spin (computeSpin sees no tangential cant; reports spin=false, aim=down) — that "down" is a layout artifact, real aim is whatever Sights Set targets.
 - 2026-06-01: **Snugstone Spell (CANON, by Olruggio) — gentleness is a power↔seal-SIZE calibration, not just the Radial signs.** Fire core + 4 Radial (temper fire→flameless heat) + 4 *inverted/backwards* Column (radiate omnidirectionally, ≈dispersion per signs.md:34) = a warmth-radiating stone (the snugstone, a sleep-warmer). Engine reads it perfectly (radial-symmetric, stable, power=1, aim "above the seal"). Key canon nuance the engine doesn't capture: the wiki says it's "precisely balanced to the **size of the seal** so it's warm to the touch but not hot enough to burn" — i.e. Radial sets the *kind* of output, seal *size* sets the safe *amount* ("bigger seals = more powerful"). Proof: at Serpentback Cave an **Arcane Lens of Amplification** unbalanced it and the heat melted the golden Ancients of Romonon. Lesson for fire "warmth" spells: treat safety as a calibration that amplification/power-dyes (Blood) will break, not an inherent ceiling. Closest analogue = Warmth-Retention Seal (preserve heat) vs Snugstone (generate heat).
 - 2026-05-31: **Engine: "spin" now means tangential cant, not any non-zero rotation.** The old `tilted` flag fired on *any* sign with rotation≠0, so a normal inward-facing ring (Pyreball) wrongly read "tilted → spin." Fixed: `computeSpin` (geometry.js) measures each directional sign's facing deviation from its **radial axis** (inward AND outward both = aligned/oriented); only a tangential cant > ~15° counts as spin. Non-directional signs (no front) never count. Wired into compose.js (`const tilted = computeSpin(...).spinning`); the CLI imports `analyzeCircleWith` from compose.js, so the one change fixes both app + CLI. Also added `inwardRotation(x,y)` (rotation that points a sign's top at center): the app now uses it as the default/reset rotation for newly-added signs, and the selected-part toolbar replaced the ±30/±5 buttons with a number input + a "reset" button.
@@ -168,5 +207,6 @@ limitations of certain magic types). Newest at the top.
 - 2026-05-31: Analyses should center on **element-physics & canon grounding** — reason from the substance's create/manipulate/collect constraint and physical state (fluid/granular/rigid) vs. each sign's documented mechanic, compare to the closest canon spell, cite docs by `file:line`, and end with a bottom-line synthesis. Dropped the "Variations & modifications" sections from both the analysis and the doc template.
 - 2026-05-31: Earth Orb vs Water Orb is the model case: water can *create* its material (self-sufficient), earth only *manipulates* (needs a real source — "a pump that needs a reservoir"); Orb fills bottom-to-top like a fluid, so sand/soil pool cleanly but rigid rock/wood jam without a compaction sign (e.g. convergence).
 - 2026-05-31: Always present the full analysis and get explicit user approval BEFORE writing the docs/spells/ md — the user wants to discuss and adjust first (see step 5).
-- 2026-05-31: The spell catalog (data/spells.json) is empty, so the engine never returns `similar` matches (reports `catalogEmpty: true`). Any "similar/related spells" must be drawn from the docs and labeled as narrative, not presented as an engine catalog match.
+- 2026-06-01: **Catalog is now POPULATED + the CLI now runs the matcher (was a no-op).** `data/spells.json` was seeded with the 6 canon spells documented so far (Purify, Water Orb, Pyreball Seal, Snugstone Spell, Flame Shot Seal, Spiraling Flame); community spells (Earth Orb) deliberately excluded. **New skill step 6a:** when archiving a doc whose `origin:canon`, also append a recipe entry to `data/spells.json` (real ids only — Region's id is `direction`; verify with the data-integrity test). Also **wired the matcher into `tools/spell-engine-cli.mjs`** — it previously only set `catalogEmpty` and never computed `similar` (the skill reads the CLI, so matches were invisible). Ported `buildSignature/matchSpell/computeSimilar` from analyze.js (kept in sync) + a "Similar spells (engine catalog)" section in `--text`. A spell now matches **itself** once archived (Purify self-match = 0.95). Supersedes the old "catalog is empty" note.
+- 2026-05-31: ~~The spell catalog (data/spells.json) is empty…~~ **(superseded — catalog is now populated; see the 2026-06-01 entry above.)**
 - 2026-05-31: Inverting a **water sigil** has no known effect — engine deduces the identical result inverted or not (Water Orb). Treat sigil-core inversion as cosmetic unless an element defines an `invertedVerb`.

@@ -39,6 +39,7 @@ const spellsDoc = require(resolve(root, 'data/spells.json'))
 
 const importLocal = (rel) => import(pathToFileURL(resolve(root, rel)).href)
 const { toComposition, analyzeCircleWith, composeWith } = await importLocal('src/engine/compose.js')
+const { computeSymmetry } = await importLocal('src/engine/geometry.js')
 
 const SIGIL_MAP = Object.fromEntries(sigilsDoc.sigils.map((s) => [s.id, s]))
 const SIGN_MAP = Object.fromEntries(signsDoc.signs.map((s) => [s.id, s]))
@@ -47,6 +48,76 @@ const SPELLS = spellsDoc.spells || []
 
 const deps = { grammar, sigilMap: SIGIL_MAP, signMap: SIGN_MAP, dyeMap: DYE_MAP }
 const getDef = (type) => SIGIL_MAP[type] || SIGN_MAP[type] || null
+
+// ---------- Catalog matcher (mirrors src/engine/analyze.js — keep in sync) ----------
+function buildSignature(circle) {
+  const { core, components } = circle
+  const signs = (components || []).filter((c) => c.role === 'sign')
+  const multiset = {}
+  for (const s of signs) {
+    const key = s.inverted ? `${s.type}!inv` : s.type
+    multiset[key] = (multiset[key] || 0) + 1
+  }
+  return {
+    core: core?.type ?? null,
+    coreElement: core ? getDef(core.type)?.element ?? null : null,
+    signMultiset: multiset,
+    signCount: signs.length,
+    symmetry: computeSymmetry(components || []),
+  }
+}
+function multisetSimilarity(a, b) {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)])
+  if (keys.size === 0) return 1
+  let inter = 0, union = 0
+  for (const k of keys) {
+    inter += Math.min(a[k] || 0, b[k] || 0)
+    union += Math.max(a[k] || 0, b[k] || 0)
+  }
+  return union === 0 ? 1 : inter / union
+}
+function spellSignMultiset(spell) {
+  const m = {}
+  for (const s of spell.composition?.signs ?? []) {
+    const key = s.inverted ? `${s.id}!inv` : s.id
+    m[key] = (m[key] || 0) + (s.count || 1)
+  }
+  return m
+}
+function sameElement(coreA, coreB) {
+  const a = getDef(coreA)?.element
+  const b = getDef(coreB)?.element
+  return a && b && a === b
+}
+const CONFIDENCE_WEIGHT = { high: 1, medium: 0.9, low: 0.7, theoretical: 0.6, unknown: 0.4 }
+function matchSpell(signature) {
+  const w = rules.matching.weights
+  const results = SPELLS.map((spell) => {
+    const comp = spell.composition || {}
+    const sigilMatch = comp.core === signature.core ? 1 : sameElement(comp.core, signature.core) ? 0.5 : 0
+    const signSetMatch = multisetSimilarity(signature.signMultiset, spellSignMultiset(spell))
+    const symmetryMatch = comp.symmetry === signature.symmetry ? 1 : 0
+    let score = w.sigilMatch * sigilMatch + w.signSetMatch * signSetMatch + w.symmetryMatch * symmetryMatch + w.placementMatch * 0.5
+    score *= CONFIDENCE_WEIGHT[spell.confidence] ?? 0.5
+    return { spell, score: Number(score.toFixed(3)), parts: { sigilMatch, signSetMatch, symmetryMatch } }
+  })
+  results.sort((a, b) => b.score - a.score)
+  return results
+}
+function computeSimilar(circle) {
+  const signature = buildSignature(circle)
+  const ranked = SPELLS.length ? matchSpell(signature) : []
+  const best = ranked[0]
+  const threshold = rules.matching.threshold
+  let match = null
+  let nearest = []
+  if (best && best.score >= threshold && signature.signCount > 0) {
+    match = { name: best.spell.name, score: best.score, effect: best.spell.effect, parts: best.parts }
+  } else {
+    nearest = ranked.slice(0, 3).filter((r) => r.score > 0.2).map((r) => ({ name: r.spell.name, score: r.score }))
+  }
+  return { catalogEmpty: SPELLS.length === 0, match, nearest }
+}
 
 // Orchestrate per-circle analysis + composition (mirrors src/engine/analyze.js, minus the
 // catalog `similar` match the app does). Accepts a v1 composition or a v2 {circles,relations}.
@@ -59,6 +130,7 @@ function analyze(input) {
     return {
       name, valid, status: { text: valid ? 'Valid' : 'Invalid — no core' },
       issues: c0.issues, sigils: c0.sigils, signs: c0.signs, deduction: c0.deduction,
+      similar: computeSimilar(circles[0]),
       dyes: c0.dyes, analysis: c0.analysis,
       circles: per, relations, combined: c0.deduction, catalogEmpty: SPELLS.length === 0,
     }
@@ -66,6 +138,7 @@ function analyze(input) {
   const combined = composeWith(grammar, relations, per)
   return {
     name, valid, status: { text: valid ? 'Valid' : 'Invalid — a circle is missing its core' },
+    similar: { catalogEmpty: SPELLS.length === 0, match: null, nearest: [] },
     circles: per, relations, combined, catalogEmpty: SPELLS.length === 0,
   }
 }
@@ -125,6 +198,23 @@ function renderCircle(L, c, h) {
   L.push(`sigils=${a.sigilCount} signs=${a.signCount} links=${a.linkCount}`)
 }
 
+// Render the catalog "Similar spells" section (engine match against data/spells.json).
+function renderSimilar(L, similar, h) {
+  if (!similar) return
+  L.push('')
+  L.push(`${h} Similar spells (engine catalog)`)
+  if (similar.catalogEmpty) {
+    L.push('- (catalog empty)')
+  } else if (similar.match) {
+    const m = similar.match
+    L.push(`- Match: ${m.name} (score ${m.score}) — ${m.effect}`)
+  } else if (similar.nearest?.length) {
+    L.push('- Nearest: ' + similar.nearest.map((n) => `${n.name} (${n.score})`).join(', '))
+  } else {
+    L.push('- No catalog match.')
+  }
+}
+
 function toText(r) {
   const L = []
   L.push(`# ${r.name || '(unnamed spell)'}`)
@@ -132,6 +222,7 @@ function toText(r) {
   L.push('')
   if (r.circles.length === 1) {
     renderCircle(L, r.circles[0], '##')
+    renderSimilar(L, r.similar, '##')
   } else {
     for (const c of r.circles) {
       L.push(`## Circle: ${c.name || c.id}`)
