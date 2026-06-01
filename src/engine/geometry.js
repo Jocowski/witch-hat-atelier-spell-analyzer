@@ -118,6 +118,13 @@ export function inwardRotation(x, y) {
   return ((Math.atan2(x, -y) * 180) / Math.PI + 180 + 360) % 360
 }
 
+// Rotation (deg, 0 = north CW) that makes a sign's TOP face AWAY from the center (outward),
+// given its position. The neutral orientation for signs whose canon default points outward
+// rather than inward — e.g. Sights Set, whose tip faces out of the seal.
+export function outwardRotation(x, y) {
+  return (inwardRotation(x, y) + 180) % 360
+}
+
 // SPIN = tangential cant of a sign's facing off its radial (inward/outward) axis. A sign
 // aimed inward or outward is ORIENTED (steering the spell), not spinning; one canted toward
 // the tangent (~90° off radial) spins the spell. Only signs with a front (directional) can

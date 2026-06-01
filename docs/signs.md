@@ -178,6 +178,8 @@ Entwine (巻きつきの矢, maki-tsuki no ya), first seen in the capture pennan
 
 The sign of wind (風の矢, kaze no ya) is an asymmetrical sign with a strange history. Prior to the volume 12 bonus, it had only ever made an appearance in chapter 1. In this chapter, the sign seemed to serve the same purpose as the wind sigil, serving as a sigil for both the sylph shoes seal and the pegasus carriage spell. However, with the sign not appearing in any subsequent chapters and even being replaced within the sylph shoes, fans believed the sign to have been a retconned version of a wind sigil. However, with its inclusion in the pegasus carriage spell reaffirmed as of the volume 12 bonus, it is now clear that the sign is still canon. Its function, beyond its relation to wind, is unclear.
 
+> **Note (whirlwind keystone).** Spiraling Flame gives the clearest evidence of the sign's effect: when Agott casts it she explicitly calls it a *"whirlwind keystone"* (*"if I use this fire rune spell with a whirlwind keystone, then…"*), and the spell's documented effect is *"a column of spinning flame."* So in Spiraling Flame the sign of wind is what sets the column **spinning into a spiral** — i.e. it acts as a whirlwind/spin operator. This may not generalize: in the pegasus carriage spell the same sign appears to serve as a plain wind sigil instead. Treat its role as "whirlwind / spin" where canon supports it, and "unclear" otherwise.
+
 **Spells Using Sign of Wind:** Spiraling Flame • Pegasus Carriage Spell
 
 ### Aeriforms Defined

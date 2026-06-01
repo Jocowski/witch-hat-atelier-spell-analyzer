@@ -5,13 +5,18 @@ import ResultPanel from './components/ResultPanel.jsx'
 import InkPanel from './components/InkPanel.jsx'
 import { analyze } from './engine/analyze.js'
 import { toComposition } from './engine/compose.js'
-import { inwardRotation } from './engine/geometry.js'
+import { inwardRotation, outwardRotation } from './engine/geometry.js'
 import { canBeCore, getComponentDef, DYE_MAP, DYES } from './engine/data.js'
 
 let _id = 1
 const nextId = () => `c${_id++}`
 let _cid = 1
 const nextCircleId = () => `k${_cid++}`
+
+// Neutral rotation for a sign at (x, y): top faces the center by default, but signs whose
+// canon orientation points outward (defaultFacing: 'outward', e.g. Sights Set) face away.
+const neutralRotation = (type, x, y) =>
+  getComponentDef(type)?.defaultFacing === 'outward' ? outwardRotation(x, y) : inwardRotation(x, y)
 
 const SIGIL = { rotation: 0, scale: 1, inverted: false }
 const newCircle = (over = {}) => ({ id: nextCircleId(), name: '', center: { x: 0, y: 0 }, radius: 170, ring: { closed: false }, core: null, components: [], dyes: [], inkColor: null, ...over })
@@ -93,8 +98,9 @@ export default function App() {
         return { ...c, components: [...c.components, withInk({ id, type, role: 'sigil', ...pos, ...SIGIL })] }
       }
       const sx = x ?? 0, sy = y ?? -100
-      // Default a sign to its neutral orientation: top facing the center of the seal.
-      return { ...c, components: [...c.components, withInk({ id, type, role: 'sign', x: sx, y: sy, ...SIGIL, rotation: inwardRotation(sx, sy) })] }
+      // Default a sign to its neutral orientation (top facing center, or outward for
+      // signs like Sights Set whose canon tip points away from the seal).
+      return { ...c, components: [...c.components, withInk({ id, type, role: 'sign', x: sx, y: sy, ...SIGIL, rotation: neutralRotation(type, sx, sy) })] }
     })
     setActiveCircleId(circleId)
     setSelected({ circleId, partId: id })
@@ -330,8 +336,8 @@ export default function App() {
                   }} />
                 °
               </label>
-              <button onClick={() => updateSelected({ rotation: isCore ? 0 : inwardRotation(selectedPart.x, selectedPart.y) })}
-                title="Reset rotation: a sign's top faces the center of the seal (a core resets to 0°).">⟲ reset</button>
+              <button onClick={() => updateSelected({ rotation: isCore ? 0 : neutralRotation(selectedPart.type, selectedPart.x, selectedPart.y) })}
+                title="Reset rotation: a sign's top faces the center of the seal — or outward for signs like Sights Set (a core resets to 0°).">⟲ reset</button>
               <button onClick={() => updateSelected({ scale: Math.max(0.4, (selectedPart.scale ?? 1) - 0.15) })}>− smaller</button>
               <button onClick={() => updateSelected({ scale: Math.min(2.5, (selectedPart.scale ?? 1) + 0.15) })}>+ larger</button>
               {selDef?.invertible && (
