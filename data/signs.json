@@ -263,7 +263,7 @@
         "soften",
         "downscale"
       ],
-      "invertible": false,
+      "invertible": true,
       "canBeCenter": false,
       "surrounds": false,
       "reference": "signs.md, Snugstone Spell, Sand Cage",
@@ -366,7 +366,7 @@
         "rewind",
         "preserve"
       ],
-      "invertible": true,
+      "invertible": false,
       "canBeCenter": true,
       "surrounds": false,
       "reference": "signs.md, Repetition Seal, Magic Cookpot, Washing Barrels",
@@ -404,7 +404,7 @@
         "transmute-ribbon",
         "flexible"
       ],
-      "invertible": false,
+      "invertible": true,
       "canBeCenter": false,
       "surrounds": true,
       "reference": "signs.md, Boulder Stretch Rope, Crystal Ribbon",
@@ -445,7 +445,7 @@
         "area",
         "precipitation"
       ],
-      "invertible": false,
+      "invertible": true,
       "canBeCenter": false,
       "surrounds": true,
       "reference": "signs.md, Rainbringer Seal",
@@ -480,7 +480,7 @@
         "flying",
         "dart"
       ],
-      "invertible": false,
+      "invertible": true,
       "canBeCenter": false,
       "surrounds": true,
       "pairsBestWith": [
@@ -532,7 +532,7 @@
         "target",
         "mind"
       ],
-      "invertible": false,
+      "invertible": true,
       "canBeCenter": false,
       "surrounds": false,
       "reference": "signs.md",
@@ -549,7 +549,7 @@
         "gather",
         "intake"
       ],
-      "invertible": false,
+      "invertible": true,
       "canBeCenter": false,
       "surrounds": false,
       "reference": "signs.md",

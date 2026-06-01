@@ -129,7 +129,7 @@ export default function ResultPanel({ result }) {
           <span>Power: <b>{analysis.power}</b> ({analysis.powerLabel})</span>
           <span>Sigils: <b>{analysis.sigilCount}</b></span>
           <span>Signs: <b>{analysis.signCount}</b></span>
-          <span>Ring: <b>{analysis.ring}</b></span>
+          <span>Aim: <b>{analysis.aim}</b></span>
           {analysis.linkCount > 0 && <span>Linked: <b>{analysis.linkCount}</b></span>}
           {analysis.inverted && <span className="flag">contains inverted signs</span>}
           {analysis.tilted && <span className="flag">tilted signs → spin</span>}

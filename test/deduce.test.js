@@ -27,12 +27,34 @@ test('no core => not ok', () => {
   assert.equal(r.ok, false)
 })
 
-test('water + column => beam of water, upward', () => {
+test('water + column => beam of water, above the seal', () => {
   const r = D('water', [{ type: 'column' }, { type: 'column' }, { type: 'column' }, { type: 'column' }])
   assert.ok(r.ok)
   assert.match(r.summary, /water/i)
   assert.match(r.summary, /column or beam/i)
-  assert.match(r.summary, /upward/i)
+  // A balanced column ring beams "above the seal" (the out-of-plane default), not compass north.
+  assert.match(r.summary, /above the seal/i)
+  assert.equal(r.direction, 'above the seal')
+})
+
+test('fire + inward levitation => lifted, centered above the seal (Pyreball)', () => {
+  // Four levitation signs pointing inward: the lift is centered above the seal, with no
+  // lateral compass direction — this is the canon Pyreball configuration.
+  const components = [0, 90, 180, 270].map((a, i) => {
+    const { x, y } = toCartesian(a, 0.6)
+    return { id: `l${i}`, type: 'levitation', role: 'sign', x, y, rotation: (a + 180) % 360, scale: 1, inverted: false }
+  })
+  const r = deduceWith(grammar, sigilMap, signMap, { ring: { closed: true }, core: { id: 'c', type: 'fire' }, components })
+  assert.match(r.summary, /levitate/i)
+  assert.match(r.summary, /above the seal/i)
+  assert.equal(r.direction, 'above the seal')
+})
+
+test('inverted flag on a non-directional sign is ignored (no front to flip)', () => {
+  // repetition is non-directional => cannot be inverted; the engine must not honor the flag.
+  const normal = D('water', [{ type: 'repetition' }])
+  const flagged = D('water', [{ type: 'repetition', inverted: true }])
+  assert.equal(flagged.summary, normal.summary)
 })
 
 test('light + column => beam of light (same FORM, different substance)', () => {

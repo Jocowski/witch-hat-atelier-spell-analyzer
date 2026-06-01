@@ -21,7 +21,7 @@ effect = substance(sigils) × form(signs) × activation(ring) × ink(dyes)
 
 - **Sigil** = the *substance/element* (center of the seal). Most spells have ≥1; mixed spells have several.
 - **Signs (keystones)** = *operators* that shape how the element manifests (rings around the center).
-- **Ring** = activation. A spell only fires when the ring is **closed**. An intentional gap = prepared but inactive.
+- **Ring** = activation. A spell only fires when the ring is **closed**; an intentional gap = prepared but not firing. This is an *app-only visual* — the engine does **not** report active/inactive, and analyses shouldn't either (focus on what the spell *does*).
 - **Conjuring ink + magical dyes** = global ink properties (duration, power, invisibility, etc.).
 
 The same signs behave differently per sigil: `column + water` = jet of water; `column + light` = beam of light. This multiplication is the whole game.
@@ -31,7 +31,6 @@ The same signs behave differently per sigil: `column + water` = jet of water; `c
 | Severity | Rule | Meaning |
 |----------|------|---------|
 | **blocking** | core present | Needs a sigil **or** a sign that can sit at center (`vision`, `repetition`, `billowing`, `weave`, `rain`, `bird`, `dancing_puppet`, `enlarge`). No core ⇒ **invalid**. |
-| **inactive** | ring closed | Ring open ⇒ prepared but **inactive**. |
 | warning | ring empty | Closed ring with nothing inside ⇒ raw discharge = **explosion**. |
 | warning | ≥1 sign | Sigil with no signs ⇒ no defined form (raw, undirected). |
 | warning | stability | ≥2 asymmetric signs ⇒ may be unstable. Aim for at least **bilateral symmetry**. |
@@ -156,8 +155,8 @@ echo '<composition-or-wrapper-json>' | node tools/spell-engine-cli.mjs
 node tools/spell-engine-cli.mjs --text path/to/spell.json
 ```
 
-Output includes: `valid`, `active`, `status`, `issues[]` (validity), `sigils[]`, `signs[]`,
+Output includes: `valid`, `status` (valid/invalid only), `issues[]` (validity), `sigils[]`, `signs[]`,
 `deduction` (`summary` + per-part `breakdown` + `notes`/`warnings`), `dyes[]`, `analysis`
-(symmetry/stability/balance/power/spin/counts/ring), and `unknownIds` if any part id is unrecognized
+(symmetry/stability/balance/`aim`/power/spin/counts), and `unknownIds` if any part id is unrecognized
 (catch typos here). Trust this for validity and the base deduced effect; add narrative/usage/variation
 reasoning on top of it.

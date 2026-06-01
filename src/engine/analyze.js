@@ -3,7 +3,7 @@
 // dyes (tinta) · outras informações geométricas. Tudo derivado das docs/.
 import grammar from '../../data/grammar.json'
 import { RULES, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef, isSigilType, signCanBeCenter } from './data.js'
-import { computeSymmetry, computeDirectionalBias, computeOrientationAim, classifyRegion, computePower, directionLabel } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert } from './geometry.js'
 import { deduceWith } from './deduce.js'
 
 const deduce = (composition) => deduceWith(grammar, SIGIL_MAP, SIGN_MAP, composition)
@@ -86,11 +86,18 @@ export function analyze(composition) {
   const power = computePower(components, { linkCount: comp.linkCount || 0 })
   const tilted = signComps.some((c) => (((c.rotation || 0) % 360) + 360) % 360 !== 0)
 
-  // AIM (para onde a magia vai) vem da ORIENTAÇÃO dos signs direcionais; BALANCE (desbalanço
-  // posicional do column) é uma questão de estabilidade/desvio, não a direção em si.
-  const invertibleOf = (t) => !!SIGN_MAP[t]?.invertible
+  // AIM (where the magic goes) comes from the ORIENTATION of directional signs; BALANCE
+  // (positional skew of column signs) is a stability/deflection matter, not the aim itself.
+  // "Above the seal" is the out-of-plane default for a column beam / levitation lift — it is
+  // NOT compass north; only a genuine lateral bias earns a compass label.
+  const familyOf = (t) => SIGN_MAP[t]?.family
   const aimSigns = signComps.filter((c) => grammar.operators[c.type]?.kind === 'direction')
-  const region = aimSigns.length ? classifyRegion(aimSigns, invertibleOf) : null
+  const region = aimSigns.length ? classifyRegion(aimSigns, familyOf) : null
+  const liftSigns = signComps.filter((c) => {
+    const op = grammar.operators[c.type]
+    return op?.kind === 'motion' && canSteer(familyOf(c.type))
+  })
+  const lift = liftSigns.length ? classifyRegion(liftSigns, familyOf) : null
   const formDirSigns = signComps.filter((c) => {
     const op = grammar.operators[c.type]
     return op?.kind === 'form' && op.directional
@@ -103,16 +110,17 @@ export function analyze(composition) {
       : region.mode === 'inward' ? 'contained within the ring'
       : region.mode === 'outward' ? 'outside the ring'
       : 'along the ring'
+  } else if (lift) {
+    aimLabel = lift.mode === 'aligned' ? directionLabel(lift.angle) : 'above the seal'
   } else if (formBiased) {
     aimLabel = directionLabel(formBalance.angle)
-  } else if (signComps.some((c) => grammar.operators[c.type]?.directional)) {
-    aimLabel = 'up'
+  } else if (formDirSigns.length) {
+    aimLabel = 'above the seal'
   }
 
   // ----- Validade (regras das docs) -----
   const issues = []
   if (!hasCore) issues.push({ severity: 'blocking', message: 'No core: place a sigil (or a sign that can occupy the center) so the seal has a substance.' })
-  if (!ringClosed) issues.push({ severity: 'inactive', message: 'Ring open: the spell is prepared but INACTIVE. Close the ring to activate.' })
   if (ringClosed && !hasCore && signComps.length === 0) issues.push({ severity: 'warning', message: 'A closed ring with nothing inside discharges raw energy — an explosion.' })
   if (hasCore && signComps.length === 0) issues.push({ severity: 'warning', message: 'No signs around the core: the element has no defined form (raw, undirected discharge).' })
   if (signComps.length >= 2) {
@@ -120,7 +128,7 @@ export function analyze(composition) {
     else issues.push({ severity: 'info', message: `Stable: ${symmetry} symmetry.` })
   }
   if (formBiased) issues.push({ severity: 'info', message: `Unbalanced projection signs: the beam skews ${directionLabel(formBalance.angle)} (bigger/more column signs pull it that way).` })
-  else if (aimLabel) issues.push({ severity: 'info', message: `Aim: the effect is directed ${aimLabel} (from the orientation of the directional signs).` })
+  else if (aimLabel) issues.push({ severity: 'info', message: `Aim: the effect manifests ${aimLabel} (from the directional signs).` })
   if (tilted) issues.push({ severity: 'info', message: 'Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach).' })
 
   const valid = hasCore
@@ -139,13 +147,14 @@ export function analyze(composition) {
   // ----- Signs (agrupados por tipo + inversão) -----
   const grouped = new Map()
   for (const c of signComps) {
-    const key = c.type + (c.inverted ? '!inv' : '')
-    if (!grouped.has(key)) grouped.set(key, { type: c.type, inverted: !!c.inverted, count: 0 })
+    const inv = !!c.inverted && canInvert(SIGN_MAP[c.type]?.family)
+    const key = c.type + (inv ? '!inv' : '')
+    if (!grouped.has(key)) grouped.set(key, { type: c.type, inverted: inv, count: 0 })
     grouped.get(key).count++
   }
   const signs = [...grouped.values()].map((g) => {
     const d = SIGN_MAP[g.type]
-    return { id: g.type, name: d?.name || g.type, category: d?.family || 'other', effect: d?.effect || '', count: g.count, inverted: g.inverted, invertible: !!d?.invertible }
+    return { id: g.type, name: d?.name || g.type, category: d?.family || 'other', effect: d?.effect || '', count: g.count, inverted: g.inverted, invertible: canInvert(d?.family) }
   })
 
   // ----- Efeito deduzido (gramática) -----
@@ -194,8 +203,9 @@ export function analyze(composition) {
     sigilCount: sigils.length,
     signCount: signComps.length,
     linkCount: comp.linkCount || 0,
-    ring: ringClosed ? 'closed (active)' : 'open (inactive)',
   }
 
+  // `active`/`status` are kept only to drive the app's activation visual (ring chip); they are
+  // NOT part of the analysis — the CLI the skill reads omits them. See SKILL.md learnings.
   return { name: comp.name || '', valid, active, status, issues, sigils, signs, deduction, similar, dyes, analysis }
 }

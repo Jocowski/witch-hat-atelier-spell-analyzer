@@ -5,17 +5,20 @@
 // deduceWith(...) is pure (grammar + maps injected) so it can be unit-tested in
 // plain Node. The app binds the real JSON via deduce() in engine/analyze.js.
 // NOTE: keep this module free of JSON imports so Node can load it without import attributes.
-import { computeSymmetry, computeDirectionalBias, computeOrientationAim, classifyRegion, directionLabel } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, classifyRegion, directionLabel, canSteer, canInvert } from './geometry.js'
 
 const KIND_ORDER = ['transmute', 'form', 'motion', 'direction', 'target', 'power', 'special', 'support', 'none']
 
-// Collapse signs into unique {type, count, inverted} entries.
-function groupSigns(components) {
+// Collapse signs into unique {type, count, inverted} entries. A sign's `inverted` flag only
+// counts when its category allows inversion (directional/semi-directional); non-directional
+// signs have no front to flip, so an `inverted` flag on them is ignored.
+function groupSigns(components, signMap) {
   const map = new Map()
   for (const c of components) {
     if (c.role !== 'sign') continue
-    const key = `${c.type}|${c.inverted ? 1 : 0}`
-    if (!map.has(key)) map.set(key, { type: c.type, inverted: !!c.inverted, count: 0 })
+    const inv = !!c.inverted && canInvert(signMap[c.type]?.family)
+    const key = `${c.type}|${inv ? 1 : 0}`
+    if (!map.has(key)) map.set(key, { type: c.type, inverted: inv, count: 0 })
     map.get(key).count++
   }
   return [...map.values()]
@@ -64,7 +67,7 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     [substance, ...extra.map((x) => x.el.substance)].filter((v, i, a) => a.indexOf(v) === i),
   )
 
-  const groups = groupSigns(composition.components)
+  const groups = groupSigns(composition.components, signMap)
   const types = new Set(groups.map((x) => x.type))
 
   // Bucket operators by kind.
@@ -105,17 +108,27 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     primary = `The ${substancePhrase} ${el.raw}`
   }
 
-  // ----- Direction: AIM por orientação (region/pull) supera o BALANÇO posicional (column) -----
-  // O aim verdadeiro vem de para onde os signs APONTAM (rotação/arranjo), não do centro de
-  // massa. O balanço posicional só inclina o jato de um column (lição do Watershot).
+  // ----- Direction -----
+  // Three separate concepts, in canon terms:
+  //   region/pull (kind 'direction') — where the magic manifests, from where the signs POINT
+  //     (aligned => fired that way / inward => contained / outward => outside / opposed => ring).
+  //   levitation (a DIRECTIONAL motion sign) — inward or balanced => the effect floats straight
+  //     up, centered ABOVE the seal; all aligned one way (air/wind case) => carried that way.
+  //   column/dispersion (FORM directional) — beams ABOVE the seal by default; positional
+  //     imbalance skews the beam (the Watershot lesson). "Above the seal" is the out-of-plane
+  //     default, NOT a compass north — only a genuine lateral bias gets a compass label.
   const signComps = composition.components.filter((c) => c.role === 'sign')
-  const invertibleOf = (t) => !!signMap[t]?.invertible
+  const familyOf = (t) => signMap[t]?.family
 
-  // region/pull — direção controlada por orientação/arranjo (kind 'direction').
   const aimSigns = signComps.filter((c) => g.operators[c.type]?.kind === 'direction')
-  const region = aimSigns.length ? classifyRegion(aimSigns, invertibleOf) : null
+  const region = aimSigns.length ? classifyRegion(aimSigns, familyOf) : null
 
-  // column/dispersion — FORM direcional; desbalanço de POSIÇÃO desvia o jato.
+  const liftSigns = signComps.filter((c) => {
+    const op = g.operators[c.type]
+    return op?.kind === 'motion' && canSteer(familyOf(c.type))
+  })
+  const lift = liftSigns.length ? classifyRegion(liftSigns, familyOf) : null
+
   const formDirSigns = signComps.filter((c) => {
     const op = g.operators[c.type]
     return op?.kind === 'form' && op.directional
@@ -132,11 +145,12 @@ export function deduceWith(g, sigilMap, signMap, composition) {
       else if (region.mode === 'outward') { aimLabel = 'outward'; directionClause = `, manifesting outside the ring` }
       else { aimLabel = 'on the ring'; directionClause = `, emerging only along the ring` }
       if (region.mode === 'aligned' && formBiased) directionClause += ` (pulled toward ${directionLabel(formBalance.angle)} by uneven signs)`
+    } else if (lift) {
+      if (lift.mode === 'aligned') { aimLabel = directionLabel(lift.angle); directionClause = `, carried ${aimLabel}` }
+      else { aimLabel = 'above the seal'; directionClause = `, centered above the seal` }
     } else if (form?.op?.directional) {
       if (formBiased) { aimLabel = directionLabel(formBalance.angle); directionClause = `, skewed toward ${aimLabel} (unbalanced signs)` }
-      else { aimLabel = 'up'; directionClause = `, directed upward` }
-    } else if (byKind.motion?.some((m) => m.op.directional)) {
-      aimLabel = 'up'; directionClause = `, directed upward`
+      else { aimLabel = 'above the seal'; directionClause = `, above the seal` }
     } else if (form?.op?.defaultDirection === 'outward') {
       aimLabel = 'outward'; directionClause = `, spreading outward`
     }

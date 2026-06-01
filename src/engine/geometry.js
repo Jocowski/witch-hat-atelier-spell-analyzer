@@ -87,44 +87,60 @@ function angleDelta(a, b) {
   return d
 }
 
-// Direção para a qual um sign "aponta" (0 = norte, horário), a partir da sua própria
-// rotação. Se for invertível e estiver invertido, a frente vira 180°.
-export function signFacing(c, invertible = false) {
+// Canon sign categories (signs.md, "Sign Categories") decide what a sign's rotation and
+// inversion actually mean:
+//   - directional: has a front; rotation STEERS the spell; inverting flips the front 180°.
+//   - semi-directional: has a front, but it does NOT steer the spell; inverting flips the
+//     EFFECT to its opposite (crush↔reform, enlarge↔shrink).
+//   - non-directional: no front — rotation is irrelevant and the sign CANNOT be inverted.
+//   - asymmetric: behavior under angling/inverting is unknown (treat as non-steering).
+export function canSteer(family) {
+  return family === 'directional'
+}
+export function canInvert(family) {
+  return family === 'directional' || family === 'semi-directional'
+}
+
+// Direction a sign "points" (0 = north, clockwise), or null when the sign has no steering
+// front (semi-/non-directional, asymmetric). Only directional signs steer the spell; an
+// inverted directional sign has its front flipped 180°.
+export function signFacing(c, family) {
+  if (!canSteer(family)) return null
   let f = (((c.rotation || 0) % 360) + 360) % 360
-  if (c.inverted && invertible) f = (f + 180) % 360
+  if (c.inverted) f = (f + 180) % 360
   return f
 }
 
 // AIM por ORIENTAÇÃO: resultante dos vetores de "frente" (rotação) dos signs direcionais.
 // Diferente de computeDirectionalBias, que usa a POSIÇÃO (centro de massa) — este lê para
-// onde os signs apontam. { aimed, angle, magnitude } (magnitude 0 = frentes se cancelam).
-export function computeOrientationAim(signs, invertibleOf = () => false) {
-  if (!signs.length) return { aimed: false, angle: 0, magnitude: 0 }
+// onde os signs apontam. Signs sem frente (signFacing === null) são ignorados.
+// { aimed, angle, magnitude } (magnitude 0 = frentes se cancelam).
+export function computeOrientationAim(signs, familyOf = () => null) {
+  const facings = signs.map((c) => signFacing(c, familyOf(c.type))).filter((f) => f != null)
+  if (!facings.length) return { aimed: false, angle: 0, magnitude: 0 }
   let vx = 0
   let vy = 0
-  for (const c of signs) {
-    const f = signFacing(c, invertibleOf(c.type))
+  for (const f of facings) {
     const rad = (f * Math.PI) / 180
     vx += Math.sin(rad)
     vy += -Math.cos(rad)
   }
-  const magnitude = Math.hypot(vx, vy) / signs.length
+  const magnitude = Math.hypot(vx, vy) / facings.length
   let angle = (Math.atan2(vx, -vy) * 180) / Math.PI
   if (angle < 0) angle += 360
   return { aimed: magnitude > 0.34, angle, magnitude }
 }
 
-// Classifica um grupo de signs de "direção" (region/pull) nas 4 configurações canônicas
-// (signs.md, Region): todos na mesma direção => dispara para lá; todos para dentro =>
-// contido no ring; todos para fora => fora do ring; opostos (frentes se cancelam) =>
-// só na linha do ring. Retorna { mode, angle? } ou null.
-export function classifyRegion(signs, invertibleOf = () => true, tol = 35) {
-  if (!signs.length) return null
-  const items = signs.map((c) => ({
-    facing: signFacing(c, invertibleOf(c.type)),
-    pos: toPolar(c.x, c.y).angle,
-  }))
-  const aim = computeOrientationAim(signs, invertibleOf)
+// Classifica um grupo de signs com frente (region/pull/levitation) nas 4 configurações
+// canônicas (signs.md, Region): todos na mesma direção => apontam para lá; todos para
+// dentro => contido/centrado; todos para fora => para fora do ring; opostos (frentes se
+// cancelam) => só na linha do ring. Signs sem frente são descartados. { mode, angle? } | null.
+export function classifyRegion(signs, familyOf = () => 'directional', tol = 35) {
+  const items = signs
+    .map((c) => ({ facing: signFacing(c, familyOf(c.type)), pos: toPolar(c.x, c.y).angle }))
+    .filter((it) => it.facing != null)
+  if (!items.length) return null
+  const aim = computeOrientationAim(signs, familyOf)
   const isInward = items.every((it) => angleDelta(it.facing, (it.pos + 180) % 360) <= tol)
   const isOutward = items.every((it) => angleDelta(it.facing, it.pos) <= tol)
   if (aim.aimed && !isInward && !isOutward) return { mode: 'aligned', angle: aim.angle }

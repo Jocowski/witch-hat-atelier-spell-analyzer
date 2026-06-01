@@ -39,7 +39,7 @@ const spellsDoc = require(resolve(root, 'data/spells.json'))
 
 const importLocal = (rel) => import(pathToFileURL(resolve(root, rel)).href)
 const { deduceWith } = await importLocal('src/engine/deduce.js')
-const { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel } =
+const { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert } =
   await importLocal('src/engine/geometry.js')
 
 const SIGIL_MAP = Object.fromEntries(sigilsDoc.sigils.map((s) => [s.id, s]))
@@ -68,10 +68,17 @@ function analyze(composition) {
   const power = computePower(components, { linkCount: comp.linkCount || 0 })
   const tilted = signComps.some((c) => (((c.rotation || 0) % 360) + 360) % 360 !== 0)
 
-  // AIM (orientation of directional signs) vs BALANCE (positional skew of column signs).
-  const invertibleOf = (t) => !!SIGN_MAP[t]?.invertible
+  // AIM (where the magic goes) comes from the ORIENTATION of directional signs; BALANCE
+  // (positional skew of column signs) is a deflection matter. "Above the seal" is the
+  // out-of-plane default for a column beam / levitation lift — not compass north.
+  const familyOf = (t) => SIGN_MAP[t]?.family
   const aimSigns = signComps.filter((c) => grammar.operators[c.type]?.kind === 'direction')
-  const region = aimSigns.length ? classifyRegion(aimSigns, invertibleOf) : null
+  const region = aimSigns.length ? classifyRegion(aimSigns, familyOf) : null
+  const liftSigns = signComps.filter((c) => {
+    const op = grammar.operators[c.type]
+    return op?.kind === 'motion' && canSteer(familyOf(c.type))
+  })
+  const lift = liftSigns.length ? classifyRegion(liftSigns, familyOf) : null
   const formDirSigns = signComps.filter((c) => {
     const op = grammar.operators[c.type]
     return op?.kind === 'form' && op.directional
@@ -84,15 +91,16 @@ function analyze(composition) {
       : region.mode === 'inward' ? 'contained within the ring'
       : region.mode === 'outward' ? 'outside the ring'
       : 'along the ring'
+  } else if (lift) {
+    aimLabel = lift.mode === 'aligned' ? directionLabel(lift.angle) : 'above the seal'
   } else if (formBiased) {
     aimLabel = directionLabel(formBalance.angle)
-  } else if (signComps.some((c) => grammar.operators[c.type]?.directional)) {
-    aimLabel = 'up'
+  } else if (formDirSigns.length) {
+    aimLabel = 'above the seal'
   }
 
   const issues = []
   if (!hasCore) issues.push({ severity: 'blocking', message: 'No core: place a sigil (or a sign that can occupy the center) so the seal has a substance.' })
-  if (!ringClosed) issues.push({ severity: 'inactive', message: 'Ring open: the spell is prepared but INACTIVE. Close the ring to activate.' })
   if (ringClosed && !hasCore && signComps.length === 0) issues.push({ severity: 'warning', message: 'A closed ring with nothing inside discharges raw energy — an explosion.' })
   if (hasCore && signComps.length === 0) issues.push({ severity: 'warning', message: 'No signs around the core: the element has no defined form (raw, undirected discharge).' })
   if (signComps.length >= 2) {
@@ -100,15 +108,11 @@ function analyze(composition) {
     else issues.push({ severity: 'info', message: `Stable: ${symmetry} symmetry.` })
   }
   if (formBiased) issues.push({ severity: 'info', message: `Unbalanced projection signs: the beam skews ${directionLabel(formBalance.angle)} (bigger/more column signs pull it that way).` })
-  else if (aimLabel) issues.push({ severity: 'info', message: `Aim: the effect is directed ${aimLabel} (from the orientation of the directional signs).` })
+  else if (aimLabel) issues.push({ severity: 'info', message: `Aim: the effect manifests ${aimLabel} (from the directional signs).` })
   if (tilted) issues.push({ severity: 'info', message: 'Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach).' })
 
   const valid = hasCore
-  const active = hasCore && ringClosed
-  let status
-  if (!hasCore) status = { class: 'invalid', text: 'Invalid — no core' }
-  else if (!ringClosed) status = { class: 'inactive', text: 'Prepared (ring open — inactive)' }
-  else status = { class: 'ok', text: 'Spell active' }
+  const status = hasCore ? { class: 'ok', text: 'Valid' } : { class: 'invalid', text: 'Invalid — no core' }
 
   const sigils = sigilComps.map((c) => {
     const d = getDef(c.type)
@@ -117,13 +121,14 @@ function analyze(composition) {
 
   const grouped = new Map()
   for (const c of signComps) {
-    const key = c.type + (c.inverted ? '!inv' : '')
-    if (!grouped.has(key)) grouped.set(key, { type: c.type, inverted: !!c.inverted, count: 0 })
+    const inv = !!c.inverted && canInvert(SIGN_MAP[c.type]?.family)
+    const key = c.type + (inv ? '!inv' : '')
+    if (!grouped.has(key)) grouped.set(key, { type: c.type, inverted: inv, count: 0 })
     grouped.get(key).count++
   }
   const signs = [...grouped.values()].map((g) => {
     const d = SIGN_MAP[g.type]
-    return { id: g.type, name: d?.name || g.type, category: d?.family || 'other', effect: d?.effect || '', count: g.count, inverted: g.inverted, invertible: !!d?.invertible }
+    return { id: g.type, name: d?.name || g.type, category: d?.family || 'other', effect: d?.effect || '', count: g.count, inverted: g.inverted, invertible: canInvert(d?.family) }
   })
 
   const deduction = hasCore ? deduceWith(grammar, SIGIL_MAP, SIGN_MAP, composition) : null
@@ -150,10 +155,9 @@ function analyze(composition) {
     sigilCount: sigils.length,
     signCount: signComps.length,
     linkCount: comp.linkCount || 0,
-    ring: ringClosed ? 'closed (active)' : 'open (inactive)',
   }
 
-  return { name: comp.name || '', valid, active, status, issues, sigils, signs, deduction, dyes, analysis: analysisInfo, catalogEmpty: SPELLS.length === 0 }
+  return { name: comp.name || '', valid, status, issues, sigils, signs, deduction, dyes, analysis: analysisInfo, catalogEmpty: SPELLS.length === 0 }
 }
 
 // ---------- Unknown id detection (helps catch typos before deducing) ----------
@@ -171,7 +175,7 @@ function unknownIds(composition) {
 function toText(r) {
   const L = []
   L.push(`# ${r.name || '(unnamed spell)'}`)
-  L.push(`Status: ${r.status.text}  |  valid=${r.valid}  active=${r.active}`)
+  L.push(`Status: ${r.status.text}  |  valid=${r.valid}`)
   L.push('')
   if (r.issues.length) {
     L.push('## Validity')
@@ -208,7 +212,7 @@ function toText(r) {
   L.push('## Other')
   const a = r.analysis
   L.push(`stability=${a.stability} | aim=${a.aim} | balance=${a.balance} | power=${a.power} (${a.powerLabel}) | symmetry=${a.symmetry}`)
-  L.push(`sigils=${a.sigilCount} signs=${a.signCount} links=${a.linkCount} ring=${a.ring}`)
+  L.push(`sigils=${a.sigilCount} signs=${a.signCount} links=${a.linkCount}`)
   return L.join('\n')
 }
 
