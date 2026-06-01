@@ -1,8 +1,23 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, classifyZone, CANVAS_RADIUS } from '../src/engine/geometry.js'
+import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, classifyZone, anchorToXY, xyToAnchor, CANVAS_RADIUS } from '../src/engine/geometry.js'
 
 const directional = () => 'directional'
+
+test('anchorToXY: a ring anchor sits on the rim at the given angle', () => {
+  const { x, y } = anchorToXY(90, 0, 100) // due east on a radius-100 ring
+  assert.ok(Math.abs(x - 100) < 1e-6)
+  assert.ok(Math.abs(y - 0) < 1e-6)
+})
+
+test('anchorToXY/xyToAnchor: round-trip, and offset tracks ring resize', () => {
+  const a = xyToAnchor(70, -70, 100) // NE, ~99px out → offset ≈ -1
+  const p1 = anchorToXY(a.angle, a.offset, 100)
+  assert.ok(Math.abs(p1.x - 70) < 1e-6 && Math.abs(p1.y - -70) < 1e-6)
+  // Same anchor on a bigger ring moves outward (offset preserved, radius grows).
+  const p2 = anchorToXY(a.angle, a.offset, 200)
+  assert.ok(Math.hypot(p2.x, p2.y) > Math.hypot(p1.x, p1.y))
+})
 
 test('classifyZone: inside / ring band / outside relative to radius', () => {
   const R = 100

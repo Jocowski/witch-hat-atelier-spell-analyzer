@@ -3,8 +3,8 @@
 // inversion/mirror, promote-to-center, move-to-circle, zone, and delete. Purely controlled —
 // every change goes back through App's updateSelected / deleteSelected / etc.
 export default function Inspector({
-  part, def, isCore, zone, otherCircles,
-  onUpdate, onResetRotation, onPromoteToCore, onMoveToCircle, onDelete, canPromote,
+  part, def, isCore, zone, otherCircles, pinned,
+  onUpdate, onResetRotation, onPromoteToCore, onTogglePin, onMoveToCircle, onDelete, canPromote,
 }) {
   if (!part) {
     return (
@@ -54,6 +54,15 @@ export default function Inspector({
           title="Mirror left↔right (visual only — does not change the deduced effect).">⇆ mirror</button>
         {canPromote && <button onClick={onPromoteToCore}>↦ to center</button>}
       </div>
+
+      {!isCore && (
+        <div className="insp-row">
+          <button className={pinned ? 'on' : ''} onClick={onTogglePin}
+            title="Pin this sign to the ring — it tracks the ring when the circle is resized, and drags along it.">
+            {pinned ? '📌 pinned to ring' : '📌 pin to ring'}
+          </button>
+        </div>
+      )}
 
       {!isCore && otherCircles?.length > 0 && (
         <div className="insp-row">

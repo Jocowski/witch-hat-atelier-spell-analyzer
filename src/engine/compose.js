@@ -13,19 +13,28 @@
 // Each circle's component coords are relative to THAT circle's center, so the per-circle
 // geometry (geometry.js) is reused unchanged.
 
-import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert, computeSpin, classifyZone } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert, computeSpin, classifyZone, anchorToXY } from './geometry.js'
 import { deduceWith } from './deduce.js'
+
+// A ring-anchored component (anchor.ring) gets its x,y from the circle radius so it tracks the
+// ring; the resolved x,y is what geometry/zone/deduction read. The anchor itself round-trips.
+function resolveAnchored(components, radius) {
+  return (components || []).map((c) =>
+    c.anchor?.ring ? { ...c, ...anchorToXY(c.anchor.angle || 0, c.anchor.offset || 0, radius) } : c,
+  )
+}
 
 // ---------- Normalize / migrate any input to the v2 shape ----------
 function normalizeCircle(c, i) {
+  const radius = c.radius ?? null
   return {
     id: c.id || `k${i}`,
     name: c.name || '',
     center: c.center || { x: 0, y: 0 },
-    radius: c.radius ?? null,
+    radius,
     ring: c.ring || { closed: false },
     core: c.core || null,
-    components: c.components || [],
+    components: resolveAnchored(c.components, radius),
     dyes: c.dyes || [],
     linkCount: c.linkCount || 0,
     inkColor: c.inkColor || null, // display-only: tints the ring; ignored by deduction
@@ -131,6 +140,8 @@ export function analyzeCircleWith(deps, circle) {
   if (formBiased) issues.push({ severity: 'info', message: `Unbalanced projection signs: the beam skews ${directionLabel(formBalance.angle)} (bigger/more column signs pull it that way).` })
   else if (aimLabel) issues.push({ severity: 'info', message: `Aim: the effect manifests ${aimLabel} (from the directional signs).` })
   if (tilted) issues.push({ severity: 'info', message: 'Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach).' })
+  const outsideCount = signComps.filter((c) => c.zone === 'outside').length
+  if (outsideCount) issues.push({ severity: 'info', message: `${outsideCount} external mark${outsideCount > 1 ? 's' : ''} outside the ring — framing only; they don't steer the spell.` })
 
   // ----- Sigils -----
   const sigils = sigilComps.map((c) => {

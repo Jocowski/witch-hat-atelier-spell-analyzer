@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getComponentDef, RULES } from '../engine/data.js'
+import { anchorToXY } from '../engine/geometry.js'
 
 const VIEW = 600 // viewBox 600x600, origin centered via -300
 const ZOOM_MIN = 0.5
@@ -63,7 +64,9 @@ function CircleGroup({ circle, isActive, selectedPartId, hoveredPartId, hoveredC
   const ringColor = circle.inkColor || '#5a3b1e'
   const openColor = circle.inkColor || '#9c7a4a'
   const core = circle.core ? { ...circle.core, role: 'core' } : null
-  const parts = [...(core ? [core] : []), ...circle.components]
+  // Ring-pinned parts render at their resolved ring position so they track the circle's size.
+  const comps = circle.components.map((p) => (p.anchor?.ring ? { ...p, ...anchorToXY(p.anchor.angle || 0, p.anchor.offset || 0, R) } : p))
+  const parts = [...(core ? [core] : []), ...comps]
   return (
     <g transform={`translate(${circle.center.x} ${circle.center.y})`} style={{ opacity: dim ? 0.2 : 1 }}>
       {hoveredCircle && <circle cx="0" cy="0" r={R + 8} fill="none" stroke="#d6713a" strokeWidth="2" strokeDasharray="2 4" pointerEvents="none" />}

@@ -7,7 +7,7 @@ import Inspector from './components/Inspector.jsx'
 import SpellTree from './components/SpellTree.jsx'
 import { analyze } from './engine/analyze.js'
 import { toComposition } from './engine/compose.js'
-import { inwardRotation, outwardRotation, classifyZone } from './engine/geometry.js'
+import { inwardRotation, outwardRotation, classifyZone, xyToAnchor, anchorToXY } from './engine/geometry.js'
 import { canBeCore, getComponentDef, DYE_MAP, DYES, RULES } from './engine/data.js'
 
 let _id = 1
@@ -125,7 +125,32 @@ export default function App() {
   function movePart(circleId, partId, x, y) {
     patchCircle(circleId, (c) => {
       if (c.core?.id === partId) return { ...c, core: { ...c.core, x, y } }
-      return { ...c, components: c.components.map((p) => (p.id === partId ? { ...p, x, y } : p)) }
+      const R = radiusOf(c)
+      return {
+        ...c,
+        components: c.components.map((p) => {
+          if (p.id !== partId) return p
+          // A ring-pinned sign tracks the ring: store the drag as an updated anchor (angle/offset).
+          if (p.anchor?.ring) { const a = xyToAnchor(x, y, R); return { ...p, x, y, anchor: { ring: true, angle: a.angle, offset: a.offset } } }
+          return { ...p, x, y }
+        }),
+      }
+    })
+  }
+  // Pin/unpin the selected sign to its circle's ring (anchor follows resize; drag moves along it).
+  function togglePinToRing() {
+    if (!selected) return
+    patchCircle(selected.circleId, (c) => {
+      const R = radiusOf(c)
+      return {
+        ...c,
+        components: c.components.map((p) => {
+          if (p.id !== selected.partId) return p
+          if (p.anchor?.ring) { const { anchor, ...rest } = p; return rest } // unpin: keep current x,y
+          const a = xyToAnchor(p.x, p.y, R)
+          return { ...p, ...anchorToXY(a.angle, a.offset, R), anchor: { ring: true, angle: a.angle, offset: a.offset } }
+        }),
+      }
     })
   }
   function updateSelected(patch) {
@@ -209,6 +234,14 @@ export default function App() {
     }))
     if (activeCircleId === id) setActiveCircleId(remaining[0].id)
     if (selected?.circleId === id) setSelected(null)
+  }
+  // Resize a circle, re-resolving any ring-pinned parts so they stay on the (new) rim.
+  function setCircleRadius(id, radius) {
+    patchCircle(id, (c) => ({
+      ...c,
+      radius,
+      components: c.components.map((p) => (p.anchor?.ring ? { ...p, ...anchorToXY(p.anchor.angle || 0, p.anchor.offset || 0, radius) } : p)),
+    }))
   }
   const setRingClosed = (id, closed) => patchCircle(id, (c) => ({ ...c, ring: { ...c.ring, closed } }))
   const setCircleName = (id, name) => patchCircle(id, (c) => ({ ...c, name }))
@@ -360,9 +393,11 @@ export default function App() {
             zone={selectedZone}
             otherCircles={otherCircles}
             canPromote={canPromoteSel}
+            pinned={!!selectedPart?.anchor?.ring}
             onUpdate={updateSelected}
             onResetRotation={() => updateSelected({ rotation: isCore ? 0 : neutralRotation(selectedPart.type, selectedPart.x, selectedPart.y) })}
             onPromoteToCore={promoteToCore}
+            onTogglePin={togglePinToRing}
             onMoveToCircle={(toId) => movePartToCircle(selected.circleId, selected.partId, toId)}
             onDelete={deleteSelected}
           />
@@ -398,7 +433,7 @@ export default function App() {
                 <span className="cp-sub">size</span>
                 <input type="range" className="cp-size" min={RADIUS_MIN} max={RADIUS_MAX} step={2}
                   value={radiusOf(activeCircle)}
-                  onChange={(e) => patchCircle(activeCircle.id, (c) => ({ ...c, radius: Number(e.target.value) }))}
+                  onChange={(e) => setCircleRadius(activeCircle.id, Number(e.target.value))}
                   aria-label="Circle size" />
                 <span className="cp-sizeval">{Math.round(radiusOf(activeCircle))}</span>
                 <button className={activeCircle.ring?.closed ? '' : 'primary'} onClick={() => setRingClosed(activeCircle.id, !activeCircle.ring?.closed)}>

@@ -67,7 +67,12 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     [substance, ...extra.map((x) => x.el.substance)].filter((v, i, a) => a.indexOf(v) === i),
   )
 
-  const groups = groupSigns(composition.components, signMap)
+  // Inside-ring signs drive the effect; outside signs are external marks/protrusions that
+  // frame the seal but don't shape the core effect (zone tagged in compose.js).
+  const insideSigns = composition.components.filter((c) => c.role === 'sign' && c.zone !== 'outside')
+  const outsideSigns = composition.components.filter((c) => c.role === 'sign' && c.zone === 'outside')
+  const groups = groupSigns(insideSigns, signMap)
+  const outsideGroups = groupSigns(outsideSigns, signMap)
   const types = new Set(groups.map((x) => x.type))
 
   // Bucket operators by kind.
@@ -179,6 +184,11 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   if (specialClause.length) summary += `; it ${joinList(specialClause)}`
   if (powerClause.length) summary += `. The effect ${joinList(powerClause)}`
   if (targetClause.length) summary += `. It ${joinList(targetClause)}`
+  // External marks (signs outside the activation ring) — framed, not folded into the effect.
+  if (outsideGroups.length) {
+    const externalNames = outsideGroups.map((g) => (signMap[g.type]?.name || g.type) + (g.count > 1 ? ` ×${g.count}` : ''))
+    summary += `. Outside the ring sit external marks (${joinList(externalNames)}) that frame the seal rather than shape the core effect`
+  }
   summary = summary.replace(/\.\s*\./g, '.').trim()
   if (!/[.!?]$/.test(summary)) summary += '.'
 
@@ -192,6 +202,16 @@ export function deduceWith(g, sigilMap, signMap, composition) {
         text: capitalize(`the ${substancePhrase} ${opVerb(item.op, item.inverted)}.`),
       })
     }
+  }
+
+  // External-mark breakdown lines (drawn outside the activation ring).
+  for (const g of outsideGroups) {
+    breakdown.push({
+      part: g.type,
+      role: 'external',
+      label: (signMap[g.type]?.name || g.type) + (g.count > 1 ? ` ×${g.count}` : '') + ' (outside ring)',
+      text: 'An external mark outside the activation ring — it frames the seal but does not shape the core effect.',
+    })
   }
 
   // ----- Interactions: synergies / warnings / notes -----

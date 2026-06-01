@@ -19,6 +19,22 @@ export function toCartesian(angle, radius) {
   return { x: r * Math.sin(rad), y: -r * Math.cos(rad) }
 }
 
+// Resolve a ring-anchor { angle, offset } to local x,y on a circle of the given radius.
+// angle is degrees (0 = north, clockwise); offset shifts in/out from the ring (px, default 0).
+// A pinned sign sits on the ring and tracks the ring when the circle is resized.
+export function anchorToXY(angle, offset = 0, radius = CANVAS_RADIUS) {
+  const r = (radius || CANVAS_RADIUS) + (offset || 0)
+  const rad = (angle * Math.PI) / 180
+  return { x: r * Math.sin(rad), y: -r * Math.cos(rad) }
+}
+
+// Inverse: local x,y on a circle of `radius` → ring-anchor { angle, offset }.
+export function xyToAnchor(x, y, radius = CANVAS_RADIUS) {
+  let angle = (Math.atan2(x, -y) * 180) / Math.PI
+  if (angle < 0) angle += 360
+  return { angle, offset: Math.hypot(x, y) - (radius || CANVAS_RADIUS) }
+}
+
 // Zone of a component relative to its circle's ring: 'inside' | 'ring' | 'outside'.
 // Read from its distance to the circle center as a fraction of the ring radius (px).
 // Components with no position (catalog recipes) or no radius default to 'inside'.
