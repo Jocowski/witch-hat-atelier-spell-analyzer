@@ -132,6 +132,22 @@
         ],
         "symmetry": "radial"
       }
+    },
+    {
+      "id": "rising_platform_of_water",
+      "name": "Rising Platform of Water",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Generates a rising column of water that lifts the object the seal is drawn on straight up into the air.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "column", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
+          { "id": "levitation", "count": 4, "placement": "alternating", "orientation": "front", "inverted": false }
+        ],
+        "symmetry": "radial"
+      }
     }
   ]
 }
