@@ -36,6 +36,14 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Boulder Stretch Rope (canon, earth)** — Richeh's spell: Earth core + a SINGLE large
+  Weave keystone *wrapped around* it (not a ring of several — Weave "is supposed to surround the central
+  sigil", signs.md:139). Transmutes rigid stone into a long flexible ribbon/rope. Runs in earth's
+  MANIPULATE mode (sigils.md:53) — needs a real boulder/rock present, cannot conjure stone ("a loom that
+  needs raw stone fed in"). The drama is overriding rock's defining rigidity. Same Weave sign as Crystal
+  Ribbon & Light Tracer on softer/self-creating substances. Canon uses: Richeh bridged the gap in the
+  serpent-back cave; Agott/Coco/Tetia bound Wolf Euini. Engine "asymmetric/unstable" = single-sign
+  artifact. Now in the catalog (self-matches ~0.85).
 - 2026-06-01: **Qifrey's Water Dragon (canon, water)** — Qifrey's signature spell (subdues the dragon
   attacking Coco in the Illusory Labyrinth). Dragon decorative sigil (shape-giver; the ONLY canon spell
   using it, sigils.md:135) + Water ×4 sigils + modified Water Flower (`flower_water`) sigil + Enlarge ×1

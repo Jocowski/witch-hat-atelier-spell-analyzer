@@ -456,6 +456,28 @@
         "symmetry": "bilateral"
       },
       "notes": "Multi-sigil water spell. The engine core is the Dragon decorative sigil (the shape-giver); the actual substance is Water ×4 sigils ringed at N/E/S/W, plus a modified Water Flower (flower_water) decorative sigil that settles the spent water into a lily. The matcher keys on core + sign multiset, so those role:sigil sigils are recorded here, not in signs[]. Runs in water's cheap COLLECT mode: the 4 Convergence signs converge nearby cloud-water to a point so the Water sigils can incorporate it; Enlarge grows the dragon; the 8 balanced Columns dictate its direction. Dye: Azuremoon Flower (duration)."
+    },
+    {
+      "id": "boulder_stretch_rope",
+      "name": "Boulder Stretch Rope",
+      "category": "earth",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Shapes a piece of existing stone into a long, flexible ribbon — a rope of rock used to span a gap or bind a target.",
+      "composition": {
+        "core": "earth",
+        "signs": [
+          {
+            "id": "weave",
+            "count": 1,
+            "placement": "surrounds",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Canon earth spell invented by Richeh. A single large Weave keystone wrapped around an Earth core transmutes rigid stone into a flexible ribbon. Runs in earth's manipulate mode (sigils.md:53) — needs a real boulder/rock to act on, it cannot conjure stone. Richeh used it to cross the gap in the serpent-back cave; Agott, Coco & Tetia used it to capture Wolf Euini. Same Weave sign as Crystal Ribbon and Light Tracer on different substances."
     }
   ]
 }
