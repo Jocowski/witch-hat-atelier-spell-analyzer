@@ -117,6 +117,21 @@
         ],
         "symmetry": "radial"
       }
+    },
+    {
+      "id": "rainbringer_seal",
+      "name": "Rainbringer Seal",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Generates a localized shower of rain down into the area around the seal.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "rain", "count": 1, "placement": "surrounds", "orientation": "outward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      }
     }
   ]
 }
