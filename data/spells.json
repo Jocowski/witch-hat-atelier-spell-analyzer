@@ -199,6 +199,22 @@
         "symmetry": "bilateral"
       },
       "notes": "Two-sigil spell: a water core plus a Horse decorative sigil (the shape-giver, which carries the canon 'can pull loads' utility). The catalog matcher keys on the core + sign multiset, so the Horse sigil is recorded here rather than in signs[]. Signs from the app JSON export: Column ×2 (horizontal, flanking the horse at the top), Region (direction) ×2 (bottom), plus the two unidentified signs — Unknown Sign 1 ×2 (mirrored left/right pair on the sides) and Unknown Sign 2 ×3 (line-shaped, bottom row)."
+    },
+    {
+      "id": "watershot_seal",
+      "name": "Watershot Seal",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Projects a jet of water out of the seal — straight up when the Column ring is balanced, leaning toward whichever column is drawn longer (Coco's first spell; the misfire that soaked Agott).",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Coco's first spell at Qifrey's Atelier (unofficial name). A water core ringed by eight inward Column signs. Balanced ⇒ straight-up jet; this documented build enlarges the south column (scale 2.35) so the jet leans toward it — the direction-by-size lesson (signs.md:34) that becomes the Skysoaring Seal. The lone oversized column reads as directional-bias magnitude ~0.18 toward the column, just under the engine's 0.25 'biased' threshold, so the engine reports it 'balanced' — override per canon."
     }
   ]
 }

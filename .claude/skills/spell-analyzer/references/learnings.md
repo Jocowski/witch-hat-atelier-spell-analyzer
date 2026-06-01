@@ -22,6 +22,14 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Watershot Seal (canon, water)** — Coco's first spell: water core + ring of inward
+  Column signs. Balanced ⇒ straight-up jet; enlarge one column and the jet leans toward it
+  ("size sets aim" for directional signs, signs.md:11/34) — the misfire that soaked Agott, and the
+  principle behind the Skysoaring Seal. ENGINE BLIND SPOT: a single oversized column produces a real
+  directional bias (measured 0.18 toward the big column for one 2.35× of 8), but it lands just under
+  the 0.25 `biased` threshold, so the engine reports `balanced`/straight-up — override per canon. The
+  oversized column was at the **south** (y≈+56 = bottom; GlyphCanvas renders y-down, no negation), so
+  the jet leaned south. Equalizing all columns drops the bias to 0.013 (genuinely straight up).
 - 2026-06-01: **Water Horse (canon, water)** — a **two-sigil** spell: water core + the **`horse`
   decorative sigil** (element `decorative`), which is the shape-giver and carries real utility
   (*"Manifests magic as a horse; can pull loads"*, sigils.json) — NOT `animal_signs` (a no-effect

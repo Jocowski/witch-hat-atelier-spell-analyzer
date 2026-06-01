@@ -1,0 +1,21 @@
+{
+  "format": "wha-spell@1",
+  "version": 1,
+  "composition": {
+    "name": "Watershot Seal",
+    "ring": { "closed": false },
+    "core": { "id": "c1", "type": "water", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false },
+    "components": [
+      { "id": "c2", "type": "column", "role": "sign", "x": 0, "y": -65, "rotation": 180, "scale": 1, "inverted": false },
+      { "id": "c3", "type": "column", "role": "sign", "x": 47.86355447474828, "y": -46.54682159423829, "rotation": 225.79904719021192, "scale": 1, "inverted": false },
+      { "id": "c4", "type": "column", "role": "sign", "x": 51.37526178065649, "y": 43.737453460693345, "rotation": 310.40884572656523, "scale": 1, "inverted": false },
+      { "id": "c5", "type": "column", "role": "sign", "x": -0.702341079711907, "y": 55.86957550048828, "rotation": 0, "scale": 2.35, "inverted": false },
+      { "id": "c6", "type": "column", "role": "sign", "x": -43.64950799647678, "y": 50.76087188720706, "rotation": 40.692389273281606, "scale": 1, "inverted": false },
+      { "id": "c7", "type": "column", "role": "sign", "x": -49.97058343592992, "y": -43.03511810302735, "rotation": 130.73532834879921, "scale": 1, "inverted": false },
+      { "id": "c8", "type": "column", "role": "sign", "x": -68.12708762288094, "y": 1.0200650691986084, "rotation": 89.19990632146994, "scale": 1, "inverted": false },
+      { "id": "c9", "type": "column", "role": "sign", "x": 64.01740503016819, "y": 1.212373673915856, "rotation": 271.0969808562245, "scale": 1, "inverted": false }
+    ],
+    "linkCount": 0,
+    "dyes": []
+  }
+}
