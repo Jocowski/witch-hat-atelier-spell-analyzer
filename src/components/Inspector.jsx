@@ -43,7 +43,7 @@ export default function Inspector({
         <span className="insp-sub">scale</span>
         <button onClick={() => onUpdate({ scale: Math.max(0.4, (part.scale ?? 1) - 0.15) })}>−</button>
         <span className="insp-val">{(part.scale ?? 1).toFixed(2)}×</span>
-        <button onClick={() => onUpdate({ scale: Math.min(2.5, (part.scale ?? 1) + 0.15) })}>+</button>
+        <button onClick={() => onUpdate({ scale: Math.min(4, (part.scale ?? 1) + 0.15) })}>+</button>
       </div>
 
       <div className="insp-row">

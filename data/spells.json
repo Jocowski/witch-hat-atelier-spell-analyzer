@@ -438,6 +438,24 @@
         "symmetry": "bilateral"
       },
       "notes": "Canon (volume 12 bonus; introduces the Cool and Gather signs). A nested two-circle spell: inner closed circle = Water core (collection basin); outer open circle = Wind ×2 sigils + 2 Gather + 4 Column + 4 Cool. Harvests atmospheric moisture in water's cheap collect mode. The matcher keys on core + sign multiset, so the two outer Wind sigils (role:sigil) are recorded here in notes, not the sign list."
+    },
+    {
+      "id": "qifreys_water_dragon",
+      "name": "Qifrey's Water Dragon",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Draws water from nearby clouds (and likely bodies of water) and shapes it into a giant dragon, which settles into a water lily before the spell ends. Qifrey uses it to subdue the dragon attacking Coco in the Illusory Labyrinth.",
+      "composition": {
+        "core": "dragon",
+        "signs": [
+          { "id": "enlarge", "count": 1, "placement": "center", "orientation": "front", "inverted": false },
+          { "id": "convergence", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
+          { "id": "column", "count": 8, "placement": "around", "orientation": "front", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Multi-sigil water spell. The engine core is the Dragon decorative sigil (the shape-giver); the actual substance is Water ×4 sigils ringed at N/E/S/W, plus a modified Water Flower (flower_water) decorative sigil that settles the spent water into a lily. The matcher keys on core + sign multiset, so those role:sigil sigils are recorded here, not in signs[]. Runs in water's cheap COLLECT mode: the 4 Convergence signs converge nearby cloud-water to a point so the Water sigils can incorporate it; Enlarge grows the dragon; the 8 balanced Columns dictate its direction. Dye: Azuremoon Flower (duration)."
     }
   ]
 }

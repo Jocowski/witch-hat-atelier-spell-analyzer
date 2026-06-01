@@ -29,12 +29,31 @@ Engine-fix narratives belong in git history — record only the durable lesson.
 - **Single-sign "asymmetric → unstable" flag** is usually a geometry artifact (one sign read
   slightly off origin), not a real defect. (Rainbringer.)
 - **`inverted:true` on a directional sign in an export** may just mean the sign lacks a
-  `defaultFacing:"outward"` flag (purify, collection, sights_set are drawn top-outward) — check
-  before reporting it as a deliberate inversion. (Purify.)
+  `defaultFacing:"outward"` flag (purify, collection, sights_set, **convergence** are drawn
+  top-outward, i.e. the business-end/point is at the BOTTOM of the art) — check before
+  reporting it as a deliberate inversion. (Purify; convergence facing fix 2026-06-01.)
 - The **CLI (`tools/spell-engine-cli.mjs`) carries its own ported copy** of `analyze()` +
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Qifrey's Water Dragon (canon, water)** — Qifrey's signature spell (subdues the dragon
+  attacking Coco in the Illusory Labyrinth). Dragon decorative sigil (shape-giver; the ONLY canon spell
+  using it, sigils.md:135) + Water ×4 sigils + modified Water Flower (`flower_water`) sigil + Enlarge ×1
+  + Convergence ×4 + Column ×8, Azuremoon dye. KEY canon corrections to override the engine/first-guess:
+  (1) runs in water's **COLLECT** mode — *"uses water from nearby clouds (and likely bodies of water)"* —
+  NOT create; it NEEDS an environmental water source (atmosphere/lake), closer to "a pump that needs a
+  reservoir." (2) **Convergence here is the INTAKE**, not the rigidity trick: it converges nearby
+  cloud-water to a point so the Water sigils can incorporate it (rigidity/compaction is a documented
+  secondary capability, but not its role here). (3) **Water Flower = end-state shaper**: when the dragon
+  dissipates, it settles the spent water into a **water lily**. Enlarge = size, Columns = direction.
+  Closest kin: Water Horse (same template: water + decorative-creature sigil), but by *source* it's
+  Vapor Bubble / Rainbringer (environmental collection). Lesson: a decorative-creature sigil over water
+  = a controllable water creature; SCALE comes from Enlarge, AIM from balanced Columns.
+- 2026-06-01: **Convergence can act as a collection/intake sign**, not only a focus/compactor: in
+  Qifrey's Water Dragon it converges water held in nearby clouds to a point so the water sigils draw it
+  in. Don't assume Convergence on water = "compact into a dense body" (the Serpent's Bed of Sand
+  rigidity reading) — check whether canon assigns it the gathering role instead.
+
 - 2026-06-01: **Vapor Bubble Spell (canon, water; vol.12 bonus)** — a **nested two-circle**
   dew-still and the debut of the **Cool** (signs.md:147, "to help it condense from the air")
   and **Gather** (signs.md:197, "actively draw material in") signs. Inner closed circle =

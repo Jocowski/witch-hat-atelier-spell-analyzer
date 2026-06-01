@@ -180,6 +180,7 @@
       "surrounds": false,
       "reference": "signs.md, Sylph Shoes Seal, Serpent's Bed of Sand, Wind Wall",
       "family": "semi-directional",
+      "defaultFacing": "outward",
       "render": "fill"
     },
     {
