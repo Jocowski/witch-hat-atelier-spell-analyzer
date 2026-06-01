@@ -1,0 +1,25 @@
+{
+  "format": "wha-spell@2",
+  "name": "Integration",
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "center": { "x": 0, "y": 0 },
+      "radius": 76,
+      "ring": { "closed": true },
+      "core": { "id": "c1", "type": "earth", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+      "components": [
+        { "id": "c3", "type": "crush", "role": "sign", "x": 0, "y": -49.4, "rotation": 0, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c4", "type": "crush", "role": "sign", "x": 42.781654946951264, "y": -24.700000000000006, "rotation": 60, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c5", "type": "crush", "role": "sign", "x": 42.78165494695127, "y": 24.69999999999999, "rotation": 120, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c6", "type": "crush", "role": "sign", "x": 6.049755187787924e-15, "y": 49.4, "rotation": 180, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c7", "type": "crush", "role": "sign", "x": -42.78165494695126, "y": 24.70000000000002, "rotation": 240, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c8", "type": "crush", "role": "sign", "x": -42.781654946951264, "y": -24.700000000000006, "rotation": 300, "scale": 1, "inverted": true, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

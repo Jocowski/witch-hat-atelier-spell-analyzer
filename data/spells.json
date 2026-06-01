@@ -478,6 +478,28 @@
         "symmetry": "radial"
       },
       "notes": "Canon earth spell invented by Richeh. A single large Weave keystone wrapped around an Earth core transmutes rigid stone into a flexible ribbon. Runs in earth's manipulate mode (sigils.md:53) — needs a real boulder/rock to act on, it cannot conjure stone. Richeh used it to cross the gap in the serpent-back cave; Agott, Coco & Tetia used it to capture Wolf Euini. Same Weave sign as Crystal Ribbon and Light Tracer on different substances."
+    },
+    {
+      "id": "integration",
+      "name": "Integration",
+      "category": "earth",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Temporarily reassembles a powdered/smashed substance back into the shape of the object it originally came from — used to identify an unknown powder.",
+      "composition": {
+        "core": "earth",
+        "signs": [
+          {
+            "id": "crush",
+            "count": 6,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": true
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Canon earth spell (unofficial name); the inverse of the Wall Breaker Seal — same Earth core + ring of Crush keystones, but the Crush signs are INVERTED so the effect runs backwards: instead of pulverizing matter to dust, it pulls existing particles back into their source object's form. The reassembly is TEMPORARY — once the spell lapses the powder slumps back to a pile (signs.md:73). Created by Tartah & Coco to identify unlabeled powdered medicinal herbs by their reconstructed shape, after Tartah's silverwash (total colour-blindness) prevented him telling them apart. Works on ANY solid powder, not just earth's stone/sand, because earth only manipulates/rearranges existing particles — it never conjures matter (sigils.md:53)."
     }
   ]
 }
