@@ -4,7 +4,7 @@
 // every change goes back through App's updateSelected / deleteSelected / etc.
 export default function Inspector({
   part, def, isCore, zone, otherCircles, pinned,
-  onUpdate, onResetRotation, onPromoteToCore, onTogglePin, onMoveToCircle, onDelete, canPromote,
+  onUpdate, onResetRotation, onPromoteToCore, onTogglePin, onMoveToCircle, onDuplicate, onRadialClone, onDelete, canPromote,
 }) {
   if (!part) {
     return (
@@ -61,6 +61,16 @@ export default function Inspector({
             title="Pin this sign to the ring — it tracks the ring when the circle is resized, and drags along it.">
             {pinned ? '📌 pinned to ring' : '📌 pin to ring'}
           </button>
+        </div>
+      )}
+
+      {!isCore && (
+        <div className="insp-row">
+          <span className="insp-sub">arrange</span>
+          <button onClick={onDuplicate} title="Duplicate this part">⧉ duplicate</button>
+          <button onClick={() => onRadialClone(4)} title="Clone into 4 copies evenly around the ring">radial ×4</button>
+          <button onClick={() => onRadialClone(6)} title="Clone into 6 copies evenly around the ring">×6</button>
+          <button onClick={() => onRadialClone(8)} title="Clone into 8 copies evenly around the ring">×8</button>
         </div>
       )}
 

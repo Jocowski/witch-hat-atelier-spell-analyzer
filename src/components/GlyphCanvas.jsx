@@ -59,7 +59,7 @@ function ComponentGlyph({ comp, circleId, selected, hovered, onPointerDown }) {
 }
 
 // One circle (its own ring + core + components), drawn relative to the circle's center.
-function CircleGroup({ circle, isActive, selectedPartId, hoveredPartId, hoveredCircle, dim, onCircleActivate, onCircleMove, onPartDown }) {
+function CircleGroup({ circle, isActive, selectedPartId, hoveredPartId, hoveredCircle, dim, onCircleActivate, onCircleMove, onPartDown, onFocus }) {
   const R = ringRadiusOf(circle)
   const ringColor = circle.inkColor || '#5a3b1e'
   const openColor = circle.inkColor || '#9c7a4a'
@@ -70,9 +70,10 @@ function CircleGroup({ circle, isActive, selectedPartId, hoveredPartId, hoveredC
   return (
     <g transform={`translate(${circle.center.x} ${circle.center.y})`} style={{ opacity: dim ? 0.2 : 1 }}>
       {hoveredCircle && <circle cx="0" cy="0" r={R + 8} fill="none" stroke="#d6713a" strokeWidth="2" strokeDasharray="2 4" pointerEvents="none" />}
-      {/* interior: clicking it selects/activates the circle, but never moves it */}
+      {/* interior: clicking it selects/activates the circle; double-click focuses it */}
       <circle cx="0" cy="0" r={R} fill="transparent" pointerEvents="all"
-        onPointerDown={(e) => onCircleActivate(e, circle.id)} />
+        onPointerDown={(e) => onCircleActivate(e, circle.id)}
+        onDoubleClick={(e) => { e.stopPropagation(); onFocus?.(circle.id) }} />
 
       {/* active highlight */}
       {isActive && <circle cx="0" cy="0" r={R + 4} fill="none" stroke="#c9a24a" strokeWidth="2" strokeDasharray="6 4" pointerEvents="none" />}
@@ -111,7 +112,7 @@ function CircleGroup({ circle, isActive, selectedPartId, hoveredPartId, hoveredC
   )
 }
 
-export default function GlyphCanvas({ composition, activeCircleId, selected, hovered, focusedCircleId, onSelectCircle, onSelectPart, onClearSelect, onMovePart, onMoveCircle, onDropAdd }) {
+export default function GlyphCanvas({ composition, activeCircleId, selected, hovered, focusedCircleId, onSelectCircle, onSelectPart, onClearSelect, onMovePart, onMoveCircle, onDropAdd, onBeginInteraction, onFocusCircle }) {
   const svgRef = useRef(null)
   const dragRef = useRef(null) // { kind:'part'|'circle', circleId, partId?, dx, dy }
   const panRef = useRef(null)
@@ -230,6 +231,7 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, hov
   function handlePartDown(e, circleId, partId) {
     if (e.button !== 0) return
     e.stopPropagation()
+    onBeginInteraction?.() // checkpoint once at drag start (coalesces the move into one undo step)
     onSelectPart(circleId, partId)
     const c = circles.find((x) => x.id === circleId)
     const part = c.core?.id === partId ? c.core : c.components.find((p) => p.id === partId)
@@ -250,6 +252,7 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, hov
   function handleCircleMove(e, circleId) {
     if (e.button !== 0) return
     e.stopPropagation()
+    onBeginInteraction?.() // checkpoint once at drag start
     onSelectCircle(circleId)
     const c = circles.find((x) => x.id === circleId)
     const loc = clientToLocal(svgRef.current, e.clientX, e.clientY)
@@ -362,6 +365,7 @@ export default function GlyphCanvas({ composition, activeCircleId, selected, hov
             onCircleActivate={handleCircleActivate}
             onCircleMove={handleCircleMove}
             onPartDown={handlePartDown}
+            onFocus={onFocusCircle}
           />
         ))}
       </svg>

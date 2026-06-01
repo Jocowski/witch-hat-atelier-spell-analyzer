@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Palette from './components/Palette.jsx'
 import GlyphCanvas, { RING_RADII } from './components/GlyphCanvas.jsx'
 import ResultPanel from './components/ResultPanel.jsx'
@@ -43,6 +43,29 @@ export default function App() {
   const [importOpen, setImportOpen] = useState(false)
   const [importText, setImportText] = useState('')
   const [importError, setImportError] = useState(null)
+
+  // ---- undo / redo (snapshot history; drags & sliders checkpoint once at interaction start) ----
+  const compRef = useRef(composition); compRef.current = composition
+  const pastRef = useRef([])
+  const futureRef = useRef([])
+  const [histVer, setHistVer] = useState(0)
+  const canUndo = pastRef.current.length > 0
+  const canRedo = futureRef.current.length > 0
+  function checkpoint() { pastRef.current = [...pastRef.current, compRef.current].slice(-60); futureRef.current = []; setHistVer((v) => v + 1) }
+  function undo() {
+    if (!pastRef.current.length) return
+    const prev = pastRef.current[pastRef.current.length - 1]
+    pastRef.current = pastRef.current.slice(0, -1)
+    futureRef.current = [compRef.current, ...futureRef.current]
+    setComposition(prev); setSelected(null); setHistVer((v) => v + 1)
+  }
+  function redo() {
+    if (!futureRef.current.length) return
+    const next = futureRef.current[0]
+    pastRef.current = [...pastRef.current, compRef.current]
+    futureRef.current = futureRef.current.slice(1)
+    setComposition(next); setSelected(null); setHistVer((v) => v + 1)
+  }
 
   const inkColor = activeInk ? DYE_MAP[activeInk]?.color : undefined
   const withInk = (part) => (inkColor ? { ...part, color: inkColor } : part)
@@ -97,6 +120,7 @@ export default function App() {
 
   // ---- add / move / edit parts (scoped to a circle) ----
   function addComponent(circleId, type, kind, x, y) {
+    checkpoint()
     const id = nextId()
     patchCircle(circleId, (c) => {
       if (kind === 'sigil') {
@@ -140,6 +164,7 @@ export default function App() {
   // Pin/unpin the selected sign to its circle's ring (anchor follows resize; drag moves along it).
   function togglePinToRing() {
     if (!selected) return
+    checkpoint()
     patchCircle(selected.circleId, (c) => {
       const R = radiusOf(c)
       return {
@@ -162,6 +187,7 @@ export default function App() {
   }
   function deleteSelected() {
     if (!selected) return
+    checkpoint()
     patchCircle(selected.circleId, (c) => {
       if (c.core?.id === selected.partId) {
         const next = c.components.find((p) => p.role === 'sigil')
@@ -172,10 +198,63 @@ export default function App() {
     })
     setSelected(null)
   }
+  // ---- group / arrange ops ----
+  // Duplicate the selected component (a small offset so it's visible), and select the copy.
+  function duplicateSelected() {
+    if (!selectedPart || isCore) return
+    checkpoint()
+    const id = nextId()
+    patchCircle(selected.circleId, (c) => ({
+      ...c,
+      components: [...c.components, { ...selectedPart, id, x: (selectedPart.x || 0) + 16, y: (selectedPart.y || 0) + 16, anchor: undefined }],
+    }))
+    setSelected({ circleId: selected.circleId, partId: id })
+  }
+  // Clone the selected sign into N copies spread evenly around the ring at its current radius.
+  function radialClone(n) {
+    if (!selectedPart || isCore || n < 2) return
+    checkpoint()
+    const r = Math.hypot(selectedPart.x || 0, selectedPart.y || 0) || (radiusOf(selectedCircle) * 0.65)
+    const base = ((Math.atan2(selectedPart.x || 0, -(selectedPart.y || 0)) * 180) / Math.PI + 360) % 360
+    patchCircle(selected.circleId, (c) => {
+      const copies = []
+      for (let i = 1; i < n; i++) {
+        const ang = ((base + (360 / n) * i) * Math.PI) / 180
+        const x = r * Math.sin(ang), y = -r * Math.cos(ang)
+        copies.push({ ...selectedPart, id: nextId(), x, y, rotation: neutralRotation(selectedPart.type, x, y), anchor: undefined })
+      }
+      return { ...c, components: [...c.components, ...copies] }
+    })
+  }
+  // Respace a circle's signs at equal angles around the ring (each keeps its own radius),
+  // re-facing them inward — turns a rough cluster into a clean radially-symmetric ring.
+  function distributeEvenly(circleId) {
+    const c = composition.circles.find((x) => x.id === circleId)
+    if (!c) return
+    const signs = c.components.filter((p) => p.role === 'sign')
+    if (signs.length < 2) return
+    checkpoint()
+    patchCircle(circleId, (cc) => {
+      let i = 0
+      const n = signs.length
+      return {
+        ...cc,
+        components: cc.components.map((p) => {
+          if (p.role !== 'sign') return p
+          const r = Math.hypot(p.x || 0, p.y || 0) || (radiusOf(cc) * 0.65)
+          const ang = ((360 / n) * i++) * (Math.PI / 180)
+          const x = r * Math.sin(ang), y = -r * Math.cos(ang)
+          return { ...p, x, y, rotation: neutralRotation(p.type, x, y), anchor: undefined }
+        }),
+      }
+    })
+  }
+
   // Move a non-core component (sign or extra sigil) from one circle to another, keeping its
   // local x,y (so it lands in the same spot relative to the new circle's center).
   function movePartToCircle(fromId, partId, toId) {
     if (fromId === toId) return
+    checkpoint()
     let moved = null
     setComposition((prev) => {
       const circles = prev.circles.map((c) => {
@@ -194,6 +273,7 @@ export default function App() {
   function promoteToCore() {
     if (!selectedPart || isCore) return
     if (!(selectedPart.role === 'sigil' || canBeCore(selectedPart.type))) return
+    checkpoint()
     patchCircle(selected.circleId, (c) => {
       const np = { id: selectedPart.id, type: selectedPart.type, x: 0, y: 0, rotation: selectedPart.rotation || 0, scale: selectedPart.scale ?? 1, inverted: !!selectedPart.inverted, mirrored: !!selectedPart.mirrored, color: selectedPart.color }
       let components = c.components.filter((p) => p.id !== selectedPart.id)
@@ -204,6 +284,7 @@ export default function App() {
 
   // ---- circle management ----
   function addCircle(concentric) {
+    checkpoint()
     const act = activeCircle
     let center = { x: 0, y: 0 }
     let radius = 170
@@ -224,6 +305,7 @@ export default function App() {
   }
   function deleteCircle(id) {
     if (composition.circles.length <= 1) { flash('A spell needs at least one circle'); return }
+    checkpoint()
     const circle = composition.circles.find((c) => c.id === id)
     const partIds = new Set(circle ? [circle.core?.id, ...circle.components.map((p) => p.id)].filter(Boolean) : [])
     const remaining = composition.circles.filter((c) => c.id !== id)
@@ -243,7 +325,7 @@ export default function App() {
       components: c.components.map((p) => (p.anchor?.ring ? { ...p, ...anchorToXY(p.anchor.angle || 0, p.anchor.offset || 0, radius) } : p)),
     }))
   }
-  const setRingClosed = (id, closed) => patchCircle(id, (c) => ({ ...c, ring: { ...c.ring, closed } }))
+  const setRingClosed = (id, closed) => { checkpoint(); patchCircle(id, (c) => ({ ...c, ring: { ...c.ring, closed } })) }
   const setCircleName = (id, name) => patchCircle(id, (c) => ({ ...c, name }))
 
   // ---- relations ----
@@ -264,13 +346,13 @@ export default function App() {
 
   useEffect(() => {
     function onKeyDown(e) {
-      if (e.key !== 'Delete' && e.key !== 'Backspace') return
       const el = document.activeElement
       const tag = el?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable) return
-      if (!selected) return
-      e.preventDefault()
-      deleteSelected()
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable
+      const mod = e.ctrlKey || e.metaKey
+      if (mod && (e.key === 'z' || e.key === 'Z')) { if (typing) return; e.preventDefault(); e.shiftKey ? redo() : undo(); return }
+      if (mod && (e.key === 'y' || e.key === 'Y')) { if (typing) return; e.preventDefault(); redo(); return }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && selected) { e.preventDefault(); deleteSelected() }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -384,6 +466,8 @@ export default function App() {
             onMovePart={movePart}
             onMoveCircle={(id, x, y) => patchCircle(id, (c) => ({ ...c, center: { x, y } }))}
             onDropAdd={addComponent}
+            onBeginInteraction={checkpoint}
+            onFocusCircle={(id) => setFocusedCircleId((cur) => (cur === id ? null : id))}
           />
 
           <Inspector
@@ -399,6 +483,8 @@ export default function App() {
             onPromoteToCore={promoteToCore}
             onTogglePin={togglePinToRing}
             onMoveToCircle={(toId) => movePartToCircle(selected.circleId, selected.partId, toId)}
+            onDuplicate={duplicateSelected}
+            onRadialClone={radialClone}
             onDelete={deleteSelected}
           />
 
@@ -433,12 +519,14 @@ export default function App() {
                 <span className="cp-sub">size</span>
                 <input type="range" className="cp-size" min={RADIUS_MIN} max={RADIUS_MAX} step={2}
                   value={radiusOf(activeCircle)}
+                  onPointerDown={checkpoint}
                   onChange={(e) => setCircleRadius(activeCircle.id, Number(e.target.value))}
                   aria-label="Circle size" />
                 <span className="cp-sizeval">{Math.round(radiusOf(activeCircle))}</span>
                 <button className={activeCircle.ring?.closed ? '' : 'primary'} onClick={() => setRingClosed(activeCircle.id, !activeCircle.ring?.closed)}>
                   {activeCircle.ring?.closed ? 'open ring' : 'close ring'}
                 </button>
+                <button onClick={() => distributeEvenly(activeCircle.id)} title="Respace this circle's signs evenly around the ring (radial symmetry)">⊛ distribute</button>
                 <button className="cp-ink" onClick={() => patchCircle(activeCircle.id, (c) => ({ ...c, inkColor: inkColor || null }))}
                   title={inkColor ? 'Tint this ring with the selected ink' : 'Reset ring to default ink (pick an ink below first)'}>
                   <span className="swatch" style={{ background: activeCircle.inkColor || '#5a3b1e' }} /> ink ring
@@ -481,10 +569,12 @@ export default function App() {
           </div>
 
           <div className="canvas-toolbar">
+            <button onClick={undo} disabled={!canUndo} title="Undo (Ctrl+Z)">↶ undo</button>
+            <button onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)">↷ redo</button>
             <button onClick={copyJSON}>Export (JSON)</button>
             <button onClick={() => { setImportText(''); setImportError(null); setImportOpen(true) }}>Import (JSON)</button>
             <button onClick={copyImage}>Copy image</button>
-            <button className="danger" onClick={() => { const c = newCircle({ name: 'Circle 1' }); setComposition({ name: '', circles: [c], relations: [] }); setActiveCircleId(c.id); setSelected(null) }}>Clear all</button>
+            <button className="danger" onClick={() => { checkpoint(); const c = newCircle({ name: 'Circle 1' }); setComposition({ name: '', circles: [c], relations: [] }); setActiveCircleId(c.id); setSelected(null) }}>Clear all</button>
           </div>
 
           <InkPanel activeInk={activeInk} onSelect={selectInk} />
