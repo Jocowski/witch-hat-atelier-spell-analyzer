@@ -22,6 +22,15 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Water Pen (canon, water)** — a water **tool** spell, not a weapon: a water core with
+  **Dispersion + 2 horizontal Columns** at the top and two new unknown signs (Unknown 4 = arc, mirrored
+  side pair; Unknown 3 = triangle, bottom). KEY pairing: Dispersion ("leaks/meters outward", signs.md:45)
+  + balanced Columns ("re-confine into one body", signs.md:34) = a steady metered bleed gathered into a
+  single coherent glob — the inked-pen reservoir, opposite of the Watershot jet. Water's create-mode +
+  fluidity is load-bearing: conjured in the palm (no reservoir) and soaks up poured conjuring ink to
+  become a giant brush. Engine `aim=up`/spin are artifacts (Dispersion+Columns clustered at top, Columns
+  rotated horizontal) — canon glob hovers BELOW at an angle. Closest in spirit to Water Horse (held,
+  shaped body), not the jets. 3 unknown signs ⇒ "incomplete deduced effect" (shape/hover unresolved).
 - 2026-06-01: **Watershot Seal (canon, water)** — Coco's first spell: water core + ring of inward
   Column signs. Balanced ⇒ straight-up jet; enlarge one column and the jet leans toward it
   ("size sets aim" for directional signs, signs.md:11/34) — the misfire that soaked Agott, and the

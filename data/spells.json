@@ -201,6 +201,25 @@
       "notes": "Two-sigil spell: a water core plus a Horse decorative sigil (the shape-giver, which carries the canon 'can pull loads' utility). The catalog matcher keys on the core + sign multiset, so the Horse sigil is recorded here rather than in signs[]. Signs from the app JSON export: Column ×2 (horizontal, flanking the horse at the top), Region (direction) ×2 (bottom), plus the two unidentified signs — Unknown Sign 1 ×2 (mirrored left/right pair on the sides) and Unknown Sign 2 ×3 (line-shaped, bottom row)."
     },
     {
+      "id": "water_pen",
+      "name": "Water Pen",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "medium",
+      "effect": "Conjures a hand-held, dagger / pen-nib-shaped glob of water that hovers below the seal at an angle; pour conjuring ink into it and it becomes a giant brush for drawing very large seals on any surface (Qifrey's tool in Serpentback Cave).",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "dispersion", "count": 1, "placement": "top", "orientation": "inward", "inverted": false },
+          { "id": "column", "count": 2, "placement": "top", "orientation": "front", "inverted": false },
+          { "id": "unknown_04", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false },
+          { "id": "unknown_03", "count": 1, "placement": "bottom", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Water tool spell (unofficial name). A water core metered out at the top by a Dispersion sign flanked by two horizontal Columns, enclosed by an arc-shaped unidentified sign on each side (Unknown Sign 4, a mirrored pair) and pointed below by a triangle-like unidentified sign (Unknown Sign 3). Dispersion+Columns meter and gather the water into one coherent body; the three unidentified signs (Unknown Sign 4 ×2 + Unknown Sign 3 ×1) encode the dagger/nib shape and angled hover, so the engine flags the deduced effect as incomplete. Drawn with the ring open as a prepared, hand-held tool. Recipe from the app JSON export."
+    },
+    {
       "id": "watershot_seal",
       "name": "Watershot Seal",
       "category": "water",

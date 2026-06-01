@@ -372,6 +372,38 @@ Its function is unknown.
 
 **Spells Using Unknown Sign 2:** Water Horse
 
+### Unknown Sign 3
+
+![Unknown Sign 3](../assets/images/signs/unknown/Unknown_03.png)
+
+A **triangle-like (A-shaped)** mark with a small curl at each lower corner, catalogued from the
+**Water Pen** spell, where a single copy sits **alone at the bottom of the seal, below the central
+water sigil**. Its function is unknown; it reads as decorative.
+
+- **Observations:** Single, bottom-centered placement (not a mirrored pair), so there is no evidence
+  yet that orientation or inversion changes its behavior. In Water Pen it sits where the dagger / pen-nib
+  glob's downward point hangs, which *may* mean it shapes the nib's tip — but this is unconfirmed (one spell).
+- **Theories:** *None yet — insufficient data (seen in only one spell).*
+
+**Spells Using Unknown Sign 3:** Water Pen
+
+### Unknown Sign 4
+
+![Unknown Sign 4](../assets/images/signs/unknown/Unknown_04.png)
+
+An **arc-shaped** mark (a segment of a circle's perimeter), catalogued from the **Water Pen** spell,
+where it appears as a **bilaterally mirrored left/right pair enclosing the central water sigil**. Its
+function is unknown.
+
+- **Observations:** The mirrored left/right placement (a front-to-front pairing hugging the core) is
+  consistent with a *directional* or *enclosing* sign, but this is unconfirmed — it has only been seen
+  in one spell. In Water Pen the two arcs trace the curved flanks of the dagger / pen-nib glob, which
+  *may* mean they shape its body — unconfirmed. The sign is **stored upright**; the two copies are
+  horizontal mirror images, placed with the editor's **mirror** control (separate from invert).
+- **Theories:** *None yet — insufficient data (seen in only one spell).*
+
+**Spells Using Unknown Sign 4:** Water Pen
+
 ---
 
 Source: <https://witchhatatelier.telepedia.net/wiki/Signs_Explained>

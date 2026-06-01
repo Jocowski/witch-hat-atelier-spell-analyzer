@@ -76,7 +76,9 @@
     "animal_signs":   { "kind": "none", "verb": "adds a decorative animal motif with no magical effect" },
     "unknown_sign":   { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
     "unknown_01":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_02":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" }
+    "unknown_02":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
+    "unknown_03":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
+    "unknown_04":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" }
   },
 
   "interactions": [
