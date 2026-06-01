@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "node --test \"test/**/*.test.js\"",
     "vectorize:sigils": "node tools/vectorize-sigils.cjs",
-    "vectorize:signs": "node tools/vectorize-signs.cjs"
+    "vectorize:signs": "node tools/vectorize-signs.cjs",
+    "unknown:report": "node tools/unknown-report.cjs"
   },
   "dependencies": {
     "react": "^18.3.1",

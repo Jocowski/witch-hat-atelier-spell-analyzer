@@ -23,7 +23,8 @@ function ComponentGlyph({ comp, circleId, selected, onPointerDown }) {
   if (!def) return null
   const size = 56 * (comp.scale ?? 1)
   const s = size / 100 // svgPath is in -50..50
-  const t = `translate(${comp.x} ${comp.y}) rotate(${comp.rotation || 0}) scale(${s} ${comp.inverted ? -s : s})`
+  // inverted flips top↔bottom (negate Y); mirrored flips left↔right (negate X).
+  const t = `translate(${comp.x} ${comp.y}) rotate(${comp.rotation || 0}) scale(${comp.mirrored ? -s : s} ${comp.inverted ? -s : s})`
   const color = comp.color || (comp.role === 'sign' ? '#3a2a16' : '#c0521f')
   return (
     <g transform={t} onPointerDown={(e) => onPointerDown(e, circleId, comp.id)} style={{ cursor: 'grab' }}>

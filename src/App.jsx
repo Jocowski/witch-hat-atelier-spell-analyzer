@@ -18,7 +18,7 @@ const nextCircleId = () => `k${_cid++}`
 const neutralRotation = (type, x, y) =>
   getComponentDef(type)?.defaultFacing === 'outward' ? outwardRotation(x, y) : inwardRotation(x, y)
 
-const SIGIL = { rotation: 0, scale: 1, inverted: false }
+const SIGIL = { rotation: 0, scale: 1, inverted: false, mirrored: false }
 const newCircle = (over = {}) => ({ id: nextCircleId(), name: '', center: { x: 0, y: 0 }, radius: 170, ring: { closed: false }, core: null, components: [], dyes: [], inkColor: null, ...over })
 
 const FIRST = newCircle({ name: 'Circle 1' })
@@ -133,7 +133,7 @@ export default function App() {
     patchCircle(selected.circleId, (c) => {
       if (c.core?.id === selected.partId) {
         const next = c.components.find((p) => p.role === 'sigil')
-        if (next) return { ...c, core: { id: next.id, type: next.type, x: 0, y: 0, rotation: next.rotation || 0, scale: next.scale ?? 1, inverted: !!next.inverted, color: next.color }, components: c.components.filter((p) => p.id !== next.id) }
+        if (next) return { ...c, core: { id: next.id, type: next.type, x: 0, y: 0, rotation: next.rotation || 0, scale: next.scale ?? 1, inverted: !!next.inverted, mirrored: !!next.mirrored, color: next.color }, components: c.components.filter((p) => p.id !== next.id) }
         return { ...c, core: null }
       }
       return { ...c, components: c.components.filter((p) => p.id !== selected.partId) }
@@ -144,7 +144,7 @@ export default function App() {
     if (!selectedPart || isCore) return
     if (!(selectedPart.role === 'sigil' || canBeCore(selectedPart.type))) return
     patchCircle(selected.circleId, (c) => {
-      const np = { id: selectedPart.id, type: selectedPart.type, x: 0, y: 0, rotation: selectedPart.rotation || 0, scale: selectedPart.scale ?? 1, inverted: !!selectedPart.inverted, color: selectedPart.color }
+      const np = { id: selectedPart.id, type: selectedPart.type, x: 0, y: 0, rotation: selectedPart.rotation || 0, scale: selectedPart.scale ?? 1, inverted: !!selectedPart.inverted, mirrored: !!selectedPart.mirrored, color: selectedPart.color }
       let components = c.components.filter((p) => p.id !== selectedPart.id)
       if (c.core && c.core.id !== selectedPart.id) components = [...components, { ...c.core, role: 'sigil', x: 80, y: 0 }]
       return { ...c, core: np, components }
@@ -343,6 +343,8 @@ export default function App() {
               {selDef?.invertible && (
                 <button onClick={() => updateSelected({ inverted: !selectedPart.inverted })}>{selectedPart.inverted ? 'un-invert' : 'invert'}</button>
               )}
+              <button onClick={() => updateSelected({ mirrored: !selectedPart.mirrored })}
+                title="Mirror the glyph left↔right (flip horizontally). Visual only — does not change the deduced effect.">{selectedPart.mirrored ? 'un-mirror' : '⇆ mirror'}</button>
               {!isCore && (selectedPart.role === 'sigil' || canBeCore(selectedPart.type)) && (
                 <button onClick={promoteToCore}>↦ to center</button>
               )}

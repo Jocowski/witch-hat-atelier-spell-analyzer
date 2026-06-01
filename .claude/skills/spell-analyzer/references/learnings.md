@@ -22,6 +22,14 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Water Horse (canon, water)** — a **two-sigil** spell: water core + the **`horse`
+  decorative sigil** (element `decorative`), which is the shape-giver and carries real utility
+  (*"Manifests magic as a horse; can pull loads"*, sigils.json) — NOT `animal_signs` (a no-effect
+  decorative *sign*). Matcher keys only on core + **sign** multiset (extra `role:sigil` sigils are
+  ignored by `buildSignature`), so record secondary sigils in the catalog entry's `notes`. Signs:
+  Column ×2 (horizontal, flank the horse) + Region ×2 (bottom) + Unknown Sign 1 ×2 + Unknown Sign 2
+  ×3. The 5 unknown signs ⇒ engine flags "deduced effect incomplete"; what they encode (cohesion /
+  locomotion / steering of the water-body) can't be deduced from one spell — needs a 2nd appearance.
 - 2026-06-01: **Water Bolt (canon, water)** — defines the **Bolt** sign (signs.md:255). Water sigil at
   bottom + horizontal row of Bolt (middle) + parallel row of Region = fast horizontal volley of water
   arrows "straight ahead," drawn **big on the ground**. KEY: the engine's directional word (`down`

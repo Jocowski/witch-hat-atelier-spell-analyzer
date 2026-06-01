@@ -57,6 +57,19 @@ test('inverted flag on a non-directional sign is ignored (no front to flip)', ()
   assert.equal(flagged.summary, normal.summary)
 })
 
+test('unidentified signs flag the deduction as incomplete', () => {
+  // unknown_01 (family 'unknown') has no deducible effect; the engine must warn, and the
+  // count in the message reflects how many such signs are present.
+  const r = D('water', [{ type: 'unknown_01' }, { type: 'unknown_01' }])
+  assert.ok(r.ok)
+  const warn = r.warnings.find((w) => /unidentified/i.test(w))
+  assert.ok(warn, 'expected an "unidentified" warning')
+  assert.match(warn, /2 unidentified signs/i)
+  // A spell with no unknown signs should NOT carry the warning.
+  const clean = D('water', [{ type: 'column' }, { type: 'column' }])
+  assert.equal(clean.warnings.some((w) => /unidentified/i.test(w)), false)
+})
+
 test('light + column => beam of light (same FORM, different substance)', () => {
   const r = D('light', [{ type: 'column' }, { type: 'column' }, { type: 'column' }, { type: 'column' }])
   assert.match(r.summary, /light/i)

@@ -7,7 +7,7 @@
 // NOTE: keep this module free of JSON imports so Node can load it without import attributes.
 import { computeSymmetry, computeDirectionalBias, classifyRegion, directionLabel, canSteer, canInvert } from './geometry.js'
 
-const KIND_ORDER = ['transmute', 'form', 'motion', 'direction', 'target', 'power', 'special', 'support', 'none']
+const KIND_ORDER = ['transmute', 'form', 'motion', 'direction', 'target', 'power', 'special', 'support', 'unknown', 'none']
 
 // Collapse signs into unique {type, count, inverted} entries. A sign's `inverted` flag only
 // counts when its category allows inversion (directional/semi-directional); non-directional
@@ -199,6 +199,15 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     if (!interactionApplies(rule.when, ctx)) continue
     if (rule.type === 'warning') warnings.push(rule.text)
     else notes.push(rule.text)
+  }
+
+  // Unidentified signs: their operator contributes nothing to the sentence, so the
+  // deduced effect is necessarily incomplete. Flag that honestly.
+  const unknownCount = (byKind.unknown || []).reduce((sum, item) => sum + item.count, 0)
+  if (unknownCount) {
+    warnings.push(
+      `Contains ${unknownCount} unidentified sign${unknownCount > 1 ? 's' : ''} — the deduced effect is incomplete and may be inaccurate.`,
+    )
   }
 
   // ----- Stability & power labels -----

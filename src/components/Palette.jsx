@@ -44,6 +44,7 @@ const SIGIL_FAMILIES = [
 const SIGN_FAMILIES = [
   ['directional', 'Directional'], ['semi-directional', 'Semi-Directional'],
   ['non-directional', 'Non-Directional'], ['asymmetric', 'Asymmetric'],
+  ['unknown', 'Unknown'],
 ]
 
 function Section({ title, items, kind, onAdd, searching, collapsed, onToggle }) {

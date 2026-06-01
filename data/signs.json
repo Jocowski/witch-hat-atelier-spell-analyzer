@@ -512,7 +512,7 @@
       "name": "Unknown Sign",
       "glyph": "?",
       "svgPath": "M-10,-10 Q0,-22 10,-10 Q10,-2 0,2 L0,8 M0,16 L0,18",
-      "effect": "Placeholder for signs not identified in the spells (Water Horse sides, Water Pen, Capture Pennant, etc.).",
+      "effect": "Placeholder for signs not identified in the spells (Water Pen, Capture Pennant, etc.). Specific, isolated unknown marks get their own numbered entry (family 'unknown') instead.",
       "effectTags": [
         "unknown"
       ],
@@ -521,6 +521,55 @@
       "surrounds": false,
       "reference": "spells.md",
       "family": "other"
+    },
+    {
+      "id": "unknown_01",
+      "name": "Unknown Sign 1",
+      "glyph": "?",
+      "svgPath": "M-1.98 -39.89 C-2.24 -38.54 -2.69 -38.01 -3.33 -38.26 C-4.62 -38.76 -6.33 -37.26 -5.86 -36.04 C-5.65 -35.50 -4.75 -35.07 -3.85 -35.07 C-2.31 -35.07 -2.22 -34.85 -2.22 -30.78 L-2.22 -26.51 -5.12 -25.16 C-8.35 -23.66 -9.05 -21.73 -6.31 -21.84 C-5.38 -21.87 -4.07 -22.14 -3.42 -22.42 C-2.33 -22.89 -2.22 -22.35 -2.22 -16.06 L-2.22 -9.18 -4.10 -8.80 C-7.50 -8.09 -9.33 -6.78 -9.96 -4.56 C-11.10 -0.59 -8.33 3.12 -4.23 3.12 C-3.00 3.12 -2.91 3.63 -2.93 10.11 L-2.96 17.10 -5.13 18.47 C-7.52 19.97 -10.93 26.07 -11.24 29.38 C-11.39 31.00 -11.14 31.47 -10.03 31.62 C-8.87 31.79 -8.42 31.17 -7.43 28.04 C-6.78 25.96 -5.50 23.41 -4.60 22.38 L-2.95 20.51 -2.93 31.25 C-2.91 41.24 -2.82 41.99 -1.64 41.99 C-0.54 41.99 -0.33 41.21 0.06 35.75 C0.31 32.32 0.50 27.65 0.50 25.39 C0.50 20.43 0.97 20.70 4.56 27.79 C7.11 32.81 8.84 34.10 9.25 31.27 C9.53 29.30 5.57 21.88 2.72 19.03 C0.52 16.82 0.50 16.76 0.50 10.07 L0.50 3.32 2.65 2.71 C3.83 2.37 5.42 1.25 6.19 0.23 C7.34 -1.32 7.47 -2.05 6.94 -4.17 C6.34 -6.57 4.94 -7.82 1.87 -8.69 C1.02 -8.93 0.88 -10.26 1.06 -16.43 L1.27 -23.89 5.68 -25.81 C10.39 -27.86 11.78 -29.45 11.12 -32.04 C10.67 -33.85 9.14 -34.89 4.60 -36.48 C1.92 -37.42 1.50 -37.84 1.32 -39.72 C1.02 -42.67 -1.39 -42.79 -1.98 -39.89 M1.19 -30.63 C1.19 -28.94 1.34 -27.56 1.53 -27.56 C2.54 -27.56 8.01 -30.54 8.01 -31.08 C8.01 -31.81 3.83 -33.70 2.23 -33.70 C1.45 -33.70 1.19 -32.94 1.19 -30.63 M-5.80 -5.01 C-7.69 -3.91 -7.34 -1.08 -5.26 -0.56 C-3.10 -0.01 -2.80 -0.31 -2.67 -3.11 C-2.56 -5.55 -3.71 -6.25 -5.80 -5.01 M0.93 -5.26 C0.10 -4.43 0.48 -0.29 1.39 -0.29 C2.65 -0.29 3.91 -1.71 3.91 -3.13 C3.91 -4.39 1.67 -6.00 0.93 -5.26",
+      "effect": "Unidentified sign. In the Water Horse spell it flanks the water sigil as a left/right pair, the two copies being horizontal mirror images of each other.",
+      "effectTags": [
+        "unknown"
+      ],
+      "invertible": false,
+      "canBeCenter": false,
+      "surrounds": false,
+      "family": "unknown",
+      "status": "unidentified",
+      "appearsIn": [
+        "water_horse"
+      ],
+      "observations": [
+        "Appears as a left/right pair flanking the core (each copy mirrored across the vertical) — consistent with a directional sign, but unconfirmed.",
+        "Stored in its upright orientation (top = top); use the editor's mirror control to place the opposing copy."
+      ],
+      "theories": [],
+      "reference": "signs.md (Unknown Signs), Water Horse",
+      "render": "fill"
+    },
+    {
+      "id": "unknown_02",
+      "name": "Unknown Sign 2",
+      "glyph": "|",
+      "svgPath": "M-0.16 -21.04 C-0.77 -19.28 -3.67 12.61 -3.67 17.52 C-3.67 21.74 -2.86 23.07 -0.98 21.89 C0.15 21.19 4.38 -18.78 3.57 -21.04 C3.32 -21.73 2.47 -22.29 1.69 -22.29 C0.91 -22.29 0.07 -21.73 -0.16 -21.04",
+      "effect": "Unidentified line-shaped sign. In the Water Horse spell it runs along the bottom row, alternating with Region signs below the water sigil.",
+      "effectTags": [
+        "unknown"
+      ],
+      "invertible": true,
+      "canBeCenter": false,
+      "surrounds": false,
+      "family": "unknown",
+      "status": "unidentified",
+      "appearsIn": [
+        "water_horse"
+      ],
+      "observations": [
+        "A simple straight line/bar. Appears in the bottom row of the Water Horse seal, interleaved with the Region (chevron) signs."
+      ],
+      "theories": [],
+      "reference": "signs.md (Unknown Signs), Water Horse",
+      "render": "fill"
     },
     {
       "id": "sights_set",

@@ -74,7 +74,9 @@
     "purify":         { "kind": "special", "verb": "is purified, separating impurities out of the element" },
     "sign_of_wind":   { "kind": "motion", "verb": "is set whirling into a spinning spiral (a 'whirlwind keystone')" },
     "animal_signs":   { "kind": "none", "verb": "adds a decorative animal motif with no magical effect" },
-    "unknown_sign":   { "kind": "none", "verb": "contributes an effect that has not been identified" }
+    "unknown_sign":   { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
+    "unknown_01":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
+    "unknown_02":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" }
   },
 
   "interactions": [

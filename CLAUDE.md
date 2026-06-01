@@ -34,7 +34,7 @@ The engine has almost no hardcoded domain knowledge — everything lives in JSON
 
 - `rules.json` — validation rules (blocking/inactive/warning/info), advanced mechanics, polar coordinate model, matcher weights/threshold (0.7).
 - `sigils.json` — 29 sigils (the *substance*). Each has a `family` (fire/water/earth/air/time/decorative/misc/special), an `element`, and either an `svgPath` or a `text` glyph (Guidance "G", Calling "C").
-- `signs.json` — 38 signs (operators on the substance). Each documented sign has a `family` = one of the 4 doc categories (directional/semi-directional/non-directional/asymmetric); 3 (`bird`, `animal_signs`, `unknown_sign`) are kept but hidden. Carries `effectTags`, `invertible`, `canBeCenter`, `surrounds`.
+- `signs.json` — 40 signs (operators on the substance). Each documented sign has a `family` = one of the 4 doc categories (directional/semi-directional/non-directional/asymmetric); 3 (`bird`, `animal_signs`, `unknown_sign`) keep family `other` and stay hidden. A 5th palette family, `unknown`, holds **catalogued-but-unidentified** signs (`unknown_NN`, e.g. `unknown_01` from Water Horse) — these are visible. Carries `effectTags`, `invertible`, `canBeCenter`, `surrounds`.
 - `dyes.json` — magical dyes mixed into the conjuring ink (kind/color/effect).
 - `grammar.json` — the **deduction grammar**: per-element `substance`, per-sign `operator` (`kind` + `verb`/`invertedVerb`), and `interactions` (synergies/warnings). This is what lets the app explain novel combinations.
 - `spells.json` — catalog of "recipes" for the matcher. **Populated with the canon spells** documented so far (`origin:canon` only — community/fan-made spells are excluded so they can't produce false "canon match" results). The engine still handles an empty catalog gracefully (`catalogEmpty`).
@@ -43,16 +43,19 @@ The engine has almost no hardcoded domain knowledge — everything lives in JSON
 
 SVG paths come from the PNGs in `assets/images/{sigils,signs}/`, traced with **potrace** via `tools/vectorize-{sigils,signs}.cjs` (`npm run vectorize:*`). Traced entries are marked `render:"fill"` (drawn filled with `fill-rule:evenodd`, tinted via `currentColor`). Paths use `viewBox="-50 -50 100 100"`, centered on the origin (translate `-50`, plus bbox-recenter where the source art is off-center). Re-run the vectorizer when the source PNGs change; don't hand-edit the long `svgPath` strings.
 
+**Unknown signs** are auto-discovered: drop `Unknown_NN.png` into `assets/images/signs/unknown/` and `vectorize:signs` traces it to id `unknown_NN` (no MAP edit needed). Unlike the fixed-size known-sign PNGs, these crops are also **scaled to fit** the viewBox (`recenterAndFit`, ≤ ±42). Then add the `unknown_NN` entry to `signs.json` (family `unknown`) + an operator to `grammar.json`, and run `npm run unknown:report` to cross-reference its appearances for theorizing.
+
 ### The composition object (UI ↔ engine contract)
 
 ```js
-{ name, ring: { closed }, core: { id, type, x, y, rotation, scale, inverted } | null,
-  components: [ { id, type, role: 'sign' | 'sigil', x, y, rotation, scale, inverted } ],
+{ name, ring: { closed }, core: { id, type, x, y, rotation, scale, inverted, mirrored } | null,
+  components: [ { id, type, role: 'sign' | 'sigil', x, y, rotation, scale, inverted, mirrored } ],
   linkCount, dyes: [dyeId] }
 ```
 
 - **Multiple sigils:** the first sigil is `core`; additional sigils are `components` with `role:'sigil'`. The engine treats `core` as primary; geometry filters `role==='sign'`.
 - Coordinates are **Cartesian px centered at origin** in the UI, converted to **polar** in the engine. Convention: angle 0° = north, clockwise; `toPolar` uses `atan2(x, -y)`. `computeDirectionalBias` must use `atan2(vx, -vy)` to stay consistent (this was a real bug once — directional skew came out reversed).
+- `inverted` flips the glyph top↔bottom (negate Y) and, for invertible signs, negates the operator's effect; `mirrored` flips it left↔right (negate X) and is **visual-only** (ignored by the engine) — both are rendered in [GlyphCanvas.jsx](src/components/GlyphCanvas.jsx) and toggled from the selection toolbar in [App.jsx](src/App.jsx).
 - This same shape is what **Export/Import (JSON)** round-trips (format `wha-spell@1`).
 
 ### Engine pipeline (`src/engine/`)

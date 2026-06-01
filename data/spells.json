@@ -180,6 +180,25 @@
         ],
         "symmetry": "bilateral"
       }
+    },
+    {
+      "id": "water_horse",
+      "name": "Water Horse",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "medium",
+      "effect": "Forms a steerable horse of water — a Horse decorative sigil over a water core — that can pull a vehicle (e.g. the water horse carriage Qifrey used to reach the Silver Eve festival).",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "column", "count": 2, "placement": "top", "orientation": "front", "inverted": false },
+          { "id": "direction", "count": 2, "placement": "bottom", "orientation": "front", "inverted": false },
+          { "id": "unknown_01", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false },
+          { "id": "unknown_02", "count": 3, "placement": "bottom", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Two-sigil spell: a water core plus a Horse decorative sigil (the shape-giver, which carries the canon 'can pull loads' utility). The catalog matcher keys on the core + sign multiset, so the Horse sigil is recorded here rather than in signs[]. Signs from the app JSON export: Column ×2 (horizontal, flanking the horse at the top), Region (direction) ×2 (bottom), plus the two unidentified signs — Unknown Sign 1 ×2 (mirrored left/right pair on the sides) and Unknown Sign 2 ×3 (line-shaped, bottom row)."
     }
   ]
 }

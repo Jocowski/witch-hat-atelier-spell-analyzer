@@ -328,6 +328,50 @@ The exact effects of Link are unknown, but it is confirmed that this sign functi
 
 **Spells Using Link:** Light Tracer
 
+## Unknown / Unidentified Signs
+
+This section is a catalog of signs that appear in canon spells but have **no name and no
+deciphered function** — distinct from the "Unofficially Named" signs above, which at least
+have a proposed name or effect. Each one is given a theory-neutral catalog number
+(`Unknown Sign N`, id `unknown_NN`) and tracked so that, as the same mark turns up across
+more spells, evidence can accumulate and a theory can eventually be proposed. Until then the
+analyzer treats them as effect-unknown and flags any spell that uses one as having an
+**incomplete deduced effect**.
+
+> This is separate from the generic `unknown_sign` placeholder, which is only a catch-all for
+> marks that have not yet been isolated into their own entry.
+
+### Unknown Sign 1
+
+![Unknown Sign 1](../assets/images/signs/unknown/Unknown_01.png)
+
+First catalogued from the **Water Horse** spell, where it appears on the **left and right of
+the central water sigil as a bilaterally mirrored pair**. Its function is unknown.
+
+- **Observations:** The mirrored left/right placement (a clear front-to-front pairing flanking
+  the core) is consistent with a *directional* sign, but this is unconfirmed — it has only been
+  seen in one spell so far, so nothing can be said about how angling, inverting, or mirroring it
+  changes its behavior. The sign is **stored upright** (top = top); the two copies in a seal are
+  horizontal mirror images, placed with the editor's **mirror** control (a left↔right flip,
+  separate from invert).
+- **Theories:** *None yet — insufficient data (seen in only one spell).*
+
+**Spells Using Unknown Sign 1:** Water Horse
+
+### Unknown Sign 2
+
+![Unknown Sign 2](../assets/images/signs/unknown/Unknown_02.png)
+
+A simple **line / bar-shaped** mark, catalogued from the **Water Horse** spell, where it runs
+along the **bottom row beneath the water sigil, alternating with the Region (chevron) signs**.
+Its function is unknown.
+
+- **Observations:** Just a straight line, interleaved with Region signs. With only one appearance
+  there is no basis yet for what the line contributes.
+- **Theories:** *None yet — insufficient data (seen in only one spell).*
+
+**Spells Using Unknown Sign 2:** Water Horse
+
 ---
 
 Source: <https://witchhatatelier.telepedia.net/wiki/Signs_Explained>
