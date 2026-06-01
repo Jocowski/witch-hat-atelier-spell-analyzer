@@ -22,6 +22,13 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Water Bolt (canon, water)** — defines the **Bolt** sign (signs.md:255). Water sigil at
+  bottom + horizontal row of Bolt (middle) + parallel row of Region = fast horizontal volley of water
+  arrows "straight ahead," drawn **big on the ground**. KEY: the engine's directional word (`down`
+  here) is an **in-plane axis label, NOT gravity** — a ground-drawn seal fires horizontally; don't
+  narrate "down" as a vertical/downward shot. Water's create-mode = self-sufficient ammo (no
+  reservoir). Structural twin of Flame Shot (forward-confining Region row), projectile cousin of the
+  Watershot jet.
 - 2026-06-01: **Rising Wave (canon, water)** — half-ring Region placement = diagonal propulsion
   (launches the caster up). Closest analogue: Rising Platform (lifts straight up via Levitation) —
   same goal, opposite mechanism (Region asymmetry vs. Levitation).

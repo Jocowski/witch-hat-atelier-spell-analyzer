@@ -164,6 +164,22 @@
         ],
         "symmetry": "bilateral"
       }
+    },
+    {
+      "id": "water_bolt",
+      "name": "Water Bolt",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Fires a fast, horizontal volley of water arrows straight ahead from a seal drawn flat on the ground.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "bolt", "count": 5, "placement": "center", "orientation": "outward", "inverted": false },
+          { "id": "direction", "count": 4, "placement": "back", "orientation": "front", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      }
     }
   ]
 }
