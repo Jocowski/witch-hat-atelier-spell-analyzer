@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, CANVAS_RADIUS } from '../src/engine/geometry.js'
+import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, CANVAS_RADIUS } from '../src/engine/geometry.js'
 
 const directional = () => 'directional'
 
@@ -78,4 +78,39 @@ test('computeSpin: non-directional rotation is ignored', () => {
   const comps = [{ id: 'f', type: 'float', role: 'sign', x: 0, y: -100, rotation: 73 }]
   const spin = computeSpin(comps, () => 'non-directional')
   assert.equal(spin.spinning, false)
+})
+
+// --- classifyRegion: positional coverage (Rising Wave) ---
+
+// helper: an inward-facing region sign at position angle `a`.
+const inwardRegion = (a, i, scale = 1) => {
+  const { x, y } = toCartesian(a, 0.6)
+  return { id: 'r' + i, type: 'direction', role: 'sign', x, y, rotation: inwardRotation(x, y), scale }
+}
+
+// A FULL, evenly-spaced ring of inward regions is positionally balanced ⇒ contained.
+test('classifyRegion: balanced inward ring => contained (regression)', () => {
+  const comps = [0, 90, 180, 270].map((a, i) => inwardRegion(a, i))
+  const cover = computeRegionCoverage(comps, directional)
+  assert.ok(cover.magnitude < 0.34, `balanced ring magnitude should be ~0, got ${cover.magnitude}`)
+  assert.equal(classifyRegion(comps, directional).mode, 'inward')
+})
+
+// Inward regions covering only the TOP half (Rising Wave) ⇒ biased surge toward the cluster (up).
+test('classifyRegion: one-sided inward regions => biased toward the cluster', () => {
+  const comps = [315, 345, 15, 45].map((a, i) => inwardRegion(a, i)) // all in the top arc
+  const cover = computeRegionCoverage(comps, directional)
+  assert.ok(cover.magnitude > 0.34, `clustered magnitude should be large, got ${cover.magnitude}`)
+  const region = classifyRegion(comps, directional)
+  assert.equal(region.mode, 'biased')
+  // centroid of a top arc points up (~0/360°)
+  assert.ok(region.angle < 20 || region.angle > 340, `expected ~up, got ${region.angle}`)
+})
+
+// Off-vertical cluster ⇒ the bias follows where the regions sit (the diagonal case).
+test('classifyRegion: tilted cluster => biased toward that diagonal', () => {
+  const comps = [30, 60, 90, 120].map((a, i) => inwardRegion(a, i)) // upper-right arc
+  const region = classifyRegion(comps, directional)
+  assert.equal(region.mode, 'biased')
+  assert.ok(region.angle > 45 && region.angle < 105, `expected upper-right, got ${region.angle}`)
 })

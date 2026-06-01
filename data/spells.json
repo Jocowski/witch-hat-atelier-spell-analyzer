@@ -148,6 +148,22 @@
         ],
         "symmetry": "radial"
       }
+    },
+    {
+      "id": "rising_wave",
+      "name": "Rising Wave",
+      "category": "water",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Drives a surge of water diagonally upward, launching the caster into the air.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false },
+          { "id": "direction", "count": 4, "placement": "alternating", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      }
     }
   ]
 }

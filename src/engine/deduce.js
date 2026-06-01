@@ -141,6 +141,7 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   if (!transmute) {
     if (region) {
       if (region.mode === 'aligned') { aimLabel = directionLabel(region.angle); directionClause = `, fired ${aimLabel}` }
+      else if (region.mode === 'biased') { aimLabel = directionLabel(region.angle); directionClause = `, surging ${aimLabel} (the region signs ring only one side of the seal)` }
       else if (region.mode === 'inward') { aimLabel = 'contained'; directionClause = `, contained within the ring` }
       else if (region.mode === 'outward') { aimLabel = 'outward'; directionClause = `, manifesting outside the ring` }
       else { aimLabel = 'on the ring'; directionClause = `, emerging only along the ring` }

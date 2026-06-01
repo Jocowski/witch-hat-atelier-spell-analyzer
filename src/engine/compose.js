@@ -102,6 +102,7 @@ export function analyzeCircleWith(deps, circle) {
   let aimLabel = null
   if (region) {
     aimLabel = region.mode === 'aligned' ? directionLabel(region.angle)
+      : region.mode === 'biased' ? `surging ${directionLabel(region.angle)} (uneven region ring)`
       : region.mode === 'inward' ? 'contained within the ring'
       : region.mode === 'outward' ? 'outside the ring'
       : 'along the ring'

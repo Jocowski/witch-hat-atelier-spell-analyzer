@@ -164,11 +164,37 @@ export function computeOrientationAim(signs, familyOf = () => null) {
   return { aimed: magnitude > 0.34, angle, magnitude }
 }
 
-// Classifica um grupo de signs com frente (region/pull/levitation) nas 4 configurações
+// Positional resultant of WHERE region signs sit on the ring (scale-weighted unit vectors
+// by position angle). magnitude ≈ 0 ⇒ spread evenly around the ring (balanced); large ⇒
+// clustered on one arc. Canon (signs.md:96–99) shows the magic emitting FROM where the
+// region signs are ("the red regions"), so a one-sided cluster biases the manifestation
+// toward that side even when every sign faces inward. { centroidAngle, magnitude }.
+export function computeRegionCoverage(signs, familyOf = () => null) {
+  const items = signs.filter((c) => signFacing(c, familyOf(c.type)) != null)
+  if (!items.length) return { centroidAngle: 0, magnitude: 0 }
+  let vx = 0
+  let vy = 0
+  for (const c of items) {
+    const { angle } = toPolar(c.x, c.y)
+    const w = c.scale ?? 1
+    const rad = (angle * Math.PI) / 180
+    vx += Math.sin(rad) * w
+    vy += -Math.cos(rad) * w
+  }
+  const magnitude = Math.hypot(vx, vy) / items.length
+  let centroidAngle = (Math.atan2(vx, -vy) * 180) / Math.PI
+  if (centroidAngle < 0) centroidAngle += 360
+  return { centroidAngle, magnitude }
+}
+
+// Classifica um grupo de signs com frente (region/pull/levitation) nas configurações
 // canônicas (signs.md, Region): todos na mesma direção => apontam para lá; todos para
 // dentro => contido/centrado; todos para fora => para fora do ring; opostos (frentes se
-// cancelam) => só na linha do ring. Signs sem frente são descartados. { mode, angle? } | null.
-export function classifyRegion(signs, familyOf = () => 'directional', tol = 35) {
+// cancelam) => só na linha do ring. CASO EXTRA (não enumerado nos docs, mas demonstrado
+// pelo Rising Wave): signs para dentro porém cobrindo só um arco do ring (coverage acima
+// de coverTol) => a magia emerge enviesada para esse lado em vez de contida. Signs sem
+// frente são descartados. { mode, angle? } | null.
+export function classifyRegion(signs, familyOf = () => 'directional', tol = 35, coverTol = 0.34) {
   const items = signs
     .map((c) => ({ facing: signFacing(c, familyOf(c.type)), pos: toPolar(c.x, c.y).angle }))
     .filter((it) => it.facing != null)
@@ -177,7 +203,15 @@ export function classifyRegion(signs, familyOf = () => 'directional', tol = 35) 
   const isInward = items.every((it) => angleDelta(it.facing, (it.pos + 180) % 360) <= tol)
   const isOutward = items.every((it) => angleDelta(it.facing, it.pos) <= tol)
   if (aim.aimed && !isInward && !isOutward) return { mode: 'aligned', angle: aim.angle }
-  if (isInward) return { mode: 'inward' }
+  if (isInward) {
+    // Inward-facing regions normally CONTAIN the magic within the ring — but only when they
+    // ring the seal evenly. Covering just one arc (positional resultant > coverTol) biases
+    // the surge toward that cluster (Rising Wave: inward regions on the top half ⇒ the water
+    // surges out toward the top rather than staying contained).
+    const cover = computeRegionCoverage(signs, familyOf)
+    if (cover.magnitude > coverTol) return { mode: 'biased', angle: cover.centroidAngle }
+    return { mode: 'inward' }
+  }
   if (isOutward) return { mode: 'outward' }
   if (!aim.aimed) return { mode: 'opposed' }
   return { mode: 'aligned', angle: aim.angle }
