@@ -4,6 +4,19 @@ Accumulated corrections from real analyses — engine quirks, per-element limits
 nuances. Skim before analyzing; append new **dated one-liners** here (not in SKILL.md).
 Engine-fix narratives belong in git history — record only the durable lesson.
 
+## Engine capabilities (recently added — no longer blind spots)
+- **Multi-circle spells now match the catalog** (as of the 2026-06-01 engine work): `analyze()`
+  builds a COMBINED signature (union of every circle's signs + the set of all cores; symmetry
+  from the form circle) so a nested spell like the Vapor Bubble self-matches. It no longer
+  returns an empty `similar` for >1 circle. `perCircle` also carries each circle's own match.
+- **Component zones** (`inside | ring | outside`) are tagged from distance-to-center vs ring
+  radius (rules.json `zones`). Outside signs are external marks: excluded from aim/symmetry/
+  balance AND from the deduction's primary clause (narrated as "external marks that frame the
+  seal"). Sign multiset keys gain `@out` for outside signs / `placement:"outside"` recipes.
+- **Ring-anchored components** carry `anchor:{ring,angle,offset}`, resolved to x,y in
+  compose.normalizeCircle (pure `anchorToXY`/`xyToAnchor` in geometry.js). Pinned signs track
+  the ring on resize. Use this to attribute ring-hugging signs to the correct circle.
+
 ## Engine blind spots — override these in your reading
 - **Clustered / partial-ring region signs:** the engine reads WHERE region signs sit only
   coarsely. A one-sided inward cluster now reads `biased` (surging toward the cluster), but
