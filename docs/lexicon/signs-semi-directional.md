@@ -143,6 +143,11 @@ needs a real solid present to transmute.
 - 2026-06-01: **Boulder Stretch Rope** (earth) runs in earth's **manipulate** mode — needs a real
   boulder fed in ("a loom that needs raw stone"); the drama is overriding rock's rigidity. Same
   Weave sign as **Crystal Ribbon** (crystal) and **Light Tracer** (light, self-creating).
+- 2026-06-02: **Crystal Ribbon** (archived) — crystal is **create+manipulate**, so unlike the earth
+  Boulder Stretch Rope it's **self-supplying** (conjures its own crystal, then weaves it); the open
+  question is only self-supply vs. reshaping an existing crystal (seal unshown). Confirms **size =
+  ribbon length, not force** (override the engine's "power 2.35x"), and a lone Weave's
+  "asymmetric/unstable" flag is an artifact.
 
 **Appears in.** Boulder Stretch Rope · Crystal Ribbon · Light Tracer.
 

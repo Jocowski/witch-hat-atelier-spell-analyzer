@@ -1,0 +1,20 @@
+{
+  "format": "wha-spell@2",
+  "name": "Crystal Ribbon",
+  "circles": [
+    {
+      "id": "k1",
+      "name": "Circle 1",
+      "center": { "x": 0, "y": 0 },
+      "radius": 170,
+      "ring": { "closed": true },
+      "core": { "id": "c1", "type": "crystal", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+      "components": [
+        { "id": "c2", "type": "weave", "role": "sign", "x": 0, "y": 0, "rotation": 180, "scale": 2.35, "inverted": false, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

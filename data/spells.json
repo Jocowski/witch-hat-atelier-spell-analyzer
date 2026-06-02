@@ -1121,6 +1121,29 @@
         "symmetry": "bilateral"
       },
       "notes": "Mixed/light utility ward. Core is the UNIDENTIFIED Warding Pillar sigil (element 'unknown') -- the actual beast-repel agent; mechanism cannot be derived (CORE.md S6), so confidence=low and the effect is recorded as a reading, not fact (see docs/spells/Beast_Warding.md for ranked hypotheses). Schema has no extra-sigil field: the seal also carries TWO LIGHT sigils flanking E/W (light is create-capable/self-sufficient, 'shines outward' -- substances.md:64-66), which make it self-lit; they are captured here in notes, not in composition. The 4 COLUMN signs are INVERTED -> magic 'driven inward and erupts... emitting on all sides' ~= Dispersion (signs-directional.md:18-22), so the light spreads omnidirectionally rather than firing. The two UNKNOWN_12 ward-crosses sit at the N/S poles. ENGINE ARTIFACT: facts report aim 'above the seal'; override -- 4 balanced inverted Columns confine/spread, they do not beam (signs-directional.md:36-37), and lateral aim on light is also an artifact (substances.md:73). Net aim: omnidirectional. Mechanically the INVERSE of Light Beam (same light, spread as a ward field instead of focused into a beam); sits in the 'light as steady emission' family with Floatglow Lamp and Bird of Light Beacon."
+    },
+    {
+      "id": "crystal_ribbon",
+      "name": "Crystal Ribbon",
+      "category": "crystal",
+      "origin": "wiki",
+      "source": "telepedia 'Crystal Ribbon' -- a crystal shaping spell by Richeh (Weave is her invention). Seal never shown in canon; reconstructed from the Crystal sigil + Weave sign (sigils.md:197; signs.md:139).",
+      "confidence": "medium",
+      "effect": "Conjures hard crystal and weaves it into a long, flexible crystalline ribbon -- a rigid material made supple. A shaping/utility spell, not an attack.",
+      "composition": {
+        "core": "crystal",
+        "signs": [
+          {
+            "id": "weave",
+            "count": 1,
+            "placement": "surrounds",
+            "orientation": "outward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "asymmetric"
+      },
+      "notes": "Crystal-type SHAPING spell. Crystal core = create+manipulate, self-sufficient, naturally rigid (substances.md:290-292). A single large WEAVE keystone WRAPS the core (placement 'surrounds', not a ring of many) -- transmute operator that 'turns solid objects into long, flexible ribbons' (signs-semi-directional.md:131-134). Its SIZE sets ribbon LENGTH, not force, so the 2.35x scale -> a long ribbon (override the engine's 'power 2.35'). The whole feat is OVERRIDING crystal's natural rigidity (hard/brittle -> supple). ENGINE ARTIFACT: a lone Weave reads as 'asymmetric/unstable' -- false flag; symmetry is recorded as asymmetric only to match what single-Weave seals compute. CANON NUANCE: self-supplying (crystal creates its own material) vs reshaping an existing crystal -- seal never shown, so flagged (see docs/spells/Crystal_Ribbon.md). Sibling to CRYSTAL SHARD (same core, inverted Columns -> rigid shard eruption; opposite character: shaping vs shattering); same Weave as BOULDER STRETCH ROPE (earth, manipulate-only, needs a real boulder -- Crystal Ribbon is the self-supplying version) and LIGHT TRACER (light ribbon)."
     }
   ]
 }
