@@ -1,0 +1,27 @@
+{
+  "format": "wha-spell@2",
+  "name": "Wall Bend (reconstruction)",
+  "circles": [
+    {
+      "id": "k4",
+      "name": "Circle 1",
+      "center": { "x": 0, "y": 0 },
+      "radius": 98,
+      "ring": { "closed": true },
+      "core": { "id": "c27", "type": "earth", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+      "components": [
+        { "id": "c28", "type": "unknown_02", "role": "sign", "x": 0, "y": 15.52, "rotation": 85, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c29", "type": "pull", "role": "sign", "x": -37.55, "y": -23.14, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c30", "type": "pull", "role": "sign", "x": 43.52, "y": -24.21, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c31", "type": "weave", "role": "sign", "x": -0.8, "y": 34.25, "rotation": 180, "scale": 1.6, "inverted": false, "mirrored": false },
+        { "id": "c32", "type": "bend", "role": "sign", "x": -34.69, "y": 14.31, "rotation": 187, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c33", "type": "bend", "role": "sign", "x": 31.93, "y": 15.39, "rotation": 0, "scale": 1, "inverted": false, "mirrored": true },
+        { "id": "c34", "type": "bind", "role": "sign", "x": 0.8, "y": -38.26, "rotation": 180, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c35", "type": "unknown_05", "role": "sign", "x": -0.63, "y": 64.35, "rotation": 180, "scale": 3.25, "inverted": false, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}
