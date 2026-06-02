@@ -1136,6 +1136,36 @@
       "reference": "signs.md (Unknown Signs), Sand Bridge",
       "render": "fill",
       "sourceRotation": 90
+    },
+    {
+      "id": "unknown_12",
+      "name": "Unknown Sign 12 (Beast-Ward Cross)",
+      "origin": "wiki",
+      "source": "telepedia 'Signs Explained' (catalogued but unidentified — theorized from in-manga appearances); appears in the Beast Repellent seal: https://witchhatatelier.telepedia.net/wiki/Signs_Explained",
+      "glyph": "✕",
+      "svgPath": "M-3.43 -12.01 L-6.76 -8.57 -10.55 -11.62 C-15.77 -15.81 -17.78 -14.28 -12.91 -9.81 L-9.17 -6.39 -11.83 -3.61 C-15.18 -0.12 -15.15 0.54 -11.57 3.98 C-8.19 7.21 -8.37 8.46 -12.61 10.96 C-14.62 12.15 -15.33 13.11 -14.69 13.75 C-13.59 14.85 -10.71 13.63 -8.01 10.93 C-6.49 9.41 -6.17 9.48 -3.63 11.92 C-0.35 15.06 0.64 15.16 2.93 12.63 C4.64 10.75 4.73 10.76 8.23 13.13 C12.13 15.78 13.10 16.03 13.98 14.59 C14.31 14.07 13.24 12.94 11.61 12.10 C6.99 9.71 6.97 8.67 11.48 4.09 L15.67 -0.19 12.57 -3.72 L9.47 -7.26 12.24 -9.27 C15.84 -11.89 14.29 -13.44 10.34 -11.17 C7.33 -9.44 7.28 -9.45 3.87 -12.44 C1.99 -14.09 0.32 -15.45 0.17 -15.45 C0.02 -15.45 -1.60 -13.90 -3.43 -12.01 M-2.67 -8.70 C-4.95 -6.25 -5.20 -5.25 -4.93 0.41 C-4.70 5.36 -4.13 7.30 -2.38 9.17 L-0.13 11.56 1.99 9.57 C3.57 8.09 4.01 6.70 3.71 4.13 C3.49 2.24 3.85 -0.95 4.51 -2.95 C5.61 -6.27 5.51 -6.82 3.44 -9.03 C0.59 -12.06 0.44 -12.05 -2.67 -8.70 M7.12 -1.87 C6.78 -1.00 6.51 0.90 6.51 2.36 L6.51 5.00 9.18 2.34 C11.43 0.09 11.65 -0.58 10.56 -1.89 C8.91 -3.87 7.88 -3.87 7.12 -1.87 M-10.36 -1.10 C-11.22 -0.07 -11.01 0.67 -9.49 2.05 C-7.53 3.82 -7.49 3.80 -7.49 0.71 C-7.49 -2.65 -8.53 -3.31 -10.36 -1.10",
+      "effect": "Unidentified ward mark: an X (two crossed strokes) pinched by a curved bracket on each side — a small bowtie/hourglass figure. In the Beast Repellent seal a pair sits at the north and south poles, flanking the central staff sigil along the vertical axis.",
+      "effectTags": [
+        "unknown"
+      ],
+      "invertible": false,
+      "canBeCenter": false,
+      "surrounds": false,
+      "family": "unknown",
+      "status": "unidentified",
+      "appearsIn": [
+        "beast_repellent"
+      ],
+      "observations": [
+        "Reads as an X crossed top-and-bottom, bounded left and right by short arcs — a pinched bowtie outline.",
+        "In Beast Repellent it appears as a top/bottom (north/south) pair on the vertical axis, mirrored across the horizontal."
+      ],
+      "theories": [
+        "Plausibly a warding/repelling keystone (the seal's purpose is to keep beasts away); the crossed form suggests a barrier or 'no-entry' mark. Low confidence — seen in one spell only.",
+        "Could be paired with the east/west boxed marks and the four diagonal darts as one omnidirectional ward lattice rather than a single directed operator."
+      ],
+      "reference": "signs.md (Unknown Signs), Beast Repellent",
+      "render": "fill"
     }
   ]
 }

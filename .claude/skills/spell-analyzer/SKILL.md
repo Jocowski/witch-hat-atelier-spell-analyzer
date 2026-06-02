@@ -111,11 +111,34 @@ Deliver a complete, readable analysis in the conversation covering, in order:
    Mark engine facts vs. your own reading throughout.
 7. **Usage ideas** — concrete in-world applications (practical and creative).
 8. **Other info** — stability/balance/power/spin, forbidden-magic flags, decorative notes.
+9. **Sum up (plain terms)** — ALWAYS close with this. A short, jargon-free recap for someone
+   who skipped the analysis: in everyday language, **what the spell does**, **how it works**
+   (a few simple steps — "it makes its own light, then spreads it on all sides…"), and **what
+   it's best used for**. No `file:line` cites, no sign/operator vocabulary, no engine terms —
+   just the plain picture. One short comparison is fine ("it's the opposite of a Light Beam").
+   Keep it tight (a few short paragraphs or a small step list). This is the part most users
+   actually read, so make it land on its own.
 
 Ground every claim in the docs/engine. If the source material is uncertain about a
 part (many signs are), say so — fidelity to canon's ambiguity matters here. Do **not**
 add "Variations" or "Modifications" sections — the value is in canon-grounded reasoning,
 not in enumerating swaps.
+
+**When the effect can't be pinned down (unknown core/signs, or ambiguous canon): give
+hypotheses, not a shrug.** An unidentified part (element `unknown`, an `unknown_NN` sign,
+or a doc-flagged ambiguous sign) means you *cannot state the effect as fact* — but "the
+deduction is incomplete" is the **start** of the answer, not the whole of it. After saying
+what's unknown, lay out the **plausible interpretations** so the reader still learns something:
+- **Reason from what you DO know** — the geometry (engine facts), the identified parts, the
+  spell's canon name/purpose, and how similar shapes behave in other spells — to constrain
+  what the unknown part is likely doing.
+- **Offer 2–4 ranked hypotheses** ("most likely / possible / long-shot"), each with the
+  in-world consequence it would produce ("if the core is a repel-field → animals avoid the
+  lit zone; if it's a marker → it only tags the spot and the light does the deterring").
+- **State what would happen under each**, and what observation/extra symbol would tell them
+  apart. Mark all of it clearly as **hypothesis, not canon**, and never upgrade a guess to a
+  fact in the doc, the catalog `confidence`, or the lexicon Findings (record it under
+  `theories`, not `effect`).
 
 **Distinguish engine facts from your own reasoning.** Validity (structure), geometry, and
 catalog `similar` matches are **engine facts** — label them as such. The **deduced effect is

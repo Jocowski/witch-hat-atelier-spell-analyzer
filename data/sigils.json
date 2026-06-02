@@ -470,6 +470,23 @@
       "render": "fill",
       "family": "misc",
       "status": "unidentified"
+    },
+    {
+      "id": "warding_pillar",
+      "name": "Warding Pillar (Beast-Ward Staff)",
+      "origin": "wiki",
+      "source": "telepedia 'Beast Repellent' / 'Sigils Explained': https://witchhatatelier.telepedia.net/wiki/Sigils_Explained — the unidentified central sigil of the Beast Repellent seal.",
+      "category": "special",
+      "element": "unknown",
+      "color": "#6b7d8a",
+      "description": "Unidentified central sigil of the Beast Repellent (Beast Warding) seal. A vertical staff capped by an upward arrowhead, flanked by bracket 'arms' near its top and bottom — a totem/'keep-out post'. Element unidentified, so its substance and capability are unknown; deductions built on it are necessarily incomplete.",
+      "centerHint": "Vertical stroke with an up-pointing chevron at the top and a pair of inward-hooked bracket arms near the top and bottom.",
+      "variants": [],
+      "reference": "sigils.md, Beast Repellent",
+      "svgPath": "M-26.61 -41.11 C-27.86 -39.85 -27.74 -22.43 -26.46 -21.37 C-24.96 -20.12 -15.40 -20.67 -15.40 -22.00 C-15.40 -22.80 -16.50 -23.07 -20.38 -23.23 L-25.37 -23.44 -25.37 -31.31 L-25.37 -39.19 -14.37 -39.19 L-3.37 -39.19 -3.37 -30.88 L-3.37 -22.56 -15.06 -10.46 C-22.98 -2.24 -26.52 1.88 -26.04 2.35 C-25.57 2.83 -21.81 -0.48 -14.36 -7.92 L-3.37 -18.89 -3.37 -12.44 L-3.37 -5.97 -8.87 0.04 C-11.89 3.35 -14.37 6.40 -14.37 6.81 C-14.37 8.54 -12.49 7.27 -8.10 2.58 L-3.43 -2.41 -3.40 18.39 L-3.37 39.19 -14.37 39.19 L-25.37 39.19 -25.37 31.31 L-25.37 23.44 -20.38 23.23 C-16.50 23.07 -15.40 22.80 -15.40 22.00 C-15.40 20.67 -24.96 20.12 -26.46 21.37 C-27.74 22.43 -27.86 39.85 -26.61 41.11 C-25.42 42.30 21.44 42.30 22.62 41.11 C23.18 40.55 23.44 37.26 23.44 30.81 C23.44 19.86 23.84 20.38 15.86 20.76 C12.46 20.92 11.41 21.21 11.41 22.00 C11.41 22.80 12.52 23.07 16.40 23.23 L21.38 23.44 21.38 31.31 L21.38 39.19 10.38 39.19 L-0.62 39.19 -0.62 18.41 L-0.62 -2.37 4.39 2.60 C8.88 7.06 11.08 8.53 11.07 7.05 C11.07 6.77 8.43 3.69 5.20 0.21 L-0.67 -6.13 -0.47 -12.37 L-0.28 -18.61 10.04 -8.99 C15.71 -3.71 20.72 0.64 21.17 0.65 C23.49 0.75 21.71 -1.33 11.03 -11.24 L-0.62 -22.04 -0.62 -30.61 L-0.62 -39.19 10.38 -39.19 L21.38 -39.19 21.38 -31.31 L21.38 -23.44 16.40 -23.23 C12.52 -23.07 11.41 -22.80 11.41 -22.00 C11.41 -21.21 12.46 -20.92 15.86 -20.76 C23.84 -20.38 23.44 -19.86 23.44 -30.81 C23.44 -37.26 23.18 -40.55 22.62 -41.11 C21.44 -42.30 -25.42 -42.30 -26.61 -41.11 M26.94 2.46 C26.97 3.27 27.14 3.42 27.36 2.88 C27.56 2.39 27.53 1.79 27.30 1.56 C27.07 1.33 26.91 1.74 26.94 2.46",
+      "render": "fill",
+      "family": "misc",
+      "status": "unidentified"
     }
   ]
 }

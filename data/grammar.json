@@ -372,6 +372,10 @@
     "unknown_11": {
       "kind": "unknown",
       "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_12": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
     }
   },
   "interactions": [

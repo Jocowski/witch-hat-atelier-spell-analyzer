@@ -35,6 +35,10 @@ flips project↔erupt.
   Clustered/rotated Columns make the engine's `aim=up`/spin artifacts; canon glob hovers below.
 - 2026-06-01 (Vapor Bubble): four balanced Columns there merely **confine airflow**, not "beam
   above the seal" as the engine narrates — treat the beam label as an artifact.
+- 2026-06-02 (Beast Warding): four balanced **inverted** Columns on a Light substance spread the
+  light **omnidirectionally** (≈ Dispersion) into an all-around ward-glow — the inverse of Light
+  Beam's focused beam. Engine again reported "aim above the seal"; another confirmed artifact of
+  4 balanced Columns (compounded by light's lateral-aim artifact, substances.md:73).
 - 2026-06-01 (Flame Shot): a single large Column extending to the far side aims the flame
   **forward** toward the column's point.
 - 2026-06-01 (Rising Platform): inward-vs-outward column rotation is **cosmetic** on a radial
@@ -42,7 +46,7 @@ flips project↔erupt.
   rotation. Don't conflate "rotated outward" with "inverted."
 
 **Appears in.** Watershot Seal · Flame Shot Seal · Wall Breaker Seal · Light Beam · Rising
-Platform of Water · Snugstone Spell · Crystal Shard (inverted) (signs.md:39).
+Platform of Water · Snugstone Spell · Crystal Shard (inverted) · Beast Warding (inverted ×4) (signs.md:39).
 
 ---
 

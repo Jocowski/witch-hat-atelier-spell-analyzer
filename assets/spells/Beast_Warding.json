@@ -1,0 +1,27 @@
+{
+  "format": "wha-spell@2",
+  "name": "Beast Warding",
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "center": { "x": 0, "y": 0 },
+      "radius": 170,
+      "ring": { "closed": true },
+      "core": { "id": "c1", "type": "warding_pillar", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+      "components": [
+        { "id": "c2", "type": "unknown_12", "role": "sign", "x": -1.605351209640503, "y": -47.89130783081055, "rotation": 180, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c3", "type": "unknown_12", "role": "sign", "x": -0.6252601554363224, "y": 47.49247360229491, "rotation": 358.6630700045239, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c4", "type": "light", "role": "sigil", "x": -62.60869646072388, "y": -0.6020088195800781, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c5", "type": "light", "role": "sigil", "x": 57.06339097770921, "y": 2.328545824411112, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c6", "type": "column", "role": "sign", "x": 33.08711494899103, "y": -40.268394470214865, "rotation": 219.40873526109306, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c7", "type": "column", "role": "sign", "x": -36.1203999519348, "y": 37.456520080566406, "rotation": 43.95965160117015, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c8", "type": "column", "role": "sign", "x": 45.575097422835185, "y": 39.19648742675786, "rotation": 310.69690673460127, "scale": 1, "inverted": true, "mirrored": false },
+        { "id": "c9", "type": "column", "role": "sign", "x": -36.29781212306328, "y": -37.59113693237306, "rotation": 136.00278171131265, "scale": 1, "inverted": true, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

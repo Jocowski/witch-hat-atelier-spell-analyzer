@@ -1076,6 +1076,51 @@
         "symmetry": "bilateral"
       },
       "notes": "Wind-type barrier spell invented by Alaira (debut: Tetia holds the transformed Euini). Wind core (air: moves but does NOT create air -- sigils.md:65; ambient air is the medium). Three roles: WEAVE x1 (large, surrounds core) weaves the moving air into one continuous ribbon = the wall surface; CONVERGENCE x6 (back half, upright) concentrates+FIRMS the air into a dense pressurized sheet (canon ties Convergence to wall-of-wind: 'manifest about or from a single point' + 'pack loose particles tightly/rigid' -- signs.md:107); COLUMN x6 (front half, INVERTED) erupts air outward on all sides (inverted column ~= dispersion, signs.md:34) so it encloses as a ring rather than firing a jet. Result is a PRESSURE barrier, not a solid object: deflects/contains but penetrable with force and temporary. Engine 'aim down/beam skews down' is an ARTIFACT (inverted columns spread, don't beam). RECONSTRUCTION not a decoded seal: Wind core + inverted Columns front + Convergence back are from the wiki text/partial panel; counts (6+6) are guesses; the enclosing sign's identity is the main open question -- WEAVE is the best functional fit ('surrounds the central sigil') but the wiki calls it 'a semicircular sign with small details on its edges,' which RADIAL (nested arcs) matches more literally. confidence=medium."
+    },
+    {
+      "id": "warmth_retention_seal",
+      "name": "Warmth-Retention Seal",
+      "category": "time",
+      "origin": "wiki",
+      "source": "telepedia 'Warmth-Retention Seal': https://witchhatatelier.telepedia.net/wiki/Warmth-Retention_Seal -- recipe is the canonical example named in the Stop sigil description (sigils.md:107).",
+      "confidence": "high",
+      "effect": "Locks an object's temperature by halting only the heat aspect of its timeline -- a magical thermos: hot stays hot, cold stays cold, indefinitely, producing no flame.",
+      "composition": {
+        "core": "stop",
+        "signs": [],
+        "symmetry": "radial"
+      },
+      "notes": "Time-type STATE-LOCK pairing two sigils: STOP core (element time; 'outright halts time for the objects it affects' -- sigils.md:107; immaterial, acts on time/state not matter) + a FIRE sigil partner that SCOPES the halt to fire's domain (heat). Stop alone = total stasis (Time Stop / Petrification); the Fire sigil narrows it to the thermal aspect, so the target's temperature freezes without continuing to burn -- this is the exact example the source names: 'stop time for specific aspects of an object, such as changes in heat if paired with a fire sigil.' Deliberately SIGN-FREE: it suppresses a change rather than projecting/aiming a substance, so the engine's 'no signs -> raw discharge' warning is a FALSE POSITIVE here. CATALOG CAVEAT: the matcher only records a 'Match' when signCount>0 (analyze.js:117), so this sign-free spell will NOT self-match -- entry is for provenance/record. Schema has no extra-sigil field; the essential Fire partner is captured here in notes, not in composition. Works both directions (keeps cold cold as readily as hot hot). Opposite mechanism to Snugstone (which GENERATES warmth; this RETAINS it)."
+    },
+    {
+      "id": "beast_warding",
+      "name": "Beast Warding",
+      "category": "light",
+      "origin": "wiki",
+      "source": "telepedia 'Beast Repellent' (also called Beast Warding): https://witchhatatelier.telepedia.net/wiki/Beast_Repellent -- a common utility seal that keeps wild animals away. Listed among Mixed Spells (spells.md) and Light spells (sigils.md:31).",
+      "confidence": "low",
+      "effect": "A stationary, self-lit, all-around ward: conjured light spread evenly on every side around an unidentified beast-repelling core, forming a glowing zone that wild animals avoid. Not a beam or projectile.",
+      "composition": {
+        "core": "warding_pillar",
+        "signs": [
+          {
+            "id": "unknown_12",
+            "count": 2,
+            "placement": "top",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": true
+          }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Mixed/light utility ward. Core is the UNIDENTIFIED Warding Pillar sigil (element 'unknown') -- the actual beast-repel agent; mechanism cannot be derived (CORE.md S6), so confidence=low and the effect is recorded as a reading, not fact (see docs/spells/Beast_Warding.md for ranked hypotheses). Schema has no extra-sigil field: the seal also carries TWO LIGHT sigils flanking E/W (light is create-capable/self-sufficient, 'shines outward' -- substances.md:64-66), which make it self-lit; they are captured here in notes, not in composition. The 4 COLUMN signs are INVERTED -> magic 'driven inward and erupts... emitting on all sides' ~= Dispersion (signs-directional.md:18-22), so the light spreads omnidirectionally rather than firing. The two UNKNOWN_12 ward-crosses sit at the N/S poles. ENGINE ARTIFACT: facts report aim 'above the seal'; override -- 4 balanced inverted Columns confine/spread, they do not beam (signs-directional.md:36-37), and lateral aim on light is also an artifact (substances.md:73). Net aim: omnidirectional. Mechanically the INVERSE of Light Beam (same light, spread as a ward field instead of focused into a beam); sits in the 'light as steady emission' family with Floatglow Lamp and Bird of Light Beacon."
     }
   ]
 }

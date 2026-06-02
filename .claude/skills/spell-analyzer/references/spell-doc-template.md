@@ -30,6 +30,12 @@ json: [assets/spells/<file>.json if provided, else "none yet"]
 ## Overview
 [2–4 sentences: what it produces, what it's for, where it comes from.]
 
+## In plain terms (sum up)
+[Jargon-free recap for someone who won't read the rest: what it does, how it works in
+a few simple steps, and what it's best used for. No `file:line` cites, no sign/operator
+vocabulary, no engine terms. One short comparison is fine. This is the most-read section —
+make it stand on its own.]
+
 ## Validity
 [Engine verdict: valid/active/inactive/invalid and why. List any blocking/warning/info issues.]
 
@@ -40,7 +46,13 @@ json: [assets/spells/<file>.json if provided, else "none yet"]
 - **Ink / dyes:** [dyes and their effect, or "plain conjuring ink"]
 
 ## Deduced effect
-[The engine's deduced summary, then a plain-language explanation in your own words.]
+[The engine's deduced summary, then a plain-language explanation in your own words.
+If a core sigil or sign is unidentified (element `unknown`, an `unknown_NN` sign, or a
+doc-flagged ambiguous sign), DO NOT stop at "incomplete." Reason from what IS known
+(geometry, the identified parts, the spell's canon name/purpose) and lay out **2–4 ranked
+hypotheses** — most likely / possible / long-shot — each with the in-world consequence it
+would produce and what observation or extra symbol would confirm it. Mark every hypothesis
+as speculation, never as fact.]
 
 ### How each part shapes the spell
 | Part | Role | Effect on this spell |

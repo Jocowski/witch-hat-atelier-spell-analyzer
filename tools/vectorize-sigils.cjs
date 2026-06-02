@@ -30,6 +30,7 @@ const MAP = {
   'Torchstag.png': 'torchstag', 'Liongoat.png': 'liongoat', 'Valance_Leech.png': 'valance_leech',
   'Crystal.png': 'crystal', 'Smoke.png': 'smoke',
   'Sand_Bridge.png': 'sand_bridge',
+  'Warding_Pillar.png': 'warding_pillar',
 };
 
 const TRACE_OPTS = { threshold: 170, turdSize: 2, optTolerance: 0.2, turnPolicy: 'minority' };
@@ -44,7 +45,7 @@ const BBOX_CENTER = new Set(['repetition_sigil', 'bird_a']);
 
 // Sigils whose source PNG is NOT 100x100 (arbitrary crop): recenter on the bbox
 // and scale to fit the viewBox, like the unknown-sign vectorizer (no -50 center).
-const FIT = new Set(['flower_water', 'sand_bridge']);
+const FIT = new Set(['flower_water', 'sand_bridge', 'warding_pillar']);
 const FIT_HALF = 42;
 
 function trace(file) {
