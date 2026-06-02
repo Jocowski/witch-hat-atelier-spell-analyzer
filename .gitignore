@@ -3,3 +3,6 @@ dist/
 .vite/
 *.log
 .DS_Store
+
+# Local manga mirror + reader (downloaded images are copyrighted — never commit)
+manga/
