@@ -1039,6 +1039,43 @@
         "symmetry": "bilateral"
       },
       "notes": "Niche earth/sand spell (manga ch. 12 / anime ep. 8). TWO-CIRCLE nested seal: an inner circle = the sand_bridge core (unidentified central sigil; element treated as earth) flanked by a Region-like unknown_06 pair; an outer coreless MODIFIER ring that shapes it. Outer ring: two large N/S Columns (raise the sand into pillars along the span axis) + 4 smaller intercardinal Columns; 4 Strengthen (reinforce to bear weight); 2 INVERTED Radial at E/W (the only known inverted Radial -- likely un-tempers/firms the structure, a DEDUCTION not canon: see the Radial lexicon Findings); 2 unknown_11 'bridge' glyphs at E/W (likely the arch/deck shape-giver); plus unidentified unknown_05 (half-circle arcs), unknown_09 (dumbbells) and unknown_10 (parallel-line marks). Earth manipulates, does not create (sigils.md:53) => needs real sand present; the build is TEMPORARY, raised one pillar at a time. Six unidentified glyph types (sand_bridge sigil + unknown_05/06/09/10/11) => engine flags the deduction incomplete. confidence=low."
+    },
+    {
+      "id": "wind_wall",
+      "name": "Wind Wall",
+      "category": "wind",
+      "origin": "wiki",
+      "source": "telepedia 'Wind Wall': https://witchhatatelier.telepedia.net/wiki/Wind_Wall (effect confirmed via Fandom mirror https://witch-hat-atelier.fandom.com/wiki/Wind_Wall) -- wind spell invented by Alaira; debut: Tetia briefly holds the transformed Euini. Recipe is a user reconstruction from the partial manga seal + the wiki construction description.",
+      "confidence": "medium",
+      "effect": "Packs and shapes the surrounding air into a standing circular wall -- a dense pressure barrier that deflects objects and contains people or animals.",
+      "composition": {
+        "core": "wind",
+        "signs": [
+          {
+            "id": "weave",
+            "count": 1,
+            "placement": "surrounds",
+            "orientation": "around",
+            "inverted": false
+          },
+          {
+            "id": "convergence",
+            "count": 6,
+            "placement": "back",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 6,
+            "placement": "front",
+            "orientation": "inward",
+            "inverted": true
+          }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Wind-type barrier spell invented by Alaira (debut: Tetia holds the transformed Euini). Wind core (air: moves but does NOT create air -- sigils.md:65; ambient air is the medium). Three roles: WEAVE x1 (large, surrounds core) weaves the moving air into one continuous ribbon = the wall surface; CONVERGENCE x6 (back half, upright) concentrates+FIRMS the air into a dense pressurized sheet (canon ties Convergence to wall-of-wind: 'manifest about or from a single point' + 'pack loose particles tightly/rigid' -- signs.md:107); COLUMN x6 (front half, INVERTED) erupts air outward on all sides (inverted column ~= dispersion, signs.md:34) so it encloses as a ring rather than firing a jet. Result is a PRESSURE barrier, not a solid object: deflects/contains but penetrable with force and temporary. Engine 'aim down/beam skews down' is an ARTIFACT (inverted columns spread, don't beam). RECONSTRUCTION not a decoded seal: Wind core + inverted Columns front + Convergence back are from the wiki text/partial panel; counts (6+6) are guesses; the enclosing sign's identity is the main open question -- WEAVE is the best functional fit ('surrounds the central sigil') but the wiki calls it 'a semicircular sign with small details on its edges,' which RADIAL (nested arcs) matches more literally. confidence=medium."
     }
   ]
 }

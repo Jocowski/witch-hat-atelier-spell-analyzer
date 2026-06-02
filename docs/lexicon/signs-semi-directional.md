@@ -59,6 +59,11 @@ inverted appearance documented).
 (the inward point is convention, not aim).
 
 **Findings.**
+- 2026-06-02: **The "firmness trick" extends to gases, not just loose earth/sand.** In **Wind Wall**,
+  Convergence ×6 (back half) compresses *moving air* into a dense, pressurized sheet — the reason the
+  wind wall resists being pushed through. Canon ties the sign to this spell directly: its effect there
+  "suggests it might make the magic manifest about or from a single point" ([../signs.md](../signs.md):107).
+  So read Convergence-on-air = densify/pressurize (barrier), the gaseous analogue of pack-grains-rigid.
 - 2026-06-02: **Likely the big downward triangle (▽) framing the Phantasmal Fireball.** Shape
   matches exactly, and the role fits: on the heatless-flame substance, Convergence *focuses +
   stiffens* the flame into a dense, persistent standing body so it holds as a contained orb
