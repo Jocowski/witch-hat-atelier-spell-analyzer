@@ -541,6 +541,23 @@
         "symmetry": "bilateral"
       },
       "notes": "Canon MIXED earth-time spell; an amalgamation invented jointly by Qifrey's four apprentices (Tetia, Richeh, Coco, Agott). Multi-circle: (1) a central BILLOW CLUSTER = a Billow sign at center (canBeCenter, signs.md:123) ringed by 4 Collection signs (gather + convert material to a cloud); (2) four small WALL BREAKER satellites (Earth core + Crush + 2 Column each) that mill real ground into fine sand and feed it inward via links; (3) an enclosing empty boundary ring; (4) an outer REPETITION SEAL (4 Repetition + 4 Convergence + 8 Column) that packs the cloud firm (Convergence, signs.md:107) and continually resets it so it returns to shape under load (Repetition, signs.md:131; retconned sign->sigil in Vol.12). Earth manipulates, does not create (sigils.md:53) => needs real stone/sand present; the Crush milling is what makes rock into the sand-like state Billow can convert. Engine validity is relation-aware: the central Billow Cluster is promoted (Billow-as-center = substance), the empty mid ring is a boundary ring, and the outer repetition seal is a modifier ring => reads VALID. SOFT sibling of the Sand Cage (which uses INVERTED Crush for rigidity instead). confidence=high (well documented in manga/wiki)."
+    },
+    {
+      "id": "wall_breaker_seal",
+      "name": "Wall Breaker Seal",
+      "category": "earth",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Drawn on a solid object, breaks through it and reduces the material to dust. Earth's destruction seal; the non-inverted-Crush counterpart of Integration and the destructive foil of Wall Bend.",
+      "composition": {
+        "core": "earth",
+        "signs": [
+          { "id": "column", "count": 2, "placement": "east-west (flanking the sigil)", "orientation": "inward", "inverted": false },
+          { "id": "crush", "count": 2, "placement": "north-south (90 deg from the columns)", "orientation": "outward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Canon earth spell. Earth sigil + two Column keystones flanking it + two Crush keystones at 90 deg. NON-INVERTED Crush = pulverize to dust (Wall Breaker; signs.md:73) - inverting the Crush flips the spell to Integration (reassemble). The Columns drive the crushing force THROUGH the material so the break has reach/penetration (crush-needs-force; signs.md:34); without them Crush only crumbles on contact. Earth manipulates, does not create (sigils.md:53): the seal is drawn ON the solid it destroys. First used by Agott to break a wall escaping the Illusory Labyrinth dragon; later by Coco to free Custas from a boulder; helped inspire the Serpent's Bed of Sand (whose satellites mill rock the same way). Engine aim 'above the seal' is an artifact - the Columns drive into the wall, not upward. confidence=high (well documented in manga/wiki)."
     }
   ]
 }

@@ -1,0 +1,23 @@
+{
+  "format": "wha-spell@2",
+  "name": "Wall Breaker Seal",
+  "circles": [
+    {
+      "id": "k7",
+      "name": "Circle 1",
+      "center": { "x": 0, "y": 0 },
+      "radius": 92,
+      "ring": { "closed": false },
+      "core": { "id": "c45", "type": "earth", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+      "components": [
+        { "id": "c46", "type": "column", "role": "sign", "x": -65.02, "y": -0.53, "rotation": 90.47, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c47", "type": "column", "role": "sign", "x": 61.98, "y": 1.74, "rotation": 271.61, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c48", "type": "crush", "role": "sign", "x": -0.63, "y": -63.55, "rotation": 359.44, "scale": 1, "inverted": false, "mirrored": false },
+        { "id": "c49", "type": "crush", "role": "sign", "x": 0, "y": 60.73, "rotation": 180, "scale": 1, "inverted": false, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}
