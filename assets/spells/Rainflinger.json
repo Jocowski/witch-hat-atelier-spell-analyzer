@@ -1,0 +1,14 @@
+{
+  "format": "wha-spell@1",
+  "name": "Rainflinger",
+  "ring": { "closed": true, "doubled": false, "size": "medium" },
+  "core": { "id": "c1", "type": "water", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false },
+  "components": [
+    { "id": "c2", "type": "fire", "role": "sigil", "x": 0, "y": -90, "rotation": 180, "scale": 0.8, "inverted": false },
+    { "id": "c3", "type": "fire", "role": "sigil", "x": 0, "y": 90, "rotation": 0, "scale": 0.8, "inverted": false },
+    { "id": "c4", "type": "crosshair", "role": "sign", "x": -90, "y": 0, "rotation": 90, "scale": 1, "inverted": false },
+    { "id": "c5", "type": "crosshair", "role": "sign", "x": 90, "y": 0, "rotation": 270, "scale": 1, "inverted": false }
+  ],
+  "linkCount": 0,
+  "dyes": []
+}

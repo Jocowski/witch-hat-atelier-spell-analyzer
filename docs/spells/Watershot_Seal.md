@@ -1,7 +1,7 @@
 ---
 name: Watershot Seal
 type: water
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: water

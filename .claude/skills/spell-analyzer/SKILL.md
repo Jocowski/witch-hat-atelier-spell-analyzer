@@ -140,7 +140,7 @@ approves, do not create the file.
 ### 6. Archive the spell in docs/spells/ (only after approval)
 Once approved, write `docs/spells/<Spell_Name>.md` using
 [references/spell-doc-template.md](references/spell-doc-template.md). It records: type,
-**canon vs community** origin, forbidden flag, the recipe (core/signs/dyes/symmetry),
+the `origin` tier (`canon`/`wiki`/`fan`) + `source` citation, forbidden flag, the recipe (core/signs/dyes/symmetry),
 the full analysis, **element behavior & canon grounding**, **how to draw it**, usage,
 and a **Reproduction** section with the importable `wha-spell@1` JSON embedded.
 
@@ -153,14 +153,16 @@ reproduction later:
 If the user provides them, save to `assets/spells/<Spell_Name>.{png,json}` and update
 the doc's frontmatter `image:`/`json:` fields and the Reproduction section.
 
-#### 6a. If the spell is CANON, add it to the engine catalog (`data/spells.json`)
+#### 6a. If the spell is a real canon spell, add it to the engine catalog (`data/spells.json`)
 The catalog is what makes the analyzer **cumulative**: the engine matches each new
 composition against it and reports "Similar spells." So whenever you archive a doc whose
-**`origin` is `canon`** (skip `community`/fan-made spells), also append a recipe entry to
-`data/spells.json` so future analyses can match against it.
+**`origin` is `canon` or `wiki`** (skip `fan`-invented spells), also append a recipe entry
+to `data/spells.json` so future analyses can match against it — carrying its `origin` +
+`source`.
 
-- **Only canon spells.** Community variants don't go in the catalog (they'd produce false
-  "canon match" results). If unsure whether it's canon, ask.
+- **Canon spells only (`canon`/`wiki`).** `fan`-invented variants don't go in the catalog
+  (they'd produce false "canon match" results); they live in docs/spells only. If unsure
+  whether the spell is real canon, ask.
 - **Don't duplicate.** Check `data/spells.json` for an existing entry with the same `id`
   first; update it instead of adding a second.
 - **Use real ids.** Every `composition.core` and `composition.signs[].id` must be an
@@ -170,7 +172,8 @@ composition against it and reports "Similar spells." So whenever you archive a d
   ```json
   {
     "id": "<unique_snake_case>", "name": "<Display Name>",
-    "category": "<element, e.g. fire|water>", "origin": "canon",
+    "category": "<element, e.g. fire|water>", "origin": "wiki",
+    "source": "<telepedia URL + manga debut ch.; 'canon' only if lifted straight from the manga/anime>",
     "confidence": "high|medium|low|theoretical|unknown",
     "effect": "<one-line effect>",
     "composition": {

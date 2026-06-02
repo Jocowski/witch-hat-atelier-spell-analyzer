@@ -2,7 +2,7 @@
   "$schema": "./schema/spells.schema.json",
   "version": "1.0.0",
   "title": "Spell Recipe Database",
-  "description": "Each spell is a 'recipe': core (sigil or central sign) + a set of signs with count/placement/orientation + symmetry. The matcher compares the user's composition against these recipes. 'composition' uses: { core, signs:[{id,count,placement,orientation,inverted}], symmetry }. placement ∈ {around, top, bottom, sides, front, back, ring, alternating, surrounds, satellite}. confidence indicates how well the glyph is known in the source material.",
+  "description": "Each spell is a 'recipe': core (sigil or central sign) + a set of signs with count/placement/orientation + symmetry. The matcher compares the user's composition against these recipes. 'composition' uses: { core, signs:[{id,count,placement,orientation,inverted}], symmetry }. placement ∈ {around, top, bottom, sides, front, back, ring, alternating, surrounds, satellite}. confidence indicates how well the glyph is KNOWN/certain (completeness of the recipe). 'origin' is the PROVENANCE tier — WHERE the recipe data came from: 'canon' = taken directly from the manga/anime; 'wiki' = obtained from the fan wiki at witchhatatelier.telepedia.net (fan-curated from canon — this is where essentially all current catalog recipes came from); 'fan' = a purely fan-invented spell (not canon, reference only, excluded from this matcher catalog). origin is INDEPENDENT of confidence: a wiki-sourced recipe can still be high-confidence, and recipe uncertainty is recorded in 'confidence', not by downgrading origin. 'source' is a free-text citation (telepedia URL + manga debut chapter, character/arc, or who reconstructed it).",
   "placementVocab": [
     "around",
     "alternating",
@@ -21,12 +21,18 @@
     "bilateral",
     "asymmetric"
   ],
+  "originVocab": [
+    "canon",
+    "wiki",
+    "fan"
+  ],
   "spells": [
     {
       "id": "purify",
       "name": "Purify",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Purify' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Purify — manga debut ch. 61 (per wiki). Water spell that purifies water by separating out the contaminants. Signs: Purify, Collection (docs/signs.md); Water sigil (docs/sigils.md).",
       "confidence": "high",
       "effect": "Draws in wastewater and separates the impurities out of it; the contaminants pile up near the seal, leaving the water clean.",
       "composition": {
@@ -54,7 +60,8 @@
       "id": "water_orb",
       "name": "Water Orb",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Water Orb' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Water_Orb — manga debut ch. 53 (per wiki). Creates an invisible spherical container holding free-floating water.",
       "confidence": "high",
       "effect": "Gathers water into a free-floating spherical container held above the glyph, with no physical vessel.",
       "composition": {
@@ -82,7 +89,8 @@
       "id": "pyreball_seal",
       "name": "Pyreball Seal",
       "category": "fire",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Pyreball Seal': https://witchhatatelier.telepedia.net/wiki/Pyreball_Seal — manga debut ch. 8 (per wiki); cast by Coco under Qifrey's instruction to cook carapace yams. Levitating, self-fueling ball of flame.",
       "confidence": "high",
       "effect": "Hovers a self-fueling ball of flame above the glyph and lifts light objects set over it — a floating stove.",
       "composition": {
@@ -103,7 +111,8 @@
       "id": "snugstone_spell",
       "name": "Snugstone Spell",
       "category": "fire",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Snugstone Spell' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Snugstone_Spell — manga debut ch. 18 (per wiki); invented by Olruggio. Radiates flameless warmth. Signs: Radial, Column (docs/signs.md).",
       "confidence": "high",
       "effect": "Radiates gentle, flameless warmth evenly in all directions, calibrated to the seal size so it never burns.",
       "composition": {
@@ -131,7 +140,8 @@
       "id": "flame_shot_seal",
       "name": "Flame Shot Seal",
       "category": "fire",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Flame Shot Seal': https://witchhatatelier.telepedia.net/wiki/Flame_Shot_Seal — manga debut ch. 63 (per wiki); Coco's spell against the valance leech, a directional flame between a beam and a fireball.",
       "confidence": "high",
       "effect": "Throws a directed column of flame forward; flanking Region signs confine the magic to the space ahead so it reaches farther.",
       "composition": {
@@ -159,7 +169,8 @@
       "id": "spiraling_flame",
       "name": "Spiraling Flame",
       "category": "fire",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Spiraling Flame': https://witchhatatelier.telepedia.net/wiki/Spiraling_Flame — manga debut ch. 6 (per wiki); cast by Agott in the Illusory Labyrinth. Aimable spiraling column of flame.",
       "confidence": "medium",
       "effect": "Produces an aimable, spiraling column of flame — a mind-guided jet of fire that corkscrews as it travels (the sign of wind acts as a 'whirlwind keystone').",
       "composition": {
@@ -194,7 +205,8 @@
       "id": "rainbringer_seal",
       "name": "Rainbringer Seal",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia wiki 'Rainbringer Seal' (雨生み ameumi): https://witchhatatelier.telepedia.net/wiki/Rainbringer_Seal — manga ch. 28 p. 10; never seen cast, shown in the mural of the apprentices' arsenal while discussing how to cure Euini of the scalewolf curse (Serpentback Cave arc).",
       "confidence": "high",
       "effect": "Generates a localized shower of rain down into the area around the seal.",
       "composition": {
@@ -215,7 +227,8 @@
       "id": "rising_platform_of_water",
       "name": "Rising Platform of Water",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia wiki 'Rising Platform of Water' (水の昇り台): https://witchhatatelier.telepedia.net/wiki/Rising_Platform_of_Water — manga ch. 25 p. 16, ch. 28 p. 11; used by Richeh's old master and apprentices to traverse the floating mountains of the Dadah Range (Consent of the Crown), later shown in a spell collage during the Second Pentagram Test arc. docs/sigils.md:41, docs/signs.md:34, docs/signs.md:55.",
       "confidence": "high",
       "effect": "Generates a rising column of water that lifts the object the seal is drawn on straight up into the air.",
       "composition": {
@@ -243,7 +256,8 @@
       "id": "rising_wave",
       "name": "Rising Wave",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Rising Wave' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Rising_Wave — manga debut ch. 27 (per wiki); Qifrey vs. Sasaran, Serpentback Cave arc. Diagonal surge of water that launches the caster.",
       "confidence": "high",
       "effect": "Drives a surge of water diagonally upward, launching the caster into the air.",
       "composition": {
@@ -271,7 +285,8 @@
       "id": "water_bolt",
       "name": "Water Bolt",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Water Bolt' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Water_Bolt — manga debut ch. 24 (per wiki); Qifrey vs. the Ancients of Romonon, Serpentback Cave. Fires water arrows; drawn with the Water Pen.",
       "confidence": "high",
       "effect": "Fires a fast, horizontal volley of water arrows straight ahead from a seal drawn flat on the ground.",
       "composition": {
@@ -299,7 +314,8 @@
       "id": "water_horse",
       "name": "Water Horse",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Water Horse Spell': https://witchhatatelier.telepedia.net/wiki/Water_Horse_Spell — manga debut ch. 46 (per wiki); Qifrey's water horse carriage to the Silver Eve festival. Recipe (incl. 2 unidentified signs) from the app JSON export.",
       "confidence": "medium",
       "effect": "Forms a steerable horse of water — a Horse decorative sigil over a water core — that can pull a vehicle (e.g. the water horse carriage Qifrey used to reach the Silver Eve festival).",
       "composition": {
@@ -342,7 +358,8 @@
       "id": "water_pen",
       "name": "Water Pen",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Water Pen' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Water_Pen — manga debut ch. 24 (per wiki); Qifrey's tool vs. the gilded people of Romonon, Serpentback Cave. Dagger/nib-shaped glob of water. Recipe (incl. unidentified signs) from the app JSON export.",
       "confidence": "medium",
       "effect": "Conjures a hand-held, dagger / pen-nib-shaped glob of water that hovers below the seal at an angle; pour conjuring ink into it and it becomes a giant brush for drawing very large seals on any surface (Qifrey's tool in Serpentback Cave).",
       "composition": {
@@ -385,7 +402,8 @@
       "id": "watershot_seal",
       "name": "Watershot Seal",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Watershot Seal' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Watershot_Seal — manga debut ch. 3 (per wiki); Coco's first spell, the misfire that soaked Agott.",
       "confidence": "high",
       "effect": "Projects a jet of water out of the seal — straight up when the Column ring is balanced, leaning toward whichever column is drawn longer (Coco's first spell; the misfire that soaked Agott).",
       "composition": {
@@ -407,7 +425,8 @@
       "id": "vapor_bubble_spell",
       "name": "Vapor Bubble Spell",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Vapor Bubble Spell': https://witchhatatelier.telepedia.net/wiki/Vapor_Bubble_Spell — introduces the Cool and Gather signs (vol. 12 bonus). Two-saucer dew-still that condenses humid air into fresh water.",
       "confidence": "high",
       "effect": "A two-circle dew-still: the outer Wind ring draws in humid air (Gather), channels it (Column) and chills it past its dew point (Cool); the nested Water core collects the condensate into a single globule of fresh water.",
       "composition": {
@@ -443,15 +462,34 @@
       "id": "qifreys_water_dragon",
       "name": "Qifrey's Water Dragon",
       "category": "water",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia wiki 'Qifrey's Water Dragon': https://witchhatatelier.telepedia.net/wiki/Qifrey%27s_Water_Dragon — manga ch. 7, anime ep. 5; Qifrey subdues the dragon attacking Coco in the Illusory Labyrinth. Recipe reconstructed by the wiki from partial/angled on-panel views (their stated method).",
       "confidence": "high",
       "effect": "Draws water from nearby clouds (and likely bodies of water) and shapes it into a giant dragon, which settles into a water lily before the spell ends. Qifrey uses it to subdue the dragon attacking Coco in the Illusory Labyrinth.",
       "composition": {
         "core": "dragon",
         "signs": [
-          { "id": "enlarge", "count": 1, "placement": "center", "orientation": "front", "inverted": false },
-          { "id": "convergence", "count": 4, "placement": "around", "orientation": "inward", "inverted": false },
-          { "id": "column", "count": 8, "placement": "around", "orientation": "front", "inverted": false }
+          {
+            "id": "enlarge",
+            "count": 1,
+            "placement": "center",
+            "orientation": "front",
+            "inverted": false
+          },
+          {
+            "id": "convergence",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 8,
+            "placement": "around",
+            "orientation": "front",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       },
@@ -461,7 +499,8 @@
       "id": "boulder_stretch_rope",
       "name": "Boulder Stretch Rope",
       "category": "earth",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Boulder Stretch Rope': https://witchhatatelier.telepedia.net/wiki/Boulder_Stretch_Rope — manga debut ch. 21 (per wiki); Richeh's spell; shapes stone into a flexible ribbon (cross the serpentback-cave gap; capture Wolf Euini).",
       "confidence": "high",
       "effect": "Shapes a piece of existing stone into a long, flexible ribbon — a rope of rock used to span a gap or bind a target.",
       "composition": {
@@ -483,7 +522,8 @@
       "id": "integration",
       "name": "Integration",
       "category": "earth",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Integration' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Integration — manga debut ch. 17 (per wiki); created by Tartah & Coco to identify powdered herbs. The inverse of the Wall Breaker Seal.",
       "confidence": "high",
       "effect": "Temporarily reassembles a powdered/smashed substance back into the shape of the object it originally came from — used to identify an unknown powder.",
       "composition": {
@@ -505,17 +545,48 @@
       "id": "sand_cage",
       "name": "Sand Cage",
       "category": "earth",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Sand Cage': https://witchhatatelier.telepedia.net/wiki/Sand_Cage — manga debut ch. 28 (per wiki); Tetia traps the Scaled Wolf Euini. Construction reconstructed (leans on unidentified signs).",
       "confidence": "medium",
       "effect": "Builds a rigid cage of sand around a target to trap it; the rigid counterpart of the Serpent's Bed of Sand ('if sand can be made soft as a bed, it can also be made rigid as a cage').",
       "composition": {
         "core": "earth",
         "signs": [
-          { "id": "crush", "count": 2, "placement": "north-south axis", "orientation": "inward", "inverted": true },
-          { "id": "column", "count": 6, "placement": "sides + intercardinals", "orientation": "inward", "inverted": false },
-          { "id": "column", "count": 2, "placement": "east-west outer", "orientation": "outward", "inverted": true },
-          { "id": "direction", "count": 8, "placement": "intercardinals", "orientation": "inward", "inverted": false },
-          { "id": "unknown_05", "count": 2, "placement": "north-south poles", "orientation": "convex-inward", "inverted": false }
+          {
+            "id": "crush",
+            "count": 2,
+            "placement": "north-south axis",
+            "orientation": "inward",
+            "inverted": true
+          },
+          {
+            "id": "column",
+            "count": 6,
+            "placement": "sides + intercardinals",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "east-west outer",
+            "orientation": "outward",
+            "inverted": true
+          },
+          {
+            "id": "direction",
+            "count": 8,
+            "placement": "intercardinals",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_05",
+            "count": 2,
+            "placement": "north-south poles",
+            "orientation": "convex-inward",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       },
@@ -525,18 +596,55 @@
       "id": "serpents_bed_of_sand",
       "name": "Serpent's Bed of Sand",
       "category": "earth",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia \"Serpent's Bed of Sand\": https://witchhatatelier.telepedia.net/wiki/Serpent%27s_Bed_of_Sand — manga debut ch. 7 (per wiki); mixed earth-time spell created by Qifrey's four apprentices; a fluffy, self-restoring cloud of sand.",
       "confidence": "high",
       "effect": "Mills real stone into fine sand, billows it into a huge fluffy cloud, and continually resets the cloud so it stays soft yet firm enough to hold a dragon (regaining shape once weight is removed). The soft, self-restoring sibling of the Sand Cage.",
       "composition": {
         "core": "earth",
         "signs": [
-          { "id": "billowing", "count": 1, "placement": "center (Billow Cluster)", "orientation": "center", "inverted": false },
-          { "id": "collection", "count": 4, "placement": "around center", "orientation": "inward", "inverted": false },
-          { "id": "crush", "count": 4, "placement": "4 satellite Wall Breakers (cardinals)", "orientation": "outward", "inverted": false },
-          { "id": "column", "count": 16, "placement": "8 in satellites + 8 in outer ring", "orientation": "mixed", "inverted": false },
-          { "id": "convergence", "count": 4, "placement": "outer ring cardinals", "orientation": "inward", "inverted": false },
-          { "id": "repetition", "count": 4, "placement": "outer ring diagonals", "orientation": "radial", "inverted": false }
+          {
+            "id": "billowing",
+            "count": 1,
+            "placement": "center (Billow Cluster)",
+            "orientation": "center",
+            "inverted": false
+          },
+          {
+            "id": "collection",
+            "count": 4,
+            "placement": "around center",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "crush",
+            "count": 4,
+            "placement": "4 satellite Wall Breakers (cardinals)",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 16,
+            "placement": "8 in satellites + 8 in outer ring",
+            "orientation": "mixed",
+            "inverted": false
+          },
+          {
+            "id": "convergence",
+            "count": 4,
+            "placement": "outer ring cardinals",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "repetition",
+            "count": 4,
+            "placement": "outer ring diagonals",
+            "orientation": "radial",
+            "inverted": false
+          }
         ],
         "symmetry": "bilateral"
       },
@@ -546,14 +654,27 @@
       "id": "wall_breaker_seal",
       "name": "Wall Breaker Seal",
       "category": "earth",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Wall Breaker Seal': https://witchhatatelier.telepedia.net/wiki/Wall_Breaker_Seal — manga debut ch. 6 (per wiki); Agott breaks a wall escaping the Illusory Labyrinth dragon; later Coco frees Custas from a boulder.",
       "confidence": "high",
       "effect": "Drawn on a solid object, breaks through it and reduces the material to dust. Earth's destruction seal; the non-inverted-Crush counterpart of Integration and the destructive foil of Wall Bend.",
       "composition": {
         "core": "earth",
         "signs": [
-          { "id": "column", "count": 2, "placement": "east-west (flanking the sigil)", "orientation": "inward", "inverted": false },
-          { "id": "crush", "count": 2, "placement": "north-south (90 deg from the columns)", "orientation": "outward", "inverted": false }
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "east-west (flanking the sigil)",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "crush",
+            "count": 2,
+            "placement": "north-south (90 deg from the columns)",
+            "orientation": "outward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -563,17 +684,41 @@
       "id": "flying_puppet_of_diversion",
       "name": "Flying Puppet of Diversion",
       "category": "wind",
-      "origin": "canon",
+      "origin": "wiki",
+      "source": "telepedia 'Flying Puppet of Diversion': https://witchhatatelier.telepedia.net/wiki/Flying_Puppet_of_Diversion — manga debut ch. 6 (per wiki); Tetia diverts a dragon by casting it on her cloak and hat.",
       "confidence": "high",
       "effect": "Makes the object the seal is drawn on dart and fly erratically through the sky (mind-piloted), with enough force to carry objects aloft. Tetia cast it on her cloak and hat as a flying decoy to divert a dragon.",
       "composition": {
         "core": "wind",
         "signs": [
-          { "id": "dancing_puppet", "count": 1, "placement": "surrounds the central sigil", "orientation": "surround", "inverted": false }
+          {
+            "id": "dancing_puppet",
+            "count": 1,
+            "placement": "surrounds the central sigil",
+            "orientation": "surround",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
       "notes": "Canon wind spell. A single large Puppet (dancing_puppet) keystone surrounding the wind sigil (surrounds=true; the one sign IS the whole form, so the engine's single-sign 'asymmetric' is an artifact). Puppet is the rare mind-control sign: it lets the drawer/last-toucher pilot the object the seal is drawn on, and its behaviour is sigil-keyed - with WIND it means aerial movement (signs.md:295). Engine grammar synergy dancing-puppet-air fires: 'With a wind element, Dancing Puppet sends objects darting through the open air.' Wind manipulates/moves air but does not create it (sigils.md:65), so it pilots the drawn object rather than conjuring wind. Sign SIZE sets power/lift (drawn large here -> can carry a cloak+hat up; engine power ~3.85 'amplified'). Same wind+puppet template as the Cloak Spell (signs.md:297) - the Cloak is worn and piloted, this is cast off as a decoy. Not forbidden (acts on an object, not a body). confidence=high (well documented in manga/wiki)."
+    },
+    {
+      "id": "rainflinger",
+      "name": "Rainflinger",
+      "category": "water",
+      "origin": "wiki",
+      "source": "telepedia 'Rainflinger' (水飛ばし mizutobashi): https://witchhatatelier.telepedia.net/wiki/Rainflinger — manga debut ch. 8 (old versions), retconned ch. 28 (new/current version). This recipe is the current version; the repel-vs-dry mechanism is unconfirmed and it leans on the canon-uncertain Crosshair sign.",
+      "confidence": "medium",
+      "effect": "Creates a water-repellent bubble around the seal, keeping its radius dry — by repelling and/or drying off the water (mechanism unconfirmed). Qifrey used it for a picnic in the rain and to dry off Brushbuddy.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "crosshair", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Mixed water/fire spell, NEW/current version (ch. 28). Engine core is the Water sigil; two Fire sigils (role:sigil) sit above and below it, and a Crosshair sign flanks each side. The matcher keys on core + sign multiset, so the two Fire sigils are recorded here in notes, not in signs[]. The Crosshair confines the magic to an area of effect — the dry 'bubble' (signs.md:239) — while the Fire substance likely drives the drying/repelling of the water; canon doesn't confirm whether the water is repelled or evaporated. Two earlier, retconned versions (manga ch. 8) used an AIR-sigil-variant core with modified Fire sigils on the sides instead: a Repelling variant and a Drying variant (the latter with INVERTED fire sigils + a disconnected triangle line) — those are described in docs/spells/Rainflinger.md but not modelled here (their 'modified/variant' sigils don't map to clean ids). confidence=medium (Crosshair is canon-uncertain; repel-vs-dry mechanism unconfirmed)."
     }
   ]
 }

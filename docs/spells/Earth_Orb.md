@@ -1,7 +1,7 @@
 ---
 name: Earth Orb
 type: earth
-origin: community
+origin: fan
 forbidden: false
 status: valid
 core: earth

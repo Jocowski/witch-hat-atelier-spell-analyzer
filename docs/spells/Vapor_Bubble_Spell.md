@@ -1,7 +1,7 @@
 ---
 name: Vapor Bubble Spell
 type: water
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: water (inner circle) + wind ×2 (outer circle)

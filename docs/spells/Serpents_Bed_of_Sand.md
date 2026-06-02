@@ -1,7 +1,7 @@
 ---
 name: Serpent's Bed of Sand
 type: mixed
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: earth ×4 (satellites) + billowing-as-center (Billow Cluster) + repetition (outer seal)

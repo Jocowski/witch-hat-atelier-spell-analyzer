@@ -1,11 +1,18 @@
 {
   "version": "1.0.0",
   "title": "Magical Dyes",
-  "description": "Substances mixed into conjuring ink to modify a drawn spell. Cosmetic or practical; see docs/magical-dye.md.",
+  "description": "Substances mixed into conjuring ink to modify a drawn spell. Cosmetic or practical; see docs/magical-dye.md. Each dye carries 'origin' (provenance — 'wiki' = obtained from telepedia's Magical Dye page, fan-curated from canon) and 'source' (citation URL).",
+  "originVocab": [
+    "canon",
+    "wiki",
+    "fan"
+  ],
   "dyes": [
     {
       "id": "azuremoon_flower",
       "name": "Azuremoon Flower",
+      "origin": "wiki",
+      "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "duration",
       "color": "#5a78d6",
       "effect": "Increases the duration of the drawn magic."
@@ -13,6 +20,8 @@
     {
       "id": "blood",
       "name": "Blood",
+      "origin": "wiki",
+      "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "power",
       "color": "#a01b1b",
       "effect": "Greatly increases the power of the drawn spell."
@@ -20,6 +29,8 @@
     {
       "id": "blushing_bride_scales",
       "name": "Blushing Bride Scales",
+      "origin": "wiki",
+      "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "visibility",
       "color": "#e7b6c8",
       "effect": "Makes the drawn seal invisible."
@@ -27,6 +38,8 @@
     {
       "id": "golden_blaze_wyrm_scales",
       "name": "Golden Blaze Wyrm Scales",
+      "origin": "wiki",
+      "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "glow",
       "color": "#e0c94a",
       "effect": "Makes the ink glow in the dark."
@@ -34,6 +47,8 @@
     {
       "id": "roaming_scallop_shells",
       "name": "Roaming Scallop Shells",
+      "origin": "wiki",
+      "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "durability",
       "color": "#6fb0c9",
       "effect": "Makes the drawn seal waterproof."

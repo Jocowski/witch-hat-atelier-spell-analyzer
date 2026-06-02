@@ -1,7 +1,7 @@
 ---
 name: Wall Bend
 type: earth
-origin: community
+origin: fan
 forbidden: false
 status: valid
 core: earth

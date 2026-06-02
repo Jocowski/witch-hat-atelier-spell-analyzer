@@ -1,7 +1,7 @@
 ---
 name: Boulder Stretch Rope
 type: earth
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: earth

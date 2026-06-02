@@ -1,7 +1,7 @@
 ---
 name: Phantasmal Fireball
 type: contraption
-origin: community
+origin: fan
 forbidden: false
 status: valid
 core: unburning_flame

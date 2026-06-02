@@ -11,14 +11,14 @@ substantial. Do not add a "Variations & modifications" section.
 ---
 name: [Spell Name]
 type: [fire | water | earth | wind | light | crystal | time | vision | decorative | mixed | niche | forbidden | contraption]
-origin: [canon | community]          # canon = appears in the manga/anime/wiki; community = fan-made / designed here
+origin: [canon | wiki | fan]          # where the data came from: canon = taken straight from manga/anime; wiki = obtained from telepedia (the usual case); fan = fan-made / designed here (formerly "community"). Independent of confidence.
 forbidden: [true | false]
 status: [valid | invalid | inactive] # from the engine
 core: [sigil id(s), e.g. water  OR  water + fire]
 signs: [comma-separated sign ids with counts, e.g. column ×5, levitation ×3]
 dyes: [comma-separated dye ids, or none]
 symmetry: [radial | bilateral | asymmetric]
-source: [chapter/episode/wiki reference if canon; "designed via /spell-creator" or user, if community]
+source: [free-text citation: chapter/episode/character if canon; telepedia page if wiki; "designed via /spell-creator" or user, if fan]
 image: [assets/spells/<file>.png if provided, else "none yet"]
 json: [assets/spells/<file>.json if provided, else "none yet"]
 ---

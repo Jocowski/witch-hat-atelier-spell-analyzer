@@ -1,7 +1,7 @@
 ---
 name: Pyreball Seal
 type: fire
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: fire

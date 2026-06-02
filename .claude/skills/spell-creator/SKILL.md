@@ -79,8 +79,8 @@ Return:
    Import (JSON). Include `name`, `ring`, `core`, `components`, `linkCount`, `dyes`.
 
 ### 4. Offer to document it
-A freshly designed spell is a `community` spell. Offer to run **/spell-analyzer** on the JSON
-to produce the full `docs/spells/<Name>.md` entry (origin: community) and to request an
+A freshly designed spell is a `fan` spell (the tier formerly labelled `community`). Offer to run **/spell-analyzer** on the JSON
+to produce the full `docs/spells/<Name>.md` entry (origin: fan) and to request an
 image/JSON for `assets/spells/`. Don't duplicate that doc-writing here — hand off to the
 analyzer so there's one archival path.
 

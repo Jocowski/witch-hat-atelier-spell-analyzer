@@ -1,7 +1,7 @@
 ---
 name: Wall Breaker Seal
 type: earth
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: earth

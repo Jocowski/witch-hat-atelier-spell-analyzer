@@ -1,7 +1,7 @@
 ---
 name: Qifrey's Water Dragon
 type: water
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: dragon (decorative shape-giver) + water ×4 (+ flower_water decorative sigil)

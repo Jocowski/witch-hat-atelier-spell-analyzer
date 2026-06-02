@@ -1,14 +1,14 @@
 ---
 name: Rainbringer Seal
 type: water
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: water
 signs: rain ×1
 dyes: none
 symmetry: radial
-source: Witch Hat Atelier — one of the spells Qifrey's apprentices had committed to memory; shown on the mural of their arsenal while discussing how to cure Euini of the scalewolf curse (Serpentback Cave arc). Wiki: "Rainmaker's Glyph."
+source: telepedia "Rainbringer Seal" (雨生み ameumi): https://witchhatatelier.telepedia.net/wiki/Rainbringer_Seal — manga ch. 28 p. 10; never seen cast, shown on the mural of the apprentices' arsenal while discussing how to cure Euini of the scalewolf curse (Serpentback Cave arc).
 image: none yet
 json: none yet
 ---

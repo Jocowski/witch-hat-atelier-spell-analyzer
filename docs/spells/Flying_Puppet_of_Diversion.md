@@ -1,7 +1,7 @@
 ---
 name: Flying Puppet of Diversion
 type: wind
-origin: canon
+origin: wiki
 forbidden: false
 status: valid
 core: wind

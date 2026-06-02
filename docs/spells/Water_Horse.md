@@ -1,7 +1,7 @@
 ---
 name: Water Horse
 type: water
-origin: canon
+origin: wiki
 forbidden: false
 status: valid (effect partly unknown)
 core: water (+ Horse decorative sigil)
