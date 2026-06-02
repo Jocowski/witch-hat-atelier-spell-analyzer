@@ -39,7 +39,8 @@ Stay upstream. End by pointing the user at the next skill for any idea they like
 
 So your ideas feel like *Witch Hat Atelier* and not generic fantasy, you only need the
 *flavor* below — **don't read the full ruleset** (that's /spell-creator's job; loading it
-here just burns tokens on rules you won't use). If you ever need depth, the cheat-sheet is
+here just burns tokens on rules you won't use). If you ever need depth, the reasoning model is
+[docs/CORE.md](../../../docs/CORE.md) and the quick sheet is
 [../spell-analyzer/references/magic-system.md](../spell-analyzer/references/magic-system.md).
 
 - Magic = **substance × form × activation × ink**. A spell takes some **element/substance**

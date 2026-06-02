@@ -284,10 +284,81 @@ function toText(r) {
   return L.join('\n')
 }
 
+// ---------- Structured FACTS (the AI reasons FROM these) ----------
+// The re-architecture (PLAN.md) makes the engine a COMPILER + fact-extractor, not the
+// authority on what a spell does. `--facts` returns clean, engine-observable facts —
+// parts present, their categories/operator kinds, geometry, zones, catalog neighbours —
+// WITHOUT asserting the effect. The prose `deduction.summary` is still included but is
+// explicitly demoted to `heuristicSummary` (a non-authoritative scaffold). Reason the
+// actual effect from docs/CORE.md + docs/lexicon/ using these facts.
+function buildFacts(input, result) {
+  const norm = toComposition(input)
+  const circleFacts = result.circles.map((c, i) => {
+    const raw = norm.circles[i] || { components: [], radius: null }
+    // Zone breakdown of the sign components (inside | ring | outside).
+    const zones = { inside: 0, ring: 0, outside: 0 }
+    for (const comp of raw.components || []) {
+      if (comp.role !== 'sign') continue
+      zones[classifyZone(comp.x, comp.y, raw.radius, rules.zones)]++
+    }
+    // Operators grouped by kind (stable mapping from grammar.json — observational, not an effect claim).
+    const byKind = {}
+    for (const s of c.signs || []) {
+      const kind = grammar.operators[s.id]?.kind || 'unknown'
+      ;(byKind[kind] ||= []).push(s.inverted ? `${s.id}!inv` : s.id)
+    }
+    const a = c.analysis || {}
+    return {
+      id: c.id,
+      name: c.name || null,
+      valid: c.valid,
+      contextRole: c.contextRole || null,
+      centerPromoted: !!c.centerPromoted,
+      core: c.sigils?.find((s) => s.role === 'core')
+        ? (() => { const k = c.sigils.find((s) => s.role === 'core'); return { id: k.id, name: k.name, element: k.element, family: k.family } })()
+        : null,
+      extraSigils: (c.sigils || []).filter((s) => s.role === 'sigil').map((s) => ({ id: s.id, name: s.name, element: s.element })),
+      signs: (c.signs || []).map((s) => ({
+        id: s.id, name: s.name, category: s.category, count: s.count,
+        inverted: s.inverted, invertible: s.invertible, operatorKind: grammar.operators[s.id]?.kind || 'unknown',
+      })),
+      operatorsByKind: byKind,
+      geometry: {
+        symmetry: a.symmetry, stability: a.stability, aim: a.aim, balance: a.balance,
+        power: a.power, powerLabel: a.powerLabel, spin: !!a.tilted,
+        signCount: a.signCount, sigilCount: a.sigilCount, linkCount: a.linkCount,
+      },
+      zones,
+      flags: {
+        hasUnknownSigns: (c.signs || []).some((s) => /^unknown/.test(s.id)),
+        inverted: (c.signs || []).some((s) => s.inverted),
+        decorative: !!a.decorative,
+      },
+      dyes: (c.dyes || []).map((d) => ({ id: d.id, name: d.name, effect: d.effect })),
+      issues: c.issues || [],
+      heuristicSummary: c.deduction?.summary || null,
+      heuristicNotes: c.deduction?.notes || [],
+      heuristicWarnings: c.deduction?.warnings || [],
+    }
+  })
+  return {
+    name: result.name || null,
+    valid: result.valid,
+    circleCount: result.circles.length,
+    circles: circleFacts,
+    relations: result.relations || [],
+    combinedHeuristicSummary: result.circles.length > 1 ? result.combined?.summary || null : circleFacts[0]?.heuristicSummary || null,
+    catalog: result.similar || null,
+    unknownIds: result.unknownIds || [],
+    note: 'FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth.',
+  }
+}
+
 // ---------- Entry ----------
 function main() {
   const args = process.argv.slice(2)
   const textMode = args.includes('--text')
+  const factsMode = args.includes('--facts')
   const fileArg = args.find((a) => !a.startsWith('--'))
   let raw
   if (fileArg) raw = readFileSync(resolve(process.cwd(), fileArg), 'utf8')
@@ -307,7 +378,9 @@ function main() {
   const result = analyze(composition)
   if (unknown.length) result.unknownIds = unknown
 
-  if (textMode) {
+  if (factsMode) {
+    console.log(JSON.stringify(buildFacts(composition, result), null, 2))
+  } else if (textMode) {
     if (unknown.length) {
       console.log('!! Unknown ids (typos?): ' + unknown.map((u) => `${u.type}@${u.where}`).join(', ') + '\n')
     }

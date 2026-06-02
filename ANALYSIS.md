@@ -1,5 +1,12 @@
 # Witch Hat Atelier — Magic System Analysis for the Simulator
 
+> **Architecture note (see [PLAN.md](PLAN.md)):** the project has been re-architected so the
+> **AI reasons the magic from first principles** ([docs/CORE.md](docs/CORE.md) +
+> [docs/lexicon/](docs/lexicon/)) and the **engine is a compiler + fact extractor**
+> (`spell-engine-cli.mjs --facts`, `tools/render.mjs`) rather than the authority on effects.
+> The deduction grammar described below (§8) is now a **heuristic scaffold**, not ground truth.
+> This document still accurately describes the engine internals.
+
 > Source document for the simulator's logic. It consolidates the rules from [docs/](docs/) and translates them into a data model (`data/*.json`) that the app consumes to **render**, **validate**, **deduce**, and **analyze** spells.
 
 ---

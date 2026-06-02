@@ -22,12 +22,19 @@ physical nature interacts with each sign, compare it to the closest canon spell,
 suggest uses — then archive it in `docs/spells/`. Always reason from the **real engine**
 and the **source docs** — never invent ids, effects, or validity.
 
-**First, read [references/magic-system.md](references/magic-system.md)** — the distilled
-ruleset (the core equation, validity rules, sigil/sign catalogs, operator kinds,
-inversion, dyes, the composition JSON contract, and how to run the engine). It points
-to the canonical `docs/` and `data/` files for anything you need in depth. Also skim
-[references/learnings.md](references/learnings.md) for accumulated corrections — engine
-blind spots and per-element limits you must override in your reading.
+**You are the reasoner; the engine is a compiler + fact extractor** (see
+[docs/PLAN.md](../../../PLAN.md)). Reason the effect from first principles — do not treat the
+engine's prose as the answer. Read, in order:
+- **[docs/CORE.md](../../../docs/CORE.md)** — the first-principles model you reason WITH
+  (substance create/manipulate/collect + state, signs as typed operators, geometry as
+  parameters, composition/validity). This is the base.
+- **[docs/lexicon/](../../../docs/lexicon/)** — per-symbol detail: how each sigil/sign is
+  *drawn*, what it does, and accumulated **Findings**. Pull the specific entries for the parts
+  in front of you (this is where per-symbol nuance now lives, not learnings.md).
+- [references/magic-system.md](references/magic-system.md) — a fast cheat-sheet for quick
+  lookups when you don't need CORE's depth.
+- [references/learnings.md](references/learnings.md) — **engine quirks / blind spots** to
+  override in your reading (per-symbol nuance moved to the lexicon).
 
 ## Workflow
 
@@ -39,16 +46,24 @@ The user will give one of:
   spinning jet of fire upward." You'll reconstruct a composition from the docs.
 - **A mix** — JSON plus questions, or a description plus a partial recipe.
 
-### 2. Get ground truth from the engine
-For any JSON, run the real engine — do not eyeball validity or the effect:
+### 2. Get structured FACTS from the engine (then reason the effect yourself)
+For any JSON, run the engine in **facts mode** — it parses the drawing into reliable,
+observable facts; it does NOT tell you what the spell does:
 ```bash
-node tools/spell-engine-cli.mjs --text path/to/spell.json     # human-readable
-node tools/spell-engine-cli.mjs path/to/spell.json            # full JSON
+node tools/spell-engine-cli.mjs --facts path/to/spell.json    # structured observations (use this)
+node tools/spell-engine-cli.mjs --text  path/to/spell.json    # human-readable heuristic report
 ```
-It returns validity/issues, the deduced effect (`summary` + per-part `breakdown` +
-`notes`/`warnings`), geometry (symmetry/balance/power/spin), dyes, and `unknownIds`
-(catch typos). Trust it for the **base facts**; your job is to layer narrative,
-canon-grounded element-physics reasoning, and usage on top.
+`--facts` returns: parts present (core/sigils/signs with category + **operatorKind**),
+geometry (symmetry/balance/aim/power/spin/zones), dyes, catalog neighbours, and `unknownIds`
+(catch typos). **Trust these for structure/geometry.** The `heuristicSummary`/`combined…`
+fields are a deterministic scaffold — **not** ground truth; the effect is something *you derive*
+from [docs/CORE.md](../../../docs/CORE.md) + the [lexicon](../../../docs/lexicon/) using these
+facts. (Honor the learnings.md engine blind spots — facts geometry is element-blind.)
+
+To show the user a picture of the spell, render it:
+```bash
+node tools/render.mjs path/to/spell.json -o spell.svg          # IR → SVG (AI → human)
+```
 
 If the user gave only a **description or name**:
 1. Reconstruct the recipe from [docs/spells.md](../../../docs/spells.md),
@@ -77,7 +92,8 @@ Deliver a complete, readable analysis in the conversation covering, in order:
 3. **Form (signs)** — each sign: category, what it does *here*, whether inverted/tilted
    matters. Pull the canon mechanic from [docs/signs.md](../../../docs/signs.md), cite it,
    and honor any uncertainty the docs flag.
-4. **Deduced effect** — the engine summary, restated plainly.
+4. **Deduced effect** — *your* reading, reasoned from CORE.md + the lexicon using the engine
+   facts (geometry/parts), stated plainly. Do not just echo the `heuristicSummary`.
 5. **How each part shapes it** — a small table; for each part, what would change without it.
 6. **Element-physics & canon grounding** — **THE CORE OF THE ANALYSIS.** Reason from
    first principles about how the substance's *physical nature* interacts with each
@@ -101,8 +117,10 @@ part (many signs are), say so — fidelity to canon's ambiguity matters here. Do
 add "Variations" or "Modifications" sections — the value is in canon-grounded reasoning,
 not in enumerating swaps.
 
-**Distinguish engine output from your own narrative.** Validity, the deduced effect,
-geometry, and any catalog `similar` matches come from the engine — label them as such.
+**Distinguish engine facts from your own reasoning.** Validity (structure), geometry, and
+catalog `similar` matches are **engine facts** — label them as such. The **deduced effect is
+yours** (reasoned from CORE.md + lexicon), as is the canon-physics narrative — the engine's
+`heuristicSummary` is only a scaffold, never cite it as authority.
 Anything you add from the docs (e.g. related/comparable canon spells beyond what the
 catalog returns) is *your reading*; mark it clearly (e.g. "Related spells (from the
 docs)") so it's never mistaken for an engine catalog match. The catalog
@@ -170,12 +188,15 @@ composition against it and reports "Similar spells." So whenever you archive a d
   and re-run the CLI on the spell — it should now report a "Similar spells" **Match** to
   itself near the top of the ranking.
 
-### 7. Record what you learned
-This skill should get smarter over time. When the user corrects you, or you discover a
-nuance about how a part behaves or a class of magic (e.g. a limitation of time sigils,
-how a specific interaction resolves, a canon detail), append a **dated one-liner** to
-[references/learnings.md](references/learnings.md) so future analyses benefit. Record the
-durable lesson, not the engine-fix narrative (that lives in git history).
+### 7. Record what you learned (file it by concept — see [docs/INGESTION.md](../../../docs/INGESTION.md))
+This system should get smarter over time, so durable knowledge goes to a concept-indexed home:
+- A nuance about **a sign/sigil** → that symbol's **Findings** in [docs/lexicon/](../../../docs/lexicon/)
+  (dated, newest first). This is where per-symbol learning now lives.
+- A reusable **technique/recipe** → [docs/patterns.md](../../../docs/patterns.md) or
+  [docs/contraptions.md](../../../docs/contraptions.md).
+- A **rule of the world** → [docs/CORE.md](../../../docs/CORE.md).
+- An **engine quirk/blind-spot or process note** → [references/learnings.md](references/learnings.md).
+Record the durable lesson, not the engine-fix narrative (that lives in git history).
 
 ## Output principles
 - **Engine first, narrative second.** Validity and the base effect come from
@@ -192,7 +213,11 @@ durable lesson, not the engine-fix narrative (that lives in git history).
 - **Flag forbidden magic.** Body magic, reality-warping, or mass destruction ⇒ mark it
   forbidden (still analyze it). See the cheat-sheet §8.
 
-## Learnings log
-Accumulated corrections live in [references/learnings.md](references/learnings.md) —
-engine blind spots, per-element limits, and canon nuances. Skim it before analyzing and
-append new dated one-liners there (keep this skill lean).
+## Knowledge homes
+Per-symbol findings live in [docs/lexicon/](../../../docs/lexicon/) (each symbol's **Findings**);
+per-spell archives in [docs/spells/](../../../docs/spells/); techniques in
+[docs/patterns.md](../../../docs/patterns.md) / [docs/contraptions.md](../../../docs/contraptions.md);
+world-rules in [docs/CORE.md](../../../docs/CORE.md); engine quirks in
+[references/learnings.md](references/learnings.md). The map + workflows are in
+[docs/INGESTION.md](../../../docs/INGESTION.md). Skim the relevant lexicon entries before
+analyzing; file new lessons by concept.

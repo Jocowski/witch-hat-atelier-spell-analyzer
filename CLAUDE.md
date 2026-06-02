@@ -8,6 +8,15 @@ A **Spell Analyzer** for the magic system of the manga *Witch Hat Atelier*. The 
 
 The UI is in **English**. The source material lives in [docs/](docs/) as markdown (`magic.md`, `sigils.md`, `signs.md`, `magical-dye.md`, `forbidden-magic.md`, `spells.md`), with images under [assets/images/](assets/images/). The full system analysis and design rationale is in [ANALYSIS.md](ANALYSIS.md) — read it before changing the engine or data model.
 
+### Architecture direction: AI is the core reasoner (see [PLAN.md](PLAN.md))
+
+The project is re-architected so the **AI reasons the magic from first principles** and the **code engine is a compiler + fact extractor**, not the authority on what a spell does. The key docs:
+- **[docs/CORE.md](docs/CORE.md)** — the first-principles semantics (substances as typed operands with create/manipulate/collect + state; signs as typed operators with preconditions/failure-modes; geometry as parameters). The reasoning base.
+- **[docs/lexicon/](docs/lexicon/)** — per-symbol *drawing* (geometric primitives) + behavior + accumulated **Findings** (the per-symbol dossiers).
+- **[docs/IR.md](docs/IR.md)** — the `wha-spell` JSON format (the shared human↔AI language); **[docs/patterns.md](docs/patterns.md)** (effect→recipe), **[docs/contraptions.md](docs/contraptions.md)** (multi-spell devices), **[docs/INGESTION.md](docs/INGESTION.md)** (how new knowledge is filed by concept).
+
+Consequence: `grammar.json` + `deduce.js` produce a **heuristic** effect string — a scaffold, not ground truth. Prefer `--facts` (structured observations) + CORE/lexicon reasoning. The deterministic deduction is kept for the GUI's live readout.
+
 ## Commands
 
 ```bash
@@ -22,6 +31,11 @@ node --test test/deduce.test.js
 # regenerate sigil/sign SVG paths from the source PNGs (potrace):
 npm run vectorize:sigils
 npm run vectorize:signs
+
+# reason about / render a spell (the engine as compiler + fact extractor):
+npm run facts -- path/to/spell.json     # structured observations (tools/spell-engine-cli.mjs --facts)
+node tools/spell-engine-cli.mjs --text path/to/spell.json   # heuristic readout (scaffold, not truth)
+npm run render -- path/to/spell.json -o spell.svg           # IR → SVG picture (tools/render.mjs)
 ```
 
 There is no linter configured.

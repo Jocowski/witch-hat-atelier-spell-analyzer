@@ -19,15 +19,20 @@ Turn a desired effect into a buildable seal — or prove it can't be built and o
 closest legal alternative. Always design within the documented rules and **validate the
 result through the real engine** so the recipe genuinely produces the intended effect.
 
-**Read both references first:**
-- [references/design-playbook.md](references/design-playbook.md) — the design loop, the
-  hard-constraint checklist ("can this exist?"), an effect→recipe table, and tuning levers.
-- [../spell-analyzer/references/magic-system.md](../spell-analyzer/references/magic-system.md)
-  — the shared cheat-sheet (core equation, validity rules, full sigil/sign catalogs,
-  operator kinds, inversion, dyes, the composition JSON contract, engine usage).
+**Read first — you design from first principles, the engine just validates structure:**
+- **[docs/CORE.md](../../../docs/CORE.md)** — the reasoning model (substance
+  create/manipulate/collect + state, signs as typed operators with preconditions/failure
+  modes, geometry as parameters, the hard limits). This is how you decide *can this exist* and
+  *what produces the effect*.
+- **[docs/patterns.md](../../../docs/patterns.md)** — effect→recipe starters and the hard
+  "can't" list; **[docs/lexicon/](../../../docs/lexicon/)** — per-symbol drawing/behavior to
+  pick the right parts; **[docs/contraptions.md](../../../docs/contraptions.md)** for devices;
+  **[docs/IR.md](../../../docs/IR.md)** for the JSON format.
+- [references/design-playbook.md](references/design-playbook.md) and
+  [../spell-analyzer/references/magic-system.md](../spell-analyzer/references/magic-system.md)
+  — quick cheat-sheets (the design loop, constraint checklist, tuning levers).
 
-These point to the canonical `docs/` and `data/` files. Never invent ids — read
-`data/sigils.json` / `data/signs.json` for exact ids and effects.
+Never invent ids — read `data/sigils.json` / `data/signs.json` for exact ids and effects.
 
 ## Workflow
 
@@ -56,12 +61,17 @@ Return:
 1. **Pick substance + signs** using the effect→recipe starters, then refine.
 2. **Build the composition JSON** (`wha-spell@1` shape; see the cheat-sheet's even-placement
    helper for sign angles). Choose symmetry, inversion, tilt, scale deliberately.
-3. **Validate through the engine** and iterate until the deduced effect matches the goal:
+3. **Validate the structure through the engine** and iterate until the facts match your design:
    ```bash
-   echo '<composition-json>' | node tools/spell-engine-cli.mjs --text
+   echo '<composition-json>' | node tools/spell-engine-cli.mjs --facts
    ```
-   Fix any `unknownIds`, unwanted `warnings`, wrong direction, or instability. Re-run until
-   `summary` reads like the intended effect and validity is clean (or intentionally inactive).
+   Check the **facts**: no `unknownIds`, the right `operatorsByKind`, geometry
+   (symmetry/aim/balance/zones) as intended, no unwanted instability. The effect is *yours* to
+   confirm by reasoning (CORE.md + lexicon) — the `heuristicSummary` is only a sanity scaffold.
+   Re-run until the parts + geometry realize the intended effect. Then render it to see it:
+   ```bash
+   node tools/render.mjs spell.json -o spell.svg     # show the user the seal you built
+   ```
 4. **Explain the design challenges** — balance/stability, ambiguous signs, anything the
    source material leaves uncertain, forbidden flags.
 5. **Explain how to use it** — practical and creative applications, and how to draw it.
@@ -74,10 +84,13 @@ to produce the full `docs/spells/<Name>.md` entry (origin: community) and to req
 image/JSON for `assets/spells/`. Don't duplicate that doc-writing here — hand off to the
 analyzer so there's one archival path.
 
-### 5. Record what you learned
-When the user corrects a design, or you discover a constraint/technique worth reusing (a
-limitation of a magic type, a reliable recipe for some effect, an engine quirk), append it to
-the **Learnings log** below. Keep entries short and dated.
+### 5. Record what you learned (by concept — [docs/INGESTION.md](../../../docs/INGESTION.md))
+File durable knowledge in its concept-indexed home, so the next design is easier:
+- A reliable **recipe / technique** → [docs/patterns.md](../../../docs/patterns.md) (or
+  [docs/contraptions.md](../../../docs/contraptions.md) for a device).
+- A nuance about **a sign/sigil** → its **Findings** in [docs/lexicon/](../../../docs/lexicon/).
+- A **rule/limit of the world** → [docs/CORE.md](../../../docs/CORE.md).
+- An **engine quirk** → the Learnings log below. Keep entries short and dated.
 
 ## Design principles
 - **Constraints are the point.** The magic system's limits (earth can't create, body magic

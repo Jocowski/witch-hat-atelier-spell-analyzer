@@ -1,7 +1,11 @@
 # Witch Hat Atelier — Magic System Cheat-Sheet
 
-Distilled rules for analyzing and designing spells. This is a fast reference; the
-**source of truth** is the repo:
+> This is a **fast reference**. The *reasoning model* you should actually think with is
+> [docs/CORE.md](../../../../docs/CORE.md); per-symbol drawing + behavior + findings are in
+> [docs/lexicon/](../../../../docs/lexicon/); the JSON format is [docs/IR.md](../../../../docs/IR.md).
+> Use this sheet for quick lookups; use CORE + the lexicon to derive effects.
+
+Distilled rules for analyzing and designing spells. The **source of truth** is the repo:
 
 - Lore: [docs/magic.md](../../../../docs/magic.md), [docs/sigils.md](../../../../docs/sigils.md), [docs/signs.md](../../../../docs/signs.md), [docs/magical-dye.md](../../../../docs/magical-dye.md), [docs/forbidden-magic.md](../../../../docs/forbidden-magic.md), [docs/spells.md](../../../../docs/spells.md)
 - Engine data: [data/grammar.json](../../../../data/grammar.json) (deduction grammar — operators + interactions), [data/sigils.json](../../../../data/sigils.json), [data/signs.json](../../../../data/signs.json), [data/dyes.json](../../../../data/dyes.json), [data/rules.json](../../../../data/rules.json)
@@ -144,19 +148,23 @@ The app's Export/Import format is `wha-spell@1`. The engine reads the inner `com
 For N signs in a balanced ring at radius `r`, place sign `i` at angle `θ = i·360/N` (degrees, 0=north CW):
 `x = r·sin(θ°)`, `y = -r·cos(θ°)`. Use `r ≈ 150`. Even spacing ⇒ radial symmetry ⇒ stable & straight-up. Make one sign larger (`scale`) or off-axis to deliberately aim the effect.
 
-## 10. Running the engine (ground truth)
+## 10. Running the engine (a compiler + fact extractor — not the authority)
 
 ```bash
-# JSON report (full structured analysis):
-node tools/spell-engine-cli.mjs path/to/spell.json
-echo '<composition-or-wrapper-json>' | node tools/spell-engine-cli.mjs
+# Structured FACTS (use this — observations you reason FROM; effect is yours to derive):
+node tools/spell-engine-cli.mjs --facts path/to/spell.json
+echo '<composition-or-wrapper-json>' | node tools/spell-engine-cli.mjs --facts
 
-# Human-readable summary:
+# Human-readable HEURISTIC report (a scaffold, not ground truth):
 node tools/spell-engine-cli.mjs --text path/to/spell.json
+
+# Render the spell to a picture (AI → human):
+node tools/render.mjs path/to/spell.json -o spell.svg
 ```
 
-Output includes: `valid`, `status` (valid/invalid only), `issues[]` (validity), `sigils[]`, `signs[]`,
-`deduction` (`summary` + per-part `breakdown` + `notes`/`warnings`), `dyes[]`, `analysis`
-(symmetry/stability/balance/`aim`/power/spin/counts), and `unknownIds` if any part id is unrecognized
-(catch typos here). Trust this for validity and the base deduced effect; add narrative/usage/variation
-reasoning on top of it.
+`--facts` gives: parts (core/sigils/signs + category + **operatorKind**), geometry
+(symmetry/stability/balance/`aim`/power/spin/zones), dyes, catalog neighbours, and `unknownIds`
+(catch typos). **Trust it for structure & geometry.** The `heuristicSummary`/`heuristicNotes`
+fields are a deterministic scaffold — derive the actual effect yourself from
+[docs/CORE.md](../../../../docs/CORE.md) + the [lexicon](../../../../docs/lexicon/), honoring the
+engine blind spots in [learnings.md](learnings.md).

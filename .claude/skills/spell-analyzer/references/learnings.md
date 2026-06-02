@@ -1,5 +1,14 @@
 # Analyzer learnings
 
+> **Knowledge has moved to concept-indexed homes (see [docs/INGESTION.md](../../../../docs/INGESTION.md)).**
+> Per-symbol findings now live in the **lexicon** ([docs/lexicon/](../../../../docs/lexicon/)) under each
+> symbol's **Findings** — that is canonical; fold new per-sign/sigil lessons *there*. Per-spell
+> findings live in [docs/spells/](../../../../docs/spells/). Reusable techniques go in
+> [docs/patterns.md](../../../../docs/patterns.md) / [docs/contraptions.md](../../../../docs/contraptions.md).
+> **This file is now for ENGINE quirks/blind-spots and PROCESS notes** (how the deterministic
+> engine misreads things, what to override). The per-symbol/per-spell log below is retained for
+> history but is mirrored into the lexicon — prefer the lexicon when they disagree.
+
 Accumulated corrections from real analyses — engine quirks, per-element limits, canon
 nuances. Skim before analyzing; append new **dated one-liners** here (not in SKILL.md).
 Engine-fix narratives belong in git history — record only the durable lesson.
