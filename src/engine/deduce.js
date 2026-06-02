@@ -106,11 +106,11 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   const transmute = byKind.transmute?.[0]
   const form = byKind.form?.[0]
   if (transmute) {
-    primary = `The ${substancePhrase} ${opVerb(transmute.op, transmute.inverted)}`
+    primary = `${subjectCap(substancePhrase)} ${opVerb(transmute.op, transmute.inverted)}`
   } else if (form) {
-    primary = `The ${substancePhrase} ${opVerb(form.op, form.inverted)}`
+    primary = `${subjectCap(substancePhrase)} ${opVerb(form.op, form.inverted)}`
   } else {
-    primary = `The ${substancePhrase} ${el.raw}`
+    primary = `${subjectCap(substancePhrase)} ${el.raw}`
   }
 
   // ----- Direction -----
@@ -199,7 +199,7 @@ export function deduceWith(g, sigilMap, signMap, composition) {
         part: item.type,
         role: kind,
         label: (signMap[item.type]?.name || item.type) + (item.inverted ? ' (inverted)' : '') + (item.count > 1 ? ` ×${item.count}` : ''),
-        text: capitalize(`the ${substancePhrase} ${opVerb(item.op, item.inverted)}.`),
+        text: capitalize(`${subjectLower(substancePhrase)} ${opVerb(item.op, item.inverted)}.`),
       })
     }
   }
@@ -253,6 +253,14 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   }
 }
 
+// Subject phrase with an article: "the water", but avoid double articles like "The an unknown
+// force" — if the phrase already starts with a/an/the, keep it (just fix the case).
+function subjectCap(phrase) {
+  return /^(an? |the )/i.test(phrase) ? capitalize(phrase) : `The ${phrase}`
+}
+function subjectLower(phrase) {
+  return /^(an? |the )/i.test(phrase) ? phrase : `the ${phrase}`
+}
 function joinList(arr) {
   const a = [...new Set(arr)]
   if (a.length <= 1) return a.join('')

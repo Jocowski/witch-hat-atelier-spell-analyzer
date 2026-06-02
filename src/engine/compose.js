@@ -74,7 +74,18 @@ export function analyzeCircleWith(deps, circle) {
   const isSigil = (t) => !!sigilMap[t]
   const canCenter = (t) => !!signMap[t]?.canBeCenter
 
-  const core = circle.core || null
+  // Billow Cluster: a sign that can occupy the center (Billow/Repetition/Vision/…) sitting at the
+  // seal's center acts as the SUBSTANCE/core even when the app exported it as a component sign.
+  // Validity and the deduction read this effective core; the sign still narrates its own operator.
+  let core = circle.core || null
+  let centerPromoted = false
+  if (!core) {
+    const centerR = circle.radius ? circle.radius * 0.25 : 30
+    const center = (circle.components || []).find(
+      (c) => c.role === 'sign' && canCenter(c.type) && Math.hypot(c.x || 0, c.y || 0) <= centerR,
+    )
+    if (center) { core = { ...center, role: 'core' }; centerPromoted = true }
+  }
   // Tag every component with its ring zone (inside | ring | outside). Outside signs are
   // external marks/protrusions: they still appear in the signs list and deduction, but they
   // must NOT skew the inside-ring aim/symmetry/balance (geometry below uses ring-only signs).
@@ -163,7 +174,7 @@ export function analyzeCircleWith(deps, circle) {
   })
 
   // ----- Deduced effect (a circle is a v1-shaped composition; pass zone-tagged components) -----
-  const deduction = hasCore ? deduceWith(grammar, sigilMap, signMap, { ...circle, components }) : null
+  const deduction = hasCore ? deduceWith(grammar, sigilMap, signMap, { ...circle, core, components }) : null
 
   // ----- Dyes -----
   const dyes = (circle.dyes || []).map((id) => dyeMap[id]).filter(Boolean)
@@ -191,7 +202,50 @@ export function analyzeCircleWith(deps, circle) {
     linkCount: circle.linkCount || 0,
   }
 
-  return { id: circle.id, name: circle.name || '', valid: hasCore, hasCore, active: hasCore && ringClosed, ringClosed, issues, sigils, signs, deduction, dyes, analysis }
+  return { id: circle.id, name: circle.name || '', valid: hasCore, hasCore, centerPromoted, active: hasCore && ringClosed, ringClosed, issues, sigils, signs, deduction, dyes, analysis }
+}
+
+// ---------- Relation-aware validity (multi-circle) ----------
+// A coreless circle is only "invalid" when it is a standalone lone seal. Inside a nested/linked
+// assembly a circle can legitimately carry no substance of its own — it may be an empty enclosing
+// boundary ring, or a modifier/wrapper ring that shapes the seal(s) it encloses or links to.
+// This re-classifies such circles (using the relations graph), rewrites their issues, and clears
+// the spurious "no core"/"explosion" flags so the spell validates in context. Mutates `per`.
+export function reclassifyCorelessCircles(per, relations) {
+  const rels = Array.isArray(relations) ? relations : []
+  const nests = rels.filter((r) => r.type === 'nest')
+  const links = rels.filter((r) => r.type === 'link')
+  const enclosesOthers = new Set(nests.map((n) => n.outer))
+  const coredIds = new Set(per.filter((p) => p.hasCore).map((p) => p.id))
+  const linkedToCored = (id) =>
+    links.some((l) => (l.a === id && coredIds.has(l.b)) || (l.b === id && coredIds.has(l.a)))
+
+  for (const p of per) {
+    if (p.hasCore) continue
+    const encloses = enclosesOthers.has(p.id)
+    // A genuinely standalone coreless seal (encloses nothing, feeds/joins nothing) stays invalid.
+    if (!encloses && !linkedToCored(p.id)) continue
+
+    const hasSigns = (p.analysis?.signCount || 0) > 0
+    let role, note
+    if (encloses && !hasSigns) {
+      role = 'boundary'
+      note = 'Boundary ring: an empty enclosing ring that contains the nested seal(s) — a chamber wall, not a discharge.'
+    } else {
+      role = 'modifier'
+      note = 'Modifier ring: a coreless ring that shapes the seal(s) it encloses or links to, rather than carrying its own substance.'
+    }
+    // Drop the blocking "no core" and, for an empty boundary ring, the "explosion" warning.
+    p.issues = p.issues.filter(
+      (iss) =>
+        !(iss.severity === 'blocking' && /^No core/.test(iss.message)) &&
+        !(role === 'boundary' && /closed ring with nothing inside/.test(iss.message)),
+    )
+    p.issues.unshift({ severity: 'info', message: note })
+    p.contextRole = role
+    p.valid = !p.issues.some((iss) => iss.severity === 'blocking')
+  }
+  return per
 }
 
 // ---------- Combine per-circle results along the relations graph ----------

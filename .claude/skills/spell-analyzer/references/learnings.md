@@ -5,6 +5,17 @@ nuances. Skim before analyzing; append new **dated one-liners** here (not in SKI
 Engine-fix narratives belong in git history — record only the durable lesson.
 
 ## Engine capabilities (recently added — no longer blind spots)
+- **Relation-aware validity for multi-circle spells** (2026-06-01): a coreless circle is no longer an automatic
+  "invalid." (1) **Billow-as-center promotion** — a `canBeCenter` sign (Billow/Repetition/Vision) sitting at the
+  origin is promoted to the circle's core (substance), so a Billow Cluster validates AND deduces a cloud
+  (`compose.js` analyzeCircleWith). Works in single- and multi-circle spells. (2) **Boundary/modifier rings** —
+  `reclassifyCorelessCircles(per, relations)` in compose.js (called by analyze.js + the CLI, multi-circle only):
+  an empty coreless ring that `nest`-encloses others = a **boundary ring** (suppresses the explosion warning);
+  a coreless ring with signs that encloses/links cored circles = a **modifier ring** (demotes "no core" to info).
+  A genuinely standalone coreless seal still reads invalid. So a reconstructed nested canon spell (Serpent's Bed
+  of Sand) now reads **valid**. Also fixed the "The an unknown force" double-article via subjectCap/subjectLower
+  in deduce.js. NOT yet done (#3): cross-circle effect COMPOSITION — the combined summary still leads with "(no
+  defined effect)" for modifier/boundary rings instead of threading satellite output → cluster input.
 - **Multi-circle spells now match the catalog** (as of the 2026-06-01 engine work): `analyze()`
   builds a COMBINED signature (union of every circle's signs + the set of all cores; symmetry
   from the form circle) so a nested spell like the Vapor Bubble self-matches. It no longer
@@ -36,6 +47,19 @@ Engine-fix narratives belong in git history — record only the durable lesson.
   `buildSignature`/`matchSpell`/`computeSimilar` — keep it in sync with `src/engine/`.
 
 ## Canon & mechanics log (newest first)
+- 2026-06-01: **Serpent's Bed of Sand (canon, mixed earth-time)** — the parent spell of the Sand Cage; a
+  **7-circle** amalgamation by Qifrey's four apprentices. Architecture: central **Billow Cluster** (Billow
+  sign at center + 4 Collection) ← fed by **4 Wall-Breaker satellites** (Earth+Crush+2 Column, links) ←
+  wrapped by an empty **boundary ring** and an outer **Repetition Seal** (4 Repetition + 4 Convergence + 8
+  Column). Crush is **non-inverted** here (mill rock → sand, the state Billow can convert; signs.md:123) —
+  contrast Sand Cage's **inverted** Crush (rigidity). Persistence is entirely the Repetition wrap
+  (signs.md:131), firmness the Convergence (signs.md:107). Runs in earth's manipulate-not-create mode
+  (sigils.md:53) → needs real ground to mill. LESSON: the engine reports this **invalid (false-negative)** —
+  it grades circles in isolation and can't model (a) **Billow-as-center** (a Billow *sign* at center isn't
+  counted as a core), (b) an **enclosing empty boundary ring** (flagged as "explosion"), or (c) a
+  **sigil-bearing wrapper exported as signs** (repetition retconned sign→sigil, but the app exports it as a
+  sign → "no core"). When a user reconstructs a nested canon spell and the engine says invalid, check these
+  three before telling them they did something wrong. Self-matches the catalog ~0.95 once added.
 - 2026-06-01: **Sand Cage (canon, earth)** — Tetia's spell to cage the Scalewolf Euini; the **rigid sibling of
   the Serpent's Bed of Sand** ("if sand can be made soft as a bed, it can also be made rigid as a cage").
   Earth core + inverted **Crush ×2** (N/S, supply the RIGIDITY by reintegrating loose grains, temporarily,

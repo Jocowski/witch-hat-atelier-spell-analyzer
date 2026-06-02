@@ -1,0 +1,595 @@
+{
+  "format": "wha-spell@2",
+  "name": "Serpent's Bed of Sand",
+  "circles": [
+    {
+      "id": "k1",
+      "name": "Circle 1",
+      "center": {
+        "x": 6.28,
+        "y": 1.25
+      },
+      "radius": 254,
+      "ring": {
+        "closed": true
+      },
+      "core": null,
+      "components": [],
+      "dyes": [],
+      "inkColor": null
+    },
+    {
+      "id": "k2",
+      "name": "Circle 2",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": 94,
+      "ring": {
+        "closed": true
+      },
+      "core": null,
+      "components": [
+        {
+          "id": "c5",
+          "type": "billowing",
+          "role": "sign",
+          "x": 0,
+          "y": 0.51,
+          "rotation": 180,
+          "scale": 1.45,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c6",
+          "type": "collection",
+          "role": "sign",
+          "x": 0.09,
+          "y": -58.21,
+          "rotation": 0.09,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c7",
+          "type": "collection",
+          "role": "sign",
+          "x": 60.45,
+          "y": 0.36,
+          "rotation": 87.96,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c8",
+          "type": "collection",
+          "role": "sign",
+          "x": 0,
+          "y": 61.1,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c9",
+          "type": "collection",
+          "role": "sign",
+          "x": -64.23,
+          "y": -2.14,
+          "rotation": 271.91,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    },
+    {
+      "id": "k4",
+      "name": "Circle 3",
+      "center": {
+        "x": 0,
+        "y": -1.25
+      },
+      "radius": 326,
+      "ring": {
+        "closed": true
+      },
+      "core": null,
+      "components": [
+        {
+          "id": "c22",
+          "type": "convergence",
+          "role": "sign",
+          "x": -280,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1.45,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c23",
+          "type": "convergence",
+          "role": "sign",
+          "x": 0,
+          "y": -280,
+          "rotation": 0,
+          "scale": 1.45,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c24",
+          "type": "convergence",
+          "role": "sign",
+          "x": 291.91,
+          "y": 1.32,
+          "rotation": 90,
+          "scale": 1.45,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c25",
+          "type": "convergence",
+          "role": "sign",
+          "x": -3.77,
+          "y": 279.96,
+          "rotation": 180,
+          "scale": 1.6,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c26",
+          "type": "column",
+          "role": "sign",
+          "x": -255,
+          "y": 99.45,
+          "rotation": 60,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c27",
+          "type": "column",
+          "role": "sign",
+          "x": -255,
+          "y": -99.45,
+          "rotation": 120,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c28",
+          "type": "column",
+          "role": "sign",
+          "x": 54.38,
+          "y": -280.96,
+          "rotation": 193.26,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c29",
+          "type": "column",
+          "role": "sign",
+          "x": 288.65,
+          "y": -58,
+          "rotation": 240,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c30",
+          "type": "column",
+          "role": "sign",
+          "x": 283.5,
+          "y": 88.59,
+          "rotation": 300,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c31",
+          "type": "column",
+          "role": "sign",
+          "x": 65.05,
+          "y": 276.79,
+          "rotation": 346.77,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c32",
+          "type": "column",
+          "role": "sign",
+          "x": -61.06,
+          "y": 279.57,
+          "rotation": 12.32,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c33",
+          "type": "column",
+          "role": "sign",
+          "x": -53.12,
+          "y": -279.57,
+          "rotation": 169.24,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c34",
+          "type": "repetition",
+          "role": "sign",
+          "x": 201.42,
+          "y": -208.04,
+          "rotation": 224.07,
+          "scale": 1.6,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c35",
+          "type": "repetition",
+          "role": "sign",
+          "x": 191.39,
+          "y": 222.5,
+          "rotation": 319.29,
+          "scale": 1.6,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c36",
+          "type": "repetition",
+          "role": "sign",
+          "x": -199.3,
+          "y": 203.95,
+          "rotation": 44.33,
+          "scale": 1.6,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c37",
+          "type": "repetition",
+          "role": "sign",
+          "x": -192.19,
+          "y": -206.55,
+          "rotation": 135.35,
+          "scale": 1.6,
+          "inverted": false,
+          "mirrored": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    },
+    {
+      "id": "k5",
+      "name": "Circle 4",
+      "center": {
+        "x": 171.33,
+        "y": 2.42
+      },
+      "radius": 50,
+      "ring": {
+        "closed": true
+      },
+      "core": {
+        "id": "c14",
+        "type": "earth",
+        "x": 0,
+        "y": 0,
+        "rotation": 90,
+        "scale": 1,
+        "inverted": false,
+        "mirrored": false
+      },
+      "components": [
+        {
+          "id": "c15",
+          "type": "column",
+          "role": "sign",
+          "x": 0,
+          "y": -32.5,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c16",
+          "type": "column",
+          "role": "sign",
+          "x": -0.77,
+          "y": 36.56,
+          "rotation": 1.21,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c17",
+          "type": "crush",
+          "role": "sign",
+          "x": 30.66,
+          "y": 2.41,
+          "rotation": 94.5,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    },
+    {
+      "id": "k6",
+      "name": "Circle 5",
+      "center": {
+        "x": 1.88,
+        "y": 173.12
+      },
+      "radius": 50,
+      "ring": {
+        "closed": true
+      },
+      "core": {
+        "id": "c10",
+        "type": "earth",
+        "x": 0,
+        "y": 0,
+        "rotation": 180,
+        "scale": 1,
+        "inverted": false,
+        "mirrored": false
+      },
+      "components": [
+        {
+          "id": "c11",
+          "type": "column",
+          "role": "sign",
+          "x": -35.21,
+          "y": 1.45,
+          "rotation": 87.63,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c12",
+          "type": "column",
+          "role": "sign",
+          "x": 33.17,
+          "y": 2.61,
+          "rotation": 270.17,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c13",
+          "type": "crush",
+          "role": "sign",
+          "x": -2.03,
+          "y": 32.59,
+          "rotation": 179.12,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    },
+    {
+      "id": "k7",
+      "name": "Circle 6",
+      "center": {
+        "x": -174.54,
+        "y": -1.66
+      },
+      "radius": 50,
+      "ring": {
+        "closed": true
+      },
+      "core": {
+        "id": "c1",
+        "type": "earth",
+        "x": 0,
+        "y": 0,
+        "rotation": 270,
+        "scale": 1,
+        "inverted": false,
+        "mirrored": false
+      },
+      "components": [
+        {
+          "id": "c2",
+          "type": "crush",
+          "role": "sign",
+          "x": -31.43,
+          "y": -1.06,
+          "rotation": 271.93,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c3",
+          "type": "column",
+          "role": "sign",
+          "x": -2.03,
+          "y": -33.85,
+          "rotation": 176.56,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c4",
+          "type": "column",
+          "role": "sign",
+          "x": -2.03,
+          "y": 35.11,
+          "rotation": 3.31,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    },
+    {
+      "id": "k8",
+      "name": "Circle 7",
+      "center": {
+        "x": 0,
+        "y": -170.17
+      },
+      "radius": 50,
+      "ring": {
+        "closed": true
+      },
+      "core": {
+        "id": "c18",
+        "type": "earth",
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "scale": 1,
+        "inverted": false,
+        "mirrored": false
+      },
+      "components": [
+        {
+          "id": "c19",
+          "type": "crush",
+          "role": "sign",
+          "x": 0,
+          "y": -32.5,
+          "rotation": 0,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c20",
+          "type": "column",
+          "role": "sign",
+          "x": 34.43,
+          "y": -2.41,
+          "rotation": 265.98,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        },
+        {
+          "id": "c21",
+          "type": "column",
+          "role": "sign",
+          "x": -37.24,
+          "y": -5.12,
+          "rotation": 97.83,
+          "scale": 1,
+          "inverted": false,
+          "mirrored": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": [
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k2"
+    },
+    {
+      "type": "nest",
+      "outer": "k4",
+      "inner": "k1"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k5"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k6"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k7"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k8"
+    },
+    {
+      "type": "link",
+      "a": "k7",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k6",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k5",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k8",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k8",
+      "b": "k1"
+    },
+    {
+      "type": "link",
+      "a": "k5",
+      "b": "k1"
+    },
+    {
+      "type": "link",
+      "a": "k6",
+      "b": "k1"
+    },
+    {
+      "type": "link",
+      "a": "k7",
+      "b": "k1"
+    }
+  ]
+}

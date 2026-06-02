@@ -38,7 +38,7 @@ const dyesDoc = require(resolve(root, 'data/dyes.json'))
 const spellsDoc = require(resolve(root, 'data/spells.json'))
 
 const importLocal = (rel) => import(pathToFileURL(resolve(root, rel)).href)
-const { toComposition, analyzeCircleWith, composeWith } = await importLocal('src/engine/compose.js')
+const { toComposition, analyzeCircleWith, composeWith, reclassifyCorelessCircles } = await importLocal('src/engine/compose.js')
 const { computeSymmetry, classifyZone } = await importLocal('src/engine/geometry.js')
 
 const SIGIL_MAP = Object.fromEntries(sigilsDoc.sigils.map((s) => [s.id, s]))
@@ -157,6 +157,9 @@ function computeSimilar(signature) {
 function analyze(input) {
   const { name, circles, relations } = toComposition(input)
   const per = circles.map((c) => analyzeCircleWith(deps, c))
+  // Relation-aware validity: coreless boundary/modifier rings aren't a false "invalid" in a
+  // nested/linked spell (mirrors src/engine/analyze.js). Single circles are left untouched.
+  if (per.length > 1) reclassifyCorelessCircles(per, relations)
   const valid = per.every((p) => p.valid)
   if (per.length === 1) {
     const c0 = per[0]

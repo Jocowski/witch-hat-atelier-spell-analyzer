@@ -4,7 +4,7 @@
 import grammar from '../../data/grammar.json'
 import { RULES, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef } from './data.js'
 import { computeSymmetry, classifyZone } from './geometry.js'
-import { toComposition, analyzeCircleWith, composeWith } from './compose.js'
+import { toComposition, analyzeCircleWith, composeWith, reclassifyCorelessCircles } from './compose.js'
 
 const deps = { grammar, sigilMap: SIGIL_MAP, signMap: SIGN_MAP, dyeMap: DYE_MAP, zones: RULES.zones }
 
@@ -138,6 +138,9 @@ function statusOf(c) {
 export function analyze(input) {
   const { name, circles, relations } = toComposition(input)
   const per = circles.map((c) => analyzeCircleWith(deps, c))
+  // In a multi-circle spell, a coreless circle may be a legitimate boundary/modifier ring — let
+  // the relations graph reclassify those so the spell isn't a false "invalid" (single circles skip).
+  if (per.length > 1) reclassifyCorelessCircles(per, relations)
 
   if (per.length === 1) {
     // Single circle: keep the legacy top-level shape so the app/ResultPanel are unchanged,

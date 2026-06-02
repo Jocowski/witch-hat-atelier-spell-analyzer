@@ -520,6 +520,27 @@
         "symmetry": "bilateral"
       },
       "notes": "Canon earth spell (unofficial name); used by Tetia to trap the Scaled Wolf Euini so the atelier could attempt the inverted Scalewolf Curse. Earth manipulates, does not create (sigils.md:53), so it needs real sand/earth present. RIGIDITY comes from the INVERTED Crush signs reintegrating loose grains into a cohesive solid (temporarily; signs.md:73) — the rigid sibling of the Serpent's Bed of Sand (soft). The canon construction (per the wiki): Earth core; a pair of Columns at east and west each pointing at one another (one normal + one inverted); inverted Crush on the N-S axis between the core and the half-circle signs; an Unknown half-circle sign (catalogued here as unknown_05) at the N and S poles; and a fusion of one Column + two Region (direction) signs at each intercardinal point (modelled here as the 3 component signs). Two unknown signs => the deduced effect is flagged incomplete. confidence=medium (leans on the unidentified unknown_05 and the column/region 'fusion' decomposition)."
+    },
+    {
+      "id": "serpents_bed_of_sand",
+      "name": "Serpent's Bed of Sand",
+      "category": "earth",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Mills real stone into fine sand, billows it into a huge fluffy cloud, and continually resets the cloud so it stays soft yet firm enough to hold a dragon (regaining shape once weight is removed). The soft, self-restoring sibling of the Sand Cage.",
+      "composition": {
+        "core": "earth",
+        "signs": [
+          { "id": "billowing", "count": 1, "placement": "center (Billow Cluster)", "orientation": "center", "inverted": false },
+          { "id": "collection", "count": 4, "placement": "around center", "orientation": "inward", "inverted": false },
+          { "id": "crush", "count": 4, "placement": "4 satellite Wall Breakers (cardinals)", "orientation": "outward", "inverted": false },
+          { "id": "column", "count": 16, "placement": "8 in satellites + 8 in outer ring", "orientation": "mixed", "inverted": false },
+          { "id": "convergence", "count": 4, "placement": "outer ring cardinals", "orientation": "inward", "inverted": false },
+          { "id": "repetition", "count": 4, "placement": "outer ring diagonals", "orientation": "radial", "inverted": false }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Canon MIXED earth-time spell; an amalgamation invented jointly by Qifrey's four apprentices (Tetia, Richeh, Coco, Agott). Multi-circle: (1) a central BILLOW CLUSTER = a Billow sign at center (canBeCenter, signs.md:123) ringed by 4 Collection signs (gather + convert material to a cloud); (2) four small WALL BREAKER satellites (Earth core + Crush + 2 Column each) that mill real ground into fine sand and feed it inward via links; (3) an enclosing empty boundary ring; (4) an outer REPETITION SEAL (4 Repetition + 4 Convergence + 8 Column) that packs the cloud firm (Convergence, signs.md:107) and continually resets it so it returns to shape under load (Repetition, signs.md:131; retconned sign->sigil in Vol.12). Earth manipulates, does not create (sigils.md:53) => needs real stone/sand present; the Crush milling is what makes rock into the sand-like state Billow can convert. Engine validity is relation-aware: the central Billow Cluster is promoted (Billow-as-center = substance), the empty mid ring is a boundary ring, and the outer repetition seal is a modifier ring => reads VALID. SOFT sibling of the Sand Cage (which uses INVERTED Crush for rigidity instead). confidence=high (well documented in manga/wiki)."
     }
   ]
 }
