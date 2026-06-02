@@ -1,0 +1,74 @@
+{
+  "format": "wha-spell@2",
+  "name": "Light Beam",
+  "circles": [
+    {
+      "id": "k4",
+      "name": "",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": null,
+      "ring": {
+        "closed": true,
+        "doubled": false,
+        "size": "medium"
+      },
+      "core": {
+        "id": "c10",
+        "type": "light",
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "scale": 1,
+        "inverted": false
+      },
+      "components": [
+        {
+          "id": "c11",
+          "type": "column",
+          "role": "sign",
+          "x": 0,
+          "y": -95,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c13",
+          "type": "column",
+          "role": "sign",
+          "x": 95,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c15",
+          "type": "column",
+          "role": "sign",
+          "x": 0,
+          "y": 95,
+          "rotation": 0,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c17",
+          "type": "column",
+          "role": "sign",
+          "x": -95,
+          "y": 0,
+          "rotation": 90,
+          "scale": 1,
+          "inverted": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

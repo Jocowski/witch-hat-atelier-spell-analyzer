@@ -1,0 +1,102 @@
+{
+  "format": "wha-spell@1",
+  "name": "Gathering Shadows",
+  "ring": {
+    "closed": true,
+    "doubled": false,
+    "size": "medium"
+  },
+  "core": {
+    "id": "c1",
+    "type": "vision_sigil",
+    "x": 0,
+    "y": 0,
+    "rotation": 0,
+    "scale": 1,
+    "inverted": false
+  },
+  "components": [
+    {
+      "id": "c2",
+      "type": "eye",
+      "role": "sign",
+      "x": 0,
+      "y": -95,
+      "rotation": 180,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c3",
+      "type": "eye",
+      "role": "sign",
+      "x": 95,
+      "y": 0,
+      "rotation": 270,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c4",
+      "type": "eye",
+      "role": "sign",
+      "x": 0,
+      "y": 95,
+      "rotation": 0,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c5",
+      "type": "eye",
+      "role": "sign",
+      "x": -95,
+      "y": 0,
+      "rotation": 90,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c6",
+      "type": "bend",
+      "role": "sign",
+      "x": 67.18,
+      "y": -67.18,
+      "rotation": 225,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c7",
+      "type": "bend",
+      "role": "sign",
+      "x": 67.18,
+      "y": 67.18,
+      "rotation": 315,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c8",
+      "type": "bend",
+      "role": "sign",
+      "x": -67.18,
+      "y": 67.18,
+      "rotation": 45,
+      "scale": 1,
+      "inverted": false
+    },
+    {
+      "id": "c9",
+      "type": "bend",
+      "role": "sign",
+      "x": -67.18,
+      "y": -67.18,
+      "rotation": 135,
+      "scale": 1,
+      "inverted": false
+    }
+  ],
+  "linkCount": 0,
+  "dyes": []
+}

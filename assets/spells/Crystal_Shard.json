@@ -1,0 +1,74 @@
+{
+  "format": "wha-spell@2",
+  "name": "Crystal Shard",
+  "circles": [
+    {
+      "id": "k5",
+      "name": "",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": null,
+      "ring": {
+        "closed": true,
+        "doubled": false,
+        "size": "medium"
+      },
+      "core": {
+        "id": "c19",
+        "type": "crystal",
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "scale": 1,
+        "inverted": false
+      },
+      "components": [
+        {
+          "id": "c20",
+          "type": "column",
+          "role": "sign",
+          "x": 0,
+          "y": -90,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c22",
+          "type": "column",
+          "role": "sign",
+          "x": 90,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c23",
+          "type": "column",
+          "role": "sign",
+          "x": 0,
+          "y": 90,
+          "rotation": 0,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c24",
+          "type": "column",
+          "role": "sign",
+          "x": -90,
+          "y": 0,
+          "rotation": 90,
+          "scale": 1,
+          "inverted": true
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

@@ -1,0 +1,234 @@
+{
+  "format": "wha-spell@2",
+  "name": "Floating Drops",
+  "circles": [
+    {
+      "id": "k7",
+      "name": "",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": null,
+      "ring": {
+        "closed": true,
+        "doubled": false,
+        "size": "medium"
+      },
+      "core": {
+        "id": "c1",
+        "type": "wind",
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "scale": 1,
+        "inverted": false
+      },
+      "components": [
+        {
+          "id": "c2",
+          "type": "water",
+          "role": "sigil",
+          "x": -62,
+          "y": 0,
+          "rotation": 90,
+          "scale": 0.8,
+          "inverted": false
+        },
+        {
+          "id": "c3",
+          "type": "water",
+          "role": "sigil",
+          "x": 62,
+          "y": 0,
+          "rotation": 270,
+          "scale": 0.8,
+          "inverted": false
+        },
+        {
+          "id": "c4",
+          "type": "column",
+          "role": "sign",
+          "x": 100,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c5",
+          "type": "column",
+          "role": "sign",
+          "x": -100,
+          "y": 0,
+          "rotation": 90,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c6",
+          "type": "direction",
+          "role": "sign",
+          "x": 0,
+          "y": -92,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c7",
+          "type": "direction",
+          "role": "sign",
+          "x": 0,
+          "y": -118,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c8",
+          "type": "direction",
+          "role": "sign",
+          "x": 65.05,
+          "y": -65.05,
+          "rotation": 225,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c9",
+          "type": "direction",
+          "role": "sign",
+          "x": 83.44,
+          "y": -83.44,
+          "rotation": 225,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c10",
+          "type": "direction",
+          "role": "sign",
+          "x": 92,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c11",
+          "type": "direction",
+          "role": "sign",
+          "x": 118,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c12",
+          "type": "direction",
+          "role": "sign",
+          "x": 65.05,
+          "y": 65.05,
+          "rotation": 315,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c13",
+          "type": "direction",
+          "role": "sign",
+          "x": 83.44,
+          "y": 83.44,
+          "rotation": 315,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c14",
+          "type": "direction",
+          "role": "sign",
+          "x": 0,
+          "y": 92,
+          "rotation": 0,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c15",
+          "type": "direction",
+          "role": "sign",
+          "x": 0,
+          "y": 118,
+          "rotation": 0,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c16",
+          "type": "direction",
+          "role": "sign",
+          "x": -65.05,
+          "y": 65.05,
+          "rotation": 45,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c17",
+          "type": "direction",
+          "role": "sign",
+          "x": -83.44,
+          "y": 83.44,
+          "rotation": 45,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c18",
+          "type": "direction",
+          "role": "sign",
+          "x": -92,
+          "y": 0,
+          "rotation": 90,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c19",
+          "type": "direction",
+          "role": "sign",
+          "x": -118,
+          "y": 0,
+          "rotation": 90,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c20",
+          "type": "direction",
+          "role": "sign",
+          "x": -65.05,
+          "y": -65.05,
+          "rotation": 135,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c21",
+          "type": "direction",
+          "role": "sign",
+          "x": -83.44,
+          "y": -83.44,
+          "rotation": 135,
+          "scale": 1,
+          "inverted": true
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

@@ -714,11 +714,259 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "crosshair", "count": 2, "placement": "sides", "orientation": "inward", "inverted": false }
+          {
+            "id": "crosshair",
+            "count": 2,
+            "placement": "sides",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
       "notes": "Mixed water/fire spell, NEW/current version (ch. 28). Engine core is the Water sigil; two Fire sigils (role:sigil) sit above and below it, and a Crosshair sign flanks each side. The matcher keys on core + sign multiset, so the two Fire sigils are recorded here in notes, not in signs[]. The Crosshair confines the magic to an area of effect — the dry 'bubble' (signs.md:239) — while the Fire substance likely drives the drying/repelling of the water; canon doesn't confirm whether the water is repelled or evaporated. Two earlier, retconned versions (manga ch. 8) used an AIR-sigil-variant core with modified Fire sigils on the sides instead: a Repelling variant and a Drying variant (the latter with INVERTED fire sigils + a disconnected triangle line) — those are described in docs/spells/Rainflinger.md but not modelled here (their 'modified/variant' sigils don't map to clean ids). confidence=medium (Crosshair is canon-uncertain; repel-vs-dry mechanism unconfirmed)."
+    },
+    {
+      "id": "grasping_wind",
+      "name": "Grasping Wind",
+      "category": "wind",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Grasping_Wind — manga debut ch. 14; first used by Coco. Wind sigil ringed by inward-facing Pull signs.",
+      "confidence": "high",
+      "effect": "Pulls a strong wind current in toward the glyph, dragging lighter objects with it; slanting the Pull signs twists the inflow into a vortex.",
+      "composition": {
+        "core": "wind",
+        "signs": [
+          {
+            "id": "pull",
+            "count": 4,
+            "placement": "around (cardinals)",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Wind spell. Wind core ringed by 4 inward Pull signs (cardinals; the wiki shows four) => the air current converges on the seal (engine: 'wind contained within the ring'). Pull stays NON-inverted: inverting Pull flips it to 'push away' (repel), the opposite effect. Pull's traced art was vertically flipped (tip at bottom); the svgPath has been corrected so a non-inverted, inward-facing Pull renders pointing toward the center. Slanting the Pull signs adds spin -> a pulling vortex (canon). Count sets ring evenness, not power (engine power = average sign SIZE). confidence=high."
+    },
+    {
+      "id": "skysoaring_seal",
+      "name": "Skysoaring Seal",
+      "category": "wind",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Skysoaring_Seal — manga debut ch. 4; Coco's Consent of the Crown test (to reach a Diadem Herb), drawn large on a sail to fly.",
+      "confidence": "high",
+      "effect": "Produces directional thrust in the direction its Levitation keystone points; drawn large on something like a sail, it lifts and flies the object.",
+      "composition": {
+        "core": "wind",
+        "signs": [
+          {
+            "id": "levitation",
+            "count": 1,
+            "placement": "center",
+            "orientation": "front",
+            "inverted": false
+          }
+        ],
+        "symmetry": "asymmetric"
+      },
+      "notes": "Wind spell. A Wind sigil sits low in the glyph with a single large Levitation sign spanning above it toward the opposite side; thrust fires in the keystone's direction (engine: 'lifted and made to levitate, above the seal'). SIZE sets lift — drawn big enough it carries large objects (a sail) into flight. The asymmetric single-keystone layout is intended (directional). confidence=high."
+    },
+    {
+      "id": "light_beam",
+      "name": "Light Beam",
+      "category": "light",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Light_Beam — used by Agott during magic drawing practice. Light sigil ringed by Column keystones.",
+      "confidence": "high",
+      "effect": "Projects a steady column/beam of light straight up from the seal; the more precisely the glyph is drawn, the steadier the beam.",
+      "composition": {
+        "core": "light",
+        "signs": [
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "ring (cardinals)",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Light spell. Light core + a ring of 4 inward Column signs (the wiki shows four) => a vertical beam (engine: 'projected as a tight column or beam, above the seal'). The light analogue of the Watershot Seal. Adding more Columns does not change the effect or power (power = average sign size); it only makes the ring denser/even and changes the matcher count. Beam steadiness scales with drawing precision (canon). confidence=high."
+    },
+    {
+      "id": "crystal_shard",
+      "name": "Crystal Shard",
+      "category": "crystal",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Crystal_Shard — manga debut ch. 18; Richeh cast it during an emotional outburst after Qifrey suggested she study other magic.",
+      "confidence": "high",
+      "effect": "Erupts several large, shard-like crystals suddenly out of the glyph.",
+      "composition": {
+        "core": "crystal",
+        "signs": [
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "around (cardinals)",
+            "orientation": "inward",
+            "inverted": true
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Crystal spell. Crystal core + a ring of 4 INVERTED Column signs (the wiki shows four) => the columns drive inward and the crystal erupts as shards (engine: 'driven inward and erupts rather than projecting out'). Count affects ring evenness/coverage, not the effect or power (power = average sign size). Same inverted-column eruption template as Wind Wall. confidence=high."
+    },
+    {
+      "id": "floating_drops",
+      "name": "Floating Drops",
+      "category": "water",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Floating_Drops — mixed water/air; manga debut ch. 16.",
+      "confidence": "high",
+      "effect": "Generates water droplets that hover in the air, forming along the seal's outer ring; counteracting Region pairs pin the drops to the ring rather than letting them fall or fly off.",
+      "composition": {
+        "core": "wind",
+        "signs": [
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "east-west, pointing inward toward the Water sigils",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 8,
+            "placement": "outer ring (paired with the inverted set, facing each other)",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 8,
+            "placement": "outer ring (paired with the normal set, facing each other)",
+            "orientation": "inward",
+            "inverted": true
+          }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Mixed water/air spell. Engine core is the Air (Wind) sigil; two Water sigils (role:sigil) flank it on the east-west axis, each fed by a Column pointing inward at it. Around the outer ring sit EIGHT opposed Region (direction) pairs -- each pair one normal + one inverted, pointing at one another -- so the net direction cancels and the conjured droplets are pinned ALONG the ring (engine: 'emerging only along the ring', bilateral). The two Water sigils are recorded here in notes (matcher keys on core + sign multiset). confidence=high."
+    },
+    {
+      "id": "bird_of_light_beacon",
+      "name": "Bird of Light Beacon",
+      "category": "light",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Bird_of_Light_Beacon — manga debut ch. 11; Agott used it at the river rescue to distract an outsider and call for help.",
+      "confidence": "medium",
+      "effect": "Forms a bird made of light that flies around for a while — to entertain, signal/call for help, or distract.",
+      "composition": {
+        "core": "light",
+        "signs": [
+          {
+            "id": "dispersion",
+            "count": 1,
+            "placement": "one side",
+            "orientation": "outward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "asymmetric"
+      },
+      "notes": "Light spell. Engine core is the Light sigil; the BIRD is the decorative shape SIGIL (bird_a, role:sigil) that gives the light the form of a bird, plus a single Dispersion sign that releases/spreads the light (engine: 'light leaks out and spreads on every side'). The matcher keys on core + sign multiset, so the bird_a sigil is recorded here in notes, not in signs[]. (Earlier draft wrongly used a 'bird' SIGN x3 -- corrected: it is one bird_a sigil + one dispersion sign.) Same 'decorative shape-sign gives the substance a body' pattern as Water Horse / Qifrey's Water Dragon. confidence=medium."
+    },
+    {
+      "id": "floatglow_lamp_seal",
+      "name": "Floatglow Lamp Seal",
+      "category": "light",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Floatglow_Lamp_Seal — manga debut ch. 2 (lamp), seal shown ch. 28 (wall-anchored). This recipe is the free-floating version.",
+      "confidence": "medium",
+      "effect": "Creates a floating ball/beam of light held free of gravity — a flameless lamp. (Free-floating version; a wall-anchored variant also exists.)",
+      "composition": {
+        "core": "light",
+        "signs": [
+          {
+            "id": "float",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Light spell, FREE-FLOATING version. Light core surrounded by alternating Float and Column signs => a beam of light that also floats free of gravity (engine: 'projected as a tight column or beam... it floats free of gravity'). A second WALL-ANCHORED version exists (seal shown ch. 28) and is not modelled here. confidence=medium (two versions; built the free-floating one)."
+    },
+    {
+      "id": "sylph_shoes_seal",
+      "name": "Sylph Shoes Seal",
+      "category": "wind",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Sylph_Shoes_Seal — manga debut ch. 1; drawn on Sylph Shoes (a contraption). The seal is bisected, one half per sole, and completes when the shoes touch.",
+      "confidence": "medium",
+      "effect": "Lets the wearer float above the ground and fly. Drawn on a pair of shoes as a bisected seal — one half on each sole — that completes and activates when the two shoes are touched together.",
+      "composition": {
+        "core": "wind_underfoot",
+        "signs": [
+          {
+            "id": "convergence",
+            "count": 8,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "levitation",
+            "count": 8,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Wind spell on a CONTRAPTION (Sylph Shoes). Core = Wind Underfoot sigil (a wind variant); around it, 8 Convergence + 8 Levitation signs alternating (the wiki shows eight of each) => lift focused to a point under the wearer (engine: 'lifted and made to levitate... focused down to a single point'). Convergence's neutral orientation already points inward (defaultFacing 'outward' = tip toward center). The seal is bisected across the two soles and completes when they touch. Count sets ring density, not power. confidence=medium (contraption; bisected activation not modelled by the single-seal engine)."
+    },
+    {
+      "id": "gathering_shadows",
+      "name": "Gathering Shadows",
+      "category": "vision",
+      "origin": "wiki",
+      "source": "https://witchhatatelier.telepedia.net/wiki/Gathering_Shadows — manga debut ch. 21; seen as a component of the Mirror Cloak of Borrowshade spell.",
+      "confidence": "medium",
+      "effect": "Makes the object it is drawn on absorb all light that hits it, so the user can conceal themselves in shadow by covering up with the object.",
+      "composition": {
+        "core": "vision_sigil",
+        "signs": [
+          {
+            "id": "eye",
+            "count": 4,
+            "placement": "4 of the 8 vision points",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "bend",
+            "count": 4,
+            "placement": "the other 4 points",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Vision spell. Vision sigil core with Eye signs on 4 of its 8 points and Bend signs off the other 4 => the object absorbs incoming light and bends light/shadow around it for concealment (engine: 'absorbs light into shadow and bends light and shadow around its target'). Appears as a building block of the Mirror Cloak of Borrowshade. confidence=medium (concealment vision magic; ties into forbidden-adjacent borrowshade)."
     }
   ]
 }

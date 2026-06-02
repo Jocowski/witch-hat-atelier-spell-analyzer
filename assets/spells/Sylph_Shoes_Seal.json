@@ -1,0 +1,194 @@
+{
+  "format": "wha-spell@2",
+  "name": "Sylph Shoes Seal",
+  "circles": [
+    {
+      "id": "k12",
+      "name": "",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": null,
+      "ring": {
+        "closed": true,
+        "doubled": false,
+        "size": "medium"
+      },
+      "core": {
+        "id": "c64",
+        "type": "wind_underfoot",
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "scale": 1,
+        "inverted": false
+      },
+      "components": [
+        {
+          "id": "c65",
+          "type": "convergence",
+          "role": "sign",
+          "x": 0,
+          "y": -95,
+          "rotation": 0,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c66",
+          "type": "levitation",
+          "role": "sign",
+          "x": 36.36,
+          "y": -87.77,
+          "rotation": 202.5,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c67",
+          "type": "convergence",
+          "role": "sign",
+          "x": 67.18,
+          "y": -67.18,
+          "rotation": 45,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c68",
+          "type": "levitation",
+          "role": "sign",
+          "x": 87.77,
+          "y": -36.36,
+          "rotation": 247.5,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c69",
+          "type": "convergence",
+          "role": "sign",
+          "x": 95,
+          "y": 0,
+          "rotation": 90,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c70",
+          "type": "levitation",
+          "role": "sign",
+          "x": 87.77,
+          "y": 36.36,
+          "rotation": 292.5,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c71",
+          "type": "convergence",
+          "role": "sign",
+          "x": 67.18,
+          "y": 67.18,
+          "rotation": 135,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c72",
+          "type": "levitation",
+          "role": "sign",
+          "x": 36.36,
+          "y": 87.77,
+          "rotation": 337.5,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c73",
+          "type": "convergence",
+          "role": "sign",
+          "x": 0,
+          "y": 110.5,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c74",
+          "type": "levitation",
+          "role": "sign",
+          "x": -42.29,
+          "y": 102.09,
+          "rotation": 22.5,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c75",
+          "type": "convergence",
+          "role": "sign",
+          "x": -78.14,
+          "y": 78.14,
+          "rotation": 225,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c76",
+          "type": "levitation",
+          "role": "sign",
+          "x": -102.09,
+          "y": 42.29,
+          "rotation": 67.5,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c77",
+          "type": "convergence",
+          "role": "sign",
+          "x": -110.5,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c78",
+          "type": "levitation",
+          "role": "sign",
+          "x": -102.09,
+          "y": -42.29,
+          "rotation": 112.5,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c79",
+          "type": "convergence",
+          "role": "sign",
+          "x": -78.14,
+          "y": -78.14,
+          "rotation": 315,
+          "scale": 1,
+          "inverted": false
+        },
+        {
+          "id": "c80",
+          "type": "levitation",
+          "role": "sign",
+          "x": -42.29,
+          "y": -102.09,
+          "rotation": 157.5,
+          "scale": 1,
+          "inverted": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

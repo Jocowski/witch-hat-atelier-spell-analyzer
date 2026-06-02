@@ -1,0 +1,21 @@
+{
+  "format": "wha-spell@2",
+  "name": "Bird of Light Beacon",
+  "circles": [
+    {
+      "id": "k9",
+      "name": "",
+      "center": { "x": 0, "y": 0 },
+      "radius": null,
+      "ring": { "closed": true, "doubled": false, "size": "medium" },
+      "core": { "id": "c47", "type": "light", "x": 0, "y": 0, "rotation": 45, "scale": 1, "inverted": false },
+      "components": [
+        { "id": "c48", "type": "dispersion", "role": "sign", "x": 0, "y": 50, "rotation": 0, "scale": 1, "inverted": false },
+        { "id": "c54", "type": "bird_a", "role": "sigil", "x": 0, "y": -10, "rotation": 0, "scale": 3.85, "inverted": false, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

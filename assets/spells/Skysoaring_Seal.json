@@ -1,0 +1,44 @@
+{
+  "format": "wha-spell@2",
+  "name": "Skysoaring Seal",
+  "circles": [
+    {
+      "id": "k3",
+      "name": "",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": null,
+      "ring": {
+        "closed": true,
+        "doubled": false,
+        "size": "large"
+      },
+      "core": {
+        "id": "c8",
+        "type": "wind",
+        "x": 0,
+        "y": 60,
+        "rotation": 0,
+        "scale": 0.8,
+        "inverted": false
+      },
+      "components": [
+        {
+          "id": "c9",
+          "type": "levitation",
+          "role": "sign",
+          "x": 0,
+          "y": -25,
+          "rotation": 180,
+          "scale": 2.4,
+          "inverted": false
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}
