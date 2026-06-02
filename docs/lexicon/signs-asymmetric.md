@@ -8,7 +8,8 @@
 >
 > This file also holds the signs the system **cannot yet name**: the `other` catch-alls (Bird,
 > Animal Signs, the generic Unknown Sign) and the **catalogued-but-unidentified** marks
-> (`unknown_01`…`unknown_05`). For those the **Drawing** field is the most valuable thing on the
+> (`unknown_01`…`unknown_05`, `unknown_07`, `unknown_08` — `unknown_06` was retired, reassigned to
+> **Convergence** once its triangle was identified). For those the **Drawing** field is the most valuable thing on the
 > page — when a sign's identity is the open question, its *shape* is the only reliable handle, and
 > reasoning from shape (per [../CORE.md](../CORE.md) §3–§4) is exactly the skill these entries are
 > meant to teach.
@@ -289,3 +290,49 @@ uncovered. The two copies are horizontal mirror images of each other.
   in earth's manipulate-not-create mode ([../sigils.md:53](../sigils.md)); the cage is temporary
   (inverted Crush). The new-unknown-sign workflow was validated here (add signs.json entry first,
   drop the PNG, `vectorize:signs`). ([../signs.md:407-429](../signs.md))
+
+> **`unknown_06` (retired).** The Phantasmal Fireball's large downward triangle was first
+> catalogued as `unknown_06`, then identified as **Convergence** (`convergence`, a downward
+> triangle ▽ — *focuses/concentrates + stiffens*) framing the Unburning Flames sigil to hold the
+> heatless flame into a dense, contained body. The id was removed; see Convergence in
+> [signs-semi-directional.md](signs-semi-directional.md).
+
+### Unknown Sign 7  `unknown_07`  ·  unknown  ·  operator: unknown
+
+**Drawing.** Two short **horizontal parallel bars** — an **"="** shape — drawn as strokes
+(`M-38 -10 L38 -10 M-38 10 L38 10`). Hand-authored clean vector; **do not re-trace** the crop.
+
+**Seen in.** **Phantasmal Fireball**, filling the gaps **between the radiating arms**, inside the
+ring (a small, evenly repeated mark).
+
+**Theories (unconfirmed).**
+- *Possibly related to [Unknown Sign 2](#unknown-sign-2--unknown_02--uncategorized--operator-unknown)
+  (`unknown_02`), the single **line**-shaped sign* — this may be a **doubled** variant, or a
+  distinct double-line keystone. Unconfirmed.
+- *Filler / balancing or reinforcement (low):* evenly spaced marks that keep the radial layout
+  symmetric/stable, or a repetition of whatever the single line encodes.
+- *Low confidence:* one spell only.
+
+**Findings.**
+- 2026-06-01: Catalogued from Phantasmal Fireball. Cross-reference `unknown_02` (the line) if a
+  second appearance clarifies whether "line" and "double line" are the same family.
+
+### Unknown Sign 8  `unknown_08`  ·  unknown  ·  operator: unknown
+
+**Drawing.** A small **circle with one half solid-filled** and the other half left as an open
+outline (a **◐**), drawn filled with `fill-rule:evenodd` (a thin ring + a filled left semicircle).
+Hand-authored clean vector; **do not re-trace** the crop.
+
+**Seen in.** **Phantasmal Fireball**, as **three external marks OUTSIDE the main ring**, each
+tethered to it by a short connecting stem.
+
+**Theories (unconfirmed).**
+- *External mark / tuning node (moderate):* like the solid satellite dots (●) on other seals
+  (e.g. Sand Cage), but the **half-fill** may encode a state (half/on) or a paired/toggle
+  relationship among the three — not a core-shaping keystone.
+- *Low confidence:* one spell only.
+
+**Findings.**
+- 2026-06-01: Catalogued from Phantasmal Fireball. Distinct from the fully-solid external dots.
+  When composing, place these in the **outside** zone (radius beyond the ring band) so the engine
+  treats them as external marks, not aim/symmetry drivers.

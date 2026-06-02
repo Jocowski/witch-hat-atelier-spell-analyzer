@@ -59,6 +59,12 @@ inverted appearance documented).
 (the inward point is convention, not aim).
 
 **Findings.**
+- 2026-06-02: **Likely the big downward triangle (▽) framing the Phantasmal Fireball.** Shape
+  matches exactly, and the role fits: on the heatless-flame substance, Convergence *focuses +
+  stiffens* the flame into a dense, persistent standing body so it holds as a contained orb
+  rather than dissipating. (Community reconstruction — originally mis-catalogued as `unknown_06`,
+  now reassigned here. Not canon-confirmed; awaiting the manga page.) See
+  [signs-asymmetric.md](signs-asymmetric.md) ("unknown_06 retired").
 - 2026-06-01: **Convergence can act as an intake/collection sign**, not only a focus/compactor.
   In **Qifrey's Water Dragon** it converges water held in nearby clouds to a point so the water
   sigils can draw it in. Don't assume Convergence-on-water = "compact into a dense body" (the

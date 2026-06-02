@@ -655,6 +655,64 @@
       "render": "fill"
     },
     {
+      "id": "unknown_07",
+      "name": "Unknown Sign 7",
+      "glyph": "=",
+      "svgPath": "M-38 -10 L38 -10 M-38 10 L38 10",
+      "effect": "Unidentified double-line sign — two short parallel bars. In the Phantasmal Fireball spell these fill the gaps between the radiating arms, inside the ring.",
+      "effectTags": [
+        "unknown"
+      ],
+      "invertible": false,
+      "canBeCenter": false,
+      "surrounds": false,
+      "family": "unknown",
+      "status": "unidentified",
+      "appearsIn": [
+        "phantasmal_fireball"
+      ],
+      "observations": [
+        "Two short horizontal parallel bars (an '=' shape). Drawn as strokes.",
+        "May be related to the single line-shaped Unknown Sign 2 (unknown_02, seen in Water Horse) — possibly a doubled variant — or a distinct double-line keystone. Unconfirmed.",
+        "Hand-authored clean vector (the source manga crop is low quality) — do NOT re-trace from a PNG."
+      ],
+      "theories": [
+        "Filler / balancing marks evenly spaced around the ring to keep the radial layout symmetric and stable; or a repetition/reinforcement of whatever the single-line sign encodes.",
+        "Low confidence: seen in one spell only (Phantasmal Fireball)."
+      ],
+      "reference": "Phantasmal Fireball (Olruggio)",
+      "render": "stroke"
+    },
+    {
+      "id": "unknown_08",
+      "name": "Unknown Sign 8",
+      "glyph": "◐",
+      "svgPath": "M-38 0 A38 38 0 1 0 38 0 A38 38 0 1 0 -38 0 Z M-32 0 A32 32 0 1 0 32 0 A32 32 0 1 0 -32 0 Z M0 -32 A32 32 0 0 0 0 32 Z",
+      "effect": "Unidentified half-filled circle (a small ring with one half solid). In the Phantasmal Fireball spell three of them sit OUTSIDE the main ring, each on a short connecting stem.",
+      "effectTags": [
+        "unknown"
+      ],
+      "invertible": false,
+      "canBeCenter": false,
+      "surrounds": false,
+      "family": "unknown",
+      "status": "unidentified",
+      "appearsIn": [
+        "phantasmal_fireball"
+      ],
+      "observations": [
+        "A small circle, one half solid-filled and the other half left open as an outline. Sits in the OUTSIDE zone (beyond the ring), tethered to the main circle by a short line/stem.",
+        "Distinct from the solid round dots (●) seen as external marks on other spells (e.g. Sand Cage) — those are fully filled; this one is half filled.",
+        "Hand-authored clean vector (the source manga crop is low quality) — do NOT re-trace from a PNG."
+      ],
+      "theories": [
+        "External mark / tuning node rather than a core-shaping keystone — like the satellite dots on other seals, but the half-fill may encode a state (on/half, or a paired/toggle relationship between the three).",
+        "Low confidence: seen in one spell only (Phantasmal Fireball)."
+      ],
+      "reference": "Phantasmal Fireball (Olruggio)",
+      "render": "fill"
+    },
+    {
       "id": "sights_set",
       "name": "Sights Set",
       "glyph": "◎",

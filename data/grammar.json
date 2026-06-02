@@ -79,7 +79,9 @@
     "unknown_02":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
     "unknown_03":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
     "unknown_04":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_05":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" }
+    "unknown_05":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
+    "unknown_07":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
+    "unknown_08":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" }
   },
 
   "interactions": [

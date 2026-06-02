@@ -1,0 +1,170 @@
+---
+name: Phantasmal Fireball
+type: contraption
+origin: community
+forbidden: false
+status: valid
+core: unburning_flame
+signs: convergence ×1, direction ×9 (6 inverted), unknown_07 ×6, unknown_02 ×6, unknown_08 ×3
+dyes: none
+symmetry: bilateral
+source: community reconstruction (user), built from the appearance of the canon Phantasmal Fireball (Olruggio); not canon-confirmed
+image: assets/spells/Phantasmal_Fireball.svg
+json: assets/spells/Phantasmal_Fireball.json
+---
+
+# Phantasmal Fireball
+
+> A heatless flame held as a stable, self-enveloping orb — gives light and looks like real
+> fire, but is cold and safe to touch. **This entry is a community reconstruction** of the
+> canon spell from its drawn appearance; the keystone identities are best-guess, not confirmed.
+
+## Overview
+Canonically, the Phantasmal Fireball is a fire-type spell by Olruggio that produces an
+**artificial flame giving off no heat** — it still looks and behaves like fire (light, scares
+beasts) but can be touched safely and never needs fuel, so it never goes out. As a contraption
+it is drawn on an orb that becomes fully engulfed in the cold flame, a convenient carried light
+source. This document records a **reconstruction** built in the app from the seal's appearance,
+analyzed through the real engine; the never-before-seen keystones are mapped to the closest
+plausible signs and flagged where uncertain.
+
+## Validity
+Engine: **valid** (core present, no unknown ids). Geometry: **bilateral symmetry → stable**;
+`aim: along the ring`; `power: concentrated (Convergence)`. The three half-circle marks sit in
+the **outside** zone and are correctly treated as external framing marks (they don't steer the
+effect). No blocking/warning issues.
+
+## Composition
+- **Substance (sigil):** **Unburning Flames** (`unburning_flame`, fire family) — a fire variant
+  whose flame gives off **no heat** while remaining luminous. This is where the heatlessness
+  comes from (not from any sign).
+- **Form (signs):**
+  - **Convergence** ×1 (`convergence`, power) — the large downward triangle framing the sigil;
+    focuses/concentrates and stiffens, holding the flame into a dense, persistent body.
+  - **Region** ×9 (`direction`, directional) — the radiating arrowheads (6 inverted + 3 normal);
+    their facings roughly cancel, so the flame manifests *around the ring* rather than projecting.
+  - **Unknown Sign 7** ×6 (`unknown_07`) — the `=` double-bars in the gaps (best-guess: balance/
+    filler marks). **Unidentified.**
+  - **Unknown Sign 2** ×6 (`unknown_02`) — the single line marks along the arms. **Unidentified.**
+  - **Unknown Sign 8** ×3 (`unknown_08`) — the half-filled circles outside the ring, on stems
+    (external marks). **Unidentified.**
+- **Ring:** closed.
+- **Ink / dyes:** plain conjuring ink.
+
+## Deduced effect
+*Reasoned from [docs/CORE.md](../CORE.md) + the lexicon, using the engine facts (the engine's
+own prose is only a scaffold).* A **stable, contained orb of heatless flame**: the Unburning
+Flames sigil supplies a luminous-but-cold flame; **Convergence** holds it as a dense, lasting
+body so it doesn't dissipate; the **balanced ring of Region signs** spreads it evenly around the
+seal (aim "along the ring") into an enveloping shell rather than a directed jet. The result is a
+self-sustaining ball of cold fire — light and the *appearance* of fire without heat or fuel.
+
+### How each part shapes the spell
+| Part | Role | Effect on this spell |
+|------|------|----------------------|
+| Unburning Flames | sigil (substance) | Supplies the **heatless luminous flame**; without it there is no cold-flame effect at all. |
+| Convergence ×1 | sign · power | Concentrates/holds the flame into a dense persistent body; without it the flame would be diffuse and short-lived. |
+| Region ×9 (6 inv.) | sign · direction | Balanced facings → flame emerges all around (enveloping orb) instead of firing one way. |
+| unknown_07 ×6 | sign · unknown | Best-guess balance/filler; keeps the layout even (effect unconfirmed). |
+| unknown_02 ×6 | sign · unknown | Line marks along the arms (effect unconfirmed). |
+| unknown_08 ×3 | sign · unknown (external) | Half-filled satellite marks outside the ring; framing only. |
+
+## Element behavior & canon grounding
+**Unburning Flames is a create-mode, luminous substance** — like fire, it conjures its own
+material and needs no fuel ([../sigils.md](../sigils.md); [../grammar.json](../../data/grammar.json):
+`unburning_flame` = "burns as flame that gives off no heat", quality `luminous`). That self-
+sufficiency is exactly why canon says the phantasmal flame *never goes out*.
+
+The decisive design point: **the heatlessness lives in the sigil, not in a sign.** Contrast
+**Snugstone** (fire + **Radial**), where Radial *tempers fire down to flameless warmth* — i.e.
+keeps the heat, drops the flame ([../signs.md](../signs.md), Radial). Phantasmal Fireball is the
+**mirror trade**: it keeps the flame's full appearance and drops the heat. So a Radial sign would
+actually be *wrong* here — the substance variant already does the work.
+
+For the form, the spell needs the flame to **wrap the object** rather than shoot. Two readings
+fit: a balanced **Region** ring (contain/spread around — the reading used here) or **Dispersion**
+(leak out on all sides). Both yield a flame shell around a center; the chosen reconstruction uses
+balanced Region signs whose facings cancel (engine `aim: along the ring`). **Convergence** is the
+holder — its focus/stiffen mechanic ([../signs.md](../signs.md), Convergence) keeps the cold flame
+a dense standing body. **Crush was explicitly rejected**: it transmutes *solids* and is canonically
+only seen with earth, so it has no defined meaning on a flame substance.
+
+**Bottom line:** mechanically coherent as *a heatless flame, held dense by Convergence and spread
+evenly by a balanced Region ring into a stable enveloping orb* — the same role canon gives it.
+The substance choice is certain; the keystone *identities* (Region vs Dispersion, and the three
+`unknown_*` marks) are reconstruction-level guesses and need the manga page to confirm.
+
+## How to draw it
+1. **Unburning Flames** sigil at the center.
+2. A large **Convergence** (downward triangle) framing the sigil (`scale` ≈ 4 here).
+3. A ring of **Region** arrowheads around it — keep them balanced (mirror pairs about the
+   vertical) so the flame spreads evenly; bilateral/radial symmetry = stable, longer-lasting.
+4. Fill the gaps with the small line / double-line marks (`unknown_02`, `unknown_07`).
+5. Three half-filled circle marks **outside** the ring on short stems (`unknown_08`).
+6. Close the ring. Bigger + neater = stronger and longer-lasting.
+
+## Usage ideas
+- A carried, fuel-less **lantern/torch** that can't burn you or spread.
+- A **beast-repellent** light for camp or travel (looks like real fire).
+- A safe **demonstration/teaching** flame — though, per Olruggio's own worry, a too-convincing
+  harmless fire risks dulling a healthy fear of real fire (his reason for shelving it).
+
+## Similar spells
+- **Snugstone** (fire + Radial) — the inverse trade (warmth without flame vs. flame without heat).
+- **Pyreball** (fire + Levitation) — a floating ball of *real* fire; this is the cold counterpart.
+- Olruggio's later **crystal-trapped** version keeps the cold flame but re-imposes "don't touch."
+
+## Notes & limitations
+- **Community reconstruction, not canon-confirmed.** The keystones marked `unknown_*` are
+  unidentified; **Convergence** (the triangle) and **Region** (the arrows) are best-guess mappings.
+- An earlier pass mis-catalogued the triangle as a new sign (`unknown_06`); it was retired and
+  reassigned to **Convergence** (see [../lexicon/signs-semi-directional.md](../lexicon/signs-semi-directional.md)).
+- To confirm, read the canon page from the local `manga/` mirror once the chapter is known.
+
+## Reproduction
+- **Image:** [assets/spells/Phantasmal_Fireball.svg](../../assets/spells/Phantasmal_Fireball.svg) (engine render; a PNG from the app can replace it)
+- **JSON:** [assets/spells/Phantasmal_Fireball.json](../../assets/spells/Phantasmal_Fireball.json)
+
+```json
+{
+  "format": "wha-spell@2",
+  "name": "Phantasmal Fireball (reconstruction)",
+  "circles": [
+    {
+      "id": "k3", "name": "Circle 1",
+      "center": { "x": 54.59, "y": -178.64 }, "radius": 80,
+      "ring": { "closed": true },
+      "core": { "id": "c1", "type": "unburning_flame", "x": 0, "y": 0, "rotation": 0, "scale": 1 },
+      "components": [
+        { "id": "c2", "type": "convergence", "role": "sign", "x": 0.1, "y": 8.43, "rotation": 0, "scale": 4 },
+        { "id": "c3", "type": "unknown_08", "role": "sign", "x": 90.07, "y": -50.87, "rotation": 240, "scale": 0.4, "mirrored": true, "anchor": { "ring": true, "angle": 60.54, "offset": 23.44 } },
+        { "id": "c4", "type": "unknown_08", "role": "sign", "x": 2.05, "y": 105.71, "rotation": 359.33, "scale": 0.4, "mirrored": true, "anchor": { "ring": true, "angle": 178.89, "offset": 25.73 } },
+        { "id": "c5", "type": "unknown_08", "role": "sign", "x": -92.45, "y": -43.68, "rotation": 111.35, "scale": 0.4, "mirrored": true, "anchor": { "ring": true, "angle": 295.29, "offset": 22.25 } },
+        { "id": "c6", "type": "direction", "role": "sign", "x": -22.86, "y": 26.47, "rotation": 43.33, "scale": 1, "inverted": true },
+        { "id": "c7", "type": "direction", "role": "sign", "x": 35.51, "y": 7.0, "rotation": 282.59, "scale": 1, "inverted": true },
+        { "id": "c8", "type": "direction", "role": "sign", "x": 8.43, "y": -35.35, "rotation": 193.41, "scale": 1, "inverted": true },
+        { "id": "c9", "type": "direction", "role": "sign", "x": 0.79, "y": -56.73, "rotation": 182.3, "scale": 1 },
+        { "id": "c10", "type": "direction", "role": "sign", "x": 53.93, "y": 28.12, "rotation": 300, "scale": 1 },
+        { "id": "c11", "type": "direction", "role": "sign", "x": -45.87, "y": 27.39, "rotation": 56.61, "scale": 1 },
+        { "id": "c12", "type": "unknown_07", "role": "sign", "x": -22.67, "y": 49.44, "rotation": 24.64, "scale": 0.4 },
+        { "id": "c13", "type": "unknown_07", "role": "sign", "x": -28.51, "y": -45.79, "rotation": 148.09, "scale": 0.4 },
+        { "id": "c14", "type": "unknown_07", "role": "sign", "x": 31.43, "y": -45.06, "rotation": 220, "scale": 0.4 },
+        { "id": "c15", "type": "unknown_07", "role": "sign", "x": 59.88, "y": -11.84, "rotation": 258.82, "scale": 0.4 },
+        { "id": "c16", "type": "unknown_07", "role": "sign", "x": 30.64, "y": 42.71, "rotation": 324.35, "scale": 0.4 },
+        { "id": "c17", "type": "unknown_07", "role": "sign", "x": -53.25, "y": -3.25, "rotation": 97.44, "scale": 0.4 },
+        { "id": "c18", "type": "unknown_02", "role": "sign", "x": -33.8, "y": 21.08, "rotation": 57.94, "scale": 0.85 },
+        { "id": "c19", "type": "unknown_02", "role": "sign", "x": 2.02, "y": -65.33, "rotation": 183.62, "scale": 1 },
+        { "id": "c20", "type": "unknown_02", "role": "sign", "x": 58.99, "y": 32.28, "rotation": 297.09, "scale": 1 },
+        { "id": "c21", "type": "unknown_02", "role": "sign", "x": 0.08, "y": -42.15, "rotation": 179.14, "scale": 1 },
+        { "id": "c22", "type": "unknown_02", "role": "sign", "x": 40.12, "y": 20.38, "rotation": 300, "scale": 1 },
+        { "id": "c23", "type": "unknown_02", "role": "sign", "x": -54.78, "y": 33.04, "rotation": 54.79, "scale": 1 },
+        { "id": "c24", "type": "direction", "role": "sign", "x": 27.31, "y": 22.49, "rotation": 315.11, "scale": 1, "inverted": true },
+        { "id": "c25", "type": "direction", "role": "sign", "x": -33.09, "y": 9.82, "rotation": 73.25, "scale": 1, "inverted": true },
+        { "id": "c26", "type": "direction", "role": "sign", "x": -11.24, "y": -33.74, "rotation": 161.98, "scale": 1, "inverted": true }
+      ],
+      "dyes": [], "inkColor": null
+    }
+  ],
+  "relations": []
+}
+```
