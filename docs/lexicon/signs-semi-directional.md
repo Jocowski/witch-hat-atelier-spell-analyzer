@@ -88,12 +88,22 @@ the vertical axis; reads as concentric.
 
 **Acts as.** A `power` operator that **attenuates** — decreases the spell's intensity, converting
 an intense form into a milder one ("is tempered to a gentler intensity"), e.g. fire → flameless
-warmth. **Invertible** in principle (never seen inverted in canon).
+warmth. **Invertible** — the **Sand Bridge** seal uses it inverted (the only known inverted
+Radial); the *effect* of that inversion is undocumented in canon — see the Findings theory below.
 
 **Parameters.** Size sets the *amount* of tempering. With fire it sets the *kind* of output
 (flameless warmth); the seal's overall size then sets the safe *amount*.
 
 **Findings.**
+- 2026-06-02: **Inverted Radial — THEORY (not canon).** Sand Bridge is the only spell that uses
+  Radial **inverted** (×2, east/west). Canon never documents an inverted Radial's effect
+  ([..\signs.md](..\signs.md):247). *Deduction:* since inverting a semi-directional sign **reverses
+  its effect** ([..\signs.md](..\signs.md):18) and normal Radial *attenuates* power, inverted Radial
+  most likely **un-tempers / firms up** — it cancels the softening so the structure sets firm enough
+  to bear weight (a power-*reducer* would be the wrong tool for a load-bearing bridge). This is a
+  first-principles inference from the inversion rule + the bridge's need for rigidity, **not** a
+  canon-stated effect — confidence low/theoretical. Engine blind spot: the engine is inversion-blind
+  for Radial and still labels inverted Radial "weakened on purpose," so don't trust its power label here.
 - 2026-06-01: **Snugstone** — Radial sets the *kind* of output (flameless warmth); seal *size* sets
   the safe *amount*. Safety is a calibration, not an inherent ceiling — amplification/power-dyes
   break it (Arcane Lens unbalanced it → melted the Ancients of Romonon).
@@ -102,7 +112,7 @@ warmth. **Invertible** in principle (never seen inverted in canon).
   Unknown Sign 5, *not* Radial. Mis-reading injected a spurious "tempered/gentle" clause. Always
   check whether an odd Radial is standing in for a missing sign.
 
-**Appears in.** Snugstone Spell. (Listed for Sand Cage only as a since-corrected placeholder.)
+**Appears in.** Snugstone Spell · Sand Bridge (inverted, E/W). (Listed for Sand Cage only as a since-corrected placeholder.)
 
 ---
 

@@ -967,6 +967,78 @@
         "symmetry": "radial"
       },
       "notes": "Vision spell. Vision sigil core with Eye signs on 4 of its 8 points and Bend signs off the other 4 => the object absorbs incoming light and bends light/shadow around it for concealment (engine: 'absorbs light into shadow and bends light and shadow around its target'). Appears as a building block of the Mirror Cloak of Borrowshade. confidence=medium (concealment vision magic; ties into forbidden-adjacent borrowshade)."
+    },
+    {
+      "id": "sand_bridge",
+      "name": "Sand Bridge",
+      "category": "earth",
+      "origin": "wiki",
+      "source": "telepedia 'Sand Bridge': https://witchhatatelier.telepedia.net/wiki/Sand_Bridge — manga debut ch. 12, anime ep. 8. Niche spell; the central sigil and several signs are unidentified (catalogued here as sand_bridge sigil + unknown_06/09/10).",
+      "confidence": "low",
+      "effect": "Constructs a temporary bridge out of sand, building it one pillar/section at a time to span a gap.",
+      "composition": {
+        "core": "sand_bridge",
+        "signs": [
+          {
+            "id": "column",
+            "count": 6,
+            "placement": "2 large N/S + 4 intercardinal",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_05",
+            "count": 4,
+            "placement": "flanking the N/S Columns",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_09",
+            "count": 4,
+            "placement": "flanking the N/S Columns",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_11",
+            "count": 2,
+            "placement": "east-west (the bridge glyph)",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "radial",
+            "count": 2,
+            "placement": "east-west (outermost)",
+            "orientation": "inward",
+            "inverted": true
+          },
+          {
+            "id": "strengthen",
+            "count": 4,
+            "placement": "diagonals",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_10",
+            "count": 4,
+            "placement": "diagonals (outboard)",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_06",
+            "count": 2,
+            "placement": "inner circle, flanking the core",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "bilateral"
+      },
+      "notes": "Niche earth/sand spell (manga ch. 12 / anime ep. 8). TWO-CIRCLE nested seal: an inner circle = the sand_bridge core (unidentified central sigil; element treated as earth) flanked by a Region-like unknown_06 pair; an outer coreless MODIFIER ring that shapes it. Outer ring: two large N/S Columns (raise the sand into pillars along the span axis) + 4 smaller intercardinal Columns; 4 Strengthen (reinforce to bear weight); 2 INVERTED Radial at E/W (the only known inverted Radial -- likely un-tempers/firms the structure, a DEDUCTION not canon: see the Radial lexicon Findings); 2 unknown_11 'bridge' glyphs at E/W (likely the arch/deck shape-giver); plus unidentified unknown_05 (half-circle arcs), unknown_09 (dumbbells) and unknown_10 (parallel-line marks). Earth manipulates, does not create (sigils.md:53) => needs real sand present; the build is TEMPORARY, raised one pillar at a time. Six unidentified glyph types (sand_bridge sigil + unknown_05/06/09/10/11) => engine flags the deduction incomplete. confidence=low."
     }
   ]
 }

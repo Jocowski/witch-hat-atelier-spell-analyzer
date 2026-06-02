@@ -3,11 +3,28 @@
   "version": "1.0.0",
   "title": "Compositional Grammar — Spell Deduction",
   "description": "Encodes HOW a spell's effect is deduced from its parts. The sigil provides the SUBSTANCE; each sign is an OPERATOR that transforms how that substance manifests. The deduction engine (src/engine/deduce.js) runs the operators through a pipeline and assembles a plain-language explanation. Derived from the canonical spells (see ANALYSIS.md §11).",
-
   "model": {
     "principle": "effect = substance(sigil) transformed by operators(signs), aimed by orientation/balance, scoped by target, scaled by power, stabilized by symmetry, negated by inversion.",
-    "operatorKinds": ["form", "transmute", "motion", "direction", "target", "power", "support", "special", "none"],
-    "pipeline": ["transmute_or_form", "motion", "direction", "target", "power", "special", "support"],
+    "operatorKinds": [
+      "form",
+      "transmute",
+      "motion",
+      "direction",
+      "target",
+      "power",
+      "support",
+      "special",
+      "none"
+    ],
+    "pipeline": [
+      "transmute_or_form",
+      "motion",
+      "direction",
+      "target",
+      "power",
+      "special",
+      "support"
+    ],
     "notes": [
       "FORM is element-agnostic: column makes a beam of water (Watershot) OR light (Light Beam).",
       "Exactly one of transmute/form usually dominates the primary clause; transmute outranks form.",
@@ -15,117 +32,506 @@
       "Symmetry sets stability; size sets power; neatness sets duration."
     ]
   },
-
   "elements": {
-    "fire":          { "substance": "flame",                 "raw": "burns, giving off heat and light", "qualities": ["hot", "luminous"] },
-    "unburning_flame":{ "substance": "heatless flame",        "raw": "burns as flame that gives off no heat", "qualities": ["luminous"] },
-    "water":         { "substance": "water",                 "raw": "pours and flows outward",          "qualities": ["fluid"] },
-    "earth":         { "substance": "earth, stone, and sand","raw": "rises up as rock and sand",         "qualities": ["solid", "heavy"] },
-    "air":           { "substance": "air",                   "raw": "stirs into moving wind",            "qualities": ["mobile", "invisible"] },
-    "light":         { "substance": "light",                 "raw": "shines outward",                    "qualities": ["luminous"] },
-    "crystal":       { "substance": "crystal",               "raw": "forms into hard crystal",           "qualities": ["solid", "rigid"] },
-    "transmutation": { "substance": "the affected matter",   "raw": "is transmuted",                     "qualities": [] },
-    "time":          { "substance": "the flow of time",      "raw": "reverts what it touches to an earlier state", "qualities": [] },
-    "smoke":         { "substance": "smoke",                 "raw": "billows out as smoke",              "qualities": ["airy"] },
-    "decorative":    { "substance": "the spell's magic",     "raw": "takes the shape of the living thing it depicts", "qualities": [] },
-    "guidance":      { "substance": "a gathering pull",      "raw": "draws matching objects toward the glyph", "qualities": [] },
-    "calling":       { "substance": "a recorded sound",      "raw": "echoes back a recorded phrase",     "qualities": [] },
-    "mind":          { "substance": "memory",                "raw": "acts upon the mind",                "qualities": ["forbidden-adjacent"] },
-    "space":         { "substance": "space itself",          "raw": "links two distant points",          "qualities": [] },
-    "forbidden":     { "substance": "forbidden power",       "raw": "warps its target in a forbidden way","qualities": ["forbidden"] },
-    "unknown":       { "substance": "an unknown force",      "raw": "manifests in an unclear way",       "qualities": ["uncertain"] }
+    "fire": {
+      "substance": "flame",
+      "raw": "burns, giving off heat and light",
+      "qualities": [
+        "hot",
+        "luminous"
+      ]
+    },
+    "unburning_flame": {
+      "substance": "heatless flame",
+      "raw": "burns as flame that gives off no heat",
+      "qualities": [
+        "luminous"
+      ]
+    },
+    "water": {
+      "substance": "water",
+      "raw": "pours and flows outward",
+      "qualities": [
+        "fluid"
+      ]
+    },
+    "earth": {
+      "substance": "earth, stone, and sand",
+      "raw": "rises up as rock and sand",
+      "qualities": [
+        "solid",
+        "heavy"
+      ]
+    },
+    "air": {
+      "substance": "air",
+      "raw": "stirs into moving wind",
+      "qualities": [
+        "mobile",
+        "invisible"
+      ]
+    },
+    "light": {
+      "substance": "light",
+      "raw": "shines outward",
+      "qualities": [
+        "luminous"
+      ]
+    },
+    "crystal": {
+      "substance": "crystal",
+      "raw": "forms into hard crystal",
+      "qualities": [
+        "solid",
+        "rigid"
+      ]
+    },
+    "transmutation": {
+      "substance": "the affected matter",
+      "raw": "is transmuted",
+      "qualities": []
+    },
+    "time": {
+      "substance": "the flow of time",
+      "raw": "reverts what it touches to an earlier state",
+      "qualities": []
+    },
+    "smoke": {
+      "substance": "smoke",
+      "raw": "billows out as smoke",
+      "qualities": [
+        "airy"
+      ]
+    },
+    "decorative": {
+      "substance": "the spell's magic",
+      "raw": "takes the shape of the living thing it depicts",
+      "qualities": []
+    },
+    "guidance": {
+      "substance": "a gathering pull",
+      "raw": "draws matching objects toward the glyph",
+      "qualities": []
+    },
+    "calling": {
+      "substance": "a recorded sound",
+      "raw": "echoes back a recorded phrase",
+      "qualities": []
+    },
+    "mind": {
+      "substance": "memory",
+      "raw": "acts upon the mind",
+      "qualities": [
+        "forbidden-adjacent"
+      ]
+    },
+    "space": {
+      "substance": "space itself",
+      "raw": "links two distant points",
+      "qualities": []
+    },
+    "forbidden": {
+      "substance": "forbidden power",
+      "raw": "warps its target in a forbidden way",
+      "qualities": [
+        "forbidden"
+      ]
+    },
+    "unknown": {
+      "substance": "an unknown force",
+      "raw": "manifests in an unclear way",
+      "qualities": [
+        "uncertain"
+      ]
+    }
   },
-
   "operators": {
-    "column":         { "kind": "form", "verb": "is projected as a tight column or beam", "invertedVerb": "is driven inward and erupts rather than projecting out", "directional": true, "defaultDirection": "up" },
-    "dispersion":     { "kind": "form", "verb": "leaks out and spreads on every side", "defaultDirection": "outward" },
-    "bolt":           { "kind": "form", "verb": "fragments into fast-flying bolts", "wants": ["direction"] },
-    "rain":           { "kind": "form", "verb": "falls as rain across the surrounding area", "surrounds": true },
-    "bird":           { "kind": "form", "verb": "gathers into the shape of a bird that flies about", "surrounds": true },
-    "weave":          { "kind": "transmute", "verb": "is woven into a long, flexible ribbon", "surrounds": true },
-    "billowing":      { "kind": "transmute", "verb": "is converted into a soft, fluffy cloud", "wants": ["collection"] },
-    "crush":          { "kind": "transmute", "verb": "is pulverized into dust", "invertedVerb": "is reassembled from dust", "pairsBestWith": ["earth"] },
-    "enlarge":        { "kind": "transmute", "verb": "grows far beyond its normal size", "invertedVerb": "shrinks far below its normal size" },
-    "levitation":     { "kind": "motion", "verb": "is lifted and made to levitate", "directional": true, "defaultDirection": "up" },
-    "float":          { "kind": "motion", "verb": "floats free of gravity" },
-    "dancing_puppet": { "kind": "motion", "verb": "darts and flits erratically through the air", "surrounds": true, "pairsBestWith": ["air"] },
-    "pull":           { "kind": "direction", "verb": "draws matter of the same element inward toward the glyph", "invertedVerb": "pushes matter of the same element away from the glyph", "vortexWhenAngled": true },
-    "direction":      { "kind": "direction", "verb": "is aimed", "arrangementControlled": true },
-    "convergence":    { "kind": "power", "verb": "is focused down to a single point", "hardensLoose": true },
-    "radial":         { "kind": "power", "verb": "is tempered to a gentler intensity" },
-    "collection":     { "kind": "support", "verb": "gathers surrounding material to feed the spell", "surrounds": true },
-    "crosshair":      { "kind": "target", "verb": "is confined within an area of effect" },
-    "window":         { "kind": "target", "verb": "affects only the object it is drawn on" },
-    "diamond":        { "kind": "target", "verb": "affects nearby objects rather than the object it is drawn on" },
-    "repetition":     { "kind": "special", "verb": "reverts its target to an earlier, like-new state", "invertedVerb": "accelerates wear on its target" },
-    "vision":         { "kind": "special", "verb": "manipulates the light around it" },
-    "eye":            { "kind": "special", "verb": "absorbs light into shadow" },
-    "bend":           { "kind": "special", "verb": "bends light and shadow around its target" },
-    "sights_set":     { "kind": "target", "verb": "is aimed at a chosen target (seemingly mind-directed)" },
-    "gather":         { "kind": "support", "verb": "actively draws in surrounding material to feed the spell", "surrounds": true },
-    "strengthen":     { "kind": "special", "verb": "is reinforced, made tougher and more durable" },
-    "entwine":        { "kind": "special", "verb": "wraps and entwines around nearby objects" },
-    "aeriforms_defined": { "kind": "special", "verb": "shapes how the air takes form (role not fully clear)" },
-    "glaives":        { "kind": "special", "verb": "embeds the magic deep into the flesh of its target" },
-    "bind":           { "kind": "special", "verb": "binds fast to the surface it touches" },
-    "link":           { "kind": "special", "verb": "links its magic to every object sharing the same origin" },
-    "cool":           { "kind": "special", "verb": "is chilled and cooled" },
-    "orb":            { "kind": "form", "verb": "gathers into a sphere held above the glyph" },
-    "purify":         { "kind": "special", "verb": "is purified, separating impurities out of the element" },
-    "sign_of_wind":   { "kind": "motion", "verb": "is set whirling into a spinning spiral (a 'whirlwind keystone')" },
-    "animal_signs":   { "kind": "none", "verb": "adds a decorative animal motif with no magical effect" },
-    "unknown_sign":   { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_01":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_02":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_03":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_04":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_05":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_07":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" },
-    "unknown_08":     { "kind": "unknown", "verb": "contributes an effect that has not yet been identified" }
+    "column": {
+      "kind": "form",
+      "verb": "is projected as a tight column or beam",
+      "invertedVerb": "is driven inward and erupts rather than projecting out",
+      "directional": true,
+      "defaultDirection": "up"
+    },
+    "dispersion": {
+      "kind": "form",
+      "verb": "leaks out and spreads on every side",
+      "defaultDirection": "outward"
+    },
+    "bolt": {
+      "kind": "form",
+      "verb": "fragments into fast-flying bolts",
+      "wants": [
+        "direction"
+      ]
+    },
+    "rain": {
+      "kind": "form",
+      "verb": "falls as rain across the surrounding area",
+      "surrounds": true
+    },
+    "bird": {
+      "kind": "form",
+      "verb": "gathers into the shape of a bird that flies about",
+      "surrounds": true
+    },
+    "weave": {
+      "kind": "transmute",
+      "verb": "is woven into a long, flexible ribbon",
+      "surrounds": true
+    },
+    "billowing": {
+      "kind": "transmute",
+      "verb": "is converted into a soft, fluffy cloud",
+      "wants": [
+        "collection"
+      ]
+    },
+    "crush": {
+      "kind": "transmute",
+      "verb": "is pulverized into dust",
+      "invertedVerb": "is reassembled from dust",
+      "pairsBestWith": [
+        "earth"
+      ]
+    },
+    "enlarge": {
+      "kind": "transmute",
+      "verb": "grows far beyond its normal size",
+      "invertedVerb": "shrinks far below its normal size"
+    },
+    "levitation": {
+      "kind": "motion",
+      "verb": "is lifted and made to levitate",
+      "directional": true,
+      "defaultDirection": "up"
+    },
+    "float": {
+      "kind": "motion",
+      "verb": "floats free of gravity"
+    },
+    "dancing_puppet": {
+      "kind": "motion",
+      "verb": "darts and flits erratically through the air",
+      "surrounds": true,
+      "pairsBestWith": [
+        "air"
+      ]
+    },
+    "pull": {
+      "kind": "direction",
+      "verb": "draws matter of the same element inward toward the glyph",
+      "invertedVerb": "pushes matter of the same element away from the glyph",
+      "vortexWhenAngled": true
+    },
+    "direction": {
+      "kind": "direction",
+      "verb": "is aimed",
+      "arrangementControlled": true
+    },
+    "convergence": {
+      "kind": "power",
+      "verb": "is focused down to a single point",
+      "hardensLoose": true
+    },
+    "radial": {
+      "kind": "power",
+      "verb": "is tempered to a gentler intensity"
+    },
+    "collection": {
+      "kind": "support",
+      "verb": "gathers surrounding material to feed the spell",
+      "surrounds": true
+    },
+    "crosshair": {
+      "kind": "target",
+      "verb": "is confined within an area of effect"
+    },
+    "window": {
+      "kind": "target",
+      "verb": "affects only the object it is drawn on"
+    },
+    "diamond": {
+      "kind": "target",
+      "verb": "affects nearby objects rather than the object it is drawn on"
+    },
+    "repetition": {
+      "kind": "special",
+      "verb": "reverts its target to an earlier, like-new state",
+      "invertedVerb": "accelerates wear on its target"
+    },
+    "vision": {
+      "kind": "special",
+      "verb": "manipulates the light around it"
+    },
+    "eye": {
+      "kind": "special",
+      "verb": "absorbs light into shadow"
+    },
+    "bend": {
+      "kind": "special",
+      "verb": "bends light and shadow around its target"
+    },
+    "sights_set": {
+      "kind": "target",
+      "verb": "is aimed at a chosen target (seemingly mind-directed)"
+    },
+    "gather": {
+      "kind": "support",
+      "verb": "actively draws in surrounding material to feed the spell",
+      "surrounds": true
+    },
+    "strengthen": {
+      "kind": "special",
+      "verb": "is reinforced, made tougher and more durable"
+    },
+    "entwine": {
+      "kind": "special",
+      "verb": "wraps and entwines around nearby objects"
+    },
+    "aeriforms_defined": {
+      "kind": "special",
+      "verb": "shapes how the air takes form (role not fully clear)"
+    },
+    "glaives": {
+      "kind": "special",
+      "verb": "embeds the magic deep into the flesh of its target"
+    },
+    "bind": {
+      "kind": "special",
+      "verb": "binds fast to the surface it touches"
+    },
+    "link": {
+      "kind": "special",
+      "verb": "links its magic to every object sharing the same origin"
+    },
+    "cool": {
+      "kind": "special",
+      "verb": "is chilled and cooled"
+    },
+    "orb": {
+      "kind": "form",
+      "verb": "gathers into a sphere held above the glyph"
+    },
+    "purify": {
+      "kind": "special",
+      "verb": "is purified, separating impurities out of the element"
+    },
+    "sign_of_wind": {
+      "kind": "motion",
+      "verb": "is set whirling into a spinning spiral (a 'whirlwind keystone')"
+    },
+    "animal_signs": {
+      "kind": "none",
+      "verb": "adds a decorative animal motif with no magical effect"
+    },
+    "unknown_sign": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_01": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_02": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_03": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_04": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_05": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_07": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_08": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_06": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_09": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_10": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    },
+    "unknown_11": {
+      "kind": "unknown",
+      "verb": "contributes an effect that has not yet been identified"
+    }
   },
-
   "interactions": [
-    { "id": "bolt-direction", "type": "synergy", "when": { "has": ["bolt", "direction"] },
-      "text": "Direction aims the bolts, firing them straight ahead at dangerous speed." },
-    { "id": "bolt-no-direction", "type": "warning", "when": { "has": ["bolt"], "missing": ["direction"] },
-      "text": "Bolts form but fly without a controlled aim — add a Direction sign to fire them straight." },
-
-    { "id": "collection-billowing", "type": "synergy", "when": { "has": ["collection", "billowing"] },
-      "text": "Collection gathers the material that Billowing then converts into a cloud." },
-    { "id": "billowing-no-collection", "type": "warning", "when": { "has": ["billowing"], "missing": ["collection"] },
-      "text": "Billowing has no material to work with — add Collection signs so it has something to turn into cloud." },
-
-    { "id": "convergence-earth", "type": "synergy", "when": { "has": ["convergence"], "element": "earth" },
-      "text": "Convergence compacts the loose earth and sand into a solid, rigid form." },
-    { "id": "radial-fire", "type": "synergy", "when": { "has": ["radial"], "element": "fire" },
-      "text": "Radial tempers the flame into gentle, flameless warmth." },
-
-    { "id": "shadow-meld", "type": "synergy", "when": { "has": ["eye", "bend"], "core": "vision_sigil" },
-      "text": "Vision + Eye + Bend meld the object — and whatever it covers — into the shadows (concealment)." },
-    { "id": "vision-incomplete", "type": "note", "when": { "core": "vision_sigil", "missing": ["eye", "bend"] },
-      "text": "On its own Vision only stirs light; pair it with Eye and Bend for true concealment." },
-
-    { "id": "pull-vortex", "type": "note", "when": { "has": ["pull"] },
-      "text": "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in." },
-    { "id": "crush-needs-force", "type": "note", "when": { "has": ["crush"], "missing": ["column"] },
-      "text": "Crush pulverizes on contact, but without a Column to drive it the break has little reach." },
-
-    { "id": "enlarge-window", "type": "note", "when": { "has": ["enlarge", "window"] },
-      "text": "Window focuses Enlarge on the object the glyph is drawn on (it grows itself)." },
-    { "id": "enlarge-diamond", "type": "note", "when": { "has": ["enlarge", "diamond"] },
-      "text": "Diamond focuses Enlarge on nearby objects rather than the glyph's own surface." },
-
-    { "id": "dancing-puppet-air", "type": "synergy", "when": { "has": ["dancing_puppet"], "element": "air" },
-      "text": "With a wind element, Dancing Puppet sends objects darting through the open air." }
+    {
+      "id": "bolt-direction",
+      "type": "synergy",
+      "when": {
+        "has": [
+          "bolt",
+          "direction"
+        ]
+      },
+      "text": "Direction aims the bolts, firing them straight ahead at dangerous speed."
+    },
+    {
+      "id": "bolt-no-direction",
+      "type": "warning",
+      "when": {
+        "has": [
+          "bolt"
+        ],
+        "missing": [
+          "direction"
+        ]
+      },
+      "text": "Bolts form but fly without a controlled aim — add a Direction sign to fire them straight."
+    },
+    {
+      "id": "collection-billowing",
+      "type": "synergy",
+      "when": {
+        "has": [
+          "collection",
+          "billowing"
+        ]
+      },
+      "text": "Collection gathers the material that Billowing then converts into a cloud."
+    },
+    {
+      "id": "billowing-no-collection",
+      "type": "warning",
+      "when": {
+        "has": [
+          "billowing"
+        ],
+        "missing": [
+          "collection"
+        ]
+      },
+      "text": "Billowing has no material to work with — add Collection signs so it has something to turn into cloud."
+    },
+    {
+      "id": "convergence-earth",
+      "type": "synergy",
+      "when": {
+        "has": [
+          "convergence"
+        ],
+        "element": "earth"
+      },
+      "text": "Convergence compacts the loose earth and sand into a solid, rigid form."
+    },
+    {
+      "id": "radial-fire",
+      "type": "synergy",
+      "when": {
+        "has": [
+          "radial"
+        ],
+        "element": "fire"
+      },
+      "text": "Radial tempers the flame into gentle, flameless warmth."
+    },
+    {
+      "id": "shadow-meld",
+      "type": "synergy",
+      "when": {
+        "has": [
+          "eye",
+          "bend"
+        ],
+        "core": "vision_sigil"
+      },
+      "text": "Vision + Eye + Bend meld the object — and whatever it covers — into the shadows (concealment)."
+    },
+    {
+      "id": "vision-incomplete",
+      "type": "note",
+      "when": {
+        "core": "vision_sigil",
+        "missing": [
+          "eye",
+          "bend"
+        ]
+      },
+      "text": "On its own Vision only stirs light; pair it with Eye and Bend for true concealment."
+    },
+    {
+      "id": "pull-vortex",
+      "type": "note",
+      "when": {
+        "has": [
+          "pull"
+        ]
+      },
+      "text": "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+    },
+    {
+      "id": "crush-needs-force",
+      "type": "note",
+      "when": {
+        "has": [
+          "crush"
+        ],
+        "missing": [
+          "column"
+        ]
+      },
+      "text": "Crush pulverizes on contact, but without a Column to drive it the break has little reach."
+    },
+    {
+      "id": "enlarge-window",
+      "type": "note",
+      "when": {
+        "has": [
+          "enlarge",
+          "window"
+        ]
+      },
+      "text": "Window focuses Enlarge on the object the glyph is drawn on (it grows itself)."
+    },
+    {
+      "id": "enlarge-diamond",
+      "type": "note",
+      "when": {
+        "has": [
+          "enlarge",
+          "diamond"
+        ]
+      },
+      "text": "Diamond focuses Enlarge on nearby objects rather than the glyph's own surface."
+    },
+    {
+      "id": "dancing-puppet-air",
+      "type": "synergy",
+      "when": {
+        "has": [
+          "dancing_puppet"
+        ],
+        "element": "air"
+      },
+      "text": "With a wind element, Dancing Puppet sends objects darting through the open air."
+    }
   ],
-
   "stability": {
     "radial": "stable (radial symmetry)",
     "bilateral": "stable (bilateral symmetry)",
     "asymmetric": "valid but potentially unstable (asymmetric)",
     "none": "no signs to balance"
   },
-
   "power": {
     "tempered": "weakened on purpose (Radial) — a gentle version of the element",
     "focused": "concentrated to a point (Convergence) — narrower but more intense",
