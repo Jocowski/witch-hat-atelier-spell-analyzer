@@ -52,7 +52,9 @@ function ComponentGlyph({ comp, circleId, selected, hovered, onPointerDown }) {
       ) : def.render === 'fill' ? (
         <path d={def.svgPath} fill={color} fillRule="evenodd" stroke="none" />
       ) : (
-        <path d={def.svgPath} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        // Stroke weight compensates for scale (4 / scale) so signs drawn large to contain
+        // others keep a thin, constant line weight instead of fattening up.
+        <path d={def.svgPath} fill="none" stroke={color} strokeWidth={4 / (comp.scale ?? 1)} strokeLinecap="round" strokeLinejoin="round" />
       )}
     </g>
   )

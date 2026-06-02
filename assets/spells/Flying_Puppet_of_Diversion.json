@@ -1,0 +1,20 @@
+{
+  "format": "wha-spell@2",
+  "name": "Flying Puppet of Diversion",
+  "circles": [
+    {
+      "id": "k8",
+      "name": "Circle 1",
+      "center": { "x": 0, "y": 0 },
+      "radius": 110,
+      "ring": { "closed": true },
+      "core": { "id": "c50", "type": "wind", "x": 0, "y": 0, "rotation": 0, "scale": 1, "inverted": false, "mirrored": false },
+      "components": [
+        { "id": "c51", "type": "dancing_puppet", "role": "sign", "x": 0, "y": 1.87, "rotation": 180, "scale": 3.85, "inverted": false, "mirrored": false }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

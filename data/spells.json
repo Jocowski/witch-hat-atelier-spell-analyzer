@@ -558,6 +558,22 @@
         "symmetry": "radial"
       },
       "notes": "Canon earth spell. Earth sigil + two Column keystones flanking it + two Crush keystones at 90 deg. NON-INVERTED Crush = pulverize to dust (Wall Breaker; signs.md:73) - inverting the Crush flips the spell to Integration (reassemble). The Columns drive the crushing force THROUGH the material so the break has reach/penetration (crush-needs-force; signs.md:34); without them Crush only crumbles on contact. Earth manipulates, does not create (sigils.md:53): the seal is drawn ON the solid it destroys. First used by Agott to break a wall escaping the Illusory Labyrinth dragon; later by Coco to free Custas from a boulder; helped inspire the Serpent's Bed of Sand (whose satellites mill rock the same way). Engine aim 'above the seal' is an artifact - the Columns drive into the wall, not upward. confidence=high (well documented in manga/wiki)."
+    },
+    {
+      "id": "flying_puppet_of_diversion",
+      "name": "Flying Puppet of Diversion",
+      "category": "wind",
+      "origin": "canon",
+      "confidence": "high",
+      "effect": "Makes the object the seal is drawn on dart and fly erratically through the sky (mind-piloted), with enough force to carry objects aloft. Tetia cast it on her cloak and hat as a flying decoy to divert a dragon.",
+      "composition": {
+        "core": "wind",
+        "signs": [
+          { "id": "dancing_puppet", "count": 1, "placement": "surrounds the central sigil", "orientation": "surround", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Canon wind spell. A single large Puppet (dancing_puppet) keystone surrounding the wind sigil (surrounds=true; the one sign IS the whole form, so the engine's single-sign 'asymmetric' is an artifact). Puppet is the rare mind-control sign: it lets the drawer/last-toucher pilot the object the seal is drawn on, and its behaviour is sigil-keyed - with WIND it means aerial movement (signs.md:295). Engine grammar synergy dancing-puppet-air fires: 'With a wind element, Dancing Puppet sends objects darting through the open air.' Wind manipulates/moves air but does not create it (sigils.md:65), so it pilots the drawn object rather than conjuring wind. Sign SIZE sets power/lift (drawn large here -> can carry a cloak+hat up; engine power ~3.85 'amplified'). Same wind+puppet template as the Cloak Spell (signs.md:297) - the Cloak is worn and piloted, this is cast off as a decoy. Not forbidden (acts on an object, not a body). confidence=high (well documented in manga/wiki)."
     }
   ]
 }

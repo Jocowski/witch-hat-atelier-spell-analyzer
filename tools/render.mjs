@@ -78,7 +78,10 @@ function glyph(comp, role) {
   } else if (def.render === 'fill') {
     inner = `<path d="${def.svgPath}" fill="${color}" fill-rule="evenodd" stroke="none"/>`
   } else {
-    inner = `<path d="${def.svgPath}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`
+    // Stroke weight is compensated for the glyph's scale so a sign drawn large (to contain
+    // others) keeps a thin, constant line weight instead of fat lines (4 / scale).
+    const sw = (4 / (comp.scale ?? 1)).toFixed(3)
+    inner = `<path d="${def.svgPath}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`
   }
   return `<g transform="${t}">${inner}</g>`
 }
