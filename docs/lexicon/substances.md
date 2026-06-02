@@ -269,6 +269,12 @@ halt one property rather than the whole object.
 **Findings.**
 - Where Repetition *reverts* continuously, Stop *halts* — pairing with a second sigil scopes the halt
   to that sigil's aspect (fire → heat held, hence Warmth-Retention).
+- 2026-06-02: **Warmth-Retention Seal** (archived) confirms the scoping rule and a structural point: a
+  Stop+aspect-sigil state-lock is correctly **sign-free** — it suppresses a change rather than
+  projecting/aiming a substance, so the engine's "no signs → raw discharge" warning is a false
+  positive for this spell class. Catalog caveat: the matcher only records a Match when `signCount>0`
+  (analyze.js:117), so sign-free spells never self-match (entry kept for provenance only). Opposite
+  mechanism to Snugstone: Stop+Fire *retains* heat (a thermos); Snugstone *generates* it (a heater).
 
 **Appears in.** Time Stop · Petrification · Warmth-Retention Seal.
 
