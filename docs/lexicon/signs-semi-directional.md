@@ -59,6 +59,14 @@ inverted appearance documented).
 (the inward point is convention, not aim).
 
 **Findings.**
+- 2026-06-03: **Convergence does NOT make a spell spin.** Tilting Convergence vanes tangentially
+  does not impart rotation — it only focuses/compacts to a point regardless of cant (Spell Checkers
+  community, on a Rasen-Shuriken fan design). This *narrows* the general "tilt any sign → spin"
+  rule ([../magic.md](../magic.md):51): that rule is about canting the **output/directional** signs;
+  a `power` sign that converges to a point has no output channel to spin. For a **wind** spell that
+  must spin, use the **Grasping Wind mechanism — angled/tangential `pull` (vortex/twist)** — or
+  `sign_of_wind` (whirlwind keystone), not tilted Convergence. Put Convergence by the **core** to
+  densify the substance instead. See [signs-directional.md](signs-directional.md) (Pull).
 - 2026-06-02: **The "firmness trick" extends to gases, not just loose earth/sand.** In **Wind Wall**,
   Convergence ×6 (back half) compresses *moving air* into a dense, pressurized sheet — the reason the
   wind wall resists being pushed through. Canon ties the sign to this spell directly: its effect there

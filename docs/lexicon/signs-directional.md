@@ -126,6 +126,12 @@ points inward (signs.md:65). Invertible: inverted, it "pushes matter of the same
 (signs.md:65). Inversion flips attract↔push.
 
 **Findings.**
+- 2026-06-03: **Angled/tangential Pull is the canon way to make a WIND spell spin** — not tilted
+  Convergence. The Grasping Wind reading (angled = pull+twist; ~90° cant = pure twist/vortex) means
+  a tangential `pull` ring spins the air into a vortex. When a design needs a spinning wind effect,
+  reach for Pull (or `sign_of_wind`) here, and leave Convergence as a non-spinning compactor by the
+  core. (Spell Checkers community, on a Rasen-Shuriken fan design; see
+  [signs-semi-directional.md](signs-semi-directional.md) Convergence.)
 - Precondition: it moves *existing* same-element matter — it does not create substance. With no
   ambient matter of the sigil's element present, it has nothing to draw.
 - Vortex is the angled mode (`vortexWhenAngled` in grammar.json) — read tilt before calling it a

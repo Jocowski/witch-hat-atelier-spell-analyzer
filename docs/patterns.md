@@ -38,6 +38,8 @@
 | Float free of gravity | (object it's drawn on) | `float` | Floatglow Lamp |
 | Fly / pilot an object | wind | `dancing_puppet` (Puppet) | Flying Puppet, Cloak |
 | Spin / spiral the output | any | tilt the signs; or `sign_of_wind` (uncertain) | Spiraling Flame |
+| Spin a **wind** spell (vortex) | wind/air | angled/tangential `pull` (Grasping Wind twist), **not** tilted `convergence` | Grasping Wind |
+| Spinning air blast fired one way | wind | core `wind` + `convergence` (by core, densify) + angled `pull` (spin) + `levitation`+`region` forward (launch) | Wind Wall + Grasping Wind + Skysoaring (recombined) |
 | Launch the caster diagonally | water | half-ring `region` (one-sided) | Rising Wave |
 
 ## Scope, target, support

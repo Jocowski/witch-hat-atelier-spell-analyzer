@@ -6,3 +6,6 @@ dist/
 
 # Local manga mirror + reader (downloaded images are copyrighted — never commit)
 manga/
+
+# Scratch dir: working renders, JSON drafts, pasted source dumps
+tmp/
