@@ -42,8 +42,13 @@ engine's prose as the answer. Read, in order:
 The user will give one of:
 - **An app JSON** — either `{ "format": "wha-spell@1", … , "composition": {…} }` or a
   bare composition object. Save it to a temp file if pasted inline.
+- **`wha-lang` source** — a `.wha.mjs` file (or pasted snippet that `export default`s a
+  `SPELL(...)`; see [docs/wha-lang.md](../../../docs/wha-lang.md)). Compile it to the IR first,
+  then analyze that: `node tools/wha-lang-cli.mjs spell.wha.mjs > spell.json` (or pipe straight
+  into `--facts`). Everything downstream is identical to the JSON case.
 - **A description / spell name** — e.g. "the Watershot Seal" or "a seal that shoots a
-  spinning jet of fire upward." You'll reconstruct a composition from the docs.
+  spinning jet of fire upward." You'll reconstruct a composition from the docs (authoring it in
+  `wha-lang` is the easiest way to build the composition — see spell-creator step 3b).
 - **A mix** — JSON plus questions, or a description plus a partial recipe.
 
 ### 2. Get structured FACTS from the engine (then reason the effect yourself)

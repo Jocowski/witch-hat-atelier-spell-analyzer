@@ -59,11 +59,25 @@ Return:
 
 ### 3b. If buildable
 1. **Pick substance + signs** using the effect→recipe starters, then refine.
-2. **Build the composition JSON** (`wha-spell@1` shape; see the cheat-sheet's even-placement
-   helper for sign angles). Choose symmetry, inversion, tilt, scale deliberately.
-3. **Validate the structure through the engine** and iterate until the facts match your design:
+2. **Author the seal in `wha-lang`, not raw JSON.** Describe the seal by *intent* — what parts,
+   how many, where, which way they face — and let the compiler own every coordinate. This is the
+   default path; it's what makes multi-ring/relative designs (the Cloak-style seals) tractable
+   instead of 200 lines of hand-computed `x/y`. Read **[docs/wha-lang.md](../../../docs/wha-lang.md)**
+   for the full vocabulary; the gist:
+   ```js
+   // spell.wha.mjs  —  export default a SPELL (see examples/cloak.wha.mjs)
+   import { SPELL, CIRCLE, GROUP, SIGIL, SIGN, RING, CARDINAL, DIAGONAL, IN, OUT, AROUND, INNER } from '../tools/wha-lang.mjs'
+   const ring = CIRCLE('k', { radius: 170, core: SIGIL('WATER') }, SIGN('COLUMN', 8, { at: RING, face: IN }))
+   export default SPELL('My Seal').stack(ring)   // .nest/.link/.toggle/.cluster for devices
+   ```
+   `count`-over-anchors auto-distributes (e.g. `8 at CARDINAL` ⇒ 2 per cardinal); `GROUP` handles
+   relative clusters ("two columns aimed at a bend"); `nest/stack/cluster/array` build multi-ring
+   devices. Choose symmetry, inversion, tilt (`face=AROUND`), scale deliberately. (For a one-glyph,
+   even-ring seal you *may* still hand-write the `wha-spell@1` JSON — but prefer `wha-lang`.)
+3. **Compile and validate through the engine**, iterating until the facts match your design:
    ```bash
-   echo '<composition-json>' | node tools/spell-engine-cli.mjs --facts
+   node tools/wha-lang-cli.mjs spell.wha.mjs | node tools/spell-engine-cli.mjs --facts   # compile → facts
+   node tools/wha-lang-cli.mjs spell.wha.mjs > spell.json                                  # the importable IR
    ```
    Check the **facts**: no `unknownIds`, the right `operatorsByKind`, geometry
    (symmetry/aim/balance/zones) as intended, no unwanted instability. The effect is *yours* to
@@ -75,8 +89,10 @@ Return:
 4. **Explain the design challenges** — balance/stability, ambiguous signs, anything the
    source material leaves uncertain, forbidden flags.
 5. **Explain how to use it** — practical and creative applications, and how to draw it.
-6. **Return the importable JSON** in a fenced block so the user can paste it into the app's
-   Import (JSON). Include `name`, `ring`, `core`, `components`, `linkCount`, `dyes`.
+6. **Return both** the concise **`wha-lang` source** (so the design is legible and editable) **and
+   the emitted importable JSON** in fenced blocks. The JSON is what the user pastes into the app's
+   Import; the `wha-lang` is the human-readable record of intent. Include `name`, `ring`/circles,
+   `core`, `components`, `linkCount`, `dyes` in the emitted IR.
 
 ### 4. Offer to document it
 A freshly designed spell is a `fan` spell (the tier formerly labelled `community`). Offer to run **/spell-analyzer** on the JSON

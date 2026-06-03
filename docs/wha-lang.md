@@ -139,14 +139,18 @@ Given a circle of radius `R`, resolve one `Placed` of `count = N`:
 **Step 5 — rotation from `face`** (θ = the item's own angle):
 | face | rotation | meaning |
 |---|---|---|
-| `IN` | `θ` | canonical orientation points at center |
-| `OUT` | `θ + 180` | points away from center |
+| `IN` | `θ + 180` | the sign's TOP points at the center |
+| `OUT` | `θ` | points away from center |
 | `AROUND` | `θ + 90` | tangential ⇒ the spell spins |
 | `FRONT` | `0` | all items aimed the same way (north) |
-| `AUTO` | from data `defaultFacing` | `IN`/`OUT` per the sign's documented default |
+| `AUTO` | from data `defaultFacing` | `defaultFacing:"outward"` ⇒ `OUT`, else `IN` |
 
-> The exact rotation offset is calibrated once against the renderer; this table fixes the
-> *semantics*, the resolver fixes the constant.
+> **Calibration note (resolved in implementation).** The constant was calibrated against the
+> engine/renderer: a sign drawn at rotation `0` points **north (toward center when placed at
+> north)**, so making it point *inward from any angle θ* requires `θ + 180` — matching
+> `inwardRotation` in `src/engine/geometry.js` and the canon reference seals (e.g. Light Beam's
+> columns at `(0, -95)` carry rotation `180`). An earlier spec draft listed `IN = θ`; the live
+> resolver in `tools/wha-lang.mjs` (`faceToRotation`) is authoritative.
 
 ---
 
