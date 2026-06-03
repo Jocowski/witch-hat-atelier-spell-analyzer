@@ -1,14 +1,14 @@
 ---
 name: Phantasmal Fireball
 type: contraption
-origin: fan
+origin: wiki
 forbidden: false
 status: valid
 core: unburning_flame
 signs: convergence ×1, direction ×9 (6 inverted), unknown_07 ×6, unknown_02 ×6, unknown_08 ×3
 dyes: none
 symmetry: bilateral
-source: community reconstruction (user), built from the appearance of the canon Phantasmal Fireball (Olruggio); not canon-confirmed
+source: telepedia 'Phantasmal Fireball': https://witchhatatelier.telepedia.net/wiki/Phantasmal_Fireball — manga debut ch. 43 (per wiki). Invented by Olruggio; the seal recipe is a community reconstruction from the spell's drawn appearance — keystone identities are best-guess, not canon-confirmed.
 image: assets/spells/Phantasmal_Fireball.svg
 json: assets/spells/Phantasmal_Fireball.json
 ---
@@ -16,17 +16,17 @@ json: assets/spells/Phantasmal_Fireball.json
 # Phantasmal Fireball
 
 > A heatless flame held as a stable, self-enveloping orb — gives light and looks like real
-> fire, but is cold and safe to touch. **This entry is a community reconstruction** of the
-> canon spell from its drawn appearance; the keystone identities are best-guess, not confirmed.
+> fire, but is cold and safe to touch. The spell's **existence and effect are wiki-sourced** (ch. 43);
+> the **keystone identities** are a community reconstruction from the drawn appearance, not canon-confirmed.
 
 ## Overview
-Canonically, the Phantasmal Fireball is a fire-type spell by Olruggio that produces an
+The Phantasmal Fireball is a fire-type contraption by Olruggio (ch. 43) that produces an
 **artificial flame giving off no heat** — it still looks and behaves like fire (light, scares
 beasts) but can be touched safely and never needs fuel, so it never goes out. As a contraption
 it is drawn on an orb that becomes fully engulfed in the cold flame, a convenient carried light
-source. This document records a **reconstruction** built in the app from the seal's appearance,
-analyzed through the real engine; the never-before-seen keystones are mapped to the closest
-plausible signs and flagged where uncertain.
+source. The wiki confirms the spell's existence, inventor, and effect; the **recipe (keystone identities)**
+is a community reconstruction from the seal's drawn appearance, analyzed through the real engine. The
+never-before-seen keystones are mapped to the closest plausible signs and flagged where uncertain.
 
 ## Validity
 Engine: **valid** (core present, no unknown ids). Geometry: **bilateral symmetry → stable**;
@@ -115,11 +115,12 @@ The substance choice is certain; the keystone *identities* (Region vs Dispersion
 - Olruggio's later **crystal-trapped** version keeps the cold flame but re-imposes "don't touch."
 
 ## Notes & limitations
-- **Community reconstruction, not canon-confirmed.** The keystones marked `unknown_*` are
-  unidentified; **Convergence** (the triangle) and **Region** (the arrows) are best-guess mappings.
+- **Spell existence and effect: wiki-sourced (ch. 43, Olruggio).** The description (heatless flame, looks real, can be touched, never goes out, scares beasts) is confirmed.
+- **Recipe: community reconstruction.** The keystones marked `unknown_*` are unidentified; **Convergence** (the triangle) and **Region** (the arrows) are best-guess mappings from the drawn appearance.
 - An earlier pass mis-catalogued the triangle as a new sign (`unknown_06`); it was retired and
   reassigned to **Convergence** (see [../lexicon/signs-semi-directional.md](../lexicon/signs-semi-directional.md)).
-- To confirm, read the canon page from the local `manga/` mirror once the chapter is known.
+- Olruggio considered it a failed contraption because it might dull a healthy fear of real fire in children. He later made a version with the flame trapped in crystal.
+- To fully confirm the keystone identities, the ch. 43 manga page is needed.
 
 ## Reproduction
 - **Image:** [assets/spells/Phantasmal_Fireball.svg](../../assets/spells/Phantasmal_Fireball.svg) (engine render; a PNG from the app can replace it)

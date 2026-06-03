@@ -1156,7 +1156,13 @@
       "composition": {
         "core": "smoke",
         "signs": [
-          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false }
+          {
+            "id": "column",
+            "count": 8,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -1173,7 +1179,13 @@
       "composition": {
         "core": "water",
         "signs": [
-          { "id": "column", "count": 6, "placement": "ring", "orientation": "inward", "inverted": false }
+          {
+            "id": "column",
+            "count": 6,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -1190,9 +1202,27 @@
       "composition": {
         "core": "window",
         "signs": [
-          { "id": "float", "count": 4, "placement": "alternating", "orientation": "inward", "inverted": false },
-          { "id": "enlarge", "count": 1, "placement": "center", "orientation": "outward", "inverted": false },
-          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false }
+          {
+            "id": "float",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "enlarge",
+            "count": 1,
+            "placement": "center",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 8,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -1209,8 +1239,20 @@
       "composition": {
         "core": "repetition_sigil",
         "signs": [
-          { "id": "enlarge", "count": 1, "placement": "center", "orientation": "inward", "inverted": true },
-          { "id": "diamond", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+          {
+            "id": "enlarge",
+            "count": 1,
+            "placement": "center",
+            "orientation": "inward",
+            "inverted": true
+          },
+          {
+            "id": "diamond",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -1227,8 +1269,20 @@
       "composition": {
         "core": "aeriforms",
         "signs": [
-          { "id": "direction", "count": 26, "placement": "ring", "orientation": "inward", "inverted": false },
-          { "id": "column", "count": 26, "placement": "ring", "orientation": "inward", "inverted": false }
+          {
+            "id": "direction",
+            "count": 26,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 26,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -1245,7 +1299,13 @@
       "composition": {
         "core": "valance_leech",
         "signs": [
-          { "id": "column", "count": 5, "placement": "ring", "orientation": "inward", "inverted": false }
+          {
+            "id": "column",
+            "count": 5,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -1277,7 +1337,13 @@
       "composition": {
         "core": "vision_sigil",
         "signs": [
-          { "id": "convergence", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+          {
+            "id": "convergence",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
@@ -1294,11 +1360,574 @@
       "composition": {
         "core": "fire",
         "signs": [
-          { "id": "float", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+          {
+            "id": "float",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
         ],
         "symmetry": "radial"
       },
       "notes": "Fire sigil (creates/maintains heat) + Float ×4 confirmed from Masterdoc; additional signs beyond Float are noted in the source as present but unspecified ('Float ×4 + others'). Float here likely keeps the heat-effect levitated/spread above the roof rather than grounding it. Duration (a full winter) implies an Azuremoon-dye amplification or a very large seal, but the recipe is incomplete. Confidence low: composition is partial and counts are guesses beyond Float ×4. Masterdoc-sourced. Do NOT confuse with Snugstone (generates flameless warmth in a small area); Snowfending is a large-scale seasonal ward."
+    },
+    {
+      "id": "capture_pennant_spell",
+      "name": "Capture Pennant Spell",
+      "category": "time",
+      "origin": "wiki",
+      "source": "telepedia 'Capture Pennant Spell': https://witchhatatelier.telepedia.net/wiki/Capture_Pennant_Spell — manga debut ch. 11 / full spell visible Volume 12 (per wiki). Two-ring contraption on Knights Moralis capture pennants.",
+      "confidence": "medium",
+      "effect": "A two-ring contraption on capture pennants that lets a knight mentally target a person or object, wraps the pennant around them via Entwine signs, and uses a Repetition sigil core to continuously reset the banner to its original form.",
+      "composition": {
+        "core": "repetition_sigil",
+        "signs": [
+          {
+            "id": "sights_set",
+            "count": 2,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "entwine",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "strengthen",
+            "count": 2,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "repetition_seal",
+      "name": "Repetition Seal",
+      "category": "time",
+      "origin": "wiki",
+      "source": "telepedia 'Repetition Seal' (JP: kurikaeshi): https://witchhatatelier.telepedia.net/wiki/Repetition_Seal — manga debut ch. 7 (Serpent's Bed of Sand); ch. 8 (Cookpot Lid); ch. 32 (Washing Barrel). Repetition sigil core; Column and Convergence signs from the Cookpot variant.",
+      "confidence": "medium",
+      "effect": "Continuously resets whatever it touches to the state it was in when the spell first activated — keeping food fresh, clothes clean, soft structures undamaged, and materials elastic indefinitely.",
+      "composition": {
+        "core": "repetition_sigil",
+        "signs": [
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "convergence",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "valance_leech_counterlock",
+      "name": "Valance Leech Counterlock",
+      "category": "time",
+      "origin": "wiki",
+      "source": "telepedia 'Valance Leech Counterlock': https://witchhatatelier.telepedia.net/wiki/Valance_Leech_Counterlock — conceived ch. 78, manga debut ch. 84. Creators: Agott, Lagrah, Beldaruit, and others. Counterclock pattern with Valance Leech decorative sigil at center.",
+      "confidence": "medium",
+      "effect": "A Counterclock seal scoped to valance leeches via a central Valance Leech decorative sigil — reverses a targeted leech to its physical state 24 hours prior, returning any absorbed matter to its sources.",
+      "composition": {
+        "core": "valance_leech",
+        "signs": [
+          {
+            "id": "unknown_sign",
+            "count": 6,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "cloak_spell",
+      "name": "Cloak Spell",
+      "category": "mixed",
+      "origin": "wiki",
+      "source": "telepedia 'Cloak Spell': https://witchhatatelier.telepedia.net/wiki/Cloak_Spell — manga debut ch. 27 (per wiki). Compound seal on Sasaran's cloak; confirmed ch. 17.",
+      "confidence": "medium",
+      "effect": "Drapes the host object in shadow (Gathering Shadows), makes it fly and dart remotely (Flying Puppet of Diversion), and opens a spatial passage through it (Windowway) — a remote-controlled shadow-cloaked flying portal.",
+      "composition": {
+        "core": "vision_sigil",
+        "signs": [
+          {
+            "id": "eye",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "bend",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "dancing_puppet",
+            "count": 4,
+            "placement": "ring",
+            "orientation": "outward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "windowway_spell",
+      "name": "Windowway Spell",
+      "category": "niche",
+      "origin": "wiki",
+      "source": "telepedia 'Windowway Spell': https://witchhatatelier.telepedia.net/wiki/Windowway_Spell — manga debut ch. 2 (per wiki). Sign ids inferred from wiki visual descriptions; medium confidence. Central mark unidentified (unknown_sigil).",
+      "confidence": "medium",
+      "effect": "Opens a paired spatial gateway between two linked Windowway seals; objects and people passing through one emerge at the other — requires both ends to function.",
+      "composition": {
+        "core": "unknown_sigil",
+        "signs": [
+          {
+            "id": "bolt",
+            "count": 8,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 8,
+            "placement": "ring",
+            "orientation": "outward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "lockwax",
+      "name": "Lockwax",
+      "category": "niche",
+      "origin": "wiki",
+      "source": "telepedia 'Lockwax': https://witchhatatelier.telepedia.net/wiki/Lockwax — manga debut ch. 50 (per wiki). Core sigil unidentified; Pull ×3 inferred from 'arrow with triangle tip pointing toward center.'",
+      "confidence": "low",
+      "effect": "Seals a scroll's wax closure shut with a three-point magical lock; reserved for important documents.",
+      "composition": {
+        "core": "unknown_sigil",
+        "signs": [
+          {
+            "id": "pull",
+            "count": 3,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "makeover_mask_spell",
+      "name": "Makeover Mask Spell",
+      "category": "vision",
+      "origin": "wiki",
+      "source": "telepedia 'Makeover Mask Spell': https://witchhatatelier.telepedia.net/wiki/Makeover_Mask_Spell — manga debut ch. 47 (per wiki). Created by Olruggio; used at Silver Eve Festival. Two unknown signs not resolved to current ids.",
+      "confidence": "medium",
+      "effect": "Makes the wearer's face appear clean and at its most beautiful to observers — magical cosmetics that project an idealized appearance.",
+      "composition": {
+        "core": "vision_sigil",
+        "signs": [
+          {
+            "id": "eye",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 2,
+            "placement": "sides",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "bilateral"
+      }
+    },
+    {
+      "id": "billow_cluster",
+      "name": "Billow Cluster",
+      "category": "niche",
+      "origin": "wiki",
+      "source": "telepedia 'Billow Cluster': https://witchhatatelier.telepedia.net/wiki/Billow_Cluster — manga debut ch. 7 (per wiki). Created by Tetia; sub-component of the Serpent's Bed of Sand to convert sand into cloud.",
+      "confidence": "high",
+      "effect": "Collects material from the surrounding area via Collection signs and transmutes it into a soft, fluffy cloud using the central Billowing sigil.",
+      "composition": {
+        "core": "billowing_sigil",
+        "signs": [
+          {
+            "id": "collection",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "fish_guidance",
+      "name": "Fish Guidance",
+      "category": "niche",
+      "origin": "wiki",
+      "source": "telepedia 'Fish Guidance' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Fish_Guidance — manga debut ch. 63 (per wiki). Coco/Jujy, Golden Eve Procession. Signs_Explained names this spell as the canon Float+Crosshair target-levitation example.",
+      "confidence": "medium",
+      "effect": "Attracts magic fish (or other guidance-parameterized objects) toward the seal and makes them float through the air via the Float+Crosshair target-levitation mechanism.",
+      "composition": {
+        "core": "guidance",
+        "signs": [
+          {
+            "id": "float",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "crosshair",
+            "count": 1,
+            "placement": "center",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "smokesculpting_seal",
+      "name": "Smokesculpting Seal",
+      "category": "niche",
+      "origin": "wiki",
+      "source": "telepedia 'Smokesculpting Seal': https://witchhatatelier.telepedia.net/wiki/Smokesculpting_Seal — Kitchen spinoff ch. 11 (per wiki). Used by Qifrey on tea saucers. Plus unknown center spiral+arrow sign and outer signs.",
+      "confidence": "medium",
+      "effect": "Creates a smoke sculpture above the seal in the shape of nearby ingredients by generating smoke (smoke sigil), projecting it upward (column), and reforming it (inverted crush).",
+      "composition": {
+        "core": "smoke",
+        "signs": [
+          {
+            "id": "crush",
+            "count": 4,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": true
+          },
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "beldaruits_smoke_sculpture",
+      "name": "Beldaruit's Smoke Sculpture",
+      "category": "niche",
+      "origin": "wiki",
+      "source": "telepedia 'Beldaruit's Smoke Sculpture': https://witchhatatelier.telepedia.net/wiki/Beldaruit%27s_Smoke_Sculpture — manga debut ch. 35 (per wiki). Levitation and Column confirmed by Signs_Explained; Dragon sigil hypothesized as shape-giver.",
+      "confidence": "medium",
+      "effect": "Conjures a large smoke dragon that flies through the air and roars, using the smoke sigil for material, levitation for flight, and column for body projection.",
+      "composition": {
+        "core": "smoke",
+        "signs": [
+          {
+            "id": "levitation",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "phantasmal_fireball",
+      "name": "Phantasmal Fireball",
+      "category": "fire",
+      "origin": "wiki",
+      "source": "telepedia 'Phantasmal Fireball': https://witchhatatelier.telepedia.net/wiki/Phantasmal_Fireball — manga debut ch. 43 (per wiki). Community reconstruction; convergence/region best-guess, three sign ids unidentified.",
+      "confidence": "low",
+      "effect": "Produces an artificial heatless flame that gives off light, looks and behaves like real fire, but is safe to touch and never goes out.",
+      "composition": {
+        "core": "unburning_flame",
+        "signs": [
+          {
+            "id": "convergence",
+            "count": 1,
+            "placement": "center",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 9,
+            "placement": "around",
+            "orientation": "alternating",
+            "inverted": false
+          },
+          {
+            "id": "unknown_07",
+            "count": 6,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_02",
+            "count": 6,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "unknown_08",
+            "count": 3,
+            "placement": "satellite",
+            "orientation": "outward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "bilateral"
+      }
+    },
+    {
+      "id": "wall_anchored_floatglow_lamp",
+      "name": "Wall-Anchored Floatglow Lamp",
+      "category": "light",
+      "origin": "wiki",
+      "source": "telepedia 'Wall-Anchored Floatglow Lamp': https://witchhatatelier.telepedia.net/wiki/Wall-Anchored_Floatglow_Lamp — lamp seen ch. 2, seal shown ch. 28 (per signs.md). Signs confirmed from 'Spells Using Levitation' and 'Spells Using Convergence' lists.",
+      "confidence": "high",
+      "effect": "A wall-mounted magical lamp: generates light, focuses it with convergence, and levitates the conical reflector top to direct the light outward into the room.",
+      "composition": {
+        "core": "light",
+        "signs": [
+          {
+            "id": "levitation",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "convergence",
+            "count": 1,
+            "placement": "center",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "light_tracer",
+      "name": "Light Tracer",
+      "category": "light",
+      "origin": "wiki",
+      "source": "telepedia 'Light Tracer': https://witchhatatelier.telepedia.net/wiki/Light_Tracer — manga debut ch. 46 (per wiki). Created by Richeh; light + weave + link confirmed. One extra keystone unidentified.",
+      "confidence": "medium",
+      "effect": "Sends a ribbon of light from one fragment of a broken object to all other fragments of the same original, creating a visible glowing thread between shared-origin pieces.",
+      "composition": {
+        "core": "light",
+        "signs": [
+          {
+            "id": "weave",
+            "count": 1,
+            "placement": "surrounds",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "link",
+            "count": 1,
+            "placement": "ring",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "flame_burst_spell",
+      "name": "Flame Burst Spell",
+      "category": "fire",
+      "origin": "wiki",
+      "source": "telepedia 'Spells' (red-link, no dedicated page): https://witchhatatelier.telepedia.net/wiki/Spells. Signs confirmed from 'Spells Using Column' and 'Spells Using Pull' lists. Exact geometry and counts unknown; reconstruction from documented sign pairings.",
+      "confidence": "medium",
+      "effect": "Draws ambient fire inward with Pull signs then projects it outward as a focused column of flame — a high-intensity fire burst.",
+      "composition": {
+        "core": "fire",
+        "signs": [
+          {
+            "id": "column",
+            "count": 4,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "pull",
+            "count": 4,
+            "placement": "alternating",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "flowers_of_light",
+      "name": "Flowers of Light",
+      "category": "light",
+      "origin": "wiki",
+      "source": "telepedia 'Spells' (red-link, no dedicated page): https://witchhatatelier.telepedia.net/wiki/Spells. Recipe read from clean seal image; sigils confirmed by docs/sigils.md ('Spells Using Flower' and 'Spells Using Light').",
+      "confidence": "high",
+      "effect": "Creates numerous flower-shaped blossoms of light that float free of gravity above the seal — a decorative display of levitating luminous flowers.",
+      "composition": {
+        "core": "light",
+        "signs": [
+          {
+            "id": "levitation",
+            "count": 5,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "petrification",
+      "name": "Petrification",
+      "category": "forbidden",
+      "origin": "wiki",
+      "source": "telepedia 'Petrification': https://witchhatatelier.telepedia.net/wiki/Petrification — manga debut ch. 1 (per wiki). Sign details from anime trailer. Confirmed: earth sigil, column, bend, dispersion, region, and a nested stop sub-seal. Additional unknown signs remain.",
+      "confidence": "low",
+      "effect": "Turns everything in the nearby area — living and inanimate — into a rock-like material, with a nested time-stop element that locks the petrified state and preserves victims in suspension.",
+      "composition": {
+        "core": "earth",
+        "signs": [
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "bend",
+            "count": 2,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "dispersion",
+            "count": 2,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 2,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
+    },
+    {
+      "id": "illusory_labyrinth",
+      "name": "Illusory Labyrinth",
+      "category": "forbidden",
+      "origin": "wiki",
+      "source": "telepedia 'Illusory Labyrinth': https://witchhatatelier.telepedia.net/wiki/Illusory_Labyrinth — manga debut ch. 6 (active), ch. 29 (seal described). Confirmed: scalewolf sigil core, column, region, dispersion signs. Additional unknown signs remain.",
+      "confidence": "low",
+      "effect": "Creates a grand underground labyrinthine area in which space is distorted into an infinite loop, making it impossible to escape — the zone collapses when the seal is destroyed.",
+      "composition": {
+        "core": "scalewolf",
+        "signs": [
+          {
+            "id": "column",
+            "count": 2,
+            "placement": "around",
+            "orientation": "inward",
+            "inverted": false
+          },
+          {
+            "id": "direction",
+            "count": 2,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": false
+          },
+          {
+            "id": "dispersion",
+            "count": 2,
+            "placement": "around",
+            "orientation": "outward",
+            "inverted": false
+          }
+        ],
+        "symmetry": "radial"
+      }
     }
   ]
 }
