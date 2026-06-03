@@ -201,6 +201,8 @@ Cluster (×4 around a Billow center).
 
 ### Sights Set  `sights_set`  ·  directional  ·  operator: target
 
+> **Official name (World Guide 2026): Sign of Focus** — JP "aiming vector" = set/lock a target ([../world-guide-2026.md](../world-guide-2026.md)).
+
 **Drawing.** A vertical line tipped with an **arrowhead at the top** and a small **diamond /
 rhombus on the shaft** (mid/lower) — like a sighting reticle on an arrow. Bilateral about the
 vertical axis; the arrow tip is the aiming front. Drawn top-outward (`defaultFacing:"outward"`).
@@ -225,6 +227,8 @@ by the caster's mind, not purely by drawn angle. Size/orientation effects unconf
 ---
 
 ### Gather  `gather`  ·  directional  ·  operator: support
+
+> **Official name (World Guide 2026): Sign of Gathering** — JP "gathering vector" ([../world-guide-2026.md](../world-guide-2026.md)).
 
 **Drawing.** A vertical line tipped with an **arrowhead at the top**, plus a smaller
 **chevron/X crossing lower on the shaft** — visibly busier than Collection's plain X (an

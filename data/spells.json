@@ -1250,6 +1250,55 @@
         "symmetry": "radial"
       },
       "notes": "A Light substance shaped by the Valance Leech DECORATIVE sigil (shape/identity) + a Column ×5 ring. Sister to the Bird of Light Beacon (light + Bird deco). Recorded with the valance_leech deco as core and Light as the substance sigil (the catalog composition flattens multi-sigil seals; Light is the substance, noted here). Masterdoc-sourced."
+    },
+    {
+      "id": "washbarrel",
+      "name": "Washbarrel",
+      "category": "time",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — Repetition sigil; returns dirty or damaged clothes to their original clean/whole state.",
+      "confidence": "medium",
+      "effect": "Resets dirty or damaged clothing back to its original clean, undamaged state — Repetition's time-reversal applied to a garment.",
+      "composition": {
+        "core": "repetition_sigil",
+        "signs": [],
+        "symmetry": "radial"
+      },
+      "notes": "Repetition sigil (time element; 'continually resets objects to their previous state' — signs.md:131). Applied to clothing: rewinds changes (dirt, wear, damage) so the garment returns to its original condition. Sign-free by design — the Repetition sigil alone carries the reset effect, as in the Warmth-Retention Seal pattern (a sign-free sigil-pair that suppresses change). Exact signs unknown; composition left minimal. Masterdoc-sourced. CATALOG CAVEAT: sign-free spell will not self-match in the matcher (analyze.js signCount>0 guard) — entry is for provenance and future expansion."
+    },
+    {
+      "id": "light_reducing_spell",
+      "name": "Light-Reducing Spell",
+      "category": "light",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — Vision sigil separate from Eye; aids sight / dims light; seen on Qifrey's glasses.",
+      "confidence": "medium",
+      "effect": "Aids sight or dims incoming light — a visual-correction spell drawn on Qifrey's glasses, distinct from illusion-making (Vision + Eye). Vision alone, without Eye, targets perception rather than illusion.",
+      "composition": {
+        "core": "vision_sigil",
+        "signs": [
+          { "id": "convergence", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Vision sigil (sign-as-sigil, light element) used WITHOUT the Eye sign — this is the key distinction: Vision+Eye = illusions/gathering shadows; Vision alone = aids sight / dims light. Seen on Qifrey's glasses (signs.md:271). Convergence ×4 added as a plausible focusing operator (Convergence appears in canon's Light-Reducing Spell entry in signs.md:109). Exact composition not fully documented; confidence medium. Masterdoc-sourced."
+    },
+    {
+      "id": "snowfending",
+      "name": "Snowfending",
+      "category": "fire",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — Fire sigil; Float ×4 + others; keeps snow off a home for a winter.",
+      "confidence": "low",
+      "effect": "Keeps snow from accumulating on a home for an entire winter — a long-duration thermal ward drawn on the structure itself.",
+      "composition": {
+        "core": "fire",
+        "signs": [
+          { "id": "float", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Fire sigil (creates/maintains heat) + Float ×4 confirmed from Masterdoc; additional signs beyond Float are noted in the source as present but unspecified ('Float ×4 + others'). Float here likely keeps the heat-effect levitated/spread above the roof rather than grounding it. Duration (a full winter) implies an Azuremoon-dye amplification or a very large seal, but the recipe is incomplete. Confidence low: composition is partial and counts are guesses beyond Float ×4. Masterdoc-sourced. Do NOT confuse with Snugstone (generates flameless warmth in a small area); Snowfending is a large-scale seasonal ward."
     }
   ]
 }

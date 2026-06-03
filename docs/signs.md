@@ -152,6 +152,8 @@ Cool (冷やす矢, hiyasu ya) is a non-directional sign that presumably cools t
 
 ![Strengthen](../assets/images/signs/Strengthen.png)
 
+> **Official name (World Guide 2026): Sign of Empowerment** — JP "reinforcement vector" = strengthen/reinforce; note it may empower *effects*, not only physical durability ([world-guide-2026.md](world-guide-2026.md)).
+
 Strengthen (強化の矢, kyōka no ya) presumably makes objects stronger and more durable. It is most likely semi-directional, but has never been seen inverted. Introduced in the volume 12 bonus, it is a component of the capture pennant spell, helping to make the banner of a Knight's capture pennant more durable.
 
 **Spells Using Strengthen:** Capture Pennant Spell
@@ -160,6 +162,8 @@ Strengthen (強化の矢, kyōka no ya) presumably makes objects stronger and mo
 
 ![Sights Set](../assets/images/signs/Sights_Set.png)
 
+> **Official name (World Guide 2026): Sign of Focus** — JP "aiming vector" = set/lock a target ([world-guide-2026.md](world-guide-2026.md)).
+
 Sights set (照準の矢, shōjun no ya) is most likely a directional or semi-directional sign and has never been seen inverted. First seen in the capture pennant spell, it is highly peculiar. Aside from the puppet sign, it appears to be the only sign that allows a spell to be controlled via one's mind. Specifically, it seems to serve the function of aiming a spell at some point or target. For example, its inclusion on the aforementioned capture pennant spell likely allows a knight to target a specific object or person for their capture pennants to wrap around.
 
 **Spells Using Sights Set:** Spiraling Flame • Capture Pennant Spell
@@ -167,6 +171,8 @@ Sights set (照準の矢, shōjun no ya) is most likely a directional or semi-di
 ### Entwine
 
 ![Entwine](../assets/images/signs/Entwine.png)
+
+> **Official name (World Guide 2026): Sign of Entwining** — JP "coiling vector" = wrap/coil around something ([world-guide-2026.md](world-guide-2026.md)).
 
 Entwine (巻きつきの矢, maki-tsuki no ya), first seen in the capture pennant spell, functions to somehow make an object it is drawn on (such as a ribbon) wrap or "entwine" itself around other objects. The mechanism through which this is achieved is unknown. It is most likely a semi-directional sign and has never been seen inverted.
 
@@ -193,6 +199,8 @@ Aeriforms defined (気体の示す矢, kitai o shimesu ya) is somewhat confusing
 ### Gather
 
 ![Gather](../assets/images/signs/Gather.png)
+
+> **Official name (World Guide 2026): Sign of Gathering** — JP "gathering vector" ([world-guide-2026.md](world-guide-2026.md)).
 
 Gather (集める矢, atsumeru ya) seems to serve a very similar function and design to collection, letting a spell use material from its surroundings to construct its effect. How it differs is unclear, but gather may be less passive than collection and actively draw material in rather than just collect things nearby. This, however, is unconfirmed. The sign is seen in the vapor bubble spell. The sign is either directional or semi-directional and has never been seen inverted.
 

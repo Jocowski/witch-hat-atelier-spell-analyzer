@@ -244,6 +244,8 @@ semi-directional" — currently classed semi-directional, but inversion is uncon
 
 ### Strengthen  `strengthen`  ·  semi-directional  ·  operator: special
 
+> **Official name (World Guide 2026): Sign of Empowerment** — JP "reinforcement vector" = strengthen/reinforce; note it may empower *effects*, not only physical durability ([../world-guide-2026.md](../world-guide-2026.md)).
+
 **Drawing.** A small hollow triangle ("∧") sitting on a short horizontal baseline, with the
 baseline extending into two little side-stubs ("⤧"-like) — a capped peak over a line. Bilateral
 about the vertical axis.
@@ -264,6 +266,8 @@ but **never seen inverted** in canon, so the reverse effect is unconfirmed.
 ---
 
 ### Entwine  `entwine`  ·  semi-directional  ·  operator: special
+
+> **Official name (World Guide 2026): Sign of Entwining** — JP "coiling vector" = wrap/coil around something ([../world-guide-2026.md](../world-guide-2026.md)).
 
 **Drawing.** A tall "I-beam" / dumbbell figure: a vertical central bar capped top and bottom by
 short horizontal end-bars (serifs), like a girder ("⊟" stretched vertically). Bilateral about
