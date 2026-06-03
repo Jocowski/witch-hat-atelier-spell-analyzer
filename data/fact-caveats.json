@@ -1,0 +1,41 @@
+{
+  "_comment": "Recurring engine-artifact corrections, surfaced automatically in `--facts` output (per circle, as `caveats`). These encode the 'engine blind spot — override in your reading' findings accumulated in docs/lexicon/ so the AI applies them consistently instead of re-deriving them each analysis. Each rule's `when` is matched against a circle's facts; if it matches, `note` (+ `source`) is attached. This is a CORRECTION layer, not an effect claim. Add a rule here when a lexicon Finding records an artifact that recurs across spells. Predicates supported by tools/spell-engine-cli.mjs evalCaveat(): coreElement[], sign, minCount, inverted, operatorKind, symmetry[], signCountEquals, hasUnknownSigns.",
+  "caveats": [
+    {
+      "id": "balanced-columns-aim-artifact",
+      "when": { "sign": "column", "minCount": 4, "symmetry": ["radial", "bilateral"] },
+      "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+      "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+    },
+    {
+      "id": "levitation-vertical-only",
+      "when": { "sign": "levitation", "coreElement": ["fire", "water", "light"] },
+      "note": "Levitation on water/fire/light lifts VERTICALLY without steering. The engine routes every directional sign through aim/spin math, so any reported lateral `aim` or `spin` here is spurious — treat as artifact.",
+      "source": "docs/CORE.md §4; docs/lexicon/substances.md"
+    },
+    {
+      "id": "inverted-column-equals-dispersion",
+      "when": { "sign": "column", "inverted": true },
+      "note": "An inverted Column's spread closely matches Dispersion's; canon cannot distinguish the two. Read it as omnidirectional eruption and FLAG the uncertainty rather than inventing a difference from Dispersion.",
+      "source": "docs/signs.md:34, docs/signs.md:45 (Snugstone)"
+    },
+    {
+      "id": "dispersion-equals-inverted-column",
+      "when": { "sign": "dispersion" },
+      "note": "Dispersion's outward leak is canonically indistinguishable from an inverted Column. Note the spread is the same and flag the uncertainty; whether it is directional or semi-directional is also unresolved in canon.",
+      "source": "docs/signs.md:45"
+    },
+    {
+      "id": "lone-sign-false-asymmetry",
+      "when": { "signCountEquals": 1, "symmetry": ["none", "asymmetric"] },
+      "note": "A single sign read slightly off-origin can false-flag `asymmetric`/unstable. With one sign, treat the symmetry/stability flag as unreliable.",
+      "source": "docs/CORE.md §4"
+    },
+    {
+      "id": "unknown-signs-incomplete",
+      "when": { "hasUnknownSigns": true },
+      "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+      "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+    }
+  ]
+}

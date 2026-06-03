@@ -416,6 +416,22 @@
       "render": "fill"
     },
     {
+      "id": "sword",
+      "name": "Sword",
+      "officialName": "Sigil of Sword",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147 — the Raincleaver)",
+      "origin": "canon",
+      "source": "WHA World Guide 2026 (official MAGs preview), seen in the Raincleaver. First object (non-animal) decorative sigil confirmed; see docs/world-guide-2026.md.",
+      "svgPath": "M0,-34 L4,-8 L3,18 L0,26 L-3,18 L-4,-8 Z M-11,18 L11,18 M-7,22 L7,22 M0,22 L0,34",
+      "family": "decorative",
+      "category": "decorative",
+      "element": "decorative",
+      "color": "#9aa3ad",
+      "description": "Newly-confirmed canon decorative sigil (World Guide 2026) — and the first known OBJECT (non-animal) decorative sigil, establishing that decorative sigils impose a shape/identity that need not be an animal. Manifests/shapes magic in the form of a sword (an edge/blade); in the Raincleaver it shapes Qifrey's water blade. Exact behaviour pending the full guide. NOTE: svgPath is a hand-drawn placeholder, not vectorized art.",
+      "centerHint": "Upright blade with a crossguard.",
+      "render": "fill"
+    },
+    {
       "id": "smoke",
       "name": "Smoke",
       "origin": "wiki",

@@ -100,6 +100,16 @@ Radial); the *effect* of that inversion is undocumented in canon — see the Fin
 (flameless warmth); the seal's overall size then sets the safe *amount*.
 
 **Findings.**
+- 2026-06-03: **World Guide 2026 — community theory that "Radial may not be canon" (HOLD, not actioned).**
+  When the official World Guide preview dropped (see [../world-guide-2026.md](../world-guide-2026.md)),
+  the Spell Checkers ([[spell-checkers-community]]) argued that what we model as Radial — and especially
+  *inverted Radial* — is actually the **Sign of Binding** (`bind`): upright Bind makes a substance
+  **stick to itself** (so the Sand **Bridge** tiles cohere and don't fall apart), and **Snugstone**
+  uses **inverted Bind** = "breaking the bind of fire," releasing it as **heat** (the flameless-warmth
+  effect we currently credit to Radial). If true, Radial's two known uses collapse into Bind/inverted-Bind
+  and Radial may not exist as its own sign. **Status: THEORY, deliberately not applied.** The preview
+  page shown does *not* list "Radial," but absence ≠ proof; this is community analysis, not a guidebook
+  statement. `radial` is left intact pending the full guide. (User decision, 2026-06-03: hold and record only.)
 - 2026-06-02: **Inverted Radial — THEORY (not canon).** Sand Bridge is the only spell that uses
   Radial **inverted** (×2, east/west). Canon never documents an inverted Radial's effect
   ([..\signs.md](..\signs.md):247). *Deduction:* since inverting a semi-directional sign **reverses
@@ -324,13 +334,24 @@ steer.
 
 ### Bind  `bind`  ·  semi-directional  ·  operator: special
 
+> **Official name (World Guide 2026): Sign of Binding** — JP "holding vector" = *fixes/anchors the
+> effect in place* ([../world-guide-2026.md](../world-guide-2026.md)).
+
 **Drawing.** A small hollow diamond/lozenge at top, sitting above a row of several short
 down-hooks (a fringe of little prongs along a baseline) — a cap over a comb of teeth. Roughly
 bilateral about the vertical axis.
 
 **Acts as.** A `special` operator: binds fast to the surface it touches ("binds fast to the
 surface it touches"). Dominant theory = it adheres like **glue**; a lesser theory = it holds an
-object together so it cannot break apart. Marked **invertible** (semi-directional).
+object together so it cannot break apart. The official JP reading ("holding vector — anchors the
+effect in place") fits the "hold together / fix in place" reading. Marked **invertible** (semi-directional).
+
+**Findings — World Guide 2026.**
+- 2026-06-03: **Community theory: Bind may absorb Radial's role.** The Spell Checkers argue Bind
+  (stick-to-itself) explains the Sand **Bridge** cohesion, and *inverted* Bind explains **Snugstone**
+  (breaking fire's bind → heat) — i.e. what we model as Radial / inverted-Radial. **Held as theory, not
+  applied** (user decision 2026-06-03); see the Radial entry's matching Finding and
+  [../world-guide-2026.md](../world-guide-2026.md) Tier 3.
 
 **Parameters.** Size = strength of adhesion/hold. Rotation does not steer.
 

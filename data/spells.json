@@ -441,7 +441,7 @@
           },
           {
             "id": "column",
-            "count": 4,
+            "count": 6,
             "placement": "ring",
             "orientation": "inward",
             "inverted": false
@@ -456,7 +456,7 @@
         ],
         "symmetry": "bilateral"
       },
-      "notes": "Canon (volume 12 bonus; introduces the Cool and Gather signs). A nested two-circle spell: inner closed circle = Water core (collection basin); outer open circle = Wind ×2 sigils + 2 Gather + 4 Column + 4 Cool. Harvests atmospheric moisture in water's cheap collect mode. The matcher keys on core + sign multiset, so the two outer Wind sigils (role:sigil) are recorded here in notes, not the sign list."
+      "notes": "Canon (volume 12 bonus; introduces the Cool and Gather signs). A nested two-circle spell: inner closed circle = Water core (collection basin); outer open circle = Wind ×2 sigils + 2 Gather + 6 Column + 4 Cool. Harvests atmospheric moisture in water's cheap collect mode. The matcher keys on core + sign multiset, so the two outer Wind sigils (role:sigil) are recorded here in notes, not the sign list. Column count corrected 4→6 per the World Guide 2026 Masterdoc (docs/world-guide-2026.md); the telepedia reconstruction had 4."
     },
     {
       "id": "qifreys_water_dragon",
@@ -1144,6 +1144,112 @@
         "symmetry": "asymmetric"
       },
       "notes": "Crystal-type SHAPING spell. Crystal core = create+manipulate, self-sufficient, naturally rigid (substances.md:290-292). A single large WEAVE keystone WRAPS the core (placement 'surrounds', not a ring of many) -- transmute operator that 'turns solid objects into long, flexible ribbons' (signs-semi-directional.md:131-134). Its SIZE sets ribbon LENGTH, not force, so the 2.35x scale -> a long ribbon (override the engine's 'power 2.35'). The whole feat is OVERRIDING crystal's natural rigidity (hard/brittle -> supple). ENGINE ARTIFACT: a lone Weave reads as 'asymmetric/unstable' -- false flag; symmetry is recorded as asymmetric only to match what single-Weave seals compute. CANON NUANCE: self-supplying (crystal creates its own material) vs reshaping an existing crystal -- seal never shown, so flagged (see docs/spells/Crystal_Ribbon.md). Sibling to CRYSTAL SHARD (same core, inverted Columns -> rigid shard eruption; opposite character: shaping vs shattering); same Weave as BOULDER STRETCH ROPE (earth, manipulate-only, needs a real boulder -- Crystal Ribbon is the self-supplying version) and LIGHT TRACER (light ribbon)."
+    },
+    {
+      "id": "pillar_of_smoke",
+      "name": "Pillar of Smoke",
+      "category": "smoke",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — manga ch. 91; Olruggio. Smoke sigil + Column ×8.",
+      "confidence": "high",
+      "effect": "Creates a tall pillar/cloud of smoke rising above the seal.",
+      "composition": {
+        "core": "smoke",
+        "signs": [
+          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Smoke sigil (creates/generates smoke) shaped by a ring of 8 Columns into a tall vertical pillar — the smoke analogue of Watershot/Light Beam/Pillar-style column rings. The balanced-Columns 'aim' is the out-of-plane up default (smoke rises). Masterdoc-sourced; effect canon, count per the Masterdoc."
+    },
+    {
+      "id": "floating_disc_of_water",
+      "name": "Floating Disc of Water",
+      "category": "water",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — manga ch. 32; Coco, Olruggio. Water sigil + Columns; sigil drawn small.",
+      "confidence": "medium",
+      "effect": "Creates a spinning disc of water that floats above the seal.",
+      "composition": {
+        "core": "water",
+        "signs": [
+          { "id": "column", "count": 6, "placement": "ring", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Water core + a ring of Columns; the disc SPINS, so the Columns are canted tangentially (tilt -> spin). Olruggio advises drawing the sigil small. Column count not pinned in the Masterdoc (recorded as a ring; 6 is a placeholder) — confidence medium."
+    },
+    {
+      "id": "floating_expansion",
+      "name": "Floating Expansion",
+      "category": "utility",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — manga ch. 37; Qifrey, Coco. Window sigil + Float ×4 + Enlarge + Column ×8.",
+      "confidence": "high",
+      "effect": "Grows the object the seal is drawn on and makes it float — an enlarge-and-lift on the seal's own object (uses Window = 'apply to the object it is drawn on').",
+      "composition": {
+        "core": "window",
+        "signs": [
+          { "id": "float", "count": 4, "placement": "alternating", "orientation": "inward", "inverted": false },
+          { "id": "enlarge", "count": 1, "placement": "center", "orientation": "outward", "inverted": false },
+          { "id": "column", "count": 8, "placement": "ring", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Window (target = the object the seal is on) as the center, with Enlarge (grow), Float ×4 (anti-gravity) and a Column ×8 ring. Pairs against the Spell of Reduction (Diamond + inverted Enlarge = shrink a NEARBY object). Window vs Diamond is the target swap. Masterdoc-sourced."
+    },
+    {
+      "id": "spell_of_reduction",
+      "name": "Spell of Reduction",
+      "category": "utility",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — manga ch. 45; Qifrey, Coco. Repetition sigil + inverted Enlarge + Diamond ×4.",
+      "confidence": "high",
+      "effect": "Shrinks a nearby object (inverted Enlarge), scoped to a neighbour by Diamond; the Repetition sigil lets the change be undone/restored.",
+      "composition": {
+        "core": "repetition_sigil",
+        "signs": [
+          { "id": "enlarge", "count": 1, "placement": "center", "orientation": "inward", "inverted": true },
+          { "id": "diamond", "count": 4, "placement": "around", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Inverted Enlarge = shrink; Diamond scopes the effect to a NEARBY object (vs Window = the object itself, as in Floating Expansion). Repetition core allows reverting to the original size. Direct inversion/target counterpart of Floating Expansion (signs.md, Enlarge/Diamond/Window). Masterdoc-sourced."
+    },
+    {
+      "id": "bubble_carriage",
+      "name": "Bubble Carriage",
+      "category": "air",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — manga ch. 30. Aeriforms sigil + Region ×26 + Column ×26.",
+      "confidence": "medium",
+      "effect": "Forms a large air bubble/dome (a breathable carriage) — Aeriforms generates the air, a dense ring of Regions + Columns shapes and contains it.",
+      "composition": {
+        "core": "aeriforms",
+        "signs": [
+          { "id": "direction", "count": 26, "placement": "ring", "orientation": "inward", "inverted": false },
+          { "id": "column", "count": 26, "placement": "ring", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "Aeriforms (creates air, but does NOT move it — pair with Wind to move) shaped by very dense Region+Column rings (26 each) into a contained air dome. Contraption (carriage). Masterdoc-sourced; confidence medium pending the seal art."
+    },
+    {
+      "id": "valance_leech_of_light",
+      "name": "Valance Leech of Light",
+      "category": "light",
+      "origin": "wiki",
+      "source": "WHA World Guide 2026 Masterdoc (docs/world-guide-2026.md) — manga ch. 78; Agott. Light + Valance Leech sigils + Column ×5.",
+      "confidence": "medium",
+      "effect": "Light manifests in the shape of a valance leech (a decorative-sigil-shaped light projection).",
+      "composition": {
+        "core": "valance_leech",
+        "signs": [
+          { "id": "column", "count": 5, "placement": "ring", "orientation": "inward", "inverted": false }
+        ],
+        "symmetry": "radial"
+      },
+      "notes": "A Light substance shaped by the Valance Leech DECORATIVE sigil (shape/identity) + a Column ×5 ring. Sister to the Bird of Light Beacon (light + Bird deco). Recorded with the valance_leech deco as core and Light as the substance sigil (the catalog composition flattens multi-sigil seals; Light is the substance, noted here). Masterdoc-sourced."
     }
   ]
 }

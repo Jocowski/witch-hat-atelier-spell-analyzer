@@ -317,6 +317,16 @@
       "kind": "special",
       "verb": "is purified, separating impurities out of the element"
     },
+    "solidification": {
+      "kind": "transmute",
+      "verb": "is solidified, hardening and coagulating into a fixed solid form",
+      "invertedVerb": "is loosened back out of its solidified form"
+    },
+    "envelopment": {
+      "kind": "form",
+      "verb": "is wrapped around its target like a clinging garment, cladding it",
+      "invertedVerb": "is stripped back from the target it had clad"
+    },
     "sign_of_wind": {
       "kind": "motion",
       "verb": "is set whirling into a spinning spiral (a 'whirlwind keystone')"

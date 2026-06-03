@@ -36,6 +36,7 @@ const sigilsDoc = require(resolve(root, 'data/sigils.json'))
 const signsDoc = require(resolve(root, 'data/signs.json'))
 const dyesDoc = require(resolve(root, 'data/dyes.json'))
 const spellsDoc = require(resolve(root, 'data/spells.json'))
+const caveatsDoc = require(resolve(root, 'data/fact-caveats.json'))
 
 const importLocal = (rel) => import(pathToFileURL(resolve(root, rel)).href)
 const { toComposition, analyzeCircleWith, composeWith, reclassifyCorelessCircles } = await importLocal('src/engine/compose.js')
@@ -284,6 +285,30 @@ function toText(r) {
   return L.join('\n')
 }
 
+// ---------- Caveats (auto-surfaced engine-artifact corrections) ----------
+// Match data/fact-caveats.json rules against a circle's facts and return the notes that apply.
+// This emits the recurring "engine blind spot — override in your reading" findings from
+// docs/lexicon/ automatically, so they are applied consistently instead of re-derived.
+const CAVEATS = caveatsDoc.caveats || []
+function evalCaveat(cf, when) {
+  const signs = cf.signs || []
+  if (when.coreElement && !when.coreElement.includes(cf.core?.element)) return false
+  if (when.symmetry && !when.symmetry.includes(cf.geometry?.symmetry)) return false
+  if (typeof when.signCountEquals === 'number' && cf.geometry?.signCount !== when.signCountEquals) return false
+  if (when.hasUnknownSigns && !cf.flags?.hasUnknownSigns) return false
+  if (when.operatorKind && !signs.some((s) => s.operatorKind === when.operatorKind)) return false
+  if (when.sign) {
+    const matches = signs.filter((s) => s.id === when.sign)
+    if (!matches.length) return false
+    if (typeof when.minCount === 'number' && !matches.some((s) => (s.count || 1) >= when.minCount)) return false
+    if (typeof when.inverted === 'boolean' && !matches.some((s) => !!s.inverted === when.inverted)) return false
+  }
+  return true
+}
+function caveatsFor(cf) {
+  return CAVEATS.filter((r) => evalCaveat(cf, r.when || {})).map((r) => ({ id: r.id, note: r.note, source: r.source }))
+}
+
 // ---------- Structured FACTS (the AI reasons FROM these) ----------
 // The re-architecture (PLAN.md) makes the engine a COMPILER + fact-extractor, not the
 // authority on what a spell does. `--facts` returns clean, engine-observable facts —
@@ -308,7 +333,7 @@ function buildFacts(input, result) {
       ;(byKind[kind] ||= []).push(s.inverted ? `${s.id}!inv` : s.id)
     }
     const a = c.analysis || {}
-    return {
+    const cf = {
       id: c.id,
       name: c.name || null,
       valid: c.valid,
@@ -340,6 +365,8 @@ function buildFacts(input, result) {
       heuristicNotes: c.deduction?.notes || [],
       heuristicWarnings: c.deduction?.warnings || [],
     }
+    cf.caveats = caveatsFor(cf)
+    return cf
   })
   return {
     name: result.name || null,

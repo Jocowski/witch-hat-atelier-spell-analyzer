@@ -52,6 +52,33 @@
       "kind": "durability",
       "color": "#6fb0c9",
       "effect": "Makes the drawn seal waterproof."
+    },
+    {
+      "id": "dragon_egg_shells",
+      "name": "Dragon Egg Shells",
+      "origin": "canon",
+      "source": "WHA World Guide 2026 (official MAGs preview, Tools/Dyes); see docs/world-guide-2026.md",
+      "kind": "unknown",
+      "color": "#b89a6a",
+      "effect": "Effect currently unknown; highly sought after."
+    },
+    {
+      "id": "dragon_scales",
+      "name": "Dragon Scales",
+      "origin": "canon",
+      "source": "WHA World Guide 2026 (official MAGs preview, Tools/Dyes); see docs/world-guide-2026.md",
+      "kind": "unknown",
+      "color": "#7a8a5a",
+      "effect": "Effect currently unknown; highly sought after."
+    },
+    {
+      "id": "tranquileaf",
+      "name": "Tranquileaf",
+      "origin": "canon",
+      "source": "WHA World Guide 2026 (official MAGs preview, Tools/Dyes); see docs/world-guide-2026.md",
+      "kind": "unknown",
+      "color": "#7fae7f",
+      "effect": "Effect currently unknown."
     }
   ]
 }

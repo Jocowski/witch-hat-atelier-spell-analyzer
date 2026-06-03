@@ -39,6 +39,21 @@ on the sigil it is paired with".)
 So the procedure is always: **identify the substance and its nature → apply each operator as
 a transformation of that substance → resolve the geometry → check it can actually run.**
 
+### 1a. Caster intent — the seal is a floor, not a cage (CANON)
+
+Magic is **not pure code**: it also responds to the **caster's will**. Canon shows a non-witch
+doctor reach toward Coco's floating water bubbles and nudge them, though that was not the spell's
+written effect (World Guide 2026 / community confirm; see [world-guide-2026.md](world-guide-2026.md)).
+The useful framing: a seal is **like a letter to a god who already knows your intent** — the
+written symbols set the rules and the *floor* of what happens, and ambiguity left by the drawing
+is resolved by what the caster is willing. A seal that flatly contradicts intent is overridden by
+what was *written*, but anything the writing leaves open, intent fine-tunes.
+
+Consequence for us: **deduce the effect the seal guarantees** (that is what these docs reason
+about), then note that within its slack the caster's intent steers specifics (which direction an
+undirected float drifts, how a motion plays out). Don't treat the deduction as the *only* possible
+outcome — treat it as the floor the symbols pin down.
+
 ---
 
 ## 2. Substances (the operands)
@@ -236,7 +251,10 @@ Hard limits that make designs authentic (decline-or-flag, don't fudge):
 - Inversion only for directional/semi-directional signs.
 - A sign supplies *form*, never a new *substance* (a decorative/animal sign isn't a fire
   source).
-- Decorative sigils are mostly aesthetic (Horse is the notable exception with real utility).
+- Decorative sigils impose a **shape/identity** on the substance — and that identity can be an
+  **object, not only an animal** (the canon **Sigil of Sword** and Valance Leech confirm this;
+  World Guide 2026). They are mostly aesthetic, but several carry real utility (Horse; Sword
+  shapes the Raincleaver's water blade).
 - **Forbidden** (forbidden-magic.md): anything drawn on / affecting the human body (incl.
   healing — only Memory Erasure is permitted), reality-warping, or excessive
   destruction/environment alteration. You may still *design/analyze* forbidden spells in this
@@ -248,7 +266,10 @@ Hard limits that make designs authentic (decline-or-flag, don't fudge):
 
 - `node tools/spell-engine-cli.mjs --facts spell.json` → the **observations** you reason from
   (parts, operator kinds, geometry, zones, catalog neighbours). The `heuristicSummary` is a
-  scaffold, not the answer.
+  scaffold, not the answer. Each circle also carries a **`caveats`** array: auto-surfaced
+  corrections for the recurring engine artifacts recorded in the lexicon (e.g. "4 balanced
+  Columns → the aim label is an artifact"). **Apply caveats before trusting the matching
+  geometry field.** They are generated from [../data/fact-caveats.json](../data/fact-caveats.json).
 - `node tools/render.mjs spell.json -o out.svg` → turn a spell you designed into a picture for
   the user.
 - The catalog match (`data/spells.json`) answers "have I seen this before?" — a *tool*, not the

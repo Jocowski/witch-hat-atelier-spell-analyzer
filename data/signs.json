@@ -786,6 +786,8 @@
     {
       "id": "sights_set",
       "name": "Sights Set",
+      "officialName": "Sign of Focus",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147); JP 'aiming vector' = set/lock a target",
       "origin": "wiki",
       "source": "telepedia 'Signs Explained': https://witchhatatelier.telepedia.net/wiki/Signs_Explained",
       "glyph": "◎",
@@ -807,6 +809,8 @@
     {
       "id": "gather",
       "name": "Gather",
+      "officialName": "Sign of Gathering",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147)",
       "origin": "wiki",
       "source": "telepedia 'Signs Explained': https://witchhatatelier.telepedia.net/wiki/Signs_Explained",
       "glyph": "⊼",
@@ -826,6 +830,8 @@
     {
       "id": "strengthen",
       "name": "Strengthen",
+      "officialName": "Sign of Empowerment",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147); JP 'reinforcement vector' — note the JP leans 'reinforce/empower' and may strengthen effects, not only physical durability",
       "origin": "wiki",
       "source": "telepedia 'Signs Explained': https://witchhatatelier.telepedia.net/wiki/Signs_Explained",
       "glyph": "⤧",
@@ -845,6 +851,8 @@
     {
       "id": "entwine",
       "name": "Entwine",
+      "officialName": "Sign of Entwining",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147); JP 'coiling vector' — directs the effect to wrap/coil around something",
       "origin": "wiki",
       "source": "telepedia 'Signs Explained': https://witchhatatelier.telepedia.net/wiki/Signs_Explained",
       "glyph": "➰",
@@ -902,6 +910,8 @@
     {
       "id": "bind",
       "name": "Bind",
+      "officialName": "Sign of Binding",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147); JP 'holding vector' — fixes/anchors the effect in place",
       "origin": "wiki",
       "source": "telepedia 'Signs Explained': https://witchhatatelier.telepedia.net/wiki/Signs_Explained",
       "glyph": "⊟",
@@ -1015,6 +1025,50 @@
       "reference": "signs.md",
       "family": "asymmetric",
       "render": "fill"
+    },
+    {
+      "id": "solidification",
+      "name": "Solidification",
+      "officialName": "Sign of Solidification",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147 — Raincleaver); JP 'solidification vector' — causes the effect to harden/coagulate",
+      "origin": "canon",
+      "source": "WHA World Guide 2026 (official MAGs preview), seen in the Raincleaver. Mechanic theorized; see docs/world-guide-2026.md.",
+      "glyph": "⊝",
+      "svgPath": "M0,-13 L11,0 L0,13 L-11,0 Z M0,-6 L5,0 L0,6 L-5,0 Z",
+      "effect": "Newly-named canon sign (World Guide 2026). Causes the spell's effect to harden / coagulate into a solid form. Exact behaviour pending the full guide; appears in the Raincleaver and Sand Bridge. Theory: distinct from Convergence (which focuses/compacts) — Solidification fixes a state as solid.",
+      "effectTags": [
+        "solidify",
+        "harden",
+        "coagulate"
+      ],
+      "invertible": true,
+      "canBeCenter": false,
+      "surrounds": false,
+      "reference": "World Guide 2026; docs/world-guide-2026.md",
+      "family": "semi-directional",
+      "confidence": "medium"
+    },
+    {
+      "id": "envelopment",
+      "name": "Envelopment",
+      "officialName": "Sign of Envelopment",
+      "officialNameSource": "WHA World Guide 2026 (MAGs preview, p.147 — Raincleaver); JP 'cloaking vector' — clads/wraps the effect around like a garment",
+      "origin": "canon",
+      "source": "WHA World Guide 2026 (official MAGs preview), seen in the Raincleaver. Mechanic theorized; see docs/world-guide-2026.md.",
+      "glyph": "⌒",
+      "svgPath": "M-13,6 C-13,-12 13,-12 13,6 M-8,6 C-8,-5 8,-5 8,6",
+      "effect": "Newly-named canon sign (World Guide 2026). Clads / wraps the effect around its target like a garment (a 'cloaking' vector). In the Raincleaver, theorized to wrap the conjured water around the sword's edge. Exact behaviour pending the full guide.",
+      "effectTags": [
+        "envelop",
+        "wrap",
+        "clad"
+      ],
+      "invertible": true,
+      "canBeCenter": false,
+      "surrounds": false,
+      "reference": "World Guide 2026; docs/world-guide-2026.md",
+      "family": "semi-directional",
+      "confidence": "medium"
     },
     {
       "id": "unknown_06",
