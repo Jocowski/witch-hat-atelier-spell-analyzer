@@ -1,17 +1,11 @@
-// spellEffectLab.js — Spell Effect Lab shell.
+// spellEffectLab.js — Spell Effect Lab: live SpellIR editor + real particle renderer.
 //
-// Builds a synthetic SpellIR object from live sliders and displays it as a live-updating
-// JSON block. Canvas rendering is a PLACEHOLDER — this shell is forward-compatible with the
-// SpellIR shape from docs/app/SPEC-spell-ir.md; once the visual renderer lands, wire it here.
-//
-// TODO: wire to src/studio/render/effects/* once SPEC-visual-renderer lands.
-//   import { SpellEffectRenderer } from '../src/studio/effects/SpellEffectRenderer.js'
-//   import { buildSpellIR } from '../src/studio/effects/effectUtils.js'
-//
-// The "Paste wha-spell@1 JSON" path imports the REAL analyze() so parameters are deduced
+// Wired to the real effect modules in src/studio/render/effects/* (SPEC-visual-renderer).
+// The "Paste wha-spell@1 JSON" path imports analyze() so parameters are deduced
 // by the same engine the Studio uses.
 
 import { analyze } from '../src/engine/analyze.js'
+import { SpellEffectRenderer } from '../src/studio/render/SpellEffectRenderer.js'
 
 // ── State ─────────────────────────────────────────────────────────────────────────
 let elements = [] // from grammar.json.elements
@@ -146,97 +140,77 @@ function buildIRFromSliders() {
   }
 }
 
-function updateIRDisplay() {
-  const ir = buildIRFromSliders()
-  document.getElementById('irBlock').textContent = JSON.stringify(ir, null, 2)
-  drawPlaceholder(ir)
-  // TODO: when SpellEffectRenderer exists:
-  //   renderer.update(ir)
-}
-
-// ── Canvas placeholder ─────────────────────────────────────────────────────────────
+// ── Canvas setup ──────────────────────────────────────────────────────────────
 const underlayCtx = document.getElementById('underlayCanvas').getContext('2d')
-const effectCtx = document.getElementById('effectCanvas').getContext('2d')
+const effectCanvas = document.getElementById('effectCanvas')
 const CW = 520, CH = 520
 
-function drawPlaceholder(ir) {
-  const ucx = underlayCtx, ecx = effectCtx
-  ucx.clearRect(0, 0, CW, CH)
-  ecx.clearRect(0, 0, CW, CH)
+// Real SpellEffectRenderer wired to the effect modules.
+const RENDERER_CONFIG = {
+  renderer: {
+    particleBaseCount: 60,
+    particleCap: 400,
+    preparedActiveGating: false,
+    stabilityFailThreshold: 0.25,
+    qualityFailThreshold: 0.20,
+  },
+}
+const renderer = new SpellEffectRenderer(effectCanvas, RENDERER_CONFIG)
 
+// Build a synthetic ring from the ringRadius slider value.
+function makeRingGeom(ir) {
+  const r = ir.ringRadius * CW
+  return { found: true, center: { x: CW / 2, y: CH / 2 }, radius: r }
+}
+
+function drawUnderlay(ir) {
+  const ucx = underlayCtx
+  ucx.clearRect(0, 0, CW, CH)
   const cx = CW / 2, cy = CH / 2
   const ringR = ir.ringRadius * CW
 
-  // Underlay: synthetic glyph guide ring
   ucx.save()
   ucx.strokeStyle = '#3a2a60'
   ucx.lineWidth = 2
   ucx.setLineDash([6, 4])
   ucx.beginPath(); ucx.arc(cx, cy, ringR, 0, Math.PI * 2); ucx.stroke()
   ucx.setLineDash([])
-  // Center sigil placeholder
   ucx.strokeStyle = '#4a3a70'
   ucx.lineWidth = 1.5
   ucx.beginPath(); ucx.arc(cx, cy, 16, 0, Math.PI * 2); ucx.stroke()
   ucx.beginPath(); ucx.moveTo(cx - 10, cy); ucx.lineTo(cx + 10, cy); ucx.stroke()
   ucx.beginPath(); ucx.moveTo(cx, cy - 10); ucx.lineTo(cx, cy + 10); ucx.stroke()
   ucx.restore()
-
-  // Effect placeholder: direction arrow + force circle
-  ecx.save()
-  // Force circle
-  const forceR = 10 + ir.force * 60
-  const elementColors = {
-    fire: '#f08030', water: '#3090f0', earth: '#806030', air: '#90c0e0',
-    time: '#c090f0', light: '#f8f060', default: '#a080f0',
-  }
-  const col = elementColors[ir.element] ?? elementColors.default
-  ecx.strokeStyle = col
-  ecx.globalAlpha = 0.5 + ir.stability * 0.3
-  ecx.lineWidth = 2
-  ecx.beginPath(); ecx.arc(cx, cy, forceR, 0, Math.PI * 2 * ir.spread); ecx.stroke()
-
-  // Direction arrow
-  if (ir.dirCoherence > 0.1 || Math.abs(ir.direction.x) > 0.05 || Math.abs(ir.direction.y) > 0.05) {
-    const ax = ir.direction.x, ay = ir.direction.y
-    const len = 50 + ir.range * 80
-    const ex = cx + ax * len, ey = cy + ay * len
-    ecx.strokeStyle = col
-    ecx.globalAlpha = 0.7
-    ecx.lineWidth = 2
-    ecx.beginPath(); ecx.moveTo(cx, cy); ecx.lineTo(ex, ey); ecx.stroke()
-    // Arrowhead
-    const angle = Math.atan2(ey - cy, ex - cx)
-    const hw = 8
-    ecx.beginPath()
-    ecx.moveTo(ex, ey)
-    ecx.lineTo(ex - hw * Math.cos(angle - 0.4), ey - hw * Math.sin(angle - 0.4))
-    ecx.lineTo(ex - hw * Math.cos(angle + 0.4), ey - hw * Math.sin(angle + 0.4))
-    ecx.closePath(); ecx.fillStyle = col; ecx.fill()
-  }
-
-  // Placeholder text
-  ecx.globalAlpha = 0.3
-  ecx.fillStyle = '#8060a0'
-  ecx.font = '11px system-ui'
-  ecx.fillText('[ renderer placeholder — SPEC-visual-renderer ]', 10, CH - 14)
-  ecx.restore()
 }
 
-// ── Animation loop placeholder ────────────────────────────────────────────────────
-// TODO: replace with renderer.start(ir) / renderer.stop() once SpellEffectRenderer exists.
+// activatedAt for emission tracking in the renderer
+let labActivatedAt = performance.now()
+
+function updateIRDisplay() {
+  const ir = buildIRFromSliders()
+  document.getElementById('irBlock').textContent = JSON.stringify(ir, null, 2)
+  drawUnderlay(ir)
+  // renderer is driven by the rAF loop; just refresh the display block here
+}
+
+// ── Animation loop (real renderer) ────────────────────────────────────────────
 function restartAnimation() {
   if (animHandle) cancelAnimationFrame(animHandle)
-  let t = 0
-  function frame() {
-    t += 0.02
+  labActivatedAt = performance.now()
+
+  function frame(timestamp) {
     const ir = buildIRFromSliders()
-    // Minimal animation: pulse the force ring opacity with time
-    effectCtx.clearRect(0, 0, CW, CH)
-    const pulse = 0.6 + 0.4 * Math.sin(t * (1 + ir.force))
-    effectCtx.globalAlpha = pulse
-    drawPlaceholder(ir)
-    effectCtx.globalAlpha = 1
+    const labSpellIR = {
+      ...ir,
+      valid: true,
+      active: true,
+      prepared: false,
+      activatedAt: labActivatedAt,
+      signature: `lab|${ir.element}|${ir.force}|${ir.spread}|${ir.stability}`,
+    }
+    const ring = makeRingGeom(ir)
+    drawUnderlay(ir)
+    renderer.render(labSpellIR, ring, timestamp, { showGuides: false })
     animHandle = requestAnimationFrame(frame)
   }
   animHandle = requestAnimationFrame(frame)

@@ -60,6 +60,7 @@ import {
 import { line, rect, triangle, circle, brush } from './tools/shapes.js'
 import { getComponentDef } from '../engine/data.js'
 import ToolDock from './ToolDock.jsx'
+import EffectCanvas from './render/EffectCanvas.jsx'
 import './drawing.css'
 
 // Enable the RIGHT mouse button (2) for dragging. Konva's default `dragButtons` is [0, 1]
@@ -194,11 +195,15 @@ function normPlaced(p) {
 
 const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   const {
-    palette       = 'dyes',
-    enableSymbols = true,
+    palette         = 'dyes',
+    enableSymbols   = true,
     onChange,
-    compact       = false,
+    compact         = false,
     overlays,        // Array<{ box:{x,y,w,h}, label, kind }> | undefined
+    spellIR,         // SpellIR | null — passed from StudioPage after Analyze
+    ringGeom,        // { center:{x,y}, radius:number, found:boolean } | null
+    effectsEnabled = false,  // master switch for the visual effect overlay
+    rulesRenderer,   // rules.json.renderer block (particle config + thresholds)
   } = props
 
   // ── tool / color / brush state ─────────────────────────────────────────────
@@ -1005,6 +1010,14 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
             </Layer>
           )}
         </Stage>
+
+        {/* ── Effect overlay canvas (pointer-events:none, z-index above Stage) ── */}
+        <EffectCanvas
+          spellIR={spellIR}
+          ringGeom={ringGeom}
+          enabled={!!effectsEnabled}
+          rulesRenderer={rulesRenderer}
+        />
       </div>
     </div>
   )

@@ -255,5 +255,14 @@
 
     "forceTiltMaxDeg":   76,
     "minSurfaceDirectionMagnitude": 0.001
+  },
+
+  "renderer": {
+    "_note": "Visual effect renderer config — SPEC-visual-renderer.md §6.4. preparedActiveGating is OFF by default (see spec for rationale). Thresholds gate failure visuals. particleBaseCount/particleCap tune performance.",
+    "preparedActiveGating":   false,
+    "stabilityFailThreshold": 0.25,
+    "qualityFailThreshold":   0.20,
+    "particleBaseCount":      60,
+    "particleCap":            400
   }
 }

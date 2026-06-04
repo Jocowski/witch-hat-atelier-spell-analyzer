@@ -24,9 +24,22 @@ import { activeTemplates, addSample } from '../data-services/samples.js'
 import { getSymbolByEngineId } from '../data-services/symbols.js'
 import { logAnalysis } from '../data-services/analyses.js'
 import { loadTemplates } from '../draw/templates.js'
+import { buildSpellIRShim } from './render/spellIRShim.js'
 import rules from '../../data/rules.json'
 
 const BRIDGE_URL = import.meta.env.VITE_AI_BRIDGE_URL || 'http://localhost:8787'
+
+// Visual effect renderer config (from rules.json) — passed to DrawingSurface as-is.
+const RENDERER_CFG = rules.renderer ?? {}
+
+// Prepared/active gating toggle (off by default, per SPEC §6.4).
+// Session override via localStorage; falls back to rules.json default.
+const GATING_LS_KEY = 'studio.renderer.preparedActiveGating'
+function readGatingSetting() {
+  const stored = localStorage.getItem(GATING_LS_KEY)
+  if (stored !== null) return stored === '1'
+  return RENDERER_CFG.preparedActiveGating ?? false
+}
 
 // Recognizer config (data-driven): source→weight (A1) + verified multiplier (A6) + confidence gate (A2).
 // activeTemplates(rules.recognition) resolves the effective weight (sourceWeight * verifiedMultiplier)
@@ -79,6 +92,12 @@ export default function StudioPage() {
   const [flash, setFlash] = useState(null)
   const [contributeMsg, setContributeMsg] = useState(null)
 
+  // Visual effect renderer state (1.1, 1.3, 1.4)
+  const [spellIRShim, setSpellIRShim] = useState(null)          // SpellIR object for EffectCanvas
+  const [ringGeom, setRingGeom] = useState(null)                  // ring geometry in canvas px
+  const [activatedAt, setActivatedAt] = useState(null)            // timestamp of last activation
+  const [preparedActiveGating, setPreparedActiveGating] = useState(readGatingSetting)
+
   // A0: accumulate the user's label corrections across the session so logAnalysis can record them.
   const correctionsRef = useRef([])
 
@@ -128,9 +147,9 @@ export default function StudioPage() {
     try {
       const model = canvasRef.current.getModel()
       const drawn = (canvasRef.current.getStrokes() || []).map((s) => s.points).filter((p) => p && p.length >= 2)
-      let recGroups = [], ringClosed = false
+      let recGroups = [], ringClosed = false, recognizerResult = null
       if (drawn.length > 0 && templates.length > 0) {
-        const r = analyzeStrokes(drawn, templates, {
+        recognizerResult = analyzeStrokes(drawn, templates, {
           adaptiveGap:          true,
           gapK:                 rules.recognition?.gapK                 ?? 0.12,
           gapMin:               rules.recognition?.gapMin               ?? 14,
@@ -143,8 +162,8 @@ export default function StudioPage() {
           rotationSteps:        rules.recognition?.rotationSteps        ?? 24,
           confidenceMinPct:     CONFIDENCE_MIN_PCT,
         })
-        recGroups = r.groups || []
-        ringClosed = !!r.ring
+        recGroups = recognizerResult.groups || []
+        ringClosed = !!recognizerResult.ring
       }
       const d = { placed: model.placed, recGroups, ringClosed, dyes: model.dyes }
       setDetection(d)
@@ -152,6 +171,22 @@ export default function StudioPage() {
       setComposition(buildComposition(d))
       setResult(null); setContributeMsg(null)
       setPhase('detected')
+
+      // Derive ring geometry for the effect canvas (SPEC-visual-renderer §3.3).
+      // The effect canvas is fixed-size (canvas px); center = stage center.
+      // Ring radius: recognizer provides world-px radius; fall back to guide-ring size.
+      const RING_RADIUS_FALLBACK = 180
+      const detectedRingRadius = recognizerResult?.ring?.radius ?? RING_RADIUS_FALLBACK
+      // We derive the stage size from the wrapper element (DrawingSurface exposes no prop for this).
+      // Use a safe-to-compute heuristic: the canvas is 100% of ds-stage-wrap.
+      const stageEl = canvasRef.current?.getStageElement?.()
+      const stageW = stageEl?.clientWidth ?? 800
+      const stageH = stageEl?.clientHeight ?? 600
+      setRingGeom({
+        found: !!recognizerResult?.ring,
+        center: { x: stageW / 2, y: stageH / 2 },
+        radius: detectedRingRadius,
+      })
     } finally { setBusy(false) }
   }, [busy, templates, buildComposition])
 
@@ -178,14 +213,25 @@ export default function StudioPage() {
       setResult(res); setPhase('analyzed')
       const corrections = correctionsRef.current.length ? { items: [...correctionsRef.current] } : null
       logAnalysis({ composition, engine_result: res, corrections }).catch(() => {})
+
+      // Build the SpellIR shim for the visual effect renderer (SPEC-visual-renderer §8 Phase R1).
+      // The shim uses the real spellIR block from analyze() when available.
+      const ringClosed = composition?.ring?.closed ?? detection.ringClosed ?? false
+      const wasActive = spellIRShim?.active ?? false
+      const nowActive = ringClosed || !preparedActiveGating  // toggle-off: always active
+      const newActivatedAt = (!wasActive && nowActive) ? performance.now() : (activatedAt ?? performance.now())
+      setActivatedAt(newActivatedAt)
+      setSpellIRShim(buildSpellIRShim(res, ringClosed, newActivatedAt))
     } finally { setBusy(false) }
-  }, [composition, busy])
+  }, [composition, busy, detection.ringClosed, spellIRShim, activatedAt, preparedActiveGating])
 
   function handleClear() {
     canvasRef.current?.clear()
     setPhase('idle'); setDetection({ placed: [], recGroups: [], ringClosed: false, dyes: [] })
     setOverlays([]); setComposition(null); setResult(null); setContributeMsg(null)
     correctionsRef.current = []
+    // Reset visual effect state
+    setSpellIRShim(null); setRingGeom(null); setActivatedAt(null)
   }
 
   // copy the drawing as a PNG to the clipboard
@@ -241,7 +287,16 @@ export default function StudioPage() {
       <div className="studio-main">
         <div className="studio-centre">
           <div className="studio-canvas-wrap">
-            <DrawingSurface ref={canvasRef} palette="dyes" enableSymbols overlays={overlays} />
+            <DrawingSurface
+              ref={canvasRef}
+              palette="dyes"
+              enableSymbols
+              overlays={overlays}
+              spellIR={spellIRShim}
+              ringGeom={ringGeom}
+              effectsEnabled={phase === 'analyzed' && !!spellIRShim}
+              rulesRenderer={{ ...RENDERER_CFG, preparedActiveGating }}
+            />
           </div>
 
           <div className="studio-action-bar">
@@ -275,6 +330,21 @@ export default function StudioPage() {
               {phase === 'analyzed' ? 'Analysis' : 'Detection'} · {detectedCount} symbol{detectedCount === 1 ? '' : 's'}
             </span>
             <div className="srh-actions">
+              {/* Ring gating toggle — only shown when preparedActiveGating is enabled in config (spec §6.4) */}
+              {RENDERER_CFG.preparedActiveGating && (
+                <label className="srh-toggle" title="When ON: open ring = prepared glow; close ring + re-Analyze = full effect. OFF = cast immediately.">
+                  <input
+                    type="checkbox"
+                    checked={preparedActiveGating}
+                    onChange={(e) => {
+                      const v = e.target.checked
+                      setPreparedActiveGating(v)
+                      localStorage.setItem(GATING_LS_KEY, v ? '1' : '0')
+                    }}
+                  />
+                  {' Ring gating'}
+                </label>
+              )}
               <button className="srh-btn" onClick={() => setCollapsed((c) => !c)} title={collapsed ? 'Expand' : 'Minimize'}>
                 {collapsed ? '▢ expand' : '— minimize'}
               </button>
