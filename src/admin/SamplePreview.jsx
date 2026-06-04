@@ -4,6 +4,15 @@ import { useEffect, useRef } from 'react'
 const CANVAS_SIZE = 220
 const PADDING     = 14
 
+// The canvas 2D context cannot parse CSS `var(--x)` strings — assigning one to fillStyle/strokeStyle
+// is silently ignored and the context keeps its default BLACK (which is why the modal rendered an
+// all-black image: black bg fill + black, invisible strokes). Resolve the theme variable to a real
+// color from the element's computed style, falling back to a literal when the var is unset.
+function cssColor(el, name, fallback) {
+  const v = el && getComputedStyle(el).getPropertyValue(name).trim()
+  return v || fallback
+}
+
 /**
  * Groups a flat [{X,Y,ID}] array into strokes keyed by ID.
  * Returns an array of arrays (one inner array per stroke, in insertion order).
@@ -51,16 +60,22 @@ export default function SamplePreview({ sample, onClose }) {
     const ctx = canvas.getContext('2d')
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
+    // Resolve theme colors to real values (canvas can't read CSS var() — see cssColor note above).
+    const bgColor     = cssColor(canvas, '--panel-2', '#1e1e2e')
+    const dimColor    = cssColor(canvas, '--ink-dim', '#888888')
+    const strokeColor = cssColor(canvas, '--accent', '#a78bfa')
+    const startColor  = cssColor(canvas, '--ok', '#4ade80')
+
     const points = Array.isArray(sample?.points) ? sample.points : []
     const strokes = groupStrokes(points)
     const { scale, dx, dy } = fitTransform(strokes, CANVAS_SIZE, PADDING)
 
     // Background
-    ctx.fillStyle = 'var(--panel-2, #1e1e2e)'
+    ctx.fillStyle = bgColor
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
     if (strokes.length === 0) {
-      ctx.fillStyle = 'var(--ink-dim, #888)'
+      ctx.fillStyle = dimColor
       ctx.font = '12px sans-serif'
       ctx.textAlign = 'center'
       ctx.fillText('No points', CANVAS_SIZE / 2, CANVAS_SIZE / 2)
@@ -71,7 +86,7 @@ export default function SamplePreview({ sample, onClose }) {
     ctx.lineWidth   = 2
     ctx.lineCap     = 'round'
     ctx.lineJoin    = 'round'
-    ctx.strokeStyle = 'var(--accent, #a78bfa)'
+    ctx.strokeStyle = strokeColor
 
     for (const stroke of strokes) {
       if (stroke.length === 0) continue
@@ -85,7 +100,7 @@ export default function SamplePreview({ sample, onClose }) {
       // Mark first point
       const sx = stroke[0].X * scale + dx
       const sy = stroke[0].Y * scale + dy
-      ctx.fillStyle = 'var(--ok, #4ade80)'
+      ctx.fillStyle = startColor
       ctx.beginPath()
       ctx.arc(sx, sy, 3, 0, Math.PI * 2)
       ctx.fill()
