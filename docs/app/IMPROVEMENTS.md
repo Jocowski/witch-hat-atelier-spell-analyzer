@@ -9,9 +9,20 @@
 > - [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) — training flywheel + analysis surfacing
 >   (A0–A3 + B1/B4 shipped; A4–A7, B2, B5, B6 pending).
 > - [SPEC-symbol-versioning.md](SPEC-symbol-versioning.md) — symbol lifecycle + canon-update flagging
->   (Fase 1 shipped; Fase 2/3 pending).
+>   (Fase 1 shipped; Fase 2/3 pending — build plan added).
 > - [SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md) — magnitude/variant model (Layer 1
->   shipped; Layers 2/3 pending).
+>   shipped; superseded/unified by SPEC-magnitude-and-variants.md).
+>
+> **New specs (2026-06-05 planning batch — conjuration + recognizer robustness + analysis):**
+> - [SPEC-spell-ir.md](SPEC-spell-ir.md) — numeric SpellIR `{force,spread,focus,range,duration,stability,gravity,direction}` + 3D tilt (1.2, 1.5).
+> - [SPEC-visual-renderer.md](SPEC-visual-renderer.md) — animated effect canvas + Prepared/Active (off-by-default) + failure visuals (1.1, 1.3, 1.4).
+> - [SPEC-ring-closure-floodfill.md](SPEC-ring-closure-floodfill.md) — flood-fill ring closure + adaptive segmentation (2.2, 2.3).
+> - [SPEC-recognizer-matching.md](SPEC-recognizer-matching.md) — rotation-tolerant guess + raster matcher cross-validation (2.4, 2.5).
+> - [SPEC-admin-verify.md](SPEC-admin-verify.md) — verified-sample flag + weight bump + bulk-exclude (2.6).
+> - [SPEC-magnitude-and-variants.md](SPEC-magnitude-and-variants.md) — shared magnitude plumbing + dyes-in-deduction + variants L2/L3 (3.1, 3.2, Track 4).
+> - [SPEC-ai-report-surfacing.md](SPEC-ai-report-surfacing.md) — report cache by hash + calibrated confidence + "disagrees with engine" (3.3, 3.5).
+> - [SPEC-nested-linked.md](SPEC-nested-linked.md) — multi-ring detection + nest/link relations + wha-spell@2 (Track 5).
+> - [SPEC-tuning-tools.md](SPEC-tuning-tools.md) — standalone template/detector/effect-lab HTML tools (7.4).
 >
 > The canvas-UX spec (pan/recenter, undo/redo, shortcuts, pixel-eraser, drawer, text-glyph removal) was
 > **fully implemented** and its standalone doc retired — the remaining UX item is autosave (§A below).

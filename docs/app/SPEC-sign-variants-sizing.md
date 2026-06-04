@@ -1,5 +1,8 @@
 # SPEC — Sign variants & magnitude (size of signs / sigils / circles)
 
+> **Superseded / extended by [SPEC-magnitude-and-variants.md](SPEC-magnitude-and-variants.md)**,
+> which unifies this spec with dyes-in-deduction (item 3.1) and the shared magnitude plumbing (item 3.2). Read that file for the current design; this document is kept as the historical record of Layers 1/2/3 and the Column "T" example.
+
 > Status: **proposed (research-leaning)** · Scope: **engine deduction + sign metadata + recognizer metrics**
 > Branch: `feat/spell-studio` · Cross-refs: [docs/CORE.md](../CORE.md) (geometry as parameters),
 > [ANALYSIS.md](../../ANALYSIS.md) §8 (deduction), [src/engine/geometry.js](../../src/engine/geometry.js),
