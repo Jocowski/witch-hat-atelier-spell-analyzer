@@ -41,6 +41,7 @@ const caveatsDoc = require(resolve(root, 'data/fact-caveats.json'))
 const importLocal = (rel) => import(pathToFileURL(resolve(root, rel)).href)
 const { toComposition, analyzeCircleWith, composeWith, reclassifyCorelessCircles } = await importLocal('src/engine/compose.js')
 const { computeSymmetry, classifyZone } = await importLocal('src/engine/geometry.js')
+const M = await importLocal('src/engine/match.js')
 
 const SIGIL_MAP = Object.fromEntries(sigilsDoc.sigils.map((s) => [s.id, s]))
 const SIGN_MAP = Object.fromEntries(signsDoc.signs.map((s) => [s.id, s]))
@@ -50,95 +51,11 @@ const SPELLS = spellsDoc.spells || []
 const deps = { grammar, sigilMap: SIGIL_MAP, signMap: SIGN_MAP, dyeMap: DYE_MAP, zones: rules.zones }
 const getDef = (type) => SIGIL_MAP[type] || SIGN_MAP[type] || null
 
-// ---------- Catalog matcher (mirrors src/engine/analyze.js — keep in sync) ----------
-function signKey(type, inverted, zone) {
-  return `${type}${inverted ? '!inv' : ''}${zone === 'outside' ? '@out' : ''}`
-}
-function buildSignature(circle) {
-  const { core, components, radius } = circle
-  const signs = (components || []).filter((c) => c.role === 'sign')
-  const multiset = {}
-  for (const s of signs) {
-    const zone = classifyZone(s.x, s.y, radius, rules.zones)
-    const key = signKey(s.type, s.inverted, zone)
-    multiset[key] = (multiset[key] || 0) + 1
-  }
-  const coreType = core?.type ?? null
-  return {
-    core: coreType,
-    cores: coreType != null ? [coreType] : [],
-    coreElement: core ? getDef(core.type)?.element ?? null : null,
-    signMultiset: multiset,
-    signCount: signs.length,
-    symmetry: computeSymmetry(components || []),
-  }
-}
-// Combined signature for a multi-circle spell (union of signs + all cores; symmetry from the
-// circle with the most signs) — lets a nested spell match one catalog recipe.
-function buildCombinedSignature(circles) {
-  const multiset = {}
-  const cores = []
-  let signCount = 0
-  let formCircle = null
-  for (const c of circles) {
-    if (c.core?.type) cores.push(c.core.type)
-    const signs = (c.components || []).filter((x) => x.role === 'sign')
-    signCount += signs.length
-    for (const s of signs) {
-      const zone = classifyZone(s.x, s.y, c.radius, rules.zones)
-      const key = signKey(s.type, s.inverted, zone)
-      multiset[key] = (multiset[key] || 0) + 1
-    }
-    if (!formCircle || signs.length > formCircle.n) formCircle = { circle: c, n: signs.length }
-  }
-  return {
-    core: cores[0] ?? null,
-    cores,
-    coreElement: cores[0] ? getDef(cores[0])?.element ?? null : null,
-    signMultiset: multiset,
-    signCount,
-    symmetry: formCircle ? computeSymmetry(formCircle.circle.components || []) : 'none',
-  }
-}
-function multisetSimilarity(a, b) {
-  const keys = new Set([...Object.keys(a), ...Object.keys(b)])
-  if (keys.size === 0) return 1
-  let inter = 0, union = 0
-  for (const k of keys) {
-    inter += Math.min(a[k] || 0, b[k] || 0)
-    union += Math.max(a[k] || 0, b[k] || 0)
-  }
-  return union === 0 ? 1 : inter / union
-}
-function spellSignMultiset(spell) {
-  const m = {}
-  for (const s of spell.composition?.signs ?? []) {
-    const key = signKey(s.id, s.inverted, s.placement === 'outside' ? 'outside' : null)
-    m[key] = (m[key] || 0) + (s.count || 1)
-  }
-  return m
-}
-function sameElement(coreA, coreB) {
-  const a = getDef(coreA)?.element
-  const b = getDef(coreB)?.element
-  return a && b && a === b
-}
-const CONFIDENCE_WEIGHT = { high: 1, medium: 0.9, low: 0.7, theoretical: 0.6, unknown: 0.4 }
-function matchSpell(signature) {
-  const w = rules.matching.weights
-  const cores = signature.cores && signature.cores.length ? signature.cores : (signature.core != null ? [signature.core] : [])
-  const results = SPELLS.map((spell) => {
-    const comp = spell.composition || {}
-    const sigilMatch = cores.includes(comp.core) ? 1 : cores.some((c) => sameElement(c, comp.core)) ? 0.5 : 0
-    const signSetMatch = multisetSimilarity(signature.signMultiset, spellSignMultiset(spell))
-    const symmetryMatch = comp.symmetry === signature.symmetry ? 1 : 0
-    let score = w.sigilMatch * sigilMatch + w.signSetMatch * signSetMatch + w.symmetryMatch * symmetryMatch + w.placementMatch * 0.5
-    score *= CONFIDENCE_WEIGHT[spell.confidence] ?? 0.5
-    return { spell, score: Number(score.toFixed(3)), parts: { sigilMatch, signSetMatch, symmetryMatch } }
-  })
-  results.sort((a, b) => b.score - a.score)
-  return results
-}
+// ---------- Catalog matcher (shared PURE module — no more copy-paste; see src/engine/match.js) ----------
+const matchDeps = { rules, spells: SPELLS, getDef }
+const buildSignature = (composition) => M.buildSignature(matchDeps, composition)
+const buildCombinedSignature = (circles) => M.buildCombinedSignature(matchDeps, circles)
+const matchSpell = (signature) => M.matchSpell(matchDeps, signature)
 function computeSimilar(signature) {
   const ranked = SPELLS.length ? matchSpell(signature) : []
   const best = ranked[0]

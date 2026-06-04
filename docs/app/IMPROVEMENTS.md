@@ -81,11 +81,21 @@ finds one ring). Closing this gap unlocks contraptions and nested seals from a d
 ## Code-quality / housekeeping (not functional bugs)
 - **Add ESLint + Prettier** matching the project style (no semicolons, single quotes, 2-space). There
   is no linter, so style drifts (the theme files had to be re-fixed). Prevents future drift.
-- **De-duplicate the catalog matcher.** `tools/spell-engine-cli.mjs` re-implements the matcher from
-  `src/engine/analyze.js` (with "keep in sync" comments; `test/matcher.test.js` guards the sync by
-  running the CLI). Extract a PURE `src/engine/match.js` (data injected, like `compose.js`) and have
-  both import it — removes the drift hazard.
+- ~~De-duplicate the catalog matcher~~ — **done.** Extracted the pure `src/engine/match.js` (data
+  injected, like `compose.js`); `analyze.js` and `tools/spell-engine-cli.mjs` both import it, so the
+  two copies can no longer drift. `matcher.test.js` (runs the CLI) + the 133 tests guard it.
 - **Prune dead `index.css`** rules from the removed drag-drop editor (`.palette`, `.inspector`,
   `.spell-tree`, `.circles-panel`, `.glyph-svg`, `.cp-*`, …).
 - **Lazy-load the Admin route** so the Studio's initial bundle doesn't pull admin-only code.
+- **Onboarding / empty states** — the recognizer starts empty; a first-run flow (or seed-from-SVG)
+  that explains training avoids a confusing "nothing recognized" first impression.
+- **Confidence gate** — show low-confidence detections as "unknown?" instead of a wrong guess; track
+  the per-symbol correction rate to drive active learning.
+
+## Recommended next steps (suggested order)
+1. **ESLint + Prettier** (locks the style; the matcher dedup is already done).
+2. **Seed templates from the canon SVGs** + **wire `logAnalysis`** — makes recognition + the flywheel
+   actually work day-to-day (§B).
+3. **Undo/redo + explicit ring tool + autosave** — the UX trio that most improves drawing (§A).
+Then: nested/linked detection (§D) and cluster recognition (WS11b) for holistic spell ID.
 - ~~`ResultPanel` unused `spell` prop~~ — fixed.
