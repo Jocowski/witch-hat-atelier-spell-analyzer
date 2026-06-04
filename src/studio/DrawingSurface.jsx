@@ -59,6 +59,7 @@ import {
 } from 'react-konva'
 import { line, rect, triangle, circle, brush } from './tools/shapes.js'
 import { beautifyStroke, weldsRingGap } from './tools/beautify.js'
+import { findFillTarget } from './tools/fill.js'
 import { getComponentDef } from '../engine/data.js'
 import ToolDock from './ToolDock.jsx'
 import EffectCanvas from './render/EffectCanvas.jsx'
@@ -188,6 +189,7 @@ function normStroke(s) {
     color: typeof s.color === 'string' ? s.color : '#c9a24a',
     width: typeof s.width === 'number' ? Math.max(1, s.width) : 3,
     dyeId: s.dyeId ?? null,
+    fill: typeof s.fill === 'string' ? s.fill : null,
     points,
   }
 }
@@ -307,7 +309,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     const placed  = []
     for (const n of ns) {
       if (n.kind === 'stroke') {
-        strokes.push({ tool: n.tool, color: n.color, width: n.width, dyeId: n.dyeId, points: n.points })
+        strokes.push({ tool: n.tool, color: n.color, width: n.width, dyeId: n.dyeId, fill: n.fill ?? null, points: n.points })
       } else {
         placed.push({
           id: n.type, type: n.type, kind: n.symKind,
@@ -611,7 +613,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   // ── keyboard: space-to-pan · undo/redo · tool shortcuts (Items 2 + 3) ─────────
   useEffect(() => {
     // Tool letters. `t` would collide with rotate's mnemonic, so triangle uses `g`.
-    const TOOL_KEYS = { b: 'brush', l: 'line', r: 'rect', g: 'triangle', c: 'circle', a: 'arrow', v: 'select', m: 'move', t: 'rotate' }
+    const TOOL_KEYS = { b: 'brush', l: 'line', r: 'rect', g: 'triangle', c: 'circle', a: 'arrow', f: 'fill', v: 'select', m: 'move', t: 'rotate' }
     const isTyping = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
     const down = (e) => {
       if (e.code === 'Space') { spaceRef.current = true; return }
@@ -778,6 +780,24 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     }
   }
 
+  // ── fill (ink bucket) — flood a CLOSED stroke with the active ink ─────────────
+  // One click = one undo step. No-op when the click isn't inside a closed shape (an open
+  // shape, or empty space). Clicking a shape already filled with the active color clears it
+  // (toggle), so the same tool both fills and un-fills.
+  function fillAt(wp) {
+    const strokeNodes = nodesRef.current.filter((n) => n.kind === 'stroke')
+    const target = findFillTarget(strokeNodes, wp)
+    if (!target) return  // open shape or empty space → nothing to fill
+    const nextFill = target.fill === color ? null : color
+    snapshot()
+    const next = nodesRef.current.map((n) => (n.id === target.id ? { ...n, fill: nextFill } : n))
+    setNodes(next); nodesRef.current = next
+    // Filling with a dyed ink registers the dye on the spell (same as a dyed stroke).
+    let ds = dyesRef.current
+    if (nextFill && dyeId && !ds.includes(dyeId)) { ds = [...ds, dyeId]; setDyes(ds); dyesRef.current = ds }
+    fireChange(next, ds)
+  }
+
   // ── pointer / gesture handlers (on Stage) ────────────────────────────────────
   function onStageMouseDown(e) {
     const stage = stageRef.current
@@ -797,6 +817,9 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     // ── erasers ───────────────────────────────────────────────────────────────
     if (tool === 'eraserStroke') { drawingRef.current = true; erasedRef.current = false; pendingSnapRef.current = true; eraseStrokeAt(wp); return }
     if (tool === 'eraserPixel')  { drawingRef.current = true; erasedRef.current = false; pendingSnapRef.current = true; erasePixelAt(wp); return }
+
+    // ── fill (single click, no drag) ──────────────────────────────────────────
+    if (tool === 'fill') { fillAt(wp); return }
 
     // ── transform tools (select / move / rotate) ──────────────────────────────
     if (isTransformTool) {
@@ -987,6 +1010,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   function cursorForTool(t) {
     switch (t) {
       case 'eraserStroke': case 'eraserPixel': return 'cell'
+      case 'fill': return 'pointer'
       case 'select': return 'default'
       case 'move': return 'move'
       case 'rotate': return 'crosshair'
@@ -1094,6 +1118,8 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
                     points={flatten(n.points)}
                     stroke={n.color || '#c9a24a'}
                     strokeWidth={n.width || 3}
+                    closed={!!n.fill}
+                    fill={n.fill || undefined}
                     lineCap="round"
                     lineJoin="round"
                     hitStrokeWidth={Math.max(n.width || 3, 12)}

@@ -22,7 +22,7 @@
  *
  * Tool IDs
  * ────────
- *   brush | line | rect | triangle | circle | arrow
+ *   brush | fill | line | rect | triangle | circle | arrow
  *   eraserStroke | eraserPixel
  *   select | move | rotate
  */
@@ -34,7 +34,10 @@ function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v }
 const TOOL_GROUPS = [
   {
     label: 'Draw',
-    tools: [{ id: 'brush', label: 'Brush', icon: '✏' }],
+    tools: [
+      { id: 'brush', label: 'Brush', icon: '✏' },
+      { id: 'fill',  label: 'Fill',  icon: '🪣' },
+    ],
   },
   {
     label: 'Shapes',
@@ -65,7 +68,7 @@ const TOOL_GROUPS = [
 
 // Keyboard shortcuts (mirror DrawingSurface's keydown map) shown in tooltips for discoverability.
 const HOTKEYS = {
-  brush: 'B', line: 'L', rect: 'R', triangle: 'G', circle: 'C', arrow: 'A',
+  brush: 'B', fill: 'F', line: 'L', rect: 'R', triangle: 'G', circle: 'C', arrow: 'A',
   eraserStroke: 'E', eraserPixel: 'Shift+E', select: 'V', move: 'M', rotate: 'T',
 }
 
