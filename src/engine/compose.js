@@ -13,8 +13,64 @@
 // Each circle's component coords are relative to THAT circle's center, so the per-circle
 // geometry (geometry.js) is reused unchanged.
 
-import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert, computeSpin, classifyZone, anchorToXY } from './geometry.js'
+import { computeSymmetry, computeDirectionalBias, classifyRegion, computePower, directionLabel, canSteer, canInvert, computeSpin, classifyZone, anchorToXY, clamp, CANVAS_RADIUS } from './geometry.js'
 import { deduceWith } from './deduce.js'
+
+// ---------- Magnitude accumulator (SPEC-magnitude-and-variants.md §3.2) ----------
+// Pure helper — no JSON imports. All data arrives via args (loaded in analyze.js).
+// Passes applied in order: ring size → sigil size → dyes. Variant metrics (Layer 2) already
+// flow through geometry's magnitudeOf(). Returns { power, duration, params }.
+export function buildAccumulator(circle, basePower, dyeMap, magnitudeCfg) {
+  const acc = { power: basePower, duration: 1, params: {} }
+
+  // Pass 1 — ring size → power multiplier (Layer 3a)
+  const ringCfg = magnitudeCfg?.ringSize ?? {}
+  const refR = ringCfg.referenceR ?? CANVAS_RADIUS
+  const minM = ringCfg.minMultiplier ?? 0.5
+  const maxM = ringCfg.maxMultiplier ?? 3.0
+  if (circle.radius != null && circle.radius > 0) {
+    const ringMult = clamp(circle.radius / refR, minM, maxM)
+    acc.power *= ringMult
+    acc.params.ringMultiplier = Number(ringMult.toFixed(3))
+  }
+
+  // Pass 2 — sigil (core) size → substance-amount multiplier (Layer 3b)
+  const coreScale = circle.core?.scale ?? (magnitudeCfg?.sigilSize?.defaultScale ?? 1)
+  acc.power *= coreScale
+
+  // Pass 3 — dyes apply modifiers (variant metrics already handled in geometry via magnitudeOf)
+  const dyeIds = circle.dyes || []
+  let hasUnknownDye = false
+  for (const id of dyeIds) {
+    const dye = dyeMap?.[id]
+    if (!dye) continue
+    const mod = dye.modifier
+    if (!mod) { hasUnknownDye = true; continue }
+    switch (dye.kind) {
+      case 'power':
+        if (mod.powerMultiplier != null) acc.power *= mod.powerMultiplier
+        break
+      case 'duration':
+        if (mod.durationMultiplier != null) acc.duration *= mod.durationMultiplier
+        break
+      case 'visibility':
+        if (mod.sealVisible != null) acc.params.sealVisible = mod.sealVisible
+        break
+      case 'glow':
+        if (mod.glowsInDark != null) acc.params.glowsInDark = true
+        break
+      case 'durability':
+        if (mod.waterproof != null) acc.params.waterproof = true
+        break
+      default:
+        hasUnknownDye = true
+    }
+  }
+  if (hasUnknownDye) acc.params.unknownDyePresent = true
+
+  acc.power = Number(acc.power.toFixed(4))
+  return acc
+}
 
 // A ring-anchored component (anchor.ring) gets its x,y from the circle radius so it tracks the
 // ring; the resolved x,y is what geometry/zone/deduction read. The anchor itself round-trips.
@@ -69,7 +125,7 @@ export function toComposition(input) {
 // ---------- Per-circle analysis (the single-ring pipeline), data injected ----------
 // deps = { grammar, sigilMap, signMap, dyeMap }. Returns one circle's structured analysis.
 export function analyzeCircleWith(deps, circle) {
-  const { grammar, sigilMap, signMap, dyeMap, zones } = deps
+  const { grammar, sigilMap, signMap, dyeMap, zones, magnitudeCfg } = deps
   const getDef = (t) => sigilMap[t] || signMap[t] || null
   const isSigil = (t) => !!sigilMap[t]
   const canCenter = (t) => !!signMap[t]?.canBeCenter
@@ -202,7 +258,10 @@ export function analyzeCircleWith(deps, circle) {
     linkCount: circle.linkCount || 0,
   }
 
-  return { id: circle.id, name: circle.name || '', valid: hasCore, hasCore, centerPromoted, active: hasCore && ringClosed, ringClosed, issues, sigils, signs, deduction, dyes, analysis }
+  // ----- Magnitude accumulator (SPEC-magnitude-and-variants.md §3.2) -----
+  const accumulator = buildAccumulator(circle, power, dyeMap, magnitudeCfg)
+
+  return { id: circle.id, name: circle.name || '', valid: hasCore, hasCore, centerPromoted, active: hasCore && ringClosed, ringClosed, issues, sigils, signs, deduction, dyes, analysis, accumulator }
 }
 
 // ---------- Relation-aware validity (multi-circle) ----------

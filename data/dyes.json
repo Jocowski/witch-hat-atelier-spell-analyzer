@@ -15,7 +15,8 @@
       "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "duration",
       "color": "#5a78d6",
-      "effect": "Increases the duration of the drawn magic."
+      "effect": "Increases the duration of the drawn magic.",
+      "modifier": { "durationMultiplier": 2.0 }
     },
     {
       "id": "blood",
@@ -24,7 +25,8 @@
       "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "power",
       "color": "#a01b1b",
-      "effect": "Greatly increases the power of the drawn spell."
+      "effect": "Greatly increases the power of the drawn spell.",
+      "modifier": { "powerMultiplier": 4.0 }
     },
     {
       "id": "blushing_bride_scales",
@@ -33,7 +35,8 @@
       "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "visibility",
       "color": "#e7b6c8",
-      "effect": "Makes the drawn seal invisible."
+      "effect": "Makes the drawn seal invisible.",
+      "modifier": { "sealVisible": false }
     },
     {
       "id": "golden_blaze_wyrm_scales",
@@ -42,7 +45,8 @@
       "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "glow",
       "color": "#e0c94a",
-      "effect": "Makes the ink glow in the dark."
+      "effect": "Makes the ink glow in the dark.",
+      "modifier": { "glowsInDark": true }
     },
     {
       "id": "roaming_scallop_shells",
@@ -51,7 +55,8 @@
       "source": "telepedia 'Magical Dye': https://witchhatatelier.telepedia.net/wiki/Magical_Dye",
       "kind": "durability",
       "color": "#6fb0c9",
-      "effect": "Makes the drawn seal waterproof."
+      "effect": "Makes the drawn seal waterproof.",
+      "modifier": { "waterproof": true }
     },
     {
       "id": "dragon_egg_shells",

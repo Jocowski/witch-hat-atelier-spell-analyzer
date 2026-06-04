@@ -3,6 +3,9 @@
 
 export const CANVAS_RADIUS = 260 // raio do ring em px no SVG
 
+// Generic clamp helper (used by ir.js + compose.js accumulator).
+export function clamp(v, lo = 0, hi = 1) { return Math.min(Math.max(v, lo), hi) }
+
 // x,y (origem no centro, y para baixo no SVG) -> { angle(0..360, 0=norte CW), radius(0..1) }
 export function toPolar(x, y) {
   const radiusPx = Math.hypot(x, y)
@@ -190,7 +193,7 @@ export function computeOrientationAim(signs, familyOf = () => null) {
   const items = signs
     .map((c) => ({ f: signFacing(c, familyOf(c.type)), w: magnitudeOf(c) }))
     .filter((it) => it.f != null)
-  if (!items.length) return { aimed: false, angle: 0, magnitude: 0 }
+  if (!items.length) return { aimed: false, angle: 0, magnitude: 0, vx: 0, vy: 0, wsum: 0 }
   let vx = 0
   let vy = 0
   let wsum = 0
@@ -203,12 +206,13 @@ export function computeOrientationAim(signs, familyOf = () => null) {
   const magnitude = wsum > 0 ? Math.hypot(vx, vy) / wsum : 0
   let angle = (Math.atan2(vx, -vy) * 180) / Math.PI
   if (angle < 0) angle += 360
-  return { aimed: magnitude > 0.34, angle, magnitude }
+  // vx/vy/wsum exposed for SpellIR tilt math (ir.js): the paper-plane surface vector is (vx,vy)/wsum.
+  return { aimed: magnitude > 0.34, angle, magnitude, vx, vy, wsum }
 }
 
 // A sign's directional magnitude: an explicit variant metric if present, else its uniform scale.
 // (SPEC-sign-variants-sizing.md — Layer 1 uses scale; Layer 2 will fill metrics.directionalMagnitude.)
-function magnitudeOf(c) {
+export function magnitudeOf(c) {
   const m = c?.metrics?.directionalMagnitude
   return typeof m === 'number' && m > 0 ? m : (c?.scale ?? 1)
 }

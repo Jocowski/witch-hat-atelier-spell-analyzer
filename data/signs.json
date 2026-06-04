@@ -47,7 +47,15 @@
       ],
       "reference": "signs.md, Watershot Seal, Light Beam",
       "family": "directional",
-      "render": "fill"
+      "render": "fill",
+      "params": {
+        "thrust": {
+          "measure": "axisLengthAlongFacing",
+          "affects": "directionalMagnitude",
+          "ref": "ringR",
+          "note": "Stem length projected onto the facing direction, normalised by ring radius. A long stem pushes harder; a wide base pushes less. (SPEC-magnitude-and-variants.md Layer 2)"
+        }
+      }
     },
     {
       "id": "dispersion",

@@ -6,8 +6,11 @@ import grammar from '../../data/grammar.json'
 import { RULES, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef } from './data.js'
 import { buildSignature as _buildSignature, buildCombinedSignature as _buildCombinedSignature, matchSpell as _matchSpell } from './match.js'
 import { toComposition, analyzeCircleWith, composeWith, reclassifyCorelessCircles } from './compose.js'
+import { computeOrientationAim } from './geometry.js'
+import { assembleSpellIR } from './ir.js'
 
-const deps = { grammar, sigilMap: SIGIL_MAP, signMap: SIGN_MAP, dyeMap: DYE_MAP, zones: RULES.zones }
+const deps = { grammar, sigilMap: SIGIL_MAP, signMap: SIGN_MAP, dyeMap: DYE_MAP, zones: RULES.zones, magnitudeCfg: RULES.magnitude }
+const irCfg = RULES.irTuning
 const matchDeps = { rules: RULES, spells: SPELLS, getDef: getComponentDef }
 
 // Thin wrappers binding the injected data to the pure matcher (keep the existing public signatures).
@@ -67,6 +70,28 @@ function statusOf(c) {
   return c.ringClosed ? { class: 'ok', text: '✦ Spell active' } : { class: 'inactive', text: '◔ Prepared (ring open — inactive)' }
 }
 
+// Assemble SpellIR facts from a per-circle result + the original raw circle (SPEC-spell-ir.md).
+// Re-derives the orientation aim to expose vx/vy/wsum for the tilt math (the circle result only
+// keeps the aim label). Additive — never throws; an invalid circle yields a zeroed SpellIR.
+function buildIRFacts(circleResult, circle) {
+  const signComps = (circle.components || []).filter((c) => c.role === 'sign')
+  const inside = signComps.filter((c) => c.zone !== 'outside')
+  const types = new Set(inside.map((c) => c.type))
+  const familyOf = (t) => SIGN_MAP[t]?.family
+  const aimSignComps = inside.filter((c) => grammar.operators[c.type]?.kind === 'direction')
+  const aim = computeOrientationAim(aimSignComps.length ? aimSignComps : inside, familyOf)
+  return {
+    valid: circleResult.valid,
+    analysis: circleResult.analysis,
+    circle,
+    signComps,
+    types,
+    aim,
+    familyOf,
+    grammarOps: grammar.operators,
+  }
+}
+
 // ---------- Orchestrator ----------
 // Accepts a v1 composition (core/components/ring) or a v2 spell ({circles,relations}).
 export function analyze(input) {
@@ -81,6 +106,7 @@ export function analyze(input) {
     // while also exposing the v2 circles[]/relations/combined fields.
     const c0 = per[0]
     const similar = computeSimilar(buildSignature(circles[0]))
+    const spellIR = assembleSpellIR(buildIRFacts(c0, circles[0]), irCfg)
     return {
       name, valid: c0.valid, active: c0.active, status: statusOf(c0),
       issues: c0.issues, sigils: c0.sigils, signs: c0.signs,
@@ -88,21 +114,42 @@ export function analyze(input) {
       forbidden: computeForbidden(circles[0], similar.match),
       dyes: c0.dyes, analysis: c0.analysis,
       circles: per, relations, combined: c0.deduction,
+      spellIR,
     }
   }
 
   // Multi-circle: match a COMBINED signature (union of all circles' signs + every core) so a
   // nested spell can match one catalog recipe; also keep each circle's own match in perCircle.
   const combined = composeWith(grammar, relations, per)
-  const perCircle = per.map((p, i) => ({ id: p.id, name: p.name, similar: computeSimilar(buildSignature(circles[i])) }))
+  const perCircle = per.map((p, i) => ({
+    id: p.id, name: p.name,
+    similar: computeSimilar(buildSignature(circles[i])),
+    spellIR: assembleSpellIR(buildIRFacts(p, circles[i]), irCfg),
+  }))
   const combinedSimilar = computeSimilar(buildCombinedSignature(circles))
   // Forbidden across the whole device: any circle's parts, or the combined catalog match.
   const fb = circles.map((c) => computeForbidden(c, combinedSimilar.match))
   const forbidden = { forbidden: fb.some((f) => f.forbidden), reasons: [...new Set(fb.flatMap((f) => f.reasons))] }
+  // Combined SpellIR: most-conservative summary across circles (max push, min stability/gravity).
+  const irList = perCircle.map((p) => p.spellIR).filter(Boolean)
+  const spellIR = irList.length
+    ? {
+        force: Math.max(...irList.map((r) => r.force)),
+        spread: Math.max(...irList.map((r) => r.spread)),
+        focus: Math.min(...irList.map((r) => r.focus)),
+        range: Math.max(...irList.map((r) => r.range)),
+        duration: Math.max(...irList.map((r) => r.duration)),
+        stability: Math.min(...irList.map((r) => r.stability)),
+        gravity: Math.min(...irList.map((r) => r.gravity)),
+        dirCoherence: Math.max(...irList.map((r) => r.dirCoherence)),
+        direction: irList[0].direction,
+      }
+    : null
   return {
     name, valid: per.every((p) => p.valid),
     circles: per, relations, combined,
     similar: combinedSimilar, forbidden,
     perCircle,
+    spellIR,
   }
 }

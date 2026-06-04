@@ -164,5 +164,63 @@
     "note": "Forbidden Magic (forbidden-magic.md): magic drawn on / affecting the human body (except Memory Erasure) or that greatly alters the environment. Catalog spells with category 'forbidden' (or forbidden:true) are flagged directly; novel compositions are flagged when a sign/sigil carries one of these effectTags. The tag list is provisional — calibrate with the Spell Checkers community.",
     "tags": ["petrify", "transmute-living", "curse", "body", "memory", "environment-alter"],
     "spellCategories": ["forbidden"]
+  },
+
+  "magnitude": {
+    "_note": "Magnitude accumulator tunables — SPEC-magnitude-and-variants.md §3.2. Ring and sigil size feed accumulator.power multiplicatively; default scale=1 and radius=CANVAS_RADIUS yield multiplier=1 (no change from prior behavior).",
+    "ringSize": {
+      "note": "Normalised ring radius (ringR / CANVAS_RADIUS) → power multiplier. Clamped to [minMultiplier, maxMultiplier].",
+      "referenceR": 260,
+      "minMultiplier": 0.5,
+      "maxMultiplier": 3.0
+    },
+    "sigilSize": {
+      "note": "Core sigil scale → substance-amount multiplier.",
+      "defaultScale": 1
+    },
+    "linkBonus": {
+      "note": "Already in computePower: power *= 1 + min(linkCount,5)*0.2. This block is the authoritative source.",
+      "perLink": 0.2,
+      "maxLinks": 5
+    }
+  },
+
+  "irTuning": {
+    "_note": "SpellIR numeric assembly — SPEC-spell-ir.md §1.2+1.5. All 0..1 fields clamped after formula. Tuning mirrors wha-spell-simulator/src/compiler/spellBuilder.js where applicable.",
+
+    "forceBase":         0.34,
+    "forceSignPower":    0.08,
+    "forcePowerScale":   0.24,
+
+    "spreadBase":        0.32,
+    "spreadInverseCoherence": 0.28,
+
+    "focusBase":         0.46,
+    "focusCoherence":    0.20,
+    "focusConvergenceBonus": 0.15,
+
+    "rangeBase":         0.42,
+    "rangeSignPower":    0.05,
+    "rangeRingScale":    0.20,
+
+    "durationMinSec":    0.65,
+    "durationMaxSec":    8.5,
+    "durationSecondsScale": 6.4,
+    "durationCurve":     1.45,
+    "durationSymmetryWeight": 0.55,
+    "durationPowerWeight":    0.45,
+
+    "stabilityMap": {
+      "radial":     1.0,
+      "bilateral":  0.7,
+      "asymmetric": 0.3,
+      "none":       0.5
+    },
+
+    "gravityLevitationScale":    0.42,
+    "gravityLevitationDivisor":  3,
+
+    "forceTiltMaxDeg":   76,
+    "minSurfaceDirectionMagnitude": 0.001
   }
 }
