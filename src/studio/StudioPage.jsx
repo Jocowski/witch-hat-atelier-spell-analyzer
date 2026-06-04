@@ -130,7 +130,19 @@ export default function StudioPage() {
       const drawn = (canvasRef.current.getStrokes() || []).map((s) => s.points).filter((p) => p && p.length >= 2)
       let recGroups = [], ringClosed = false
       if (drawn.length > 0 && templates.length > 0) {
-        const r = analyzeStrokes(drawn, templates, { gap: 45, confidenceMinPct: CONFIDENCE_MIN_PCT })
+        const r = analyzeStrokes(drawn, templates, {
+          adaptiveGap:          true,
+          gapK:                 rules.recognition?.gapK                 ?? 0.12,
+          gapMin:               rules.recognition?.gapMin               ?? 14,
+          gapMax:               rules.recognition?.gapMax               ?? 80,
+          cvThreshold:          rules.recognition?.cvThreshold          ?? 0.3,
+          cvThresholdRelaxed:   rules.recognition?.cvThresholdRelaxed   ?? 0.45,
+          minRingRadius:        rules.recognition?.minRingRadius        ?? 40,
+          floodFill:            rules.recognition?.floodFill            ?? true,
+          floodFillConfig:      rules.recognition?.floodFillConfig      ?? {},
+          rotationSteps:        rules.recognition?.rotationSteps        ?? 24,
+          confidenceMinPct:     CONFIDENCE_MIN_PCT,
+        })
         recGroups = r.groups || []
         ringClosed = !!r.ring
       }

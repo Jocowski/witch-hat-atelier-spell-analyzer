@@ -5,6 +5,15 @@
 // templates, and returns the recognized symbols + a wha-spell@1 composition the engine can analyze.
 // Keep it JSON-free so it stays trivially testable (mirrors the geometry.js/deduce.js convention).
 
+import { analyzeRingClosure } from './ringClosure.js'
+
+// TODO(orchestrator): wire opts.rotationSteps to rules.json recognition.rotationSteps
+// TODO(orchestrator): wire opts.gapK / gapMin / gapMax to rules.json recognition.gapK/gapMin/gapMax
+// TODO(orchestrator): wire opts.cvThreshold / cvThresholdRelaxed to rules.json recognition
+// TODO(orchestrator): wire opts.minRingRadius to rules.json recognition.minRingRadius
+// TODO(orchestrator): wire opts.floodFill to rules.json recognition.floodFill
+// TODO(orchestrator): wire raster veto opts to rules.json rasterMatch block
+
 const NUM_POINTS = 32
 const ORIGIN = { X: 0, Y: 0 }
 
@@ -109,25 +118,216 @@ function rotateStroke(stroke, cx, cy, ang) {
   return stroke.map((p) => { const dx = p.x - cx, dy = p.y - cy; return { x: cx + dx * co - dy * si, y: cy + dx * si + dy * co } })
 }
 
+// ---------- adaptive gap ----------
+
+/**
+ * Compute the segmentation gap threshold from ring radius or a median nearest-neighbour fallback.
+ *
+ * @param {number|null} ringR   detected ring radius (null if no ring)
+ * @param {Array}       strokes symbol strokes (after ring removal)
+ * @param {object}      config  { gapK, gapMin, gapMax }
+ * @returns {number}  gap in px
+ */
+export function computeAdaptiveGap(ringR, strokes, config = {}) {
+  // TODO(orchestrator): wire to rules.json recognition.gapK / gapMin / gapMax
+  const gapK   = config.gapK   ?? 0.12
+  const gapMin = config.gapMin ?? 14
+  const gapMax = config.gapMax ?? 80
+
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
+
+  if (ringR != null && ringR > 0) {
+    return clamp(gapK * ringR, gapMin, gapMax)
+  }
+
+  // Fallback: median nearest-neighbour distance across strokes
+  if (strokes.length < 2) return gapMin
+  const distances = []
+  for (let i = 0; i < strokes.length; i++) {
+    let nearest = Infinity
+    for (let j = 0; j < strokes.length; j++) {
+      if (i !== j) {
+        const d = minGap(strokes[i], strokes[j])
+        if (d < nearest) nearest = d
+      }
+    }
+    if (isFinite(nearest)) distances.push(nearest)
+  }
+  if (!distances.length) return gapMin
+  distances.sort((a, b) => a - b)
+  const median = distances[Math.floor(distances.length / 2)]
+  return clamp(median * 0.9, gapMin, gapMax)
+}
+
+// ---------- rotation sweep (extracted, reusable) ----------
+
+/**
+ * Run recognize() over a rotation sweep and return the best single match.
+ *
+ * @param {Array<{x,y}>}  rawPoints  flat array of {x,y} (raw canvas coords, not clouded)
+ * @param {Array}         clouds     prebuilt makeCloud() objects
+ * @param {number[]}      steps      rotation offsets in degrees to try
+ * @param {{cx?:number, cy?:number}} opts  pivot for rotation (default: centroid of rawPoints)
+ * @returns {{ name, dist, adjDist, rotation } | null}
+ */
+export function bestMatchOverRotations(rawPoints, clouds, steps, opts = {}) {
+  if (!clouds.length || !rawPoints.length) return null
+
+  // Pivot: caller-supplied or centroid of rawPoints
+  const pivot = (opts.cx != null && opts.cy != null)
+    ? { x: opts.cx, y: opts.cy }
+    : rawPoints.reduce(
+        (acc, p) => ({ x: acc.x + p.x / rawPoints.length, y: acc.y + p.y / rawPoints.length }),
+        { x: 0, y: 0 }
+      )
+
+  let best = null
+  for (const deg of steps) {
+    const rad = (deg * Math.PI) / 180
+    const pts = []
+    // rawPoints may carry an optional _id field (per-stroke ID for $P's multi-stroke aware path)
+    rawPoints.forEach((p, idx) => {
+      const rot = rotateStroke([{ x: p.x, y: p.y }], pivot.x, pivot.y, rad)[0]
+      pts.push(P(rot.x, rot.y, p._id ?? idx))
+    })
+    const ranked = recognize(pts, clouds)
+    if (ranked.length && (!best || ranked[0].adjDist < best.adjDist)) {
+      best = { name: ranked[0].name, dist: ranked[0].dist, adjDist: ranked[0].adjDist, rotation: deg }
+    }
+  }
+  return best
+}
+
+// ---------- variant metric extractors ----------
+
+/**
+ * Extract directionalMagnitude for a sign group by projecting the group's bounding strokes onto
+ * the sign's facing axis (the direction the sign pushes), normalised by ringR.
+ *
+ * "Facing axis" is derived from `facingAngleDeg` (0 = up/north, 90 = east, etc.)
+ * We project all points onto the axis vector and return (max − min) / ringR.
+ *
+ * @param {Array<Array<{x,y}>>} strokes  the group's raw strokes
+ * @param {number} facingAngleDeg  sign's facing direction (deg, same convention as rotation field)
+ * @param {number} ringR  ring radius in px (normalisation reference)
+ * @returns {number}  directionalMagnitude ≥ 0
+ */
+export function extractAxisLengthAlongFacing(strokes, facingAngleDeg, ringR) {
+  if (!strokes.length || ringR <= 0) return 1
+  // Axis vector (unit): angle 0 = north = (0, -1); 90 = east = (1, 0)
+  const rad = (facingAngleDeg * Math.PI) / 180
+  const ax = Math.sin(rad), ay = -Math.cos(rad)
+
+  const allPts = strokes.flat()
+  if (allPts.length === 0) return 1
+
+  let minProj = Infinity, maxProj = -Infinity
+  for (const p of allPts) {
+    const proj = p.x * ax + p.y * ay
+    if (proj < minProj) minProj = proj
+    if (proj > maxProj) maxProj = proj
+  }
+
+  const length = maxProj - minProj
+  return length / ringR
+}
+
 // ---------- the full pipeline ----------
 // strokes: array of strokes; each stroke = array of {x,y} (canvas px).
 // templates: [{ name, role, points:[{X,Y,ID}] }].  opts: { gap } stroke-merge threshold (px).
 // Returns { ring, center, groups:[{role,cx,cy,angle,match,strokes}], composition }.
 export function analyzeStrokes(strokes, templates, opts = {}) {
-  const gap = opts.gap ?? 45
   const confidenceMinPct = opts.confidenceMinPct ?? 0
+  const cvThreshold = opts.cvThreshold ?? 0.3
+  const cvThresholdRelaxed = opts.cvThresholdRelaxed ?? 0.45
+  const minRingRadius = opts.minRingRadius ?? 40
+  const useFloodFill = opts.floodFill !== false  // default true
+  const floodFillConfig = opts.floodFillConfig ?? {}
+  const rotationSteps = opts.rotationSteps ?? 24
+
   const clouds = templates.map((t) => makeCloud(t.name, t.points, t.weight))
   const drawn = strokes.filter((s) => s.length >= 2)
   if (!drawn.length || !clouds.length) return { ring: null, center: { x: 0, y: 0 }, groups: [], composition: null }
 
-  // 1 · ring
+  // 1 · ring detection (two-tier: heuristic + optional flood-fill)
   let ring = null, ringIdx = -1
-  drawn.forEach((s, i) => { const cs = circleScore(s); if (cs.cv < 0.3 && cs.closed && (!ring || cs.r > ring.r)) { ring = cs; ringIdx = i } })
-  let center, ringR
-  if (ring) { center = { x: ring.cx, y: ring.cy }; ringR = ring.r } else { center = cxy(drawn.flat()); ringR = 200 }
 
-  // 2 · segment by proximity
+  // Step 1a: fast heuristic candidates
+  let fastRingCandidate = null, fastRingIdx = -1
+  let relaxedRingCandidate = null, relaxedRingIdx = -1
+  drawn.forEach((s, i) => {
+    const cs = circleScore(s)
+    // Fast path: clearly round (tight threshold)
+    if (cs.cv < cvThreshold && cs.closed && cs.r >= minRingRadius) {
+      if (!fastRingCandidate || cs.r > fastRingCandidate.r) { fastRingCandidate = cs; fastRingIdx = i }
+    }
+    // Relaxed path: might be a messy circle (flood-fill will confirm)
+    if (cs.cv < cvThresholdRelaxed && cs.r >= minRingRadius) {
+      if (!relaxedRingCandidate || cs.r > relaxedRingCandidate.r) { relaxedRingCandidate = cs; relaxedRingIdx = i }
+    }
+  })
+
+  if (fastRingCandidate && !useFloodFill) {
+    // Legacy path: keep old behavior exactly when floodFill disabled
+    ring = { ...fastRingCandidate, floodClosed: undefined, strokeIds: [fastRingIdx] }
+    ringIdx = fastRingIdx
+  } else if (useFloodFill) {
+    // Step 1b: flood-fill confirmation
+    const ffCfg = { ...floodFillConfig, minRadius: minRingRadius }
+
+    // Try single-stroke candidate first
+    if (fastRingCandidate) {
+      const ffResult = analyzeRingClosure([drawn[fastRingIdx]], ffCfg)
+      if (ffResult.closed) {
+        ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: fastRingCandidate.cv, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: ffResult.strokeIds.map(() => fastRingIdx) }
+        ringIdx = fastRingIdx
+      }
+    }
+
+    // If single-stroke failed but we have a relaxed candidate, try flood on just that stroke
+    if (!ring && relaxedRingCandidate && relaxedRingIdx !== fastRingIdx) {
+      const ffResult = analyzeRingClosure([drawn[relaxedRingIdx]], ffCfg)
+      if (ffResult.closed) {
+        ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: relaxedRingCandidate.cv, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: [relaxedRingIdx] }
+        ringIdx = relaxedRingIdx
+      }
+    }
+
+    // Multi-stroke path: flood all strokes together
+    if (!ring && drawn.length > 1) {
+      const ffResult = analyzeRingClosure(drawn, ffCfg)
+      if (ffResult.closed) {
+        // Use the stroke that contributed the most (first in strokeIds) as the "ring stroke"
+        ringIdx = ffResult.strokeIds.length > 0 ? ffResult.strokeIds[0] : -1
+        ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: 0, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: ffResult.strokeIds }
+      }
+    }
+
+    // Fallback: fast candidate without flood-fill confirmation (preserve legacy behavior)
+    if (!ring && fastRingCandidate) {
+      ring = { ...fastRingCandidate, floodClosed: false, strokeIds: [fastRingIdx] }
+      ringIdx = fastRingIdx
+    }
+  } else {
+    // No flood, no fast candidate — no ring
+  }
+
+  let center, ringR
+  if (ring) { center = { x: ring.cx, y: ring.cy }; ringR = ring.r } else { center = cxy(drawn.flat()); ringR = null }
+
+  // 2 · segment by proximity (adaptive gap)
   const symStrokes = drawn.filter((_, i) => i !== ringIdx)
+
+  // Compute gap: explicit override, or adaptive, or fixed default
+  let gap
+  if (opts.gap != null) {
+    gap = opts.gap
+  } else if (opts.adaptiveGap) {
+    gap = computeAdaptiveGap(ringR, symStrokes, { gapK: opts.gapK, gapMin: opts.gapMin, gapMax: opts.gapMax })
+  } else {
+    gap = 45  // legacy default
+  }
+
   let groups = symStrokes.map((s) => ({ strokes: [s], pts: s.slice() }))
   let merged = true
   while (merged) {
@@ -140,33 +340,39 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
   }
 
   // 3 · center vs border
+  const effectiveRingR = ringR ?? 200
   groups.forEach((g) => { const c = cxy(g.pts); g.cx = c.x; g.cy = c.y; g.distC = Math.hypot(c.x - center.x, c.y - center.y) })
   groups.sort((a, b) => a.distC - b.distC)
-  const innerR = 0.45 * ringR
+  const innerR = 0.45 * effectiveRingR
   let core = groups.length && groups[0].distC < innerR ? groups[0] : null
   groups.forEach((g) => { g.role = g === core ? 'core' : 'sign' })
 
-  // 4 + 5 · de-rotate (sweep) and classify
+  // 4 + 5 · de-rotate (sweep) and classify — using bestMatchOverRotations
+  const sweep = Array.from({ length: rotationSteps }, (_, k) => k * (360 / rotationSteps))
+
   groups.forEach((g) => {
     g.angle = ((Math.atan2(g.cx - center.x, -(g.cy - center.y)) * 180) / Math.PI + 360) % 360
-    const sweep = g.role === 'core' ? [0] : Array.from({ length: 24 }, (_, k) => k * 15)
-    let best = null
-    for (const deg of sweep) {
-      const pts = []
-      g.strokes.forEach((s, si) => rotateStroke(s, g.cx, g.cy, (deg * Math.PI) / 180).forEach((p) => pts.push(P(p.x, p.y, si))))
-      const ranked = recognize(pts, clouds)
-      if (ranked.length && (!best || ranked[0].adjDist < best.adjDist)) {
-        best = { name: ranked[0].name, dist: ranked[0].dist, adjDist: ranked[0].adjDist, rotation: deg }
-      }
-    }
-    g.match = best
+    const steps = g.role === 'core' ? [0] : sweep
+    const rawPts = g.strokes.flatMap((s, strokeIdx) => s.map((p) => ({ x: p.x, y: p.y, _id: strokeIdx })))
+    g.match = bestMatchOverRotations(rawPts, clouds, steps, { cx: g.cx, cy: g.cy })
     // Confidence gate: a low-confidence guess is kept for display but flagged so the caller can render
     // it as "unknown?" and exclude it from the engine input (SPEC A2).
-    g.confidence = best ? confidencePct(best.dist) : 0
-    g.confident = best ? g.confidence >= confidenceMinPct : false
+    g.confidence = g.match ? confidencePct(g.match.dist) : 0
+    g.confident = g.match ? g.confidence >= confidenceMinPct : false
+
+    // Track 4 Layer 2b: attach directionalMagnitude metric for confident sign detections.
+    // The engine reads c.metrics?.directionalMagnitude ?? c.scale, so this drops in without
+    // changing any engine code.
+    if (g.confident && g.match && g.role === 'sign' && effectiveRingR > 0) {
+      // Use the match's winning rotation as the facing angle (same convention as composition.rotation)
+      const facingAngle = g.match.rotation ?? 0
+      const mag = extractAxisLengthAlongFacing(g.strokes, facingAngle, effectiveRingR)
+      g.metrics = { directionalMagnitude: mag }
+    }
+    // Low-confidence detections must NOT assert a metric (SPEC-magnitude-and-variants.md §P2b)
   })
 
-  return { ring, center, ringR, groups, composition: buildComposition(groups, center, ring) }
+  return { ring, center, ringR: effectiveRingR, groups, composition: buildComposition(groups, center, ring) }
 }
 
 // Build a wha-spell@1 composition (one circle) from analyzed groups. Coordinates are recentred on
@@ -181,6 +387,7 @@ export function buildComposition(groups, center, ring) {
       type: g.match.name, role: 'sign',
       x: Math.round(g.cx - center.x), y: Math.round(g.cy - center.y),
       rotation: g.match.rotation, scale: 1, inverted: false,
+      ...(g.metrics ? { metrics: g.metrics } : {}),
     })),
     dyes: [],
   }
