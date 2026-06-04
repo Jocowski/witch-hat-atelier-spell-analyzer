@@ -17,3 +17,5 @@ tmp/
 # Supabase local stack runtime (config.toml + migrations/ + seed.sql ARE committed)
 supabase/.branches/
 supabase/.temp/
+
+.claude/
