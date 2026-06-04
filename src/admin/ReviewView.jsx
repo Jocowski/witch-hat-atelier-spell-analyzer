@@ -1,6 +1,6 @@
 // ReviewView.jsx — training governance: samples table, rollback, delete-by-user, restore, audit log.
 import { useCallback, useEffect, useState } from 'react'
-import { listSamples, softDeleteByDate, softDeleteByUser, softDeleteOne, restore } from '../data-services/samples.js'
+import { listSamples, softDeleteByDate, softDeleteByUser, softDeleteOne, restore, setVerified } from '../data-services/samples.js'
 import { logAction, recentAudit } from '../data-services/audit.js'
 import { listSymbols } from '../data-services/symbols.js'
 import SamplePreview from './SamplePreview.jsx'
@@ -19,9 +19,10 @@ export default function ReviewView() {
   const [samplesLoad,  setSamplesLoad]  = useState(true)
 
   // Filters
-  const [filterUser, setFilterUser] = useState('')
-  const [filterFrom, setFilterFrom] = useState('')
-  const [filterTo,   setFilterTo]   = useState('')
+  const [filterUser,     setFilterUser]     = useState('')
+  const [filterFrom,     setFilterFrom]     = useState('')
+  const [filterTo,       setFilterTo]       = useState('')
+  const [filterVerified, setFilterVerified] = useState('')
 
   // Rollback by date
   const [rollbackDate,    setRollbackDate]    = useState('')
@@ -45,6 +46,10 @@ export default function ReviewView() {
   const [deleteRowMsg, setDeleteRowMsg] = useState(null)
   const [deleteRowErr, setDeleteRowErr] = useState(null)
 
+  // Per-row verify / unverify
+  const [verifyMsg, setVerifyMsg] = useState(null)
+  const [verifyErr, setVerifyErr] = useState(null)
+
   // Sample preview modal
   const [previewSample, setPreviewSample] = useState(null)
 
@@ -61,9 +66,10 @@ export default function ReviewView() {
     setSamplesLoad(true); setSamplesErr(null)
     try {
       const opts = {}
-      if (filterUser.trim()) opts.userId = filterUser.trim()
-      if (filterFrom)        opts.from   = new Date(filterFrom).toISOString()
-      if (filterTo)          opts.to     = new Date(filterTo + 'T23:59:59').toISOString()
+      if (filterUser.trim())   opts.userId   = filterUser.trim()
+      if (filterFrom)          opts.from     = new Date(filterFrom).toISOString()
+      if (filterTo)            opts.to       = new Date(filterTo + 'T23:59:59').toISOString()
+      if (filterVerified !== '') opts.verified = filterVerified === 'true'
       const rows = await listSamples(opts)
       setSamples(rows ?? [])
     } catch (err) {
@@ -71,7 +77,7 @@ export default function ReviewView() {
     } finally {
       setSamplesLoad(false)
     }
-  }, [filterUser, filterFrom, filterTo])
+  }, [filterUser, filterFrom, filterTo, filterVerified])
 
   const loadAudit = useCallback(async () => {
     setAuditLoad(true); setAuditErr(null)
@@ -150,6 +156,32 @@ export default function ReviewView() {
       await loadSamples(); await loadAudit()
     } catch (err) {
       setDeleteRowErr(err.message || 'Delete failed.')
+    }
+  }
+
+  // ── per-row verify ──
+  async function handleVerify(id) {
+    setVerifyErr(null); setVerifyMsg(null)
+    try {
+      await setVerified(id, true)
+      await logAction({ action: 'sample.verify', target: { id } })
+      setVerifyMsg(`Sample ${id.slice(0, 8)}… verified.`)
+      await loadSamples(); await loadAudit()
+    } catch (err) {
+      setVerifyErr(err.message || 'Verify failed.')
+    }
+  }
+
+  // ── per-row unverify ──
+  async function handleUnverify(id) {
+    setVerifyErr(null); setVerifyMsg(null)
+    try {
+      await setVerified(id, false)
+      await logAction({ action: 'sample.unverify', target: { id } })
+      setVerifyMsg(`Sample ${id.slice(0, 8)}… unverified.`)
+      await loadSamples(); await loadAudit()
+    } catch (err) {
+      setVerifyErr(err.message || 'Unverify failed.')
     }
   }
 
@@ -240,8 +272,16 @@ export default function ReviewView() {
             <label className="admin-hint" style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
               To <input type="date" className="admin-input admin-input-sm" value={filterTo} onChange={(e) => setFilterTo(e.target.value)} />
             </label>
+            <label className="admin-hint" style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              Verified
+              <select className="admin-input admin-input-sm" value={filterVerified} onChange={(e) => setFilterVerified(e.target.value)}>
+                <option value="">All</option>
+                <option value="true">Verified only</option>
+                <option value="false">Unverified only</option>
+              </select>
+            </label>
             <button className="admin-btn admin-btn-sm" onClick={loadSamples}>Apply</button>
-            <button className="admin-btn admin-btn-sm admin-btn-ghost" onClick={() => { setFilterUser(''); setFilterFrom(''); setFilterTo('') }}>Clear</button>
+            <button className="admin-btn admin-btn-sm admin-btn-ghost" onClick={() => { setFilterUser(''); setFilterFrom(''); setFilterTo(''); setFilterVerified('') }}>Clear</button>
           </div>
         </div>
 
@@ -249,6 +289,8 @@ export default function ReviewView() {
         {restoreErr   && <p className="admin-error">{restoreErr}</p>}
         {deleteRowMsg && <p className="admin-ok">{deleteRowMsg}</p>}
         {deleteRowErr && <p className="admin-error">{deleteRowErr}</p>}
+        {verifyMsg    && <p className="admin-ok">{verifyMsg}</p>}
+        {verifyErr    && <p className="admin-error">{verifyErr}</p>}
         {samplesErr   && <p className="admin-error">Load error: {samplesErr}</p>}
 
         {samplesLoad ? (
@@ -264,6 +306,7 @@ export default function ReviewView() {
                   <th>Symbol</th>
                   <th>Role</th>
                   <th>Source</th>
+                  <th>Verified</th>
                   <th>Status</th>
                   <th>Deleted at</th>
                   <th>Actions</th>
@@ -278,6 +321,12 @@ export default function ReviewView() {
                     <td>{symMap[row.symbol_id] ?? row.symbol_id?.slice(0, 8) + '…'}</td>
                     <td><span className="admin-badge">{row.role ?? '—'}</span></td>
                     <td className="admin-cell-dim">{row.source}</td>
+                    <td>
+                      {row.verified
+                        ? <span className="admin-badge admin-badge-verified">verified</span>
+                        : <span className="admin-badge">—</span>
+                      }
+                    </td>
                     <td>
                       {row.deleted_at
                         ? <span className="admin-badge admin-badge-deleted">deleted</span>
@@ -298,11 +347,20 @@ export default function ReviewView() {
                           Delete
                         </button>
                       )}
+                      {!row.deleted_at && (
+                        row.verified
+                          ? <button className="admin-btn admin-btn-sm admin-btn-ghost" onClick={() => handleUnverify(row.id)}>
+                              Unverify
+                            </button>
+                          : <button className="admin-btn admin-btn-sm admin-btn-ok" onClick={() => handleVerify(row.id)}>
+                              Verify
+                            </button>
+                      )}
                     </td>
                   </tr>
                 ))}
                 {samples.length === 0 && (
-                  <tr><td colSpan={9} className="admin-hint admin-table-empty">No samples match the current filters.</td></tr>
+                  <tr><td colSpan={10} className="admin-hint admin-table-empty">No samples match the current filters.</td></tr>
                 )}
               </tbody>
             </table>

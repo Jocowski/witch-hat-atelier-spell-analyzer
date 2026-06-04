@@ -28,10 +28,10 @@ import rules from '../../data/rules.json'
 
 const BRIDGE_URL = import.meta.env.VITE_AI_BRIDGE_URL || 'http://localhost:8787'
 
-// Recognizer config (data-driven): source→weight (A1) + confidence gate (A2).
-const SAMPLE_WEIGHTS = rules.recognition?.sampleWeights ?? {}
+// Recognizer config (data-driven): source→weight (A1) + verified multiplier (A6) + confidence gate (A2).
+// activeTemplates(rules.recognition) resolves the effective weight (sourceWeight * verifiedMultiplier)
+// server-side, so the recognizer receives a numeric weight and stays PURE.
 const CONFIDENCE_MIN_PCT = rules.recognition?.confidenceMinPct ?? 0
-const withWeights = (list) => list.map((t) => ({ ...t, weight: SAMPLE_WEIGHTS[t.source] ?? 1 }))
 
 // Results-drawer persistence (Item 7).
 const DRAWER_H_KEY = 'studio.drawer.height'
@@ -85,7 +85,7 @@ export default function StudioPage() {
   const [templates, setTemplates] = useState([])
   useEffect(() => {
     (async () => {
-      try { const tpl = await activeTemplates(); setTemplates(tpl.length ? withWeights(tpl) : loadTemplates()) }
+      try { const tpl = await activeTemplates(rules.recognition); setTemplates(tpl.length ? tpl : loadTemplates()) }
       catch { setTemplates(loadTemplates()) }
     })()
   }, [])
