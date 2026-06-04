@@ -38,7 +38,7 @@ function confidencePct(dist) {
 
 function Row({
   type, kind, dist, isRecognized, confident = true, group, onRelabel,
-  selectable = false, selected = false, onToggleSelect, autoEdit = false,
+  selectable = false, selected = false, onToggleSelect, autoEdit = false, onBeautify, onHover, onErase,
 }) {
   const [editing, setEditing] = useState(() => !!autoEdit)
   const [newType, setNewType] = useState(type || '')
@@ -53,6 +53,22 @@ function Row({
     if (autoEdit) { setEditing(true); setForceTrain(true); setNewType(type || ''); if (group) group._justMerged = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoEdit])
+
+  // Feed this drawing to the training set under its CURRENT label — no relabel needed.
+  async function doTrain() {
+    const target = (type || '').trim()
+    if (!isRecognized || !group || !target) return
+    try {
+      const symbol = await getSymbolByEngineId(target)
+      if (!symbol) { setStatus('error'); return } // no DB or unknown id
+      const role = group.role === 'core' ? 'sigil' : 'sign'
+      const points = groupToTemplate(group, target, role).points
+      await addSample({ symbol_id: symbol.id, points, role, source: 'drawn', app_version: 'studio' })
+      setStatus('trained')
+    } catch {
+      setStatus('error')
+    }
+  }
 
   async function doRelabel() {
     const target = newType.trim()
@@ -84,7 +100,13 @@ function Row({
   const uncertain = isRecognized && !confident
 
   return (
-    <li className={`identified-row${selected ? ' selected' : ''}`}>
+    <li
+      className={`identified-row${selected ? ' selected' : ''}`}
+      onMouseEnter={() => onHover?.(true)}
+      onMouseLeave={() => onHover?.(false)}
+      onFocus={() => onHover?.(true)}
+      onBlur={() => onHover?.(false)}
+    >
       <div className="identified-main">
         {selectable && (
           <input
@@ -117,7 +139,24 @@ function Row({
             {status === 'trained' && <span className="identified-saved" title="Saved as a training example">trained ✓</span>}
             {status === 'saved' && <span className="identified-saved">relabeled</span>}
             {status === 'error' && <span className="note warn">save failed</span>}
-            <button className="identified-edit" onClick={() => setEditing(true)} title="Correct this symbol">Edit</button>
+            {isRecognized && (
+              <button className="identified-icon" onClick={doTrain} aria-label={`Train as ${type}`}
+                title={`Add this drawing to the training set as "${type}" (no relabel needed)`}>
+                ⊕
+              </button>
+            )}
+            {isRecognized && onBeautify && (
+              <button className="identified-icon" onClick={() => onBeautify(group)} aria-label="Smooth strokes"
+                title="Smooth the drawn strokes in place — snap to a clean shape if one fits, else de-jitter (keeps size & style)">
+                ✦
+              </button>
+            )}
+            <button className="identified-icon" onClick={() => setEditing(true)} aria-label="Correct symbol" title="Correct this symbol">✎</button>
+            {onErase && (
+              <button className="identified-icon identified-erase" onClick={onErase} aria-label="Erase from drawing"
+                onMouseEnter={() => onHover?.(true)} onMouseLeave={() => onHover?.(false)}
+                title="Erase this symbol from the drawing">🗑</button>
+            )}
           </>
         )}
       </div>
@@ -125,7 +164,21 @@ function Row({
   )
 }
 
-export default function IdentifiedPanel({ placed = [], groups = [], onRelabel, onMerge }) {
+// Bounding box (centre-origin world coords, padded) of a recognized group's drawn points.
+function groupBox(g) {
+  const pts = g?.pts || []
+  if (pts.length === 0) return null
+  let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity
+  for (const p of pts) { a = Math.min(a, p.x); b = Math.min(b, p.y); c = Math.max(c, p.x); d = Math.max(d, p.y) }
+  return { x: a - 6, y: b - 6, w: c - a + 12, h: d - b + 12 }
+}
+// Bounding box of a placed palette symbol.
+function placedBox(sym) {
+  const half = 34 * (sym.scale || 1)
+  return { x: (sym.x || 0) - half, y: (sym.y || 0) - half, w: half * 2, h: half * 2 }
+}
+
+export default function IdentifiedPanel({ placed = [], groups = [], onRelabel, onMerge, onBeautify, onBeautifyAll, onHover, onErase }) {
   const recognized = groups.filter((g) => g.match)
   // Selected recognized groups (by reference) for the merge action. Reset whenever the group set
   // changes (a merge/correction replaces the array), so stale references never linger.
@@ -156,16 +209,27 @@ export default function IdentifiedPanel({ placed = [], groups = [], onRelabel, o
     <div className="identified-panel">
       <div className="identified-titlebar">
         <h3 className="identified-title">Identified symbols</h3>
-        {canMerge && (
-          <button
-            className="identified-merge-btn"
-            onClick={doMerge}
-            disabled={selectedCount < 2}
-            title="Combine the ticked rows into one symbol (a single drawing read as several)"
-          >
-            ⧉ Merge{selectedCount >= 2 ? ` ${selectedCount}` : ''}
-          </button>
-        )}
+        <div className="identified-titlebar-actions">
+          {recognized.length > 0 && onBeautifyAll && (
+            <button
+              className="identified-merge-btn"
+              onClick={() => onBeautifyAll(recognized)}
+              title="Smooth every recognized drawing in place (keeps each one's size & style)"
+            >
+              ✦ Smooth all
+            </button>
+          )}
+          {canMerge && (
+            <button
+              className="identified-merge-btn"
+              onClick={doMerge}
+              disabled={selectedCount < 2}
+              title="Combine the ticked rows into one symbol (a single drawing read as several)"
+            >
+              ⧉ Merge{selectedCount >= 2 ? ` ${selectedCount}` : ''}
+            </button>
+          )}
+        </div>
       </div>
       {canMerge && (
         <p className="identified-merge-hint">
@@ -177,13 +241,17 @@ export default function IdentifiedPanel({ placed = [], groups = [], onRelabel, o
       </datalist>
       <ul className="identified-list">
         {placed.map((sym, i) => (
-          <Row key={`placed-${i}`} type={sym.type || sym.id} kind={sym.kind === 'sigil' ? 'sigil' : 'sign'}
-            isRecognized={false} onRelabel={onRelabel} />
+          <Row key={`placed-${sym.id || sym.type}-${i}`} type={sym.type || sym.id} kind={sym.kind === 'sigil' ? 'sigil' : 'sign'}
+            isRecognized={false} onRelabel={onRelabel}
+            onHover={(on) => onHover?.(on ? placedBox(sym) : null)}
+            onErase={onErase ? () => onErase({ placed: sym }) : undefined} />
         ))}
         {recognized.map((g, i) => (
-          <Row key={`rec-${i}`} type={g.match.name} kind={g.role === 'core' ? 'sigil' : 'sign'}
+          <Row key={g._uid || `rec-${i}`} type={g.match.name} kind={g.role === 'core' ? 'sigil' : 'sign'}
             dist={g.match.dist} isRecognized confident={g.confident !== false} group={g} onRelabel={onRelabel}
-            selectable={canMerge} selected={selected.has(g)} onToggleSelect={toggle} autoEdit={!!g._justMerged} />
+            selectable={canMerge} selected={selected.has(g)} onToggleSelect={toggle} autoEdit={!!g._justMerged}
+            onBeautify={onBeautify} onHover={(on) => onHover?.(on ? groupBox(g) : null)}
+            onErase={onErase ? () => onErase({ group: g }) : undefined} />
         ))}
       </ul>
     </div>

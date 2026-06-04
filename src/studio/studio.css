@@ -212,22 +212,24 @@
 }
 
 .studio-results-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-  align-items: flex-start;
+  display: block;          /* tabs show one panel at a time → it takes the full drawer width */
   padding: 0;
 }
 
+/* Full-width Analysis: drop the old side-by-side cap and flow the sections into responsive
+   columns so the content fills the page width instead of sitting in a 600px corner. */
 .studio-results-inner .panel.result {
-  flex: 1 1 320px;
-  min-width: 280px;
-  max-width: 600px;
-  border-right: 1px solid var(--line);
+  width: 100%;
+  max-width: none;
+  border: none;
   border-radius: 0;
-  border-top: none;
-  border-left: none;
-  border-bottom: none;
+  padding: 12px 18px;
+  columns: 340px;
+  column-gap: 20px;
+}
+.studio-results-inner .panel.result .result-section {
+  break-inside: avoid;
+  margin-bottom: 14px;
 }
 
 /* ── ToolDock ───────────────────────────────────────────────── */
@@ -538,6 +540,12 @@
   color: var(--accent);
 }
 
+.identified-titlebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .identified-merge-btn {
   font-size: 0.72rem;
   padding: 3px 9px;
@@ -565,6 +573,15 @@
 .identified-row.selected {
   outline: 1px solid var(--accent);
   outline-offset: -1px;
+}
+
+/* Hover/focus: emphasize the row so it's clear which one maps to the canvas glow. */
+.identified-row:hover,
+.identified-row:focus-within {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+  font-weight: 600;
 }
 
 .identified-list {
@@ -667,6 +684,67 @@
 .identified-cancel:hover  { border-color: var(--err); color: var(--err); }
 .identified-edit:hover    { border-color: var(--accent); color: var(--accent); }
 .identified-saved { font-size: 0.68rem; color: var(--ok); }
+
+.identified-erase {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  transition: border-color 0.1s, color 0.1s;
+}
+.identified-erase:hover { border-color: var(--err); color: var(--err); }
+
+/* Compact icon-only row actions (Train / Smooth / Edit / Erase) — reclaim the row width. */
+.identified-icon {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-dim);
+  cursor: pointer;
+  width: 26px;
+  height: 24px;
+  padding: 0;
+  font-size: 0.82rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.1s, color 0.1s;
+}
+.identified-icon:hover { border-color: var(--accent); color: var(--accent); }
+.identified-icon.identified-erase:hover { border-color: var(--err); color: var(--err); }
+
+/* Results-drawer tabs (Detected / Analysis / AI Report). */
+.studio-results-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--line);
+}
+.srt-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 5px 12px;
+  font-size: 0.76rem;
+  margin-bottom: -1px;
+}
+.srt-tab:hover:not(:disabled) { color: var(--ink); }
+.srt-tab.active {
+  color: var(--accent);
+  border-color: var(--line);
+  border-bottom-color: var(--panel);
+  background: var(--panel);
+}
+.srt-tab:disabled { opacity: 0.4; cursor: default; }
+
+.srh-btn-off { opacity: 0.6; }
 
 /* ── AIReportPanel ──────────────────────────────────────────── */
 
