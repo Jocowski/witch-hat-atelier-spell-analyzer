@@ -275,6 +275,20 @@
   border-radius: 6px;
 }
 
+/* Reference image of the symbol being trained (its SVG). */
+.admin-symbol-preview {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+}
+.admin-symbol-preview svg { display: block; }
+
 /* ─── Trace view (image → SVG) ────────────────────────────────────────────── */
 .admin-trace-wrap { display: flex; flex-direction: column; gap: 12px; }
 

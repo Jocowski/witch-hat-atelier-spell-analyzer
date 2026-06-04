@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DrawingSurface from '../studio/DrawingSurface.jsx'
 import { recognize, makeCloud, strokesToTemplate } from '../draw/recognizer.js'
+import { getComponentDef } from '../engine/data.js'
 import { listSymbols, addSymbol } from '../data-services/symbols.js'
 import { addSample, listSamples } from '../data-services/samples.js'
 import rules from '../../data/rules.json'
@@ -91,6 +92,26 @@ function rankOverRotations(pts, clouds) {
     }
   }
   return [...best.values()].sort((a, b) => a.adjDist - b.adjDist).slice(0, 3)
+}
+
+// Reference image of the symbol being trained — the SVG the app actually renders (DB svg_path
+// overlay, falling back to the JSON baseline via getComponentDef). Lets the user copy the original
+// shape while drawing a sample.
+function SymbolPreview({ sym }) {
+  if (!sym) return null
+  const def = getComponentDef(sym.engine_id || sym.name)
+  const svgPath = sym.svg_path || def?.svgPath
+  return (
+    <div className="admin-symbol-preview" title="The original symbol to draw">
+      {svgPath ? (
+        <svg viewBox="-50 -50 100 100" width="120" height="120" aria-label={`${sym.label || sym.name} reference`}>
+          <path d={svgPath} fill="currentColor" fillRule="evenodd" />
+        </svg>
+      ) : (
+        <div className="admin-hint" style={{ padding: 20, textAlign: 'center' }}>No reference image for this symbol yet.</div>
+      )}
+    </div>
+  )
 }
 
 export default function TrainingView() {
@@ -246,6 +267,7 @@ export default function TrainingView() {
                 {' · '}<strong>{exampleCount} example{exampleCount !== 1 ? 's' : ''}</strong>
               </p>
             )}
+            {selectedSym && <SymbolPreview sym={selectedSym} />}
           </div>
 
           <button className="admin-btn admin-btn-ghost" style={{ alignSelf: 'flex-start' }}
