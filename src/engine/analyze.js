@@ -2,14 +2,22 @@
 // validity (rules) · sigils · signs · deduced effect · similar spells · dyes · geometry.
 // Per-circle work + circle composition live in the pure compose.js; the catalog matcher lives in the
 // pure match.js (shared with the CLI). This module binds the JSON and keeps the app-shaped result.
-import grammar from '../../data/grammar.json'
-import { RULES, SPELLS, SIGN_MAP, SIGIL_MAP, DYE_MAP, getComponentDef } from './data.js'
+import { RULES, SPELLS, DYE_MAP, getComponentDef } from './data.js'
+import { getSnapshot } from './symbolStore.js'
 import { buildSignature as _buildSignature, buildCombinedSignature as _buildCombinedSignature, matchSpell as _matchSpell } from './match.js'
 import { toComposition, analyzeCircleWith, composeWith, reclassifyCorelessCircles } from './compose.js'
 import { computeOrientationAim } from './geometry.js'
 import { assembleSpellIR } from './ir.js'
 
-const deps = { grammar, sigilMap: SIGIL_MAP, signMap: SIGN_MAP, dyeMap: DYE_MAP, zones: RULES.zones, magnitudeCfg: RULES.magnitude }
+// Build the engine deps from the CURRENT symbol snapshot (baseline ⊕ DB overlay), so re-analysis
+// after an Admin edit uses fresh grammar/maps. Cheap object build per analyze() call.
+function buildDeps() {
+  const snap = getSnapshot()
+  return {
+    grammar: snap.grammar,
+    deps: { grammar: snap.grammar, sigilMap: snap.sigilMap, signMap: snap.signMap, dyeMap: DYE_MAP, zones: RULES.zones, magnitudeCfg: RULES.magnitude },
+  }
+}
 const irCfg = RULES.irTuning
 const matchDeps = { rules: RULES, spells: SPELLS, getDef: getComponentDef }
 
@@ -75,11 +83,11 @@ function statusOf(c) {
 // Assemble SpellIR facts from a per-circle result + the original raw circle (SPEC-spell-ir.md).
 // Re-derives the orientation aim to expose vx/vy/wsum for the tilt math (the circle result only
 // keeps the aim label). Additive — never throws; an invalid circle yields a zeroed SpellIR.
-function buildIRFacts(circleResult, circle) {
+function buildIRFacts(circleResult, circle, grammar, signMap) {
   const signComps = (circle.components || []).filter((c) => c.role === 'sign')
   const inside = signComps.filter((c) => c.zone !== 'outside')
   const types = new Set(inside.map((c) => c.type))
-  const familyOf = (t) => SIGN_MAP[t]?.family
+  const familyOf = (t) => signMap[t]?.family
   const aimSignComps = inside.filter((c) => grammar.operators[c.type]?.kind === 'direction')
   const aim = computeOrientationAim(aimSignComps.length ? aimSignComps : inside, familyOf)
   return {
@@ -97,6 +105,8 @@ function buildIRFacts(circleResult, circle) {
 // ---------- Orchestrator ----------
 // Accepts a v1 composition (core/components/ring) or a v2 spell ({circles,relations}).
 export function analyze(input) {
+  const { grammar, deps } = buildDeps()
+  const signMap = deps.signMap
   const { name, circles, relations } = toComposition(input)
   const per = circles.map((c) => analyzeCircleWith(deps, c))
   // In a multi-circle spell, a coreless circle may be a legitimate boundary/modifier ring — let
@@ -108,7 +118,7 @@ export function analyze(input) {
     // while also exposing the v2 circles[]/relations/combined fields.
     const c0 = per[0]
     const similar = computeSimilar(buildSignature(circles[0]))
-    const spellIR = assembleSpellIR(buildIRFacts(c0, circles[0]), irCfg)
+    const spellIR = assembleSpellIR(buildIRFacts(c0, circles[0], grammar, signMap), irCfg)
     return {
       name, valid: c0.valid, active: c0.active, status: statusOf(c0),
       issues: c0.issues, sigils: c0.sigils, signs: c0.signs,
@@ -126,7 +136,7 @@ export function analyze(input) {
   const perCircle = per.map((p, i) => ({
     id: p.id, name: p.name,
     similar: computeSimilar(buildSignature(circles[i])),
-    spellIR: assembleSpellIR(buildIRFacts(p, circles[i]), irCfg),
+    spellIR: assembleSpellIR(buildIRFacts(p, circles[i], grammar, signMap), irCfg),
   }))
   const combinedSimilar = computeSimilar(buildCombinedSignature(circles))
   // Forbidden across the whole device: any circle's parts, or the combined catalog match.

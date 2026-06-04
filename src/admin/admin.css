@@ -135,6 +135,7 @@
 .admin-input:focus,
 .admin-select:focus { border-color: var(--accent); }
 .admin-input::placeholder { color: var(--ink-dim); }
+.admin-input-warn { border-color: var(--warn, #c80); }
 .admin-input-sm,
 .admin-select-sm { padding: 3px 8px; font-size: 12px; }
 
@@ -273,6 +274,140 @@
   border: 1px solid var(--line);
   border-radius: 6px;
 }
+
+/* ─── Trace view (image → SVG) ────────────────────────────────────────────── */
+.admin-trace-wrap { display: flex; flex-direction: column; gap: 12px; }
+
+.admin-trace-modes { display: flex; gap: 4px; }
+.admin-tab-sm {
+  border: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.admin-tab-sm.admin-tab-active { border-color: var(--accent); }
+
+.admin-trace-layout {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.admin-trace-col {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-trace-source { display: flex; flex-direction: column; gap: 10px; }
+.admin-trace-thumb {
+  max-width: 260px;
+  max-height: 260px;
+  align-self: flex-start;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.admin-trace-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.admin-label-row {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+}
+.admin-label-row input[type='range'] { flex: 1; }
+
+.admin-trace-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent);
+}
+.admin-trace-svg { width: 200px; height: 200px; }
+
+.admin-trace-out {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  resize: vertical;
+  word-break: break-all;
+}
+
+/* ─── Symbol editor (Registry add/edit) ───────────────────────────────────── */
+.admin-sym-editor {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+}
+.admin-sym-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.admin-sym-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.admin-sym-fs {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.admin-sym-fs legend {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  padding: 0 6px;
+}
+.admin-sym-svg {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  resize: vertical;
+  word-break: break-all;
+}
+.admin-sym-trace-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.admin-sym-preview {
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--accent);
+}
+.admin-sym-tri-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.admin-sym-tri-row .admin-label { flex: 1; min-width: 90px; }
+
+.admin-sym-draw { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.admin-sym-draw .ds-surface { width: 100%; min-width: 220px; }
+
+/* When the draw canvas is open, let the Drawing fieldset use the full editor width. */
+.admin-sym-grid:has(.admin-sym-draw) { grid-template-columns: 1fr; }
 .admin-guess-top { font-size: 20px; font-weight: 700; color: var(--accent); min-height: 28px; }
 
 /* ─── Registry view ───────────────────────────────────────────────────────── */

@@ -1,6 +1,29 @@
 // data-services/symbols.js — registry queries for the `symbols` table.
 import { supabase, hasSupabase } from './supabase.js'
 
+// Writable columns. The dynamic-symbol columns (svg_path … substance_qualities) overlay the JSON
+// baseline at runtime (see src/engine/symbolMerge.js); all are nullable. addSymbol/updateSymbol
+// whitelist against this so callers can pass a partial row without listing every field.
+const WRITABLE = [
+  'kind', 'name', 'label', 'engine_id', 'status', 'operator_kind',
+  'lc_status', 'lc_rev', 'lc_flag',
+  // presentation
+  'svg_path', 'render', 'family',
+  // sign semantics
+  'effect_tags', 'invertible', 'can_be_center', 'surrounds',
+  // sign grammar operator
+  'op_kind', 'op_verb', 'op_inverted_verb', 'op_directional', 'op_default_direction',
+  // sigil semantics
+  'element', 'substance', 'substance_raw', 'substance_qualities',
+]
+
+// Pick only whitelisted, defined keys from an input object.
+function pickWritable(input) {
+  const out = {}
+  for (const k of WRITABLE) if (input[k] !== undefined) out[k] = input[k]
+  return out
+}
+
 /**
  * List symbols, optionally filtered by kind ('sign' | 'sigil').
  * @param {{ kind?: string }} [opts]
@@ -34,16 +57,17 @@ export async function getSymbolByEngineId(engineId) {
 }
 
 /**
- * Insert a new symbol into the registry.
- * @param {{ kind: string, name: string, label?: string, engine_id?: string,
- *           status?: string, operator_kind?: string }} symbol
+ * Insert a new symbol into the registry. Accepts any whitelisted column (see WRITABLE), so the
+ * dynamic-symbol fields (svg_path, family, op_*, element, …) can be set at creation time.
+ * @param {object} symbol  At minimum { kind, name }.
  * @returns {Promise<object>} The inserted row.
  */
-export async function addSymbol({ kind, name, label, engine_id, status = 'canon', operator_kind }) {
+export async function addSymbol(symbol) {
   if (!hasSupabase()) return null
+  const row = pickWritable({ status: 'canon', ...symbol })
   const { data, error } = await supabase
     .from('symbols')
-    .insert({ kind, name, label, engine_id, status, operator_kind })
+    .insert(row)
     .select()
     .single()
   if (error) throw new Error(error.message)
@@ -51,7 +75,7 @@ export async function addSymbol({ kind, name, label, engine_id, status = 'canon'
 }
 
 /**
- * Update fields on an existing symbol.
+ * Update fields on an existing symbol (whitelisted against WRITABLE).
  * @param {string} id  UUID of the symbol row.
  * @param {object} patch  Partial column values to update.
  * @returns {Promise<object>} The updated row.
@@ -60,7 +84,7 @@ export async function updateSymbol(id, patch) {
   if (!hasSupabase()) return null
   const { data, error } = await supabase
     .from('symbols')
-    .update(patch)
+    .update(pickWritable(patch))
     .eq('id', id)
     .select()
     .single()

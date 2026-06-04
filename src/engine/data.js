@@ -1,23 +1,34 @@
-// Carrega e indexa os JSONs de regras/sigils/signs/spells.
-// Vite importa JSON nativamente; data/ está na raiz do projeto.
+// Carrega e indexa os dados de regras/sigils/signs/spells.
+// Sigils/signs/grammar agora vêm do symbolStore (baseline JSON ⊕ overlay do DB), então a paleta e o
+// engine refletem edições do Admin em runtime. RULES/SPELLS/DYES continuam estáticos (fora de escopo).
 import rules from '../../data/rules.json'
-import sigilsDoc from '../../data/sigils.json'
-import signsDoc from '../../data/signs.json'
 import spellsDoc from '../../data/spells.json'
 import dyesDoc from '../../data/dyes.json'
+import { getSnapshot, subscribe, SIGIL_RENDER_DEFAULTS, SIGN_RENDER_DEFAULTS } from './symbolStore.js'
 
 export const RULES = rules
-export const SIGILS = sigilsDoc.sigils
-export const SIGNS = signsDoc.signs
 export const SPELLS = spellsDoc.spells
 export const DYES = dyesDoc.dyes
 
-export const SIGIL_RENDER_DEFAULTS = sigilsDoc.renderDefaults
-export const SIGN_RENDER_DEFAULTS = signsDoc.renderDefaults
+export { SIGIL_RENDER_DEFAULTS, SIGN_RENDER_DEFAULTS }
+
+// Live bindings: re-pointed whenever the overlay changes so importers (palette, engine) see fresh
+// data on their next render/call. ES module `let` exports are live, so `import { SIGILS }` tracks
+// these reassignments — but read them at call/render time (don't capture into a long-lived const).
+export let SIGILS = getSnapshot().sigils
+export let SIGNS = getSnapshot().signs
+export let SIGIL_MAP = getSnapshot().sigilMap
+export let SIGN_MAP = getSnapshot().signMap
+
+subscribe(() => {
+  const s = getSnapshot()
+  SIGILS = s.sigils
+  SIGNS = s.signs
+  SIGIL_MAP = s.sigilMap
+  SIGN_MAP = s.signMap
+})
 
 const byId = (arr) => Object.fromEntries(arr.map((x) => [x.id, x]))
-export const SIGIL_MAP = byId(SIGILS)
-export const SIGN_MAP = byId(SIGNS)
 export const SPELL_MAP = byId(SPELLS)
 export const DYE_MAP = byId(DYES)
 

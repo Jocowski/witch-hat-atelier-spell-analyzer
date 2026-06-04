@@ -1,10 +1,11 @@
 // App routing: the Studio (the drawing app) is the default screen; /login + /admin/* are admin-only.
 // The Studio is the front door, so it loads eagerly; the Admin and Login screens are code-split
 // (React.lazy) so the Studio's initial bundle doesn't pull in admin-only views or the auth UI.
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import StudioPage from './studio/StudioPage.jsx'
 import RequireAdmin from './admin/RequireAdmin.jsx'
+import { loadDbSymbols } from './engine/symbolLoader.js'
 
 // Admin-only screens: only fetched when the user actually navigates to /login or /admin.
 const LoginPage = lazy(() => import('./admin/LoginPage.jsx'))
@@ -31,6 +32,9 @@ function Nav() {
 }
 
 export default function AppRouter() {
+  // Load the DB symbol overlay once at boot (baseline ⊕ overlay). No-ops without Supabase.
+  useEffect(() => { loadDbSymbols() }, [])
+
   return (
     <BrowserRouter>
       <Nav />

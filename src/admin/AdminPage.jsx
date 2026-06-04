@@ -8,11 +8,13 @@ import { useAuth } from './AuthProvider.jsx'
 import TrainingView from './TrainingView.jsx'
 import RegistryView from './RegistryView.jsx'
 import ReviewView   from './ReviewView.jsx'
+import TraceView    from './TraceView.jsx'
 import './admin.css'
 
 const TABS = [
   { id: 'training', label: 'Training' },
   { id: 'registry', label: 'Registry' },
+  { id: 'trace',    label: 'Trace'    },
   { id: 'review',   label: 'Review'   },
 ]
 
@@ -57,6 +59,7 @@ export default function AdminPage() {
       <main className="admin-content">
         {activeTab === 'training' && <TrainingView />}
         {activeTab === 'registry' && <RegistryView />}
+        {activeTab === 'trace'    && <TraceView />}
         {activeTab === 'review'   && <ReviewView />}
       </main>
     </div>

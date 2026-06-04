@@ -522,12 +522,49 @@
   border-right: 1px solid var(--line);
 }
 
+.identified-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .identified-title {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--accent);
+}
+
+.identified-merge-btn {
+  font-size: 0.72rem;
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+}
+.identified-merge-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.identified-merge-btn:disabled { opacity: 0.45; cursor: default; }
+
+.identified-merge-hint {
+  margin: 0 0 8px;
+  font-size: 0.7rem;
+  opacity: 0.65;
+  line-height: 1.3;
+}
+
+.identified-check {
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.identified-row.selected {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
 }
 
 .identified-list {

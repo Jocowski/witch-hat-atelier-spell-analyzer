@@ -663,6 +663,58 @@ export function buildComposition(groups, center, ring) {
   }
 }
 
+/**
+ * Merge several analyzed groups into ONE, re-recognizing the combined strokes.
+ *
+ * The segmentation step can over-split a single hand-drawn symbol into multiple groups when its
+ * strokes sit farther apart than the adaptive gap (e.g. one "levitation" read as three). This lets
+ * the UI stitch those groups back together: it concatenates their strokes, recomputes the centroid,
+ * and runs the de-rotation sweep over the combined shape so the result carries a fresh match +
+ * confidence. The merged group keeps `role:'core'` if ANY input was a core, else `'sign'`, and
+ * inherits the first group's ringIndex.
+ *
+ * PURE: clouds are passed in (built by the caller from templates). When no clouds are available the
+ * first group's existing match is preserved so the merge still collapses the rows.
+ *
+ * @param {Array}  groups   ≥2 analyzed groups ({ strokes, pts, role, ringIndex, angle, match })
+ * @param {Array}  clouds   prebuilt makeCloud() objects
+ * @param {object} opts     { rotationSteps=24, confidenceMinPct=0 }
+ * @returns {object|null}   the merged group, or null if fewer than 2 groups given
+ */
+export function mergeGroups(groups, clouds = [], opts = {}) {
+  if (!Array.isArray(groups) || groups.length < 2) return null
+  const rotationSteps = opts.rotationSteps ?? 24
+  const confidenceMinPct = opts.confidenceMinPct ?? 0
+
+  const strokes = groups.flatMap((g) => g.strokes)
+  const pts = strokes.flat().map((p) => ({ x: p.x, y: p.y }))
+  const c = cxy(pts)
+  const role = groups.some((g) => g.role === 'core') ? 'core' : 'sign'
+
+  let match
+  if (clouds.length) {
+    const steps = role === 'core' ? [0] : Array.from({ length: rotationSteps }, (_, k) => k * (360 / rotationSteps))
+    const rawPts = strokes.flatMap((s, si) => s.map((p) => ({ x: p.x, y: p.y, _id: si })))
+    match = bestMatchOverRotations(rawPts, clouds, steps, { cx: c.x, cy: c.y })
+  } else {
+    match = groups.find((g) => g.match)?.match ?? null
+  }
+
+  const confidence = match ? confidencePct(match.dist) : 0
+  return {
+    strokes,
+    pts,
+    cx: c.x,
+    cy: c.y,
+    role,
+    angle: groups[0].angle,
+    ringIndex: groups[0].ringIndex ?? 0,
+    match,
+    confidence,
+    confident: match ? confidence >= confidenceMinPct : false,
+  }
+}
+
 // Turn one analyzed group's strokes into a storable template (raw points, one ID per stroke).
 export function groupToTemplate(group, name, role) {
   const points = []

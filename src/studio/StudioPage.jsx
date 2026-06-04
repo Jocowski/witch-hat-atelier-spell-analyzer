@@ -18,8 +18,10 @@ import ThemeSwitcher   from '../theme/ThemeSwitcher.jsx'
 import ResultPanel from '../components/ResultPanel.jsx'
 import { analyze } from '../engine/analyze.js'
 import { isSigilType } from '../engine/data.js'
+import { useSymbolData } from '../engine/useSymbolData.js'
+import { loadDbSymbols } from '../engine/symbolLoader.js'
 import { toComposition, recognizedToPlaced } from './drawingModel.js'
-import { analyzeStrokes, groupToTemplate } from '../draw/recognizer.js'
+import { analyzeStrokes, groupToTemplate, mergeGroups, makeCloud } from '../draw/recognizer.js'
 import { activeTemplates, addSample } from '../data-services/samples.js'
 import { getSymbolByEngineId } from '../data-services/symbols.js'
 import { logAnalysis } from '../data-services/analyses.js'
@@ -45,6 +47,7 @@ function readGatingSetting() {
 // activeTemplates(rules.recognition) resolves the effective weight (sourceWeight * verifiedMultiplier)
 // server-side, so the recognizer receives a numeric weight and stays PURE.
 const CONFIDENCE_MIN_PCT = rules.recognition?.confidenceMinPct ?? 0
+const ROTATION_STEPS = rules.recognition?.rotationSteps ?? 24
 
 // Results-drawer persistence (Item 7).
 const DRAWER_H_KEY = 'studio.drawer.height'
@@ -85,6 +88,18 @@ function overlaysFor(d) {
 }
 
 export default function StudioPage() {
+  // Re-render the palette + canvas when the DB symbol overlay loads or an Admin edit lands.
+  useSymbolData()
+
+  // Re-pull the overlay when the tab regains focus, so symbols added in a separate Admin tab/window
+  // show up without a manual reload (the store is per-tab; same-tab navigation already shares it).
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState !== 'hidden') loadDbSymbols() }
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    return () => { window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh) }
+  }, [])
+
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
 
@@ -245,6 +260,24 @@ export default function StudioPage() {
     if (phase === 'analyzed') setResult(analyze(comp))
   }
 
+  // Merge several over-split recognized groups into one (single drawn symbol read as 2+).
+  // Re-recognizes the combined strokes, replaces the inputs with the merged group, and refreshes
+  // overlays + composition. The merged row auto-opens its label editor (see IdentifiedPanel).
+  const handleMerge = useCallback((groupsToMerge) => {
+    if (!groupsToMerge || groupsToMerge.length < 2) return
+    const clouds = templates.map((t) => makeCloud(t.name, t.points, t.weight))
+    const merged = mergeGroups(groupsToMerge, clouds, { rotationSteps: ROTATION_STEPS, confidenceMinPct: CONFIDENCE_MIN_PCT })
+    if (!merged) return
+    merged._justMerged = true // signal IdentifiedPanel to open the label editor on this row
+    const set = new Set(groupsToMerge)
+    const recGroups = detection.recGroups.filter((g) => !set.has(g))
+    recGroups.push(merged)
+    const d = { ...detection, recGroups }
+    setDetection(d); setOverlays(overlaysFor(d))
+    const comp = buildComposition(d); setComposition(comp)
+    if (phase === 'analyzed') setResult(analyze(comp))
+  }, [detection, templates, buildComposition, phase])
+
   // STEP 2 — analyze (+ A0: log the analysis + corrections for the improvement loop)
   const handleAnalyze = useCallback(() => {
     if (!composition || busy) return
@@ -404,7 +437,7 @@ export default function StudioPage() {
                     </button>
                   )}
                 </div>
-                <IdentifiedPanel placed={detection.placed} groups={detection.recGroups} onRelabel={handleCorrect} />
+                <IdentifiedPanel placed={detection.placed} groups={detection.recGroups} onRelabel={handleCorrect} onMerge={handleMerge} />
                 {canContribute && (
                   <div className="contribute-box">
                     <p className="detect-hint">This matches <strong>{result.similar.match.name}</strong> — its symbols are confirmed and can seed the training set.</p>
