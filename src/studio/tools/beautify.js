@@ -386,6 +386,16 @@ export function weldsRingGap(arcPts, bridgePts, opts = {}) {
   const B = arc[arc.length - 1]
   const P = bridge[0]
   const Q = bridge[bridge.length - 1]
+
+  // The bridge must be a roughly STRAIGHT closing chord — not itself an arc. Otherwise a SECOND arc
+  // drawn near the first (e.g. a "Cc" sign) would satisfy the endpoint test and wrongly close the ring.
+  // Reject when the bridge bows away from the line P→Q by more than weldStraightFrac of its chord.
+  const chord = dist(P, Q)
+  if (chord < 1) return null
+  let maxDev = 0
+  for (const p of bridge) { const d = perpDist(p, P, Q); if (d > maxDev) maxDev = d }
+  if (maxDev > (o.weldStraightFrac ?? 0.12) * chord) return null
+
   const snap = Math.max(o.weldSnapMin, o.weldSnapFrac * fit.r)
   const bridged =
     (dist(P, A) <= snap && dist(Q, B) <= snap) ||

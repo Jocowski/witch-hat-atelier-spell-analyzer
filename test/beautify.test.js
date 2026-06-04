@@ -223,6 +223,28 @@ test('weldsRingGap: a closing stroke across an open ring → full closed circle'
   assert.ok(Math.hypot(circ[0].x - circ[circ.length - 1].x, circ[0].y - circ[circ.length - 1].y) < 6, 'should be closed')
 })
 
+// a quadratic-bezier "bow" from A to B that bulges sideways by `bulge`·chord (a curved bridge)
+function bow(A, B, bulge = 0.4, n = 16) {
+  const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2
+  const dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1
+  const nx = -dy / len, ny = dx / len
+  const c = { x: mx + nx * bulge * len, y: my + ny * bulge * len }
+  const pts = []
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, u = 1 - t
+    pts.push({ x: u * u * A.x + 2 * u * t * c.x + t * t * B.x, y: u * u * A.y + 2 * u * t * c.y + t * t * B.y })
+  }
+  return pts
+}
+
+test('weldsRingGap: a CURVED second arc across the gap does NOT weld (two arcs stay separate)', () => {
+  const arc = gappedCircle(0, 0, 50, 60, 60, 1, 81)
+  const A = arc[0]
+  const B = arc[arc.length - 1]
+  const curved = bow(B, A, 0.45, 18) // a bowed stroke, not a straight closing chord
+  assert.equal(weldsRingGap(arc, curved), null)
+})
+
 test('weldsRingGap: a stroke that does not touch the ends → null', () => {
   const arc = gappedCircle(0, 0, 50, 60, 60, 1, 43)
   const bridge = driftingLine({ x: 200, y: 200 }, { x: 260, y: 200 }, 10, 1, 44)
