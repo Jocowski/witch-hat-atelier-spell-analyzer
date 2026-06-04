@@ -74,7 +74,14 @@ function overlaysFor(d) {
     const half = 34 * (p.scale || 1)
     return { box: { x: p.x - half, y: p.y - half, w: half * 2, h: half * 2 }, label: p.type, kind: p.kind }
   })
-  return [...rec, ...placed]
+  // 5.5A: ring indicator overlays — faint dashed bounding-square per detected ring, labeled by id.
+  // Uses the DrawingSurface's existing overlay box mechanism (world/centre-origin coords).
+  const rings = (d.detectedRings || []).map((ring) => ({
+    box: { x: ring.cx - ring.r, y: ring.cy - ring.r, w: ring.r * 2, h: ring.r * 2 },
+    label: ring.id,
+    kind: 'ring',
+  }))
+  return [...rings, ...rec, ...placed]
 }
 
 export default function StudioPage() {
@@ -82,7 +89,8 @@ export default function StudioPage() {
   const fileInputRef = useRef(null)
 
   const [phase, setPhase] = useState('idle') // 'idle' | 'detected' | 'analyzed'
-  const [detection, setDetection] = useState({ placed: [], recGroups: [], ringClosed: false, dyes: [] })
+  // detection includes: placed, recGroups, ringClosed, dyes, detectedRings, relations
+  const [detection, setDetection] = useState({ placed: [], recGroups: [], ringClosed: false, dyes: [], detectedRings: [], relations: [] })
   const [overlays, setOverlays] = useState([])
   const [composition, setComposition] = useState(null)
   const [result, setResult] = useState(null)
@@ -132,13 +140,40 @@ export default function StudioPage() {
   function handleSymbolSelect(sym) { canvasRef.current?.placeSymbol(sym.type, sym.kind) }
 
   // A2: only confident detections feed the engine (low-confidence ones stay visible as "unknown?").
-  const buildComposition = useCallback((d) => toComposition(
-    {
-      placed: [...d.placed, ...recognizedToPlaced(d.recGroups.filter((g) => g.confident !== false))],
-      ringClosed: d.ringClosed || undefined, dyes: d.dyes,
-    },
-    { isSigil: isSigilType },
-  ), [])
+  // Multi-ring path: when we have >1 detected rings, pass rings/relations/ringAssignments so
+  // toComposition builds a proper wha-spell@2 with multiple circles (Track 5 §5.4).
+  const buildComposition = useCallback((d) => {
+    const confidentRecognized = recognizedToPlaced(d.recGroups.filter((g) => g.confident !== false))
+    const allPlaced = [...d.placed, ...confidentRecognized]
+    const hasMultiRings = Array.isArray(d.detectedRings) && d.detectedRings.length > 1
+    if (hasMultiRings) {
+      // Build ring assignment map: each recognized group carries .ringIndex; map id → ringIndex.
+      const assignments = {}
+      for (const g of d.recGroups) {
+        if (g.match && g.ringIndex != null) assignments[g.match.name] = g.ringIndex
+      }
+      // Placed symbols from the palette: assign by proximity to ring centers
+      for (const item of d.placed) {
+        if ((item.id || item.type) in assignments) continue
+        const key = item.id || item.type
+        const rings = d.detectedRings
+        let bestIdx = 0, bestDist = Infinity
+        rings.forEach((r, i) => {
+          const dist = Math.hypot((item.x || 0) - r.cx, (item.y || 0) - r.cy)
+          if (dist < bestDist) { bestDist = dist; bestIdx = i }
+        })
+        assignments[key] = bestIdx
+      }
+      return toComposition(
+        { placed: allPlaced, rings: d.detectedRings, ringAssignments: assignments, relations: d.relations || [], dyes: d.dyes, name: '' },
+        { isSigil: isSigilType },
+      )
+    }
+    return toComposition(
+      { placed: allPlaced, ringClosed: d.ringClosed || undefined, dyes: d.dyes },
+      { isSigil: isSigilType },
+    )
+  }, [])
 
   // STEP 1 — detect
   const handleDetect = useCallback(() => {
@@ -161,11 +196,17 @@ export default function StudioPage() {
           floodFillConfig:      rules.recognition?.floodFillConfig      ?? {},
           rotationSteps:        rules.recognition?.rotationSteps        ?? 24,
           confidenceMinPct:     CONFIDENCE_MIN_PCT,
+          // Track 5: multi-ring tolerances (SPEC-nested-linked.md)
+          ringAssignSlack:      rules.recognition?.ringAssignSlack      ?? 1.15,
+          nestCenterSlack:      rules.recognition?.nestCenterSlack      ?? 0.85,
+          linkEndpointSlack:    rules.recognition?.linkEndpointSlack    ?? 0.12,
         })
         recGroups = recognizerResult.groups || []
         ringClosed = !!recognizerResult.ring
       }
-      const d = { placed: model.placed, recGroups, ringClosed, dyes: model.dyes }
+      const detectedRings  = recognizerResult?.rings     || []
+      const detectedRelations = recognizerResult?.relations || []
+      const d = { placed: model.placed, recGroups, ringClosed, dyes: model.dyes, detectedRings, relations: detectedRelations }
       setDetection(d)
       setOverlays(overlaysFor(d))
       setComposition(buildComposition(d))
@@ -227,7 +268,7 @@ export default function StudioPage() {
 
   function handleClear() {
     canvasRef.current?.clear()
-    setPhase('idle'); setDetection({ placed: [], recGroups: [], ringClosed: false, dyes: [] })
+    setPhase('idle'); setDetection({ placed: [], recGroups: [], ringClosed: false, dyes: [], detectedRings: [], relations: [] })
     setOverlays([]); setComposition(null); setResult(null); setContributeMsg(null)
     correctionsRef.current = []
     // Reset visual effect state

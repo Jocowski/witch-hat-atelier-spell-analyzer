@@ -230,10 +230,182 @@ export function extractAxisLengthAlongFacing(strokes, facingAngleDeg, ringR) {
   return length / ringR
 }
 
+// ---------- multi-ring helpers (Track 5 — SPEC-nested-linked.md) ----------
+
+/**
+ * Detect all ring-candidate strokes in the drawn set using the fast heuristic.
+ * Returns an array of { cx, cy, r, cv, closed, strokeIndex } sorted by radius ascending.
+ * Duplicate rings (two strokes that are really the same circle, drawn twice) are merged
+ * by keeping only the larger when centers are within 50% of the smaller radius.
+ *
+ * @param {Array<Array<{x,y}>>} drawn    filtered strokes (length ≥ 2)
+ * @param {number}              cvThresh max CV to accept as a ring
+ * @param {number}              minR     minimum ring radius
+ * @returns {Array}  ring descriptors, sorted radius ascending
+ */
+function detectAllRings(drawn, cvThresh, minR) {
+  const candidates = []
+  drawn.forEach((s, i) => {
+    const cs = circleScore(s)
+    if (cs.cv < cvThresh && cs.closed && cs.r >= minR) {
+      candidates.push({ cx: cs.cx, cy: cs.cy, r: cs.r, cv: cs.cv, closed: true, strokeIndex: i })
+    }
+  })
+  // De-duplicate: if two candidates are almost the same circle (drawn twice), keep the larger.
+  // "Same circle" = centers are close AND radii are similar.
+  //   • center distance < 0.5 * smaller r   (they're co-located)
+  //   • radius ratio > 0.75                  (radii are within ~25% of each other)
+  // Concentric circles (genuinely different radii, e.g. r=80 and r=200, ratio=0.4) are NOT deduped.
+  const deduped = []
+  for (const c of candidates) {
+    const dup = deduped.findIndex((d) => {
+      const centerClose = Math.hypot(d.cx - c.cx, d.cy - c.cy) < 0.5 * Math.min(d.r, c.r)
+      const radiiSimilar = Math.min(d.r, c.r) / Math.max(d.r, c.r) > 0.75
+      return centerClose && radiiSimilar
+    })
+    if (dup >= 0) {
+      if (c.r > deduped[dup].r) deduped[dup] = c  // keep the larger
+    } else {
+      deduped.push(c)
+    }
+  }
+  deduped.sort((a, b) => a.r - b.r)  // smallest first → id k0, k1, …
+  return deduped
+}
+
+/**
+ * Given a set of rings and a set of non-ring strokes, find link-candidate strokes:
+ * those whose first AND last point each lie within `slack * ringRadius` of DIFFERENT ring
+ * boundaries.  Returns { linkCandidates:[{a,b,stroke,strokeIndex}], consumed:Set<number> }.
+ *
+ * @param {Array}  rings           ring descriptors with .id, .cx, .cy, .r
+ * @param {Array}  nonRingStrokes  [{stroke:[{x,y}], origIdx}]
+ * @param {number} slack           linkEndpointSlack (fraction of ring radius)
+ */
+function extractLinkCandidates(rings, nonRingStrokes, slack) {
+  const linkCandidates = []
+  const consumed = new Set()
+
+  for (const { stroke, origIdx } of nonRingStrokes) {
+    if (stroke.length < 2) continue
+    const p0 = stroke[0]
+    const pN = stroke[stroke.length - 1]
+
+    let nearA = null, nearB = null
+    for (const ring of rings) {
+      const tol = slack * ring.r
+      if (Math.abs(Math.hypot(p0.x - ring.cx, p0.y - ring.cy) - ring.r) < tol) {
+        nearA = nearA ?? ring.id
+      }
+      if (Math.abs(Math.hypot(pN.x - ring.cx, pN.y - ring.cy) - ring.r) < tol) {
+        nearB = nearB ?? ring.id
+      }
+    }
+    if (nearA && nearB && nearA !== nearB) {
+      linkCandidates.push({ a: nearA, b: nearB, stroke, strokeIndex: origIdx })
+      consumed.add(origIdx)
+    }
+  }
+  return { linkCandidates, consumed }
+}
+
+/**
+ * Assign each group (with centroid cx,cy) to its innermost enclosing ring.
+ * Falls back to the nearest ring if the group centroid is outside all rings.
+ * Mutates each group in place, adding .ringIndex.
+ *
+ * @param {Array}  groups      groups with .cx .cy
+ * @param {Array}  rings       ring descriptors { cx, cy, r } (sorted by r ascending)
+ * @param {number} slack       ringAssignSlack (fraction of ring radius, default 1.15)
+ */
+function assignGroupsToRings(groups, rings, slack) {
+  if (!rings.length) {
+    groups.forEach((g) => { g.ringIndex = 0 })
+    return
+  }
+  groups.forEach((g) => {
+    // candidates: rings whose center distance < radius * slack
+    const candidates = rings.filter(
+      (ring) => Math.hypot(g.cx - ring.cx, g.cy - ring.cy) < ring.r * slack
+    )
+    if (candidates.length) {
+      // innermost = smallest radius among candidates
+      const innermost = candidates.reduce((min, r) => (r.r < min.r ? r : min), candidates[0])
+      g.ringIndex = rings.indexOf(innermost)
+    } else {
+      // fallback: nearest ring
+      let nearestIdx = 0, nearestDist = Infinity
+      rings.forEach((ring, ri) => {
+        const d = Math.hypot(g.cx - ring.cx, g.cy - ring.cy)
+        if (d < nearestDist) { nearestDist = d; nearestIdx = ri }
+      })
+      g.ringIndex = nearestIdx
+    }
+  })
+}
+
+/**
+ * Extract nesting relations from the ring array.
+ * A ring A (inner) is nested inside ring B (outer) when:
+ *   dist(A.center, B.center) + A.r < B.r * nestCenterSlack
+ *
+ * @param {Array}  rings           ring descriptors with .id, .cx, .cy, .r (sorted by r ascending)
+ * @param {number} nestCenterSlack fraction-of-outer-radius tolerance
+ * @returns {Array}  relation objects { type:'nest', outer, inner }
+ */
+function extractNestRelations(rings, nestCenterSlack) {
+  const relations = []
+  for (let i = 0; i < rings.length; i++) {
+    for (let j = i + 1; j < rings.length; j++) {
+      const inner = rings[i]  // smaller r (sorted ascending)
+      const outer = rings[j]
+      const d = Math.hypot(inner.cx - outer.cx, inner.cy - outer.cy)
+      if (d + inner.r < outer.r * nestCenterSlack) {
+        relations.push({ type: 'nest', outer: outer.id, inner: inner.id })
+      }
+    }
+  }
+  return relations
+}
+
+// ---------- classify+recognize a group of strokes relative to a ring center ----------
+function classifyAndRecognize(groups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct) {
+  const innerR = 0.45 * effectiveRingR
+  groups.forEach((g) => { const c = cxy(g.pts); g.cx = c.x; g.cy = c.y; g.distC = Math.hypot(c.x - center.x, c.y - center.y) })
+  groups.sort((a, b) => a.distC - b.distC)
+  const core = groups.length && groups[0].distC < innerR ? groups[0] : null
+  groups.forEach((g) => { g.role = g === core ? 'core' : 'sign' })
+
+  const sweep = Array.from({ length: rotationSteps }, (_, k) => k * (360 / rotationSteps))
+  groups.forEach((g) => {
+    g.angle = ((Math.atan2(g.cx - center.x, -(g.cy - center.y)) * 180) / Math.PI + 360) % 360
+    const steps = g.role === 'core' ? [0] : sweep
+    const rawPts = g.strokes.flatMap((s, strokeIdx) => s.map((p) => ({ x: p.x, y: p.y, _id: strokeIdx })))
+    g.match = bestMatchOverRotations(rawPts, clouds, steps, { cx: g.cx, cy: g.cy })
+    g.confidence = g.match ? confidencePct(g.match.dist) : 0
+    g.confident = g.match ? g.confidence >= confidenceMinPct : false
+
+    if (g.confident && g.match && g.role === 'sign' && effectiveRingR > 0) {
+      const facingAngle = g.match.rotation ?? 0
+      const mag = extractAxisLengthAlongFacing(g.strokes, facingAngle, effectiveRingR)
+      g.metrics = { directionalMagnitude: mag }
+    }
+  })
+}
+
 // ---------- the full pipeline ----------
 // strokes: array of strokes; each stroke = array of {x,y} (canvas px).
 // templates: [{ name, role, points:[{X,Y,ID}] }].  opts: { gap } stroke-merge threshold (px).
-// Returns { ring, center, groups:[{role,cx,cy,angle,match,strokes}], composition }.
+//
+// Single-ring return (back-compat):
+//   { ring, center, ringR, groups:[{role,cx,cy,angle,match,strokes}], composition,
+//     rings:[…], ringGroups:[…], relations:[] }
+// Multi-ring return (new):
+//   { ring, center, ringR,           ← back-compat (largest ring)
+//     rings:[…], ringGroups:[…],     ← per-ring descriptors + per-ring group arrays
+//     groups:[…],                    ← ALL groups (each with .ringIndex)
+//     relations:[{type,…}],          ← nest + link relations
+//     composition }                  ← wha-spell@2 (single or multi)
 export function analyzeStrokes(strokes, templates, opts = {}) {
   const confidenceMinPct = opts.confidenceMinPct ?? 0
   const cvThreshold = opts.cvThreshold ?? 0.3
@@ -243,134 +415,234 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
   const floodFillConfig = opts.floodFillConfig ?? {}
   const rotationSteps = opts.rotationSteps ?? 24
 
+  // Track 5 tolerance opts (defaulted here; caller reads from rules.json and passes in)
+  const ringAssignSlack  = opts.ringAssignSlack  ?? 1.15
+  const nestCenterSlack  = opts.nestCenterSlack  ?? 0.85
+  const linkEndpointSlack = opts.linkEndpointSlack ?? 0.12
+
   const clouds = templates.map((t) => makeCloud(t.name, t.points, t.weight))
   const drawn = strokes.filter((s) => s.length >= 2)
-  if (!drawn.length || !clouds.length) return { ring: null, center: { x: 0, y: 0 }, groups: [], composition: null }
+  if (!drawn.length) return { ring: null, center: { x: 0, y: 0 }, groups: [], rings: [], ringGroups: [], relations: [], composition: null }
 
-  // 1 · ring detection (two-tier: heuristic + optional flood-fill)
-  let ring = null, ringIdx = -1
+  // ---------- PHASE 1: detect all ring candidates ----------
+  const multiRings = detectAllRings(drawn, cvThreshold, minRingRadius)
 
-  // Step 1a: fast heuristic candidates
-  let fastRingCandidate = null, fastRingIdx = -1
-  let relaxedRingCandidate = null, relaxedRingIdx = -1
-  drawn.forEach((s, i) => {
-    const cs = circleScore(s)
-    // Fast path: clearly round (tight threshold)
-    if (cs.cv < cvThreshold && cs.closed && cs.r >= minRingRadius) {
-      if (!fastRingCandidate || cs.r > fastRingCandidate.r) { fastRingCandidate = cs; fastRingIdx = i }
-    }
-    // Relaxed path: might be a messy circle (flood-fill will confirm)
-    if (cs.cv < cvThresholdRelaxed && cs.r >= minRingRadius) {
-      if (!relaxedRingCandidate || cs.r > relaxedRingCandidate.r) { relaxedRingCandidate = cs; relaxedRingIdx = i }
-    }
-  })
+  // Assign sequential ids k0, k1, …
+  multiRings.forEach((r, i) => { r.id = `k${i}` })
 
-  if (fastRingCandidate && !useFloodFill) {
-    // Legacy path: keep old behavior exactly when floodFill disabled
-    ring = { ...fastRingCandidate, floodClosed: undefined, strokeIds: [fastRingIdx] }
-    ringIdx = fastRingIdx
-  } else if (useFloodFill) {
-    // Step 1b: flood-fill confirmation
-    const ffCfg = { ...floodFillConfig, minRadius: minRingRadius }
+  // ---- Single-ring path (legacy behavior preserved) ----
+  if (multiRings.length <= 1) {
+    // Use the existing single-ring logic (flood-fill confirmation etc.) for perfect back-compat.
+    let ring = null, ringIdx = -1
 
-    // Try single-stroke candidate first
-    if (fastRingCandidate) {
-      const ffResult = analyzeRingClosure([drawn[fastRingIdx]], ffCfg)
-      if (ffResult.closed) {
-        ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: fastRingCandidate.cv, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: ffResult.strokeIds.map(() => fastRingIdx) }
+    let fastRingCandidate = null, fastRingIdx = -1
+    let relaxedRingCandidate = null, relaxedRingIdx = -1
+    drawn.forEach((s, i) => {
+      const cs = circleScore(s)
+      if (cs.cv < cvThreshold && cs.closed && cs.r >= minRingRadius) {
+        if (!fastRingCandidate || cs.r > fastRingCandidate.r) { fastRingCandidate = cs; fastRingIdx = i }
+      }
+      if (cs.cv < cvThresholdRelaxed && cs.r >= minRingRadius) {
+        if (!relaxedRingCandidate || cs.r > relaxedRingCandidate.r) { relaxedRingCandidate = cs; relaxedRingIdx = i }
+      }
+    })
+
+    if (fastRingCandidate && !useFloodFill) {
+      ring = { ...fastRingCandidate, floodClosed: undefined, strokeIds: [fastRingIdx] }
+      ringIdx = fastRingIdx
+    } else if (useFloodFill) {
+      const ffCfg = { ...floodFillConfig, minRadius: minRingRadius }
+      if (fastRingCandidate) {
+        const ffResult = analyzeRingClosure([drawn[fastRingIdx]], ffCfg)
+        if (ffResult.closed) {
+          ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: fastRingCandidate.cv, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: ffResult.strokeIds.map(() => fastRingIdx) }
+          ringIdx = fastRingIdx
+        }
+      }
+      if (!ring && relaxedRingCandidate && relaxedRingIdx !== fastRingIdx) {
+        const ffResult = analyzeRingClosure([drawn[relaxedRingIdx]], ffCfg)
+        if (ffResult.closed) {
+          ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: relaxedRingCandidate.cv, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: [relaxedRingIdx] }
+          ringIdx = relaxedRingIdx
+        }
+      }
+      if (!ring && drawn.length > 1) {
+        const ffResult = analyzeRingClosure(drawn, ffCfg)
+        if (ffResult.closed) {
+          ringIdx = ffResult.strokeIds.length > 0 ? ffResult.strokeIds[0] : -1
+          ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: 0, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: ffResult.strokeIds }
+        }
+      }
+      if (!ring && fastRingCandidate) {
+        ring = { ...fastRingCandidate, floodClosed: false, strokeIds: [fastRingIdx] }
         ringIdx = fastRingIdx
       }
     }
 
-    // If single-stroke failed but we have a relaxed candidate, try flood on just that stroke
-    if (!ring && relaxedRingCandidate && relaxedRingIdx !== fastRingIdx) {
-      const ffResult = analyzeRingClosure([drawn[relaxedRingIdx]], ffCfg)
-      if (ffResult.closed) {
-        ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: relaxedRingCandidate.cv, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: [relaxedRingIdx] }
-        ringIdx = relaxedRingIdx
+    let center, ringR
+    if (ring) { center = { x: ring.cx, y: ring.cy }; ringR = ring.r } else { center = cxy(drawn.flat()); ringR = null }
+
+    const symStrokes = drawn.filter((_, i) => i !== ringIdx)
+    let gap
+    if (opts.gap != null) {
+      gap = opts.gap
+    } else if (opts.adaptiveGap) {
+      gap = computeAdaptiveGap(ringR, symStrokes, { gapK: opts.gapK, gapMin: opts.gapMin, gapMax: opts.gapMax })
+    } else {
+      gap = 45
+    }
+
+    let groups = symStrokes.map((s) => ({ strokes: [s], pts: s.slice() }))
+    let merged = true
+    while (merged) {
+      merged = false
+      outer: for (let i = 0; i < groups.length; i++) for (let j = i + 1; j < groups.length; j++) {
+        if (minGap(groups[i].pts, groups[j].pts) < gap) {
+          groups[i].strokes.push(...groups[j].strokes); groups[i].pts = groups[i].pts.concat(groups[j].pts); groups.splice(j, 1); merged = true; break outer
+        }
       }
     }
 
-    // Multi-stroke path: flood all strokes together
-    if (!ring && drawn.length > 1) {
-      const ffResult = analyzeRingClosure(drawn, ffCfg)
-      if (ffResult.closed) {
-        // Use the stroke that contributed the most (first in strokeIds) as the "ring stroke"
-        ringIdx = ffResult.strokeIds.length > 0 ? ffResult.strokeIds[0] : -1
-        ring = { cx: ffResult.cx, cy: ffResult.cy, r: ffResult.r, cv: 0, closed: true, floodClosed: true, perfection: ffResult.perfection, strokeIds: ffResult.strokeIds }
-      }
-    }
+    const effectiveRingR = ringR ?? 200
+    classifyAndRecognize(groups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct)
 
-    // Fallback: fast candidate without flood-fill confirmation (preserve legacy behavior)
-    if (!ring && fastRingCandidate) {
-      ring = { ...fastRingCandidate, floodClosed: false, strokeIds: [fastRingIdx] }
-      ringIdx = fastRingIdx
+    // Single ring descriptor for ringGroups
+    const singleRingDesc = ring ? { cx: ring.cx, cy: ring.cy, r: ring.r, closed: true, id: 'k0' } : null
+    const rings = singleRingDesc ? [singleRingDesc] : []
+    groups.forEach((g) => { g.ringIndex = 0 })
+    const ringGroups = rings.length
+      ? [{ ring: singleRingDesc, groups: groups.slice() }]
+      : [{ ring: null, groups: groups.slice() }]
+
+    return {
+      ring, center, ringR: effectiveRingR,
+      rings, ringGroups,
+      groups,
+      relations: [],
+      composition: buildComposition(groups, center, ring),
     }
-  } else {
-    // No flood, no fast candidate — no ring
   }
 
-  let center, ringR
-  if (ring) { center = { x: ring.cx, y: ring.cy }; ringR = ring.r } else { center = cxy(drawn.flat()); ringR = null }
+  // ---------- PHASE 2 (multi-ring): link-candidate extraction ----------
+  const ringStrokeIndices = new Set(multiRings.map((r) => r.strokeIndex))
+  const nonRingStrokes = drawn
+    .map((s, i) => ({ stroke: s, origIdx: i }))
+    .filter(({ origIdx }) => !ringStrokeIndices.has(origIdx))
 
-  // 2 · segment by proximity (adaptive gap)
-  const symStrokes = drawn.filter((_, i) => i !== ringIdx)
+  const { linkCandidates, consumed } = extractLinkCandidates(multiRings, nonRingStrokes, linkEndpointSlack)
 
-  // Compute gap: explicit override, or adaptive, or fixed default
+  // ---------- PHASE 3: symbol grouping (excluding link strokes) ----------
+  const symStrokesMR = nonRingStrokes.filter(({ origIdx }) => !consumed.has(origIdx)).map(({ stroke }) => stroke)
+
   let gap
   if (opts.gap != null) {
     gap = opts.gap
   } else if (opts.adaptiveGap) {
-    gap = computeAdaptiveGap(ringR, symStrokes, { gapK: opts.gapK, gapMin: opts.gapMin, gapMax: opts.gapMax })
+    // Use the largest ring's radius as the reference for the global gap
+    const refR = multiRings[multiRings.length - 1].r
+    gap = computeAdaptiveGap(refR, symStrokesMR, { gapK: opts.gapK, gapMin: opts.gapMin, gapMax: opts.gapMax })
   } else {
-    gap = 45  // legacy default
+    gap = 45
   }
 
-  let groups = symStrokes.map((s) => ({ strokes: [s], pts: s.slice() }))
-  let merged = true
-  while (merged) {
-    merged = false
-    outer: for (let i = 0; i < groups.length; i++) for (let j = i + 1; j < groups.length; j++) {
-      if (minGap(groups[i].pts, groups[j].pts) < gap) {
-        groups[i].strokes.push(...groups[j].strokes); groups[i].pts = groups[i].pts.concat(groups[j].pts); groups.splice(j, 1); merged = true; break outer
+  let allGroups = symStrokesMR.map((s) => ({ strokes: [s], pts: s.slice() }))
+  let mergedMR = true
+  while (mergedMR) {
+    mergedMR = false
+    outer2: for (let i = 0; i < allGroups.length; i++) for (let j = i + 1; j < allGroups.length; j++) {
+      if (minGap(allGroups[i].pts, allGroups[j].pts) < gap) {
+        allGroups[i].strokes.push(...allGroups[j].strokes); allGroups[i].pts = allGroups[i].pts.concat(allGroups[j].pts); allGroups.splice(j, 1); mergedMR = true; break outer2
       }
     }
   }
 
-  // 3 · center vs border
-  const effectiveRingR = ringR ?? 200
-  groups.forEach((g) => { const c = cxy(g.pts); g.cx = c.x; g.cy = c.y; g.distC = Math.hypot(c.x - center.x, c.y - center.y) })
-  groups.sort((a, b) => a.distC - b.distC)
-  const innerR = 0.45 * effectiveRingR
-  let core = groups.length && groups[0].distC < innerR ? groups[0] : null
-  groups.forEach((g) => { g.role = g === core ? 'core' : 'sign' })
+  // Compute group centroids before ring assignment
+  allGroups.forEach((g) => { const c = cxy(g.pts); g.cx = c.x; g.cy = c.y })
 
-  // 4 + 5 · de-rotate (sweep) and classify — using bestMatchOverRotations
-  const sweep = Array.from({ length: rotationSteps }, (_, k) => k * (360 / rotationSteps))
+  // Assign groups to rings
+  assignGroupsToRings(allGroups, multiRings, ringAssignSlack)
 
-  groups.forEach((g) => {
-    g.angle = ((Math.atan2(g.cx - center.x, -(g.cy - center.y)) * 180) / Math.PI + 360) % 360
-    const steps = g.role === 'core' ? [0] : sweep
-    const rawPts = g.strokes.flatMap((s, strokeIdx) => s.map((p) => ({ x: p.x, y: p.y, _id: strokeIdx })))
-    g.match = bestMatchOverRotations(rawPts, clouds, steps, { cx: g.cx, cy: g.cy })
-    // Confidence gate: a low-confidence guess is kept for display but flagged so the caller can render
-    // it as "unknown?" and exclude it from the engine input (SPEC A2).
-    g.confidence = g.match ? confidencePct(g.match.dist) : 0
-    g.confident = g.match ? g.confidence >= confidenceMinPct : false
-
-    // Track 4 Layer 2b: attach directionalMagnitude metric for confident sign detections.
-    // The engine reads c.metrics?.directionalMagnitude ?? c.scale, so this drops in without
-    // changing any engine code.
-    if (g.confident && g.match && g.role === 'sign' && effectiveRingR > 0) {
-      // Use the match's winning rotation as the facing angle (same convention as composition.rotation)
-      const facingAngle = g.match.rotation ?? 0
-      const mag = extractAxisLengthAlongFacing(g.strokes, facingAngle, effectiveRingR)
-      g.metrics = { directionalMagnitude: mag }
-    }
-    // Low-confidence detections must NOT assert a metric (SPEC-magnitude-and-variants.md §P2b)
+  // ---------- PHASE 4: per-ring classification + recognition ----------
+  const ringGroups = multiRings.map((ring, ri) => {
+    const myGroups = allGroups.filter((g) => g.ringIndex === ri)
+    const center = { x: ring.cx, y: ring.cy }
+    const effectiveRingR = ring.r
+    classifyAndRecognize(myGroups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct)
+    return { ring: { cx: ring.cx, cy: ring.cy, r: ring.r, closed: ring.closed, id: ring.id }, groups: myGroups }
   })
 
-  return { ring, center, ringR: effectiveRingR, groups, composition: buildComposition(groups, center, ring) }
+  // ---------- PHASE 5: relation extraction ----------
+  const nestRelations = extractNestRelations(multiRings, nestCenterSlack)
+  const linkRelations = linkCandidates.map(({ a, b }) => ({ type: 'link', a, b }))
+  const relations = [...nestRelations, ...linkRelations]
+
+  // ---------- PHASE 6: build multi-circle composition ----------
+  // Back-compat: the largest ring becomes the primary ring / center for legacy callers
+  const primaryRing = multiRings[multiRings.length - 1]
+  const legacyRing = { cx: primaryRing.cx, cy: primaryRing.cy, r: primaryRing.r, closed: primaryRing.closed }
+  const legacyCenter = { x: primaryRing.cx, y: primaryRing.cy }
+
+  const composition = buildMultiRingComposition(ringGroups, relations)
+
+  return {
+    // Back-compat legacy fields (largest ring)
+    ring: legacyRing,
+    center: legacyCenter,
+    ringR: primaryRing.r,
+    // New multi-ring fields
+    rings: multiRings.map(({ id, cx, cy, r, closed }) => ({ id, cx, cy, r, closed })),
+    ringGroups,
+    groups: allGroups,
+    relations,
+    composition,
+  }
+}
+
+/**
+ * Build a wha-spell@2 multi-circle composition from per-ring groups + relations.
+ * Each circle's component coordinates are relative to THAT ring's center.
+ *
+ * @param {Array}  ringGroups  [{ ring:{cx,cy,r,closed,id}, groups:[…] }]
+ * @param {Array}  relations   nest/link relation objects
+ */
+function buildMultiRingComposition(ringGroups, relations) {
+  const circles = ringGroups.map(({ ring, groups }) => {
+    // Center for this circle in world coords
+    const cx = ring.cx, cy = ring.cy
+    const coreGroup = groups.find((g) => g.role === 'core' && g.match)
+    const core = coreGroup ? {
+      id: coreGroup.match.name,
+      type: coreGroup.match.name,
+      x: Math.round(coreGroup.cx - cx),
+      y: Math.round(coreGroup.cy - cy),
+      rotation: 0, scale: 1, inverted: false,
+    } : null
+    const components = groups
+      .filter((g) => g.role === 'sign' && g.match)
+      .map((g) => ({
+        type: g.match.name, role: 'sign',
+        x: Math.round(g.cx - cx),
+        y: Math.round(g.cy - cy),
+        rotation: g.match.rotation, scale: 1, inverted: false,
+        ...(g.metrics ? { metrics: g.metrics } : {}),
+      }))
+    return {
+      id: ring.id,
+      center: { x: Math.round(cx), y: Math.round(cy) },
+      radius: Math.round(ring.r),
+      ring: { closed: !!ring.closed },
+      core,
+      components,
+      dyes: [],
+    }
+  })
+
+  return {
+    format: 'wha-spell@2',
+    name: '',
+    circles,
+    relations,
+  }
 }
 
 // Build a wha-spell@1 composition (one circle) from analyzed groups. Coordinates are recentred on

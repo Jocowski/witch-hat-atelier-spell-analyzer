@@ -155,6 +155,11 @@
 
     "verifiedMultiplier": 1.3,
 
+    "_multiRingNote": "Multi-ring detection tolerances (Track 5 — SPEC-nested-linked.md). ringAssignSlack: fraction of ring radius for point-in-ring assignment (1.15 covers signs on the boundary). nestCenterSlack: inner ring must fit inside this fraction of outer radius (0.85 tolerates concentric wobble). linkEndpointSlack: endpoint proximity to ring boundary as fraction of radius (0.12 ≈ 20px on a 170px ring).",
+    "ringAssignSlack": 1.15,
+    "nestCenterSlack": 0.85,
+    "linkEndpointSlack": 0.12,
+
     "_segNote": "Adaptive segmentation + ring closure (SPEC-ring-closure-floodfill.md). gap = clamp(gapK*ringR, gapMin, gapMax); cvThreshold gates the fast circularity heuristic, cvThresholdRelaxed the fallback; floodFill enables the MS-Paint topological closure confirmation.",
     "gapK": 0.12,
     "gapMin": 14,

@@ -28,18 +28,89 @@
 
 const DEFAULT_RADIUS = 170 // fallback when no placed symbols exist
 
+// ---------- single-circle builder (shared by both paths) ----------
+
+/**
+ * Build a single wha-spell@2 circle descriptor for a set of placed items relative to a center.
+ *
+ * @param {Array}    placed      placed items for this ring (already assigned)
+ * @param {Function} isItemSigil predicate: (item) → bool
+ * @param {{x,y}}    center      ring center in world coords (components become relative to it)
+ * @param {number}   radius      ring radius (px)
+ * @param {boolean}  ringClosed  whether the ring stroke is closed
+ * @param {string}   id          circle id ('k0', 'k1', …)
+ * @param {string[]} dyes        dye ids for this circle
+ */
+function buildCircleDescriptor(placed, isItemSigil, center, radius, ringClosed, id, dyes) {
+  const sigils = placed.filter(isItemSigil)
+  const signs  = placed.filter((item) => !isItemSigil(item))
+
+  let coreSigil = null
+  if (sigils.length > 0) {
+    coreSigil = sigils.reduce((nearest, item) => {
+      const d  = Math.hypot((item.x || 0) - center.x, (item.y || 0) - center.y)
+      const dn = Math.hypot((nearest.x || 0) - center.x, (nearest.y || 0) - center.y)
+      return d < dn ? item : nearest
+    })
+  }
+
+  const core = coreSigil
+    ? {
+        id:       coreSigil.id   || coreSigil.type,
+        type:     coreSigil.type,
+        x:        0,
+        y:        0,
+        rotation: coreSigil.rotation ?? 0,
+        scale:    coreSigil.scale    ?? 1,
+        inverted: !!coreSigil.inverted,
+      }
+    : null
+
+  const otherSigils = sigils.filter((s) => s !== coreSigil)
+  const components = [
+    ...otherSigils.map((item) => ({
+      id:       item.id   || item.type,
+      type:     item.type,
+      role:     'sigil',
+      x:        (item.x ?? 0) - center.x,
+      y:        (item.y ?? 0) - center.y,
+      rotation: item.rotation ?? 0,
+      scale:    item.scale    ?? 1,
+      inverted: !!item.inverted,
+    })),
+    ...signs.map((item) => ({
+      id:       item.id   || item.type,
+      type:     item.type,
+      role:     'sign',
+      x:        (item.x ?? 0) - center.x,
+      y:        (item.y ?? 0) - center.y,
+      rotation: item.rotation ?? 0,
+      scale:    item.scale    ?? 1,
+      inverted: !!item.inverted,
+    })),
+  ]
+
+  return { id, center: { x: Math.round(center.x), y: Math.round(center.y) }, radius, ring: { closed: ringClosed }, core, components, dyes }
+}
+
 /**
  * toComposition(model, opts) → wha-spell@2 object
  *
- * Converts the Studio's canvas state into a single-circle wha-spell@2 composition.
+ * Converts the Studio's canvas state into a wha-spell@2 composition.
+ * Single-ring case: output is BIT-IDENTICAL to the previous implementation (back-compat).
+ * Multi-ring case: delegates to buildMultiComposition (Track 5, SPEC-nested-linked.md §5.4).
  *
- * model:  StudioModel (see type above)
+ * model:  StudioModel (see type above), extended for multi-ring:
+ *   model.rings?:           [{cx,cy,r,closed,id}]  — detected ring descriptors
+ *   model.ringAssignments?: { [placedId]: number }  — which ring index each placed item belongs to
+ *   model.relations?:       [{type,…}]              — nest/link relations from the recognizer
+ *
  * opts: {
  *   isSigil(type: string) → bool   — injected predicate; returns true when `type` is a sigil id.
  *                                     Keeps this module JSON-free (no direct sigils.json import).
  * }
  *
- * Placement rules:
+ * Placement rules (single-ring, unchanged):
  *   - Among all placed items whose kind === 'sigil' (or isSigil(type) is true), the one
  *     nearest the origin (0,0) becomes the `core` (placed at x:0,y:0 in the composition).
  *   - Other sigils become `components` with role:'sigil'.
@@ -52,10 +123,15 @@ export function toComposition(model, opts = {}) {
   const { isSigil = () => false } = opts
   const placed = model.placed || []
   const dyes   = model.dyes   || []
-
-  // Split placed into sigils and signs.
-  // A placed item is treated as a sigil if kind==='sigil' OR isSigil(type) returns true.
   const isItemSigil = (item) => item.kind === 'sigil' || isSigil(item.type)
+
+  // Multi-ring path: when the model carries explicit ring descriptors (from the recognizer)
+  if (Array.isArray(model.rings) && model.rings.length > 1) {
+    return buildMultiComposition(model, isItemSigil, opts)
+  }
+
+  // ---------- Single-ring path (unchanged from before) ----------
+
   const sigils = placed.filter(isItemSigil)
   const signs  = placed.filter((item) => !isItemSigil(item))
 
@@ -137,6 +213,72 @@ export function toComposition(model, opts = {}) {
       },
     ],
     relations: [],
+  }
+}
+
+/**
+ * buildMultiComposition(model, isItemSigil, opts) → wha-spell@2
+ *
+ * Multi-ring path (Track 5, SPEC-nested-linked.md §5.4).
+ * Called by toComposition when model.rings has more than one entry.
+ *
+ * The model must carry:
+ *   model.rings           — [{id, cx, cy, r, closed}] from the recognizer
+ *   model.ringAssignments — {[placedId]: ringIndex} mapping each placed item to a ring
+ *   model.relations       — [{type:'nest'|'link', …}] from the recognizer
+ *
+ * Per-circle component coordinates are relative to THAT ring's center (compose.js convention).
+ * The global dyes list is assigned to circle k0 (back-compat); per-ring dyes can be added later.
+ *
+ * This function is also exported so callers (tests, CLI tools) can invoke it directly.
+ */
+export function buildMultiComposition(model, isItemSigil, _opts = {}) {
+  const placed    = model.placed    || []
+  const rings     = model.rings     || []
+  const relations = model.relations || []
+  const dyes      = model.dyes      || []
+  const assignments = model.ringAssignments || {}
+
+  const circles = rings.map((ring, ri) => {
+    // Collect placed items for this ring
+    const ringPlaced = placed.filter((item) => {
+      const id = item.id || item.type
+      if (id in assignments) return assignments[id] === ri
+      // Fallback: assign by proximity (innermost enclosing ring)
+      return ri === rings.reduce((bestIdx, r, i) => {
+        const d = Math.hypot((item.x || 0) - r.cx, (item.y || 0) - r.cy)
+        const bestD = Math.hypot((item.x || 0) - rings[bestIdx].cx, (item.y || 0) - rings[bestIdx].cy)
+        return d < bestD ? i : bestIdx
+      }, 0)
+    })
+
+    // Derive radius from ring descriptor; fall back to placed-symbol distance or DEFAULT_RADIUS.
+    let radius = ring.r ?? DEFAULT_RADIUS
+    if (!ring.r && ringPlaced.length > 0) {
+      const farthest = ringPlaced.reduce((max, item) => {
+        const d = Math.hypot((item.x || 0) - ring.cx, (item.y || 0) - ring.cy)
+        return d > max ? d : max
+      }, 0)
+      if (farthest > 0) radius = Math.round(farthest * 1.25)
+    }
+
+    const ringDyes = ri === 0 ? dyes : []   // global dyes go to k0; per-ring dyes are a future feature
+
+    return buildCircleDescriptor(
+      ringPlaced, isItemSigil,
+      { x: ring.cx, y: ring.cy },
+      Math.round(radius),
+      !!ring.closed,
+      ring.id || `k${ri}`,
+      ringDyes,
+    )
+  })
+
+  return {
+    format:    'wha-spell@2',
+    name:      model.name || '',
+    circles,
+    relations,
   }
 }
 
