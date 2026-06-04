@@ -9,7 +9,7 @@ import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 
 export default [
-  { ignores: ['dist/**', 'node_modules/**', 'assets/**', 'supabase/**', '**/*.json'] },
+  { ignores: ['dist/**', 'node_modules/**', 'assets/**', 'supabase/**', '.claude/**', '**/*.json'] },
 
   js.configs.recommended,
 
