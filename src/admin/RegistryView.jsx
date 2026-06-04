@@ -8,6 +8,8 @@ const KIND_OPTIONS   = ['', 'sign', 'sigil']
 const STATUS_OPTIONS = ['canon', 'fan']
 const EMPTY_ADD = { kind: 'sign', name: '', label: '', engine_id: '', status: 'canon', operator_kind: '' }
 
+const LC_STATUS_OPTIONS = ['stable', 'unverified', 'revised', 'deprecated', 'removed']
+
 // ─── inline-edit row ─────────────────────────────────────────────────────────
 function EditRow({ sym, onSave, onCancel }) {
   const [form, setForm] = useState({ ...sym })
@@ -24,6 +26,9 @@ function EditRow({ sym, onSave, onCancel }) {
         engine_id:     form.engine_id?.trim() || null,
         status:        form.status,
         operator_kind: form.operator_kind?.trim() || null,
+        // F2-C: lifecycle fields — gracefully no-op when DB columns absent
+        lc_status: form.lc_status ?? null,
+        lc_rev:    form.lc_rev ? Number(form.lc_rev) : null,
       })
       await logAction({ action: 'symbol.update', target: row })
       onSave(row)
@@ -53,6 +58,20 @@ function EditRow({ sym, onSave, onCancel }) {
         </select>
       </td>
       <td><input className="admin-input admin-input-sm" value={form.operator_kind ?? ''} onChange={f('operator_kind')} /></td>
+      <td>
+        <select className="admin-select admin-select-sm" value={form.lc_status ?? 'stable'} onChange={f('lc_status')}>
+          {LC_STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </td>
+      <td>
+        <input
+          type="number" min="1" step="1"
+          className="admin-input admin-input-sm"
+          style={{ width: 52 }}
+          value={form.lc_rev ?? 1}
+          onChange={f('lc_rev')}
+        />
+      </td>
       <td>
         {err && <p className="admin-error admin-error-inline">{err}</p>}
         <div style={{ display: 'flex', gap: 4 }}>
@@ -129,7 +148,8 @@ export default function RegistryView() {
   const [error,      setError]      = useState(null)
   const [editingId,  setEditingId]  = useState(null)
   const [kindFilter, setKindFilter] = useState('')
-  const [deleteConf, setDeleteConf] = useState(null) // id to confirm
+  const [queueOnly,  setQueueOnly]  = useState(false) // F2-C: review-queue filter
+  const [deleteConf, setDeleteConf] = useState(null)  // id to confirm
   const [deleteErr,  setDeleteErr]  = useState(null)
 
   const load = useCallback(async () => {
@@ -168,7 +188,10 @@ export default function RegistryView() {
     }
   }
 
-  const visible = kindFilter ? symbols.filter((s) => s.kind === kindFilter) : symbols
+  // F2-C: apply kind filter, then optionally restrict to the review queue
+  const visible = symbols
+    .filter((s) => !kindFilter || s.kind === kindFilter)
+    .filter((s) => !queueOnly || ['unverified', 'revised'].includes(s.lc_status) || s.lc_flag)
 
   return (
     <div className="admin-registry-wrap">
@@ -180,6 +203,15 @@ export default function RegistryView() {
             <select className="admin-select admin-select-sm" value={kindFilter} onChange={(e) => setKindFilter(e.target.value)}>
               {KIND_OPTIONS.map((k) => <option key={k} value={k}>{k || 'all'}</option>)}
             </select>
+          </label>
+          {/* F2-C: review-queue filter — shows only unverified/revised/flagged rows */}
+          <label className="admin-label" style={{ flexDirection: 'row', gap: 6, cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={queueOnly}
+              onChange={(e) => setQueueOnly(e.target.checked)}
+            />
+            Review queue
           </label>
           <button className="admin-btn admin-btn-ghost" onClick={load}>Refresh</button>
         </div>
@@ -201,6 +233,8 @@ export default function RegistryView() {
                 <th>engine_id</th>
                 <th>Status</th>
                 <th>operator_kind</th>
+                <th>LC Status</th>
+                <th>LC Rev</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -216,6 +250,9 @@ export default function RegistryView() {
                       <td className="admin-cell-dim">{sym.engine_id ?? '—'}</td>
                       <td><span className={`admin-badge admin-badge-${sym.status}`}>{sym.status}</span></td>
                       <td className="admin-cell-dim">{sym.operator_kind ?? '—'}</td>
+                      {/* F2-C: lifecycle columns — gracefully show 'stable' / '—' when DB columns absent */}
+                      <td><span className={`admin-badge admin-badge-${sym.lc_status || 'stable'}`}>{sym.lc_status || 'stable'}</span></td>
+                      <td className="admin-cell-dim">{sym.lc_rev ?? '—'}</td>
                       <td>
                         {deleteConf === sym.id ? (
                           <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
@@ -236,7 +273,11 @@ export default function RegistryView() {
               <AddRow onAdded={handleAdded} />
             </tbody>
           </table>
-          {visible.length === 0 && <p className="admin-hint admin-table-empty">No symbols{kindFilter ? ` of kind "${kindFilter}"` : ''} yet.</p>}
+          {visible.length === 0 && (
+            <p className="admin-hint admin-table-empty">
+              No symbols{kindFilter ? ` of kind "${kindFilter}"` : ''}{queueOnly ? ' in the review queue' : ''} yet.
+            </p>
+          )}
         </div>
       )}
     </div>

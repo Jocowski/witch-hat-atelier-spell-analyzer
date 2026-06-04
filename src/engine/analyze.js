@@ -38,6 +38,8 @@ function computeSimilar(signature) {
       forbidden: spellIsForbidden(best.spell), score: best.score,
       // B1: surface WHY it matched — the weighted sub-scores from match.js.
       parts: best.parts, weights: RULES.matching.weights,
+      // F2-B: thread lifecycle from the matched spell record (absent = stable, no caveat).
+      lifecycle: best.spell.lifecycle ?? null,
     }
     nearest = ranked.slice(1, 4).filter((r) => r.score > 0.3).map((r) => ({ name: r.spell.name, score: r.score }))
   } else {

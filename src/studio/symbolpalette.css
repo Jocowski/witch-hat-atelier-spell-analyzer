@@ -211,3 +211,23 @@
 .sp-palette--collapsed .sp-body {
   display: none;
 }
+
+/* ── Lifecycle status dot (F2-A) ─────────────────────────────
+   Shown on tiles for symbols that are `revised` or `unverified`.
+   `deprecated` and `removed` symbols are hidden from the palette
+   entirely (filtered out in SymbolPalette.jsx before render).
+   ─────────────────────────────────────────────────────────── */
+
+.sp-tile { position: relative; }   /* ensure dot can be positioned */
+
+.sp-lc-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.sp-lc-dot--revised    { background: var(--warn, #e0b341); }
+.sp-lc-dot--unverified { background: var(--err, #d65a4a); }

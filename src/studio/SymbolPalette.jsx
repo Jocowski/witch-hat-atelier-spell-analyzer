@@ -39,6 +39,7 @@ import './symbolpalette.css'
 function SymbolTile({ sym, kind, pendingType, onSelect }) {
   const def    = getComponentDef(sym.id)
   const active = pendingType === sym.id
+  const lc     = def?.lifecycle
 
   return (
     <button
@@ -62,6 +63,19 @@ function SymbolTile({ sym, kind, pendingType, onSelect }) {
         )}
       </span>
       <span className="sp-name">{sym.name}</span>
+      {['revised', 'unverified'].includes(lc?.status) && (
+        <span
+          className={`sp-lc-dot sp-lc-dot--${lc.status}`}
+          title={[
+            lc.status === 'revised'
+              ? `Revised (rev ${lc.rev ?? '?'})`
+              : 'Unverified — pending re-review',
+            lc.flag?.reason,
+            lc.reviewedAt && `Last reviewed: ${lc.reviewedAt}`,
+          ].filter(Boolean).join(' · ')}
+          aria-label={`Symbol status: ${lc.status}`}
+        />
+      )}
     </button>
   )
 }
@@ -74,8 +88,9 @@ export default function SymbolPalette({ onSelect, pendingType }) {
 
   const q = query.toLowerCase().trim()
 
-  const sigils = SIGILS.filter((s) => s.family && s.family !== 'special')
-  const signs  = SIGNS.filter((s)  => s.family && !['other'].includes(s.family))
+  const lcHidden = (s) => ['deprecated', 'removed'].includes(s.lifecycle?.status)
+  const sigils = SIGILS.filter((s) => s.family && s.family !== 'special' && !lcHidden(s))
+  const signs  = SIGNS.filter((s)  => s.family && !['other'].includes(s.family) && !lcHidden(s))
 
   const filteredSigils = q
     ? sigils.filter((s) => s.name.toLowerCase().includes(q) || (s.element || '').toLowerCase().includes(q))

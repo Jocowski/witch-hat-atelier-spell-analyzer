@@ -78,3 +78,21 @@ export async function deleteSymbol(id) {
   const { error } = await supabase.from('symbols').delete().eq('id', id)
   if (error) throw new Error(error.message)
 }
+
+/**
+ * Review queue: symbols with lc_status in (unverified, revised, deprecated) or lc_flag set.
+ * Requires the F3 migration (20260606000000_symbols_lifecycle.sql) to be applied; returns []
+ * when Supabase is unavailable or the columns don't exist yet.
+ * @returns {Promise<object[]>}
+ */
+export async function listReviewQueue() {
+  if (!hasSupabase()) return []
+  const { data, error } = await supabase
+    .from('symbols')
+    .select('*')
+    .or('lc_status.in.(unverified,revised,deprecated),lc_flag.not.is.null')
+    .order('lc_status')
+    .order('name')
+  if (error) throw error
+  return data ?? []
+}

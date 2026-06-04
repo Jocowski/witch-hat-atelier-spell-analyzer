@@ -1,4 +1,4 @@
-import { test } from 'node:test'
+import { test, describe } from 'node:test'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 
@@ -52,4 +52,33 @@ test('cada spell tem effect e category', () => {
     assert.ok(s.effect, `spell "${s.id}" sem effect`)
     assert.ok(s.category, `spell "${s.id}" sem category`)
   }
+})
+
+// F2-D — Symbol lifecycle: no catalog spell may reference a `removed` symbol.
+// A removed symbol is a tombstone; any spell using it must be updated or archived.
+describe('symbol lifecycle', () => {
+  test('no catalog spell references a removed symbol', () => {
+    const sigilList = sigilsDoc.sigils ?? []
+    const signList  = signsDoc.signs ?? []
+    const spellList = spellsDoc.spells ?? []
+
+    const removedIds = new Set(
+      [...sigilList, ...signList]
+        .filter((s) => s.lifecycle?.status === 'removed')
+        .map((s) => s.id),
+    )
+    if (removedIds.size === 0) return // nothing removed yet — passes trivially
+
+    for (const spell of spellList) {
+      const c = spell.composition || {}
+      const deps = [c.core, ...(c.signs ?? []).map((s) => s.id)].filter(Boolean)
+      for (const id of deps) {
+        assert.ok(
+          !removedIds.has(id),
+          `Spell "${spell.id || spell.name}" references removed symbol "${id}". ` +
+            `Update the spell's composition or mark it archived.`,
+        )
+      }
+    }
+  })
 })

@@ -187,6 +187,18 @@ function SimilarSection({ similar }) {
             <div className="alts">Also close: {similar.nearest.map((a) => `${a.name} (${(a.score * 100).toFixed(0)}%)`).join(' · ')}</div>
           )}
           <MatchWhy match={similar.match} />
+          {(similar.match.lifecycle?.status === 'unverified' ||
+            similar.match.lifecycle?.flag) && (
+            <div className="spell-card-caveat" role="note">
+              Recipe pending re-review after a canon update
+              {similar.match.lifecycle.flag?.since
+                ? ` (flagged ${similar.match.lifecycle.flag.since})`
+                : ''}
+              {similar.match.lifecycle.flag?.reason
+                ? ` — ${similar.match.lifecycle.flag.reason}`
+                : ''}
+            </div>
+          )}
         </div>
       ) : similar.nearest.length > 0 ? (
         <p className="muted">No strong match. Closest: {similar.nearest.map((a) => `${a.name} (${(a.score * 100).toFixed(0)}%)`).join(' · ')}</p>

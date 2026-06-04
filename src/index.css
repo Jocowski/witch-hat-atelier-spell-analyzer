@@ -67,6 +67,8 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .spell-card .meta { font-size: 0.7rem; color: var(--ink-dim); margin: 2px 0 6px; text-transform: uppercase; letter-spacing: .5px; }
 .spell-card .effect { font-size: 0.88rem; line-height: 1.4; }
 .alts { font-size: 0.74rem; color: var(--ink-dim); margin-top: 6px; }
+/* F2-B — lifecycle caveat: warm-yellow data-quality notice (not a hard prohibition). */
+.spell-card-caveat { margin-top: 6px; padding: 4px 8px; border-left: 3px solid var(--warn); font-size: 0.82em; color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); }
 
 /* ---------- Issues list ---------- */
 .issues { list-style: none; padding: 0; margin: 8px 0 0; }
