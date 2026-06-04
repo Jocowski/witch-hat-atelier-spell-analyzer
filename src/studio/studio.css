@@ -162,6 +162,14 @@
 }
 .studio-results.collapsed { max-height: none; overflow: visible; }
 
+/* drag handle on the drawer's top edge (Item 7 — resizable height) */
+.studio-results-resize {
+  position: sticky; top: 0; z-index: 3;
+  height: 6px; margin-bottom: -6px; cursor: ns-resize;
+  background: linear-gradient(var(--line), transparent);
+}
+.studio-results-resize:hover { background: linear-gradient(var(--accent), transparent); }
+
 /* collapsible drawer header */
 .studio-results-head {
   position: sticky; top: 0; z-index: 2;
@@ -579,6 +587,9 @@
 .conf-high { background: rgba(111,191,115,0.2); color: var(--ok); }
 .conf-mid  { background: rgba(224,179,65,0.2);  color: var(--warn); }
 .conf-low  { background: rgba(214,90,74,0.2);   color: var(--err); }
+
+/* A2 — low-confidence detection shown as "unknown?" with the guess as a faint suggestion */
+.identified-suggest { color: var(--ink-dim); font-weight: 400; font-size: 0.78rem; }
 
 .identified-placed {
   font-size: 0.68rem;

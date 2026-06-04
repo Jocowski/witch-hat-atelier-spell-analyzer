@@ -22,9 +22,26 @@ import { toComposition, recognizedToPlaced } from './drawingModel.js'
 import { analyzeStrokes, groupToTemplate } from '../draw/recognizer.js'
 import { activeTemplates, addSample } from '../data-services/samples.js'
 import { getSymbolByEngineId } from '../data-services/symbols.js'
+import { logAnalysis } from '../data-services/analyses.js'
 import { loadTemplates } from '../draw/templates.js'
+import rules from '../../data/rules.json'
 
 const BRIDGE_URL = import.meta.env.VITE_AI_BRIDGE_URL || 'http://localhost:8787'
+
+// Recognizer config (data-driven): source→weight (A1) + confidence gate (A2).
+const SAMPLE_WEIGHTS = rules.recognition?.sampleWeights ?? {}
+const CONFIDENCE_MIN_PCT = rules.recognition?.confidenceMinPct ?? 0
+const withWeights = (list) => list.map((t) => ({ ...t, weight: SAMPLE_WEIGHTS[t.source] ?? 1 }))
+
+// Results-drawer persistence (Item 7).
+const DRAWER_H_KEY = 'studio.drawer.height'
+const DRAWER_C_KEY = 'studio.drawer.collapsed'
+const DRAWER_MIN = 160
+const readDrawerHeight = () => {
+  const v = Number(localStorage.getItem(DRAWER_H_KEY))
+  return Number.isFinite(v) && v >= DRAWER_MIN ? v : Math.round(window.innerHeight * 0.45)
+}
+const readDrawerCollapsed = () => localStorage.getItem(DRAWER_C_KEY) === '1'
 
 // bounding box of a point list → { x, y, w, h }
 function bbox(pts) {
@@ -35,7 +52,10 @@ function bbox(pts) {
 // detection overlay boxes (world/centre-origin) for the recognized groups + placed symbols
 function overlaysFor(d) {
   const rec = d.recGroups.filter((g) => g.match).map((g) => ({
-    box: bbox(g.pts), label: g.match.name, kind: g.role === 'core' ? 'sigil' : 'sign',
+    box: bbox(g.pts),
+    // A2: low-confidence detections read as "unknown?" instead of asserting a wrong label.
+    label: g.confident === false ? `unknown? (${g.match.name})` : g.match.name,
+    kind: g.role === 'core' ? 'sigil' : 'sign',
   }))
   const placed = d.placed.map((p) => {
     const half = 34 * (p.scale || 1)
@@ -54,24 +74,50 @@ export default function StudioPage() {
   const [composition, setComposition] = useState(null)
   const [result, setResult] = useState(null)
   const [busy, setBusy] = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(readDrawerCollapsed)
+  const [drawerHeight, setDrawerHeight] = useState(readDrawerHeight)
   const [flash, setFlash] = useState(null)
   const [contributeMsg, setContributeMsg] = useState(null)
+
+  // A0: accumulate the user's label corrections across the session so logAnalysis can record them.
+  const correctionsRef = useRef([])
 
   const [templates, setTemplates] = useState([])
   useEffect(() => {
     (async () => {
-      try { const tpl = await activeTemplates(); setTemplates(tpl.length ? tpl : loadTemplates()) }
+      try { const tpl = await activeTemplates(); setTemplates(tpl.length ? withWeights(tpl) : loadTemplates()) }
       catch { setTemplates(loadTemplates()) }
     })()
   }, [])
+
+  // persist drawer collapsed/height (Item 7)
+  useEffect(() => { localStorage.setItem(DRAWER_C_KEY, collapsed ? '1' : '0') }, [collapsed])
+  useEffect(() => { localStorage.setItem(DRAWER_H_KEY, String(drawerHeight)) }, [drawerHeight])
+
+  // drag the drawer's top edge to resize (clamped 160px..85vh)
+  function startDrawerResize(e) {
+    e.preventDefault()
+    const startY = e.clientY
+    const startH = drawerHeight
+    const onMove = (ev) => {
+      const next = Math.max(DRAWER_MIN, Math.min(window.innerHeight * 0.85, startH + (startY - ev.clientY)))
+      setDrawerHeight(next)
+    }
+    const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp) }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
 
   function toast(msg) { setFlash(msg); clearTimeout(toast._t); toast._t = setTimeout(() => setFlash(null), 2200) }
 
   function handleSymbolSelect(sym) { canvasRef.current?.placeSymbol(sym.type, sym.kind) }
 
+  // A2: only confident detections feed the engine (low-confidence ones stay visible as "unknown?").
   const buildComposition = useCallback((d) => toComposition(
-    { placed: [...d.placed, ...recognizedToPlaced(d.recGroups)], ringClosed: d.ringClosed || undefined, dyes: d.dyes },
+    {
+      placed: [...d.placed, ...recognizedToPlaced(d.recGroups.filter((g) => g.confident !== false))],
+      ringClosed: d.ringClosed || undefined, dyes: d.dyes,
+    },
     { isSigil: isSigilType },
   ), [])
 
@@ -84,7 +130,7 @@ export default function StudioPage() {
       const drawn = (canvasRef.current.getStrokes() || []).map((s) => s.points).filter((p) => p && p.length >= 2)
       let recGroups = [], ringClosed = false
       if (drawn.length > 0 && templates.length > 0) {
-        const r = analyzeStrokes(drawn, templates, { gap: 45 })
+        const r = analyzeStrokes(drawn, templates, { gap: 45, confidenceMinPct: CONFIDENCE_MIN_PCT })
         recGroups = r.groups || []
         ringClosed = !!r.ring
       }
@@ -93,32 +139,41 @@ export default function StudioPage() {
       setOverlays(overlaysFor(d))
       setComposition(buildComposition(d))
       setResult(null); setContributeMsg(null)
-      setPhase('detected'); setCollapsed(false)
+      setPhase('detected')
     } finally { setBusy(false) }
   }, [busy, templates, buildComposition])
 
-  // correct a recognized label → update group + overlay + composition
+  // correct a recognized label → update group + overlay + composition (+ record the correction for A0)
   function handleCorrect(group, newType) {
     if (!group || !group.match) return
+    const from = group.match.name
+    if (from !== newType) correctionsRef.current.push({ from, to: newType, role: group.role })
     group.match.name = newType
+    // A corrected label is, by definition, a confident one now.
+    group.confident = true
     const d = { ...detection, recGroups: [...detection.recGroups] }
     setDetection(d); setOverlays(overlaysFor(d))
     const comp = buildComposition(d); setComposition(comp)
     if (phase === 'analyzed') setResult(analyze(comp))
   }
 
-  // STEP 2 — analyze
+  // STEP 2 — analyze (+ A0: log the analysis + corrections for the improvement loop)
   const handleAnalyze = useCallback(() => {
     if (!composition || busy) return
     setBusy(true)
-    try { setResult(analyze(composition)); setPhase('analyzed'); setCollapsed(false) }
-    finally { setBusy(false) }
+    try {
+      const res = analyze(composition)
+      setResult(res); setPhase('analyzed')
+      const corrections = correctionsRef.current.length ? { items: [...correctionsRef.current] } : null
+      logAnalysis({ composition, engine_result: res, corrections }).catch(() => {})
+    } finally { setBusy(false) }
   }, [composition, busy])
 
   function handleClear() {
     canvasRef.current?.clear()
     setPhase('idle'); setDetection({ placed: [], recGroups: [], ringClosed: false, dyes: [] })
     setOverlays([]); setComposition(null); setResult(null); setContributeMsg(null)
+    correctionsRef.current = []
   }
 
   // copy the drawing as a PNG to the clipboard
@@ -196,7 +251,13 @@ export default function StudioPage() {
       </div>
 
       {phase !== 'idle' && (
-        <div className={`studio-results ${collapsed ? 'collapsed' : ''}`}>
+        <div
+          className={`studio-results ${collapsed ? 'collapsed' : ''}`}
+          style={collapsed ? undefined : { height: drawerHeight, maxHeight: 'none' }}
+        >
+          {!collapsed && (
+            <div className="studio-results-resize" onPointerDown={startDrawerResize} title="Drag to resize" />
+          )}
           <div className="studio-results-head">
             <span className="srh-title">
               {phase === 'analyzed' ? 'Analysis' : 'Detection'} · {detectedCount} symbol{detectedCount === 1 ? '' : 's'}

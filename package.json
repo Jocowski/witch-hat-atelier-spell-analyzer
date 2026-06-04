@@ -8,10 +8,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "node --test \"test/**/*.test.js\"",
     "vectorize:sigils": "node tools/vectorize-sigils.cjs",
     "vectorize:signs": "node tools/vectorize-signs.cjs",
     "unknown:report": "node tools/unknown-report.cjs",
+    "flag:impact": "node tools/flag-impact.mjs",
     "facts": "node tools/spell-engine-cli.mjs --facts",
     "render": "node tools/render.mjs",
     "ai": "node tools/ai-bridge.mjs"
@@ -26,8 +31,16 @@
     "react-router-dom": "^7.16.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
     "potrace": "^2.1.8",
+    "prettier": "^3.8.3",
     "supabase": "^2.104.0",
     "vite": "^5.4.11"
   }

@@ -1,0 +1,7 @@
+dist
+node_modules
+assets
+supabase
+data
+package-lock.json
+*.min.*

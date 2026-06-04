@@ -8,23 +8,49 @@ import { supabase, hasSupabase } from './supabase.js'
  * Shape returned per element:
  *   { name: string,   // symbol.engine_id if set, else symbol.name
  *     role: string,   // sample.role if set, else derived from symbol.kind
- *     points: any     // sample.points (jsonb — [{X,Y,ID}])
+ *     points: any,    // sample.points (jsonb — [{X,Y,ID}])
+ *     source: string  // 'drawn' | 'confirmed' | 'corrected' — drives recognizer weighting (A1)
  *   }
  *
- * @returns {Promise<Array<{ name: string, role: string, points: any }>>}
+ * @returns {Promise<Array<{ name: string, role: string, points: any, source: string }>>}
  */
 export async function activeTemplates() {
   if (!hasSupabase()) return []
   const { data, error } = await supabase
     .from('training_samples')
-    .select('role, points, symbols(engine_id, name, kind)')
+    .select('role, points, source, symbols(engine_id, name, kind)')
     .is('deleted_at', null)
   if (error) throw new Error(error.message)
   return data.map((row) => ({
     name: row.symbols?.engine_id || row.symbols?.name || '',
     role: row.role || (row.symbols?.kind === 'sigil' ? 'sigil' : 'sign'),
     points: row.points,
+    source: row.source || 'drawn',
   }))
+}
+
+/**
+ * Per-symbol active-sample counts, for active-learning + ML-readiness (A3).
+ * Returns a map keyed by the symbol's id AND its engine_id/name, each → count, plus a `_total`.
+ * (Both keys are populated so callers can look up by registry id or by engine id.)
+ *
+ * @returns {Promise<Record<string, number>>}
+ */
+export async function sampleCounts() {
+  if (!hasSupabase()) return {}
+  const { data, error } = await supabase
+    .from('training_samples')
+    .select('symbol_id, symbols(engine_id, name)')
+    .is('deleted_at', null)
+  if (error) throw new Error(error.message)
+  const counts = { _total: 0 }
+  for (const row of data) {
+    counts._total++
+    if (row.symbol_id) counts[row.symbol_id] = (counts[row.symbol_id] || 0) + 1
+    const eng = row.symbols?.engine_id || row.symbols?.name
+    if (eng) counts[eng] = (counts[eng] || 0) + 1
+  }
+  return counts
 }
 
 /**

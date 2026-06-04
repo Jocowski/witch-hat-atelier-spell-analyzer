@@ -5,8 +5,58 @@ import DrawingSurface from '../studio/DrawingSurface.jsx'
 import { recognize, makeCloud, strokesToTemplate } from '../draw/recognizer.js'
 import { listSymbols, addSymbol } from '../data-services/symbols.js'
 import { addSample, listSamples } from '../data-services/samples.js'
+import rules from '../../data/rules.json'
 
 const EMPTY_FORM = { kind: 'sign', name: '', label: '', status: 'canon', operator_kind: '' }
+
+// A3 — ML-readiness thresholds (data-driven via rules.json).
+const ML_TMIN = rules.mlReadiness?.tMin ?? 50
+const ML_COVERAGE_TARGET = rules.mlReadiness?.coverageTarget ?? 0.9
+
+// Dataset coverage + ML-readiness bars and the least-covered symbols to draw next (active learning).
+function CoveragePanel({ symbols, counts, onPick }) {
+  const total = symbols.length
+  if (!total) return null
+  const bySymbol = counts.bySymbol || {}
+  const covered = symbols.filter((s) => (bySymbol[s.id] || 0) >= ML_TMIN).length
+  const coveragePct = covered / total
+  const volumeTarget = total * ML_TMIN
+  const volumePct = Math.min(1, (counts.total || 0) / (volumeTarget || 1))
+  const ready = coveragePct >= ML_COVERAGE_TARGET
+  const least = symbols
+    .map((s) => ({ s, n: bySymbol[s.id] || 0 }))
+    .sort((a, b) => a.n - b.n)
+    .slice(0, 6)
+  const Bar = ({ frac }) => (
+    <div style={{ height: 6, background: 'var(--line)', borderRadius: 3, overflow: 'hidden' }}>
+      <div style={{ width: `${Math.round(frac * 100)}%`, height: '100%', background: 'linear-gradient(90deg, var(--accent-2), var(--accent))' }} />
+    </div>
+  )
+  return (
+    <div className="admin-coverage" style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <h4 className="admin-subsection">Dataset readiness {ready ? '· ✅ ML-ready' : `· ${ML_TMIN}+/symbol target`}</h4>
+      <div>
+        <div className="admin-hint">Coverage: {covered}/{total} symbols ≥ {ML_TMIN} ({Math.round(coveragePct * 100)}% · target {Math.round(ML_COVERAGE_TARGET * 100)}%)</div>
+        <Bar frac={coveragePct} />
+      </div>
+      <div>
+        <div className="admin-hint">Volume: {counts.total || 0}/{volumeTarget} samples ({Math.round(volumePct * 100)}%)</div>
+        <Bar frac={volumePct} />
+      </div>
+      <div>
+        <div className="admin-hint">Draw these next (fewest samples):</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+          {least.map(({ s, n }) => (
+            <button key={s.id} className="admin-btn admin-btn-ghost" style={{ fontSize: '0.72rem', padding: '2px 8px' }}
+              onClick={() => onPick(s.id)} title={`${n} sample${n === 1 ? '' : 's'}`}>
+              {s.label || s.name} <span style={{ opacity: 0.6 }}>({n})</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function groupByKind(symbols) {
   const groups = {}
@@ -32,6 +82,7 @@ export default function TrainingView() {
 
   const [liveGuess, setLiveGuess] = useState(null)
   const [clouds, setClouds] = useState([])
+  const [counts, setCounts] = useState({ bySymbol: {}, total: 0 })
 
   const [saveMsg, setSaveMsg] = useState(null)
   const [saveErr, setSaveErr] = useState(null)
@@ -65,14 +116,18 @@ export default function TrainingView() {
     listSamples().then((rows) => {
       if (cancelled || !rows?.length) return
       const byName = {}
+      const bySymbol = {}
+      let total = 0
       for (const r of rows) {
         if (r.deleted_at) continue
+        total++
+        bySymbol[r.symbol_id] = (bySymbol[r.symbol_id] || 0) + 1
         const sym = symbols.find((s) => s.id === r.symbol_id)
         const name = sym?.engine_id || sym?.name || r.symbol_id
         ;(byName[name] ||= []).push(...(r.points ?? []))
       }
       const built = Object.entries(byName).filter(([, p]) => p.length >= 2).map(([name, p]) => makeCloud(name, p))
-      if (!cancelled) setClouds(built)
+      if (!cancelled) { setClouds(built); setCounts({ bySymbol, total }) }
     }).catch(() => {})
     return () => { cancelled = true }
   }, [symbols, saveMsg])
@@ -207,6 +262,8 @@ export default function TrainingView() {
                 </>
               : <div className="admin-hint">Draw something to see a guess…</div>}
           </div>
+
+          <CoveragePanel symbols={symbols} counts={counts} onPick={(id) => { setSelectedId(id); setSaveMsg(null); setSaveErr(null) }} />
         </div>
       </div>
     </div>

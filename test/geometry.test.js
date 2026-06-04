@@ -1,8 +1,31 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, classifyZone, anchorToXY, xyToAnchor, CANVAS_RADIUS } from '../src/engine/geometry.js'
+import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, computeOrientationAim, classifyZone, anchorToXY, xyToAnchor, CANVAS_RADIUS } from '../src/engine/geometry.js'
 
 const directional = () => 'directional'
+
+test('computeOrientationAim: equal opposing signs cancel (the Column "T" balance)', () => {
+  // One sign faces north (0°), an equal-size one faces south (180°) → net push cancels.
+  const signs = [
+    { role: 'sign', type: 'column', rotation: 0, scale: 1 },
+    { role: 'sign', type: 'column', rotation: 180, scale: 1 },
+  ]
+  const aim = computeOrientationAim(signs, directional)
+  assert.ok(aim.magnitude < 1e-9, `expected ~0 magnitude, got ${aim.magnitude}`)
+  assert.equal(aim.aimed, false)
+})
+
+test('computeOrientationAim: the larger sign wins the tug-of-war (magnitude weighting)', () => {
+  // A bigger Column pointing south (180°) overpowers a small one pointing north → spell goes south.
+  const signs = [
+    { role: 'sign', type: 'column', rotation: 180, scale: 3 },
+    { role: 'sign', type: 'column', rotation: 0, scale: 1 },
+  ]
+  const aim = computeOrientationAim(signs, directional)
+  assert.ok(aim.aimed, 'unequal sizes should produce a net aim')
+  assert.ok(Math.abs(aim.angle - 180) < 1e-6, `expected south (180°), got ${aim.angle}`)
+  assert.ok(aim.magnitude > 0.34, `expected magnitude past threshold, got ${aim.magnitude}`)
+})
 
 test('anchorToXY: a ring anchor sits on the rim at the given angle', () => {
   const { x, y } = anchorToXY(90, 0, 100) // due east on a radius-100 ring

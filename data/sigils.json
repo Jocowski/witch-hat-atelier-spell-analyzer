@@ -455,7 +455,7 @@
       "element": "guidance",
       "color": "#5a9ad6",
       "description": "Attracts nearby objects matching the spell’s parameters toward the glyph.",
-      "text": "G"
+      "lifecycle": { "status": "stable", "rev": 2, "reviewedAt": "2026-06-04", "reviewedBy": "text-glyph 'G' retired; vector svgPath is the canonical art" }
     },
     {
       "id": "calling",
@@ -468,7 +468,7 @@
       "element": "calling",
       "color": "#d68a5a",
       "description": "Echoes back a recorded phrase (seen in the Pouch of Calling).",
-      "text": "C"
+      "lifecycle": { "status": "stable", "rev": 2, "reviewedAt": "2026-06-04", "reviewedBy": "text-glyph 'C' retired; vector svgPath is the canonical art" }
     },
     {
       "id": "sand_bridge",

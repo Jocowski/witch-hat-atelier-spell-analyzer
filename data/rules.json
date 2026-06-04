@@ -146,5 +146,23 @@
       "placementMatch": 0.1
     },
     "note": "signSetMatch usa similaridade de multiconjunto (tipos + contagens, com sufixo @out para signs na zona externa). placementMatch compara anéis/ângulos relativos. Inversões contam como variante (pode apontar para o spell invertido correspondente). Spells multi-círculo usam uma assinatura combinada (união dos signs de todos os círculos + conjunto de cores)."
+  },
+
+  "recognition": {
+    "note": "Recognizer ($P) tuning. sampleWeights weights a template by where it came from (a user CORRECTION is the most trustworthy training signal, a CONFIRMED catalog harvest the least). Applied as adjDist = dist / weight before ranking. confidenceMinPct gates a detection: below it, the symbol is shown as 'unknown?' and kept OUT of the engine input so a wrong guess doesn't poison the deduction.",
+    "sampleWeights": { "corrected": 1.5, "drawn": 1.0, "confirmed": 0.6 },
+    "confidenceMinPct": 30
+  },
+
+  "mlReadiness": {
+    "note": "Dataset thresholds that gate moving from $P to a trained ML model. tMin = samples/symbol considered 'covered'; coverageTarget = fraction of the symbol registry that must reach tMin before ML is worthwhile (a small CNN typically needs ~50-100/symbol to beat $P). Drives the Training coverage/readiness bars.",
+    "tMin": 50,
+    "coverageTarget": 0.9
+  },
+
+  "forbidden": {
+    "note": "Forbidden Magic (forbidden-magic.md): magic drawn on / affecting the human body (except Memory Erasure) or that greatly alters the environment. Catalog spells with category 'forbidden' (or forbidden:true) are flagged directly; novel compositions are flagged when a sign/sigil carries one of these effectTags. The tag list is provisional — calibrate with the Spell Checkers community.",
+    "tags": ["petrify", "transmute-living", "curse", "body", "memory", "environment-alter"],
+    "spellCategories": ["forbidden"]
   }
 }

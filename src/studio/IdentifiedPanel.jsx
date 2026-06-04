@@ -27,7 +27,7 @@ function confidencePct(dist) {
   return Math.round(Math.min(1, 1 / dist) * 100)
 }
 
-function Row({ type, kind, dist, isRecognized, group, onRelabel }) {
+function Row({ type, kind, dist, isRecognized, confident = true, group, onRelabel }) {
   const [editing, setEditing] = useState(false)
   const [newType, setNewType] = useState(type || '')
   const [status, setStatus] = useState(null) // null | 'saved' | 'trained' | 'error'
@@ -53,12 +53,17 @@ function Row({ type, kind, dist, isRecognized, group, onRelabel }) {
 
   const pct = confidencePct(dist)
   const confClass = pct >= 60 ? 'conf-high' : pct >= 30 ? 'conf-mid' : 'conf-low'
+  // A2: below the gate, don't assert the label — show "unknown?" with the top guess as a suggestion.
+  const uncertain = isRecognized && !confident
 
   return (
     <li className="identified-row">
       <div className="identified-main">
         <span className={`identified-badge ${kind}`}>{kind}</span>
-        <span className="identified-type">{type || '—'}</span>
+        <span className="identified-type">
+          {uncertain ? 'unknown?' : (type || '—')}
+          {uncertain && type && <span className="identified-suggest"> (maybe {type})</span>}
+        </span>
         {isRecognized
           ? <span className={`identified-conf ${confClass}`} title="Recognition confidence">{pct}%</span>
           : <span className="identified-placed" title="Placed from palette">placed</span>}
@@ -101,7 +106,7 @@ export default function IdentifiedPanel({ placed = [], groups = [], onRelabel })
         ))}
         {recognized.map((g, i) => (
           <Row key={`rec-${i}`} type={g.match.name} kind={g.role === 'core' ? 'sigil' : 'sign'}
-            dist={g.match.dist} isRecognized group={g} onRelabel={onRelabel} />
+            dist={g.match.dist} isRecognized confident={g.confident !== false} group={g} onRelabel={onRelabel} />
         ))}
       </ul>
     </div>

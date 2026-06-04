@@ -182,19 +182,35 @@ export function computeSpin(components, familyOf = () => null, { tolDeg = 15 } =
 // onde os signs apontam. Signs sem frente (signFacing === null) são ignorados.
 // { aimed, angle, magnitude } (magnitude 0 = frentes se cancelam).
 export function computeOrientationAim(signs, familyOf = () => null) {
-  const facings = signs.map((c) => signFacing(c, familyOf(c.type))).filter((f) => f != null)
-  if (!facings.length) return { aimed: false, angle: 0, magnitude: 0 }
+  // Each facing vector is weighted by the sign's magnitude (size). Two opposing signs of EQUAL size
+  // still cancel (magnitude 0), but a larger sign wins the tug-of-war — the Column "T" lesson: the
+  // longer/bigger keystone steers the spell its way. Weight defaults to scale; a future variant-metric
+  // (stem length) can override it via `c.metrics.directionalMagnitude`. Normalize by Σweight (not count)
+  // so a lone large sign doesn't push magnitude past 1.
+  const items = signs
+    .map((c) => ({ f: signFacing(c, familyOf(c.type)), w: magnitudeOf(c) }))
+    .filter((it) => it.f != null)
+  if (!items.length) return { aimed: false, angle: 0, magnitude: 0 }
   let vx = 0
   let vy = 0
-  for (const f of facings) {
+  let wsum = 0
+  for (const { f, w } of items) {
     const rad = (f * Math.PI) / 180
-    vx += Math.sin(rad)
-    vy += -Math.cos(rad)
+    vx += Math.sin(rad) * w
+    vy += -Math.cos(rad) * w
+    wsum += w
   }
-  const magnitude = Math.hypot(vx, vy) / facings.length
+  const magnitude = wsum > 0 ? Math.hypot(vx, vy) / wsum : 0
   let angle = (Math.atan2(vx, -vy) * 180) / Math.PI
   if (angle < 0) angle += 360
   return { aimed: magnitude > 0.34, angle, magnitude }
+}
+
+// A sign's directional magnitude: an explicit variant metric if present, else its uniform scale.
+// (SPEC-sign-variants-sizing.md — Layer 1 uses scale; Layer 2 will fill metrics.directionalMagnitude.)
+function magnitudeOf(c) {
+  const m = c?.metrics?.directionalMagnitude
+  return typeof m === 'number' && m > 0 ? m : (c?.scale ?? 1)
 }
 
 // Positional resultant of WHERE region signs sit on the ring (scale-weighted unit vectors

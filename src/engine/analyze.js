@@ -15,6 +15,12 @@ export function buildSignature(composition) { return _buildSignature(matchDeps, 
 export function buildCombinedSignature(circles) { return _buildCombinedSignature(matchDeps, circles) }
 export function matchSpell(signature) { return _matchSpell(matchDeps, signature) }
 
+// A catalog spell is forbidden when explicitly flagged or in a forbidden category (rules.forbidden).
+function spellIsForbidden(spell) {
+  const cats = RULES.forbidden?.spellCategories ?? ['forbidden']
+  return Boolean(spell.forbidden) || cats.includes(spell.category)
+}
+
 // ----- Similar-spell match (catalog) from a prebuilt signature (app-shaped result) -----
 function computeSimilar(signature) {
   const ranked = SPELLS.length ? matchSpell(signature) : []
@@ -26,13 +32,33 @@ function computeSimilar(signature) {
     match = {
       id: best.spell.id, name: best.spell.name, effect: best.spell.effect,
       category: best.spell.category, confidence: best.spell.confidence,
-      forbidden: Boolean(best.spell.forbidden), score: best.score,
+      forbidden: spellIsForbidden(best.spell), score: best.score,
+      // B1: surface WHY it matched — the weighted sub-scores from match.js.
+      parts: best.parts, weights: RULES.matching.weights,
     }
     nearest = ranked.slice(1, 4).filter((r) => r.score > 0.3).map((r) => ({ name: r.spell.name, score: r.score }))
   } else {
     nearest = ranked.slice(0, 3).filter((r) => r.score > 0.2).map((r) => ({ name: r.spell.name, score: r.score }))
   }
   return { catalogEmpty: SPELLS.length === 0, match, nearest }
+}
+
+// B4: forbidden-magic check. Flags the composition when its matched recipe is forbidden, or when any of
+// its parts carries a configured forbidden effectTag (body/environment-affecting, per forbidden-magic.md).
+// Returns { forbidden, reasons[] } — data-driven via rules.forbidden, so the engine stays generic.
+function computeForbidden(circle, match) {
+  const cfg = RULES.forbidden ?? {}
+  const tags = new Set(cfg.tags ?? [])
+  const reasons = []
+  if (match?.forbidden) reasons.push(`Matches a known forbidden spell: ${match.name}.`)
+  const parts = [circle.core, ...(circle.components ?? [])].filter(Boolean)
+  for (const p of parts) {
+    const def = getComponentDef(p.type)
+    for (const t of def?.effectTags ?? []) {
+      if (tags.has(t)) reasons.push(`"${def?.name || p.type}" carries a forbidden trait (${t}).`)
+    }
+  }
+  return { forbidden: reasons.length > 0, reasons: [...new Set(reasons)] }
 }
 
 // `status`/`active` drive the app's activation visual only; they are NOT part of the analysis.
@@ -54,10 +80,12 @@ export function analyze(input) {
     // Single circle: keep the legacy top-level shape so the app/ResultPanel are unchanged,
     // while also exposing the v2 circles[]/relations/combined fields.
     const c0 = per[0]
+    const similar = computeSimilar(buildSignature(circles[0]))
     return {
       name, valid: c0.valid, active: c0.active, status: statusOf(c0),
       issues: c0.issues, sigils: c0.sigils, signs: c0.signs,
-      deduction: c0.deduction, similar: computeSimilar(buildSignature(circles[0])),
+      deduction: c0.deduction, similar,
+      forbidden: computeForbidden(circles[0], similar.match),
       dyes: c0.dyes, analysis: c0.analysis,
       circles: per, relations, combined: c0.deduction,
     }
@@ -67,10 +95,14 @@ export function analyze(input) {
   // nested spell can match one catalog recipe; also keep each circle's own match in perCircle.
   const combined = composeWith(grammar, relations, per)
   const perCircle = per.map((p, i) => ({ id: p.id, name: p.name, similar: computeSimilar(buildSignature(circles[i])) }))
+  const combinedSimilar = computeSimilar(buildCombinedSignature(circles))
+  // Forbidden across the whole device: any circle's parts, or the combined catalog match.
+  const fb = circles.map((c) => computeForbidden(c, combinedSimilar.match))
+  const forbidden = { forbidden: fb.some((f) => f.forbidden), reasons: [...new Set(fb.flatMap((f) => f.reasons))] }
   return {
     name, valid: per.every((p) => p.valid),
     circles: per, relations, combined,
-    similar: computeSimilar(buildCombinedSignature(circles)),
+    similar: combinedSimilar, forbidden,
     perCircle,
   }
 }

@@ -5,6 +5,54 @@
 // stays purely the deterministic engine reading; the legacy single-call AI section was removed here to
 // avoid duplicating the AI surface.
 
+import { useState } from 'react'
+
+const pct = (n) => `${Math.round((n ?? 0) * 100)}%`
+
+// B4 — prominent forbidden-magic callout (forbidden-magic.md): body/environment-affecting magic.
+function ForbiddenCallout({ forbidden }) {
+  if (!forbidden?.forbidden) return null
+  return (
+    <div className="forbidden-callout" role="alert">
+      <div className="fc-head">⛔ Forbidden magic</div>
+      <ul className="fc-reasons">
+        {forbidden.reasons.map((r, k) => <li key={k}>{r}</li>)}
+      </ul>
+      <div className="fc-note">Banned since the Day of the Pact — magic on/affecting the body or that greatly alters the environment.</div>
+    </div>
+  )
+}
+
+// B1 — collapsible breakdown of WHY a catalog match scored as it did (weighted sub-scores).
+function MatchWhy({ match }) {
+  const [open, setOpen] = useState(false)
+  if (!match?.parts) return null
+  const { parts, weights = {} } = match
+  const rows = [
+    ['Core / sigil', parts.sigilMatch, weights.sigilMatch],
+    ['Sign set', parts.signSetMatch, weights.signSetMatch],
+    ['Symmetry', parts.symmetryMatch, weights.symmetryMatch],
+  ]
+  return (
+    <div className="match-why">
+      <button className="match-why-toggle" onClick={() => setOpen((o) => !o)}>
+        {open ? '▾' : '▸'} Why this match?
+      </button>
+      {open && (
+        <ul className="match-parts">
+          {rows.map(([label, v, w]) => (
+            <li key={label}>
+              <span className="mp-label">{label}</span>
+              <span className="mp-bar"><i style={{ width: pct(v) }} /></span>
+              <span className="mp-val">{pct(v)}{w != null ? <span className="mp-w"> · weight {w}</span> : null}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 function Section({ title, sub, children }) {
   return (
     <section className="result-section">
@@ -138,6 +186,7 @@ function SimilarSection({ similar }) {
           {similar.nearest.length > 0 && (
             <div className="alts">Also close: {similar.nearest.map((a) => `${a.name} (${(a.score * 100).toFixed(0)}%)`).join(' · ')}</div>
           )}
+          <MatchWhy match={similar.match} />
         </div>
       ) : similar.nearest.length > 0 ? (
         <p className="muted">No strong match. Closest: {similar.nearest.map((a) => `${a.name} (${(a.score * 100).toFixed(0)}%)`).join(' · ')}</p>
@@ -159,6 +208,7 @@ export default function ResultPanel({ result }) {
     <div className="panel result">
       <h2>Analysis{name ? <span className="result-name"> — {name}</span> : ''}</h2>
       <div className={`status ${status.class}`}>{status.text}</div>
+      <ForbiddenCallout forbidden={result.forbidden} />
 
       {multi ? (
         <>

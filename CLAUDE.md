@@ -21,13 +21,13 @@ Consequence: `grammar.json` + `deduce.js` produce a **heuristic** effect string 
 
 The app evolved from the drag-drop editor into **Spell Studio** (entry: `src/main.jsx` → `src/router.jsx`). Routes: `/` Studio · `/login` · `/admin/*` (admin-gated). **The legacy drag-drop editor (`App.jsx` + `components/{GlyphCanvas,Inspector,SpellTree,InkPanel,Palette}`, `DrawModal`) was removed** — only `components/ResultPanel.jsx` remains from the old UI.
 
-- **Studio** (`src/studio/`): a near-fullscreen **react-konva** canvas (`DrawingSurface.jsx`) with paint tools (brush/line/rect/triangle/circle/arrow, stroke + pixel erasers, select/move/rotate, area-select, right-click/space pan, Shift+wheel zoom) + dye colors; place registered sigils/signs from `SymbolPalette.jsx`. **Detect** runs the `$P` recognizer (`src/draw/recognizer.js`) over the drawn strokes (+ placed symbols) → a `composition` (overlay boxes show each detection, correctable); **Analyze** runs the engine + a streaming multi-topic **AI report** (`src/ai/report.js`). Copy-image + JSON export/import via the `DrawingSurface` ref. Corrections and confident catalog matches feed the training set.
+- **Studio** (`src/studio/`): a near-fullscreen **react-konva** canvas (`DrawingSurface.jsx`) with paint tools (brush/line/rect/triangle/circle/arrow, stroke + pixel erasers, select/move/rotate, area-select), **right-drag/space pan + Recenter**, Shift+wheel zoom, **undo/redo (Ctrl+Z/Y)**, and **tool keyboard shortcuts** (B/L/R/G/C/A/V/M/T/E) + dye colors; place registered sigils/signs from `SymbolPalette.jsx`. **Detect** runs the `$P` recognizer (`src/draw/recognizer.js`) over the drawn strokes (+ placed symbols) → a `composition`; detections are weighted by training `source` and gated by a **confidence threshold** (low-confidence reads "unknown?" and is kept out of the engine input), shown as correctable overlay boxes. **Analyze** runs the engine + a streaming multi-topic **AI report** (`src/ai/report.js`), and logs the analysis + corrections via `data-services/analyses.js` (the improvement loop). Copy-image + JSON export/import via the `DrawingSurface` ref. The resizable, state-persisting results drawer holds it all. Corrections and confident catalog matches feed the training set.
 - **Admin** (`src/admin/`): Supabase Auth login + role guard; **Training** (`TrainingView`: draw → save a labeled `training_sample`), **Registry** (`RegistryView`: CRUD the `symbols` registry), **Review** (`ReviewView`: filter/rollback/delete/see a sample's replay).
 - **Themes** (`src/theme/`): 4 CSS-variable themes (brown default / dark / light / arcane) + themed scrollbars (in `themes.css`).
 - **Data** (`src/data-services/` → Supabase): tables `profiles`, `symbols`, `training_samples` (the recognizer templates), `analyses`, `audit_log`. Schema in `supabase/migrations/`; local stack via the `supabase` CLI; the browser client (`supabase.js`) reads `.env` (`VITE_SUPABASE_*`) and degrades gracefully when absent.
 - **AI**: the local **bridge** (`tools/ai-bridge.mjs`, `npm run ai`) runs `claude -p` (Claude Code, **no API token cost**) — routes `/health`, `/analyze`, `/report/stream` (SSE, parallel topics from `tools/report-topics.json`). The browser gates the AI UI on `/health`. Prod AI = your local bridge via a tunnel, or BYO API key (see APP-PLAN).
 
-Plans/specs live in **[docs/app/](docs/app/)**: [APP-PLAN.md](docs/app/APP-PLAN.md) (master), [SPEC.md](docs/app/SPEC.md) (workstreams WS0–WS11), [DRAWING-APP.md](docs/app/DRAWING-APP.md), [SPEC-cluster-recognition.md](docs/app/SPEC-cluster-recognition.md). Manual test plan: [TEST-PLAN.md](docs/app/TEST-PLAN.md). Improvement backlog: [IMPROVEMENTS.md](docs/app/IMPROVEMENTS.md). (The magic-system source + reasoning docs stay in `docs/`.)
+Plans/specs live in **[docs/app/](docs/app/)**: [APP-PLAN.md](docs/app/APP-PLAN.md) (master), [SPEC.md](docs/app/SPEC.md) (workstreams WS0–WS11), [DRAWING-APP.md](docs/app/DRAWING-APP.md), [SPEC-cluster-recognition.md](docs/app/SPEC-cluster-recognition.md). Active feature specs: [SPEC-recognizer-analysis.md](docs/app/SPEC-recognizer-analysis.md) (training flywheel + analysis surfacing), [SPEC-symbol-versioning.md](docs/app/SPEC-symbol-versioning.md) (symbol lifecycle + canon-update flagging), [SPEC-sign-variants-sizing.md](docs/app/SPEC-sign-variants-sizing.md) (magnitude/variant model). Manual test plan: [TEST-PLAN.md](docs/app/TEST-PLAN.md). Improvement backlog: [IMPROVEMENTS.md](docs/app/IMPROVEMENTS.md). (The magic-system source + reasoning docs stay in `docs/`.)
 
 ## Commands
 
@@ -36,6 +36,8 @@ npm install
 npm run dev      # Vite dev server (http://localhost:5173)
 npm run build    # production build
 npm test         # all engine + data tests (node --test)
+npm run lint     # ESLint (flat config); npm run lint:fix to autofix
+npm run format   # Prettier --write (format:check to verify)
 
 # run a single test file (the npm glob form can misbehave on Windows):
 node --test test/deduce.test.js
@@ -43,6 +45,9 @@ node --test test/deduce.test.js
 # regenerate sigil/sign SVG paths from the source PNGs (potrace):
 npm run vectorize:sigils
 npm run vectorize:signs
+
+# symbol lifecycle: flag catalog spells whose symbols changed (SPEC-symbol-versioning.md):
+npm run flag:impact          # report stale spells; --write stamps lifecycle.flag
 
 # reason about / render a spell (the engine as compiler + fact extractor):
 npm run facts -- path/to/spell.json     # structured observations (tools/spell-engine-cli.mjs --facts)
@@ -57,7 +62,7 @@ npx supabase migration up   # apply pending migrations (schema in supabase/migra
 node tools/seed-admin.mjs <email> <pass> [user]   # create/promote a local admin (SUPABASE_SECRET env)
 ```
 
-There is no linter configured.
+Linting/formatting: **ESLint 9** (flat config `eslint.config.js`, React + hooks, Prettier-compat) + **Prettier** (`.prettierrc.json`: no semicolons, single quotes, 2-space, printWidth 100). `npm run lint` is clean (0 errors). Prettier is configured but not yet run repo-wide (a mass reformat would strip the intentional column alignment) — format new/changed files as you go.
 
 ## Architecture
 
@@ -65,8 +70,8 @@ There is no linter configured.
 
 The engine has almost no hardcoded domain knowledge — everything lives in JSON:
 
-- `rules.json` — validation rules (blocking/inactive/warning/info), advanced mechanics, polar coordinate model, matcher weights/threshold (0.7).
-- `sigils.json` — 33 sigils (the *substance*). Each has a `family` (fire/water/earth/air/time/decorative/misc/special), an `element`, and either an `svgPath` or a `text` glyph (Guidance "G", Calling "C").
+- `rules.json` — validation rules (blocking/inactive/warning/info), advanced mechanics, polar coordinate model, matcher weights/threshold (0.7). Also: `recognition` (per-`source` sample weights + `confidenceMinPct` gate), `mlReadiness` (coverage targets for the Training bars), `forbidden` (tags/categories for the forbidden-magic check).
+- `sigils.json` — 33 sigils (the *substance*). Each has a `family` (fire/water/earth/air/time/decorative/misc/special), an `element`, and an `svgPath`. An optional `lifecycle` block (`status`/`rev`/…) tracks canon revisions (see SPEC-symbol-versioning.md).
 - `signs.json` — 52 signs (operators on the substance). Each documented sign has a `family` = one of the 4 doc categories (directional/semi-directional/non-directional/asymmetric); 3 (`bird`, `animal_signs`, `unknown_sign`) keep family `other` and stay hidden. A 5th palette family, `unknown`, holds **catalogued-but-unidentified** signs (`unknown_NN`, e.g. `unknown_01` from Water Horse) — these are visible. Carries `effectTags`, `invertible`, `canBeCenter`, `surrounds`.
 - `dyes.json` — magical dyes mixed into the conjuring ink (kind/color/effect).
 - `grammar.json` — the **deduction grammar**: per-element `substance`, per-sign `operator` (`kind` + `verb`/`invertedVerb`), and `interactions` (synergies/warnings). This is what lets the app explain novel combinations.
@@ -95,9 +100,9 @@ SVG paths come from the PNGs in `assets/images/{sigils,signs}/`, traced with **p
 
 `analyze(composition)` orchestrates everything and returns **structured sections** consumed by [ResultPanel.jsx](src/components/ResultPanel.jsx), which renders them all in one panel:
 
-`{ name, valid, active, status, issues[], sigils[], signs[], deduction, similar, dyes[], analysis }`
+`{ name, valid, active, status, issues[], sigils[], signs[], deduction, similar, forbidden, dyes[], analysis }`
 
-— i.e. validity (rules) · sigils · signs · deduced **effect** · **similar spells** (catalog match/nearest) · **dye effects** · **other info** (symmetry/stability, balance/direction, power, spin, inversion, counts, ring).
+— i.e. validity (rules) · sigils · signs · deduced **effect** · **similar spells** (catalog match/nearest, with a `parts` breakdown of why it matched) · **forbidden-magic** flag (`{ forbidden, reasons }`, surfaced as a red callout) · **dye effects** · **other info** (symmetry/stability, balance/direction, power, spin, inversion, counts, ring).
 
 Deduction model (see ANALYSIS.md §8): each sigil provides a **substance**; each sign is an **operator** with a `kind` (`form`, `transmute`, `motion`, `direction`, `target`, `power`, `support`, `special`). A pipeline assembles the sentence: substance(s) → primary clause (`transmute` outranks `form`, else raw element) → direction → motion/target/power/special → interaction notes/warnings. With multiple sigils the substances are combined.
 
@@ -117,11 +122,12 @@ Adding a sign/sigil/spell touches multiple JSONs, and tests enforce it:
 - A new **sign** needs an entry in `signs.json` **and** an operator in `grammar.json.operators` (coverage test in `deduce.test.js` fails otherwise).
 - A new **sigil** needs its `element` to exist in `grammar.json.elements` (coverage test).
 - Any `core`/sign `id` referenced in `spells.json` must exist in `sigils.json`/`signs.json` (data-integrity test).
-- A sigil/sign shown in the palette needs a `family`; ids without a doc family stay hidden (see `Palette.jsx`).
+- A sigil/sign shown in the palette needs a `family`; ids without a doc family stay hidden (see `SymbolPalette.jsx`).
 
 ## Source-material modeling notes
 
 - Some sigils are "sign-as-sigil" (`vision`, `repetition`, `billowing` can occupy the center) — `canBeCore()` in `data.js` encodes this. They live in both `sigils.json` (as `*_sigil`, family `special`, hidden from the palette) and `signs.json`.
 - A few signs were renamed to match the docs while keeping their ids: `direction`→**Region**, `billowing`→**Billow**, `dancing_puppet`→**Puppet**.
 - Inversion negates an invertible operator (Wall Breaker ↔ Integration). Only directional/semi-directional signs are invertible; non-directional have no front to flip. Narrative exception: the Scalewolf Curse is *not* reversed by inversion (needs a different spell).
+- **Sign size affects direction** (Layer 1 of SPEC-sign-variants-sizing.md): `computeOrientationAim` weights each directional sign's facing by its `scale` (or `metrics.directionalMagnitude`) — equal opposing signs cancel, a larger one wins (the Column-"T" lesson). Variant *metrics* (e.g. stem length) and ring/sigil sizing are later layers.
 - Magical dyes are informational (shown in the analysis); they don't yet change the numeric power/duration of the deduction.

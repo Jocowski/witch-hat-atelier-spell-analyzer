@@ -57,8 +57,6 @@ function SymbolTile({ sym, kind, pendingType, onSelect }) {
           >
             <path d={def.svgPath} fill="currentColor" fillRule="evenodd" />
           </svg>
-        ) : def?.text ? (
-          <span className="sp-glyph-text">{def.text}</span>
         ) : (
           <span className="sp-glyph-circle" />
         )}

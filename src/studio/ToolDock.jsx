@@ -63,6 +63,12 @@ const TOOL_GROUPS = [
   },
 ]
 
+// Keyboard shortcuts (mirror DrawingSurface's keydown map) shown in tooltips for discoverability.
+const HOTKEYS = {
+  brush: 'B', line: 'L', rect: 'R', triangle: 'G', circle: 'C', arrow: 'A',
+  eraserStroke: 'E', eraserPixel: 'Shift+E', select: 'V', move: 'M', rotate: 'T',
+}
+
 const BW_COLORS = [
   { id: 'black', color: '#1a1a1a', name: 'Black' },
   { id: 'white', color: '#f0f0f0', name: 'White' },
@@ -78,7 +84,7 @@ export default function ToolDock({
   palette      = 'dyes',
   compact      = false,
   zoom         = 1,
-  onZoomIn, onZoomOut, onZoomReset,
+  onZoomIn, onZoomOut, onZoomReset, onRecenter,
 }) {
   const colors = palette === 'bw' ? BW_COLORS : DYES
 
@@ -99,7 +105,7 @@ export default function ToolDock({
               <button
                 key={t.id}
                 className={`ds-tool-btn${tool === t.id ? ' ds-active' : ''}`}
-                title={`${group.label}: ${t.label}`}
+                title={`${group.label}: ${t.label}${HOTKEYS[t.id] ? ` (${HOTKEYS[t.id]})` : ''}`}
                 onClick={() => setTool(t.id)}
                 aria-pressed={tool === t.id}
               >
@@ -171,6 +177,9 @@ export default function ToolDock({
           <button className="ds-zoom-btn" title="Zoom in (Shift+scroll)" onClick={onZoomIn}>+</button>
           <div className="ds-zoom-label">{Math.round(zoom * 100)}%</div>
           <button className="ds-zoom-btn" title="Zoom out (Shift+scroll)" onClick={onZoomOut}>−</button>
+          {onRecenter && (
+            <button className="ds-zoom-btn ds-zoom-recenter" title="Recenter view (keep zoom)" onClick={onRecenter}>⊕</button>
+          )}
           <button className="ds-zoom-btn ds-zoom-reset" title="Reset zoom + pan" onClick={onZoomReset}>1:1</button>
         </div>
       </div>

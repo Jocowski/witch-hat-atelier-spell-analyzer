@@ -1,11 +1,22 @@
-// App routing: the Studio (new drawing app) is the default screen; the legacy structured
-// drag-drop editor stays reachable at /editor; /admin is added later (WS5). Keeping the old App
-// untouched at its own route avoids a risky monolith refactor while the Studio becomes the front door.
+// App routing: the Studio (the drawing app) is the default screen; /login + /admin/* are admin-only.
+// The Studio is the front door, so it loads eagerly; the Admin and Login screens are code-split
+// (React.lazy) so the Studio's initial bundle doesn't pull in admin-only views or the auth UI.
+import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import StudioPage from './studio/StudioPage.jsx'
-import LoginPage from './admin/LoginPage.jsx'
-import AdminPage from './admin/AdminPage.jsx'
 import RequireAdmin from './admin/RequireAdmin.jsx'
+
+// Admin-only screens: only fetched when the user actually navigates to /login or /admin.
+const LoginPage = lazy(() => import('./admin/LoginPage.jsx'))
+const AdminPage = lazy(() => import('./admin/AdminPage.jsx'))
+
+function RouteFallback() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--ink-dim)' }}>
+      Loading…
+    </div>
+  )
+}
 
 function Nav() {
   const { pathname } = useLocation()
@@ -23,12 +34,14 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <Nav />
-      <Routes>
-        <Route path="/" element={<StudioPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin/*" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/" element={<StudioPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin/*" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

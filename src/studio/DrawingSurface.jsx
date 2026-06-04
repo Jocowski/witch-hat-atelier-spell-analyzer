@@ -53,13 +53,21 @@ import {
   useRef, useEffect, useImperativeHandle, forwardRef,
   useCallback, useState, useMemo,
 } from 'react'
+import Konva from 'konva'
 import {
   Stage, Layer, Line, Rect, Circle as KCircle, Path, Transformer, Text, Group,
 } from 'react-konva'
 import { line, rect, triangle, circle, brush } from './tools/shapes.js'
-import { DYES, getComponentDef } from '../engine/data.js'
+import { getComponentDef } from '../engine/data.js'
 import ToolDock from './ToolDock.jsx'
 import './drawing.css'
+
+// Enable the RIGHT mouse button (2) for dragging. Konva's default `dragButtons` is [0, 1]
+// (left + middle), so right-drag panning — wired below via startDrag() — silently no-ops without this.
+// Process-wide, but this app only uses Konva here.
+Konva.dragButtons = [0, 1, 2]
+
+const HISTORY_LIMIT = 50  // max undo depth
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -233,6 +241,9 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   const erasedRef   = useRef(false)             // a delete happened in this gesture
   const spaceRef    = useRef(false)             // space held → pan mode
   const marqueeShiftRef = useRef(false)         // shift held when marquee started
+  const historyRef  = useRef({ past: [], future: [] })  // undo/redo snapshot stacks
+  const pendingSnapRef = useRef(false)                  // a gesture began → snapshot on first mutation
+  const [panning, setPanning] = useState(false)         // right/space drag in progress (cursor only)
 
   // ── world ↔ screen ──────────────────────────────────────────────────────────
   // screen = world*zoom + (pan + centre);  world = (screen - pan - centre) / zoom
@@ -273,6 +284,50 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     onChangeRef.current?.(buildModel(ns ?? nodesRef.current, ds ?? dyesRef.current))
   }, [buildModel])
 
+  // ── undo/redo (Item 2) ───────────────────────────────────────────────────────
+  // The whole drawing is two immutable arrays (nodes, dyes) that every mutation REPLACES wholesale,
+  // so a snapshot can just keep the current array references. snapshot() is called once at the START
+  // of each mutating action (gesture-start for draw/erase, so a stroke or an eraser drag = one step).
+  const snapshot = useCallback(() => {
+    const h = historyRef.current
+    h.past.push({ nodes: nodesRef.current, dyes: dyesRef.current })
+    if (h.past.length > HISTORY_LIMIT) h.past.shift()
+    h.future = []
+  }, [])
+
+  // Take the pending gesture's snapshot on its FIRST real mutation, so a brush stroke / eraser drag
+  // collapses to a single undo step and a no-op gesture (click that draws/erases nothing) adds none.
+  const maybeSnap = useCallback(() => {
+    if (pendingSnapRef.current) { snapshot(); pendingSnapRef.current = false }
+  }, [snapshot])
+
+  const applySnapshot = useCallback((s) => {
+    nodesRef.current = s.nodes; dyesRef.current = s.dyes
+    setNodes(s.nodes); setDyes(s.dyes); setSelectedIds([])
+    fireChange(s.nodes, s.dyes)
+  }, [fireChange])
+
+  const undo = useCallback(() => {
+    const h = historyRef.current
+    if (!h.past.length) return
+    h.future.push({ nodes: nodesRef.current, dyes: dyesRef.current })
+    applySnapshot(h.past.pop())
+  }, [applySnapshot])
+
+  const redo = useCallback(() => {
+    const h = historyRef.current
+    if (!h.future.length) return
+    h.past.push({ nodes: nodesRef.current, dyes: dyesRef.current })
+    applySnapshot(h.future.pop())
+  }, [applySnapshot])
+
+  // Tool selection that also clears the selection when leaving a transform tool. Shared by the
+  // ToolDock buttons and the keyboard shortcuts (Item 3) so behavior stays identical.
+  const selectTool = useCallback((t) => {
+    setTool(t)
+    if (t !== 'select' && t !== 'move' && t !== 'rotate') setSelectedIds([])
+  }, [])
+
   // ── imperative API (contract preserved + new methods) ───────────────────────
   useImperativeHandle(ref, () => ({
     // ── EXISTING (contract unchanged) ───────────────────────────────────────
@@ -288,12 +343,16 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
         .map((n) => ({ tool: n.tool, color: n.color, width: n.width, dyeId: n.dyeId, points: n.points }))
     },
     clear() {
+      snapshot()
       setNodes([]); setDyes([]); setSelectedIds([])
       nodesRef.current = []; dyesRef.current = []
       onChangeRef.current?.({ strokes: [], placed: [], dyes: [] })
     },
+    undo() { undo() },
+    redo() { redo() },
     placeSymbol(type, kind) {
       if (!enableSymbols) return
+      snapshot()
       // Drop at the current viewport centre, converted to world coords (accounts for pan/zoom).
       const wc = toWorld(stageSz.width / 2, stageSz.height / 2)
       const sym = {
@@ -352,6 +411,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     // Validates/guards every field; resets selection; fires onChange.
     loadModel(model) {
       if (!model || typeof model !== 'object') return
+      snapshot()
 
       const rawStrokes = Array.isArray(model.strokes) ? model.strokes : []
       const rawPlaced  = Array.isArray(model.placed)  ? model.placed  : []
@@ -369,7 +429,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
       setSelectedIds([])
       onChangeRef.current?.(buildModel(nextNodes, nextDyes))
     },
-  }), [buildModel, enableSymbols, color, dyeId, fireChange, toWorld, stageSz.width, stageSz.height])
+  }), [buildModel, enableSymbols, color, dyeId, fireChange, toWorld, stageSz.width, stageSz.height, snapshot, undo, redo])
 
   // ── size observer ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -386,14 +446,30 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     return () => ro.disconnect()
   }, [compact])
 
-  // ── space-to-pan key tracking ────────────────────────────────────────────────
+  // ── keyboard: space-to-pan · undo/redo · tool shortcuts (Items 2 + 3) ─────────
   useEffect(() => {
-    const down = (e) => { if (e.code === 'Space') spaceRef.current = true }
-    const up   = (e) => { if (e.code === 'Space') spaceRef.current = false }
+    // Tool letters. `t` would collide with rotate's mnemonic, so triangle uses `g`.
+    const TOOL_KEYS = { b: 'brush', l: 'line', r: 'rect', g: 'triangle', c: 'circle', a: 'arrow', v: 'select', m: 'move', t: 'rotate' }
+    const isTyping = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
+    const down = (e) => {
+      if (e.code === 'Space') { spaceRef.current = true; return }
+      if (isTyping(e.target)) return
+      if (e.ctrlKey || e.metaKey) {
+        const k = e.key.toLowerCase()
+        if (k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo() }
+        else if (k === 'y') { e.preventDefault(); redo() }
+        return
+      }
+      if (e.altKey) return
+      const k = e.key.toLowerCase()
+      if (k === 'e') { e.preventDefault(); selectTool(e.shiftKey ? 'eraserPixel' : 'eraserStroke') }
+      else if (TOOL_KEYS[k]) { e.preventDefault(); selectTool(TOOL_KEYS[k]) }
+    }
+    const up = (e) => { if (e.code === 'Space') spaceRef.current = false }
     window.addEventListener('keydown', down)
     window.addEventListener('keyup', up)
     return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up) }
-  }, [])
+  }, [undo, redo, selectTool])
 
   // ── attach Transformer to current selection ──────────────────────────────────
   useEffect(() => {
@@ -439,6 +515,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
 
   function commitStroke(points, toolName) {
     if (!points || points.length < 2) return
+    maybeSnap()
     const node = { id: nextId(), kind: 'stroke', tool: toolName, color, width: brushSize, dyeId, points }
     setNodes((prev) => {
       const next = [...prev, node]
@@ -474,7 +551,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
         if (Math.hypot(n.x - wp.x, n.y - wp.y) <= half) toRemove.add(n.id)
       }
     }
-    if (toRemove.size) { erasedRef.current = true; removeNodes(toRemove) }
+    if (toRemove.size) { maybeSnap(); erasedRef.current = true; removeNodes(toRemove) }
   }
 
   function erasePixelAt(wp) {
@@ -483,7 +560,14 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     let changed = false
     const out = []
     for (const n of nodesRef.current) {
-      if (n.kind !== 'stroke') { out.push(n); continue }
+      if (n.kind !== 'stroke') {
+        // Item 4: a vector symbol can't be partially erased — delete it whole when the eraser touches it.
+        if (enableSymbols && n.kind === 'symbol') {
+          const half = SYMBOL_SIZE * (n.scale ?? 1) + 4
+          if (Math.hypot((n.x ?? 0) - wp.x, (n.y ?? 0) - wp.y) <= R + half) { changed = true; continue }
+        }
+        out.push(n); continue
+      }
       let any = false
       const segs = []
       let cur = []
@@ -501,6 +585,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
       }
     }
     if (changed) {
+      maybeSnap()
       erasedRef.current = true
       setNodes(out); nodesRef.current = out
       fireChange(out)
@@ -511,15 +596,21 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   function onStageMouseDown(e) {
     const stage = stageRef.current
     const evt = e.evt
-    // pan: right-button OR space held → let Stage handle drag (draggable)
-    if (evt.button === 2 || spaceRef.current) return  // Stage.draggable handles it
+    // pan: right-button OR space held. Start the Stage drag HERE, from Konva's own mousedown —
+    // react-konva doesn't wire DOM capture-phase handlers (onMouseDownCapture maps to a non-existent
+    // 'mousedowncapture' Konva event that never fires), so the drag must be kicked off from this
+    // handler. Konva.dragButtons (set at module load) allows the right button.
+    if (evt.button === 2 || spaceRef.current) {
+      if (stage) { stage.draggable(true); stage.startDrag(); setPanning(true) }
+      return
+    }
 
     const wp = pointerWorld()
     if (!wp) return
 
     // ── erasers ───────────────────────────────────────────────────────────────
-    if (tool === 'eraserStroke') { drawingRef.current = true; erasedRef.current = false; eraseStrokeAt(wp); return }
-    if (tool === 'eraserPixel')  { drawingRef.current = true; erasedRef.current = false; erasePixelAt(wp); return }
+    if (tool === 'eraserStroke') { drawingRef.current = true; erasedRef.current = false; pendingSnapRef.current = true; eraseStrokeAt(wp); return }
+    if (tool === 'eraserPixel')  { drawingRef.current = true; erasedRef.current = false; pendingSnapRef.current = true; erasePixelAt(wp); return }
 
     // ── transform tools (select / move / rotate) ──────────────────────────────
     if (isTransformTool) {
@@ -539,6 +630,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     // ── draw tools ──────────────────────────────────────────────────────────────
     if (DRAW_TOOLS.has(tool)) {
       drawingRef.current = true
+      pendingSnapRef.current = true  // commitStroke takes the snapshot on mouseup (one step per stroke)
       startRef.current = wp
       if (tool === 'brush') { livePtsRef.current = [wp]; setPreview({ tool: 'brush', color, width: brushSize, points: [wp] }) }
     }
@@ -619,6 +711,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     if (evt.button === 2 || spaceRef.current) return
     if (tool === 'eraserStroke') {
       e.cancelBubble = true
+      snapshot()
       erasedRef.current = true
       removeNodes(new Set([id]))
       return
@@ -636,6 +729,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
 
   // ── commit Konva node transform back into the world-coord model ──────────────
   function commitSymbolTransform(id, knode) {
+    snapshot()
     const absScaleX = Math.abs(knode.scaleX())
     setNodes((prev) => {
       const next = prev.map((n) => {
@@ -662,6 +756,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   }
 
   function commitStrokeTransform(id, knode) {
+    snapshot()
     // Bake the Konva node transform into the stroke's world points, then reset the node.
     const tr = knode.getTransform()
     setNodes((prev) => {
@@ -683,15 +778,20 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   const dash = (n) => n / zoom
 
   const cursor = useMemo(() => {
+    if (panning) return 'grabbing'
     if (spaceRef.current) return 'grab'
-    switch (tool) {
+    return cursorForTool(tool)
+  }, [tool, panning])
+
+  function cursorForTool(t) {
+    switch (t) {
       case 'eraserStroke': case 'eraserPixel': return 'cell'
       case 'select': return 'default'
       case 'move': return 'move'
       case 'rotate': return 'crosshair'
       default: return 'crosshair'
     }
-  }, [tool])
+  }
 
   const stageHeight = compact ? COMPACT_H : stageSz.height
 
@@ -706,7 +806,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   return (
     <div className={`ds-surface${compact ? ' ds-compact' : ''}`}>
       <ToolDock
-        tool={tool} setTool={(t) => { setTool(t); if (t !== 'select' && t !== 'move' && t !== 'rotate') setSelectedIds([]) }}
+        tool={tool} setTool={selectTool}
         color={color} setColor={setColor}
         dyeId={dyeId} setDyeId={setDyeId}
         brushSize={brushSize} setBrushSize={setBrushSize}
@@ -716,6 +816,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
         onZoomIn={() => zoomAtCenter(ZOOM_STEP)}
         onZoomOut={() => zoomAtCenter(-ZOOM_STEP)}
         onZoomReset={resetView}
+        onRecenter={() => setPan({ x: 0, y: 0 })}
       />
 
       <div
@@ -748,17 +849,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
               st.draggable(false)
               setPan((prev) => ({ x: prev.x + px, y: prev.y + py }))
             }
-          }}
-          // Enable Stage dragging only with right-button or space (decided on mousedown)
-          onMouseDownCapture={(e) => {
-            const native = e.evt
-            const st = stageRef.current
-            if (st && (native.button === 2 || spaceRef.current)) {
-              st.draggable(true)
-              st.startDrag()
-            } else if (st) {
-              st.draggable(false)
-            }
+            setPanning(false)
           }}
         >
           {/* ── Content layer ──────────────────────────────────────────────── */}
@@ -798,7 +889,6 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
               const def = n.type ? getComponentDef(n.type) : null
               const scale = (SYMBOL_SIZE / 50) * (n.scale ?? 1)  // viewBox -50..50 → half-size
               const common = {
-                key: n.id,
                 x: n.x, y: n.y, rotation: n.rotation,
                 draggable: selectable,
                 onMouseDown: (e) => onNodeMouseDown(e, n.id),
@@ -809,14 +899,14 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
               }
               if (def?.svgPath) {
                 return (
-                  <Path {...common}
+                  <Path key={n.id} {...common}
                     data={def.svgPath} fill={n.color || '#c9a24a'} fillRule="evenodd"
                     scaleX={scale} scaleY={n.inverted ? -scale : scale} />
                 )
               }
-              // fallback: small circle for text/unknown glyphs (no label per spec)
+              // fallback: small circle for symbols with no vector path (no label)
               return (
-                <KCircle {...common}
+                <KCircle key={n.id} {...common}
                   radius={SYMBOL_SIZE * (n.scale ?? 1) * 0.8}
                   stroke={n.color || '#c9a24a'} strokeWidth={2} />
               )

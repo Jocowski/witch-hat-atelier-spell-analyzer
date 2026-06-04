@@ -42,10 +42,17 @@ function scaleToSquare(points) {
 }
 function translateToOrigin(points) { const ce = centroid(points); return points.map((p) => P(p.X + ORIGIN.X - ce.X, p.Y + ORIGIN.Y - ce.Y, p.ID)) }
 
-export function makeCloud(name, points) {
+export function makeCloud(name, points, weight = 1) {
   let p = resample(points.map((q) => P(q.X, q.Y, q.ID)), NUM_POINTS)
   p = scaleToSquare(p); p = translateToOrigin(p)
-  return { name, points: p }
+  return { name, points: p, weight: weight > 0 ? weight : 1 }
+}
+
+// Recognition confidence (%) from a raw $P cloud distance. 0 dist = perfect (100%); larger = lower.
+// Kept here (pure) so the UI and the gate agree on one definition.
+export function confidencePct(dist) {
+  if (dist == null || dist === 0) return 100
+  return Math.round(Math.min(1, 1 / dist) * 100)
 }
 function cloudDistance(p1, p2, start) {
   const matched = new Array(p1.length).fill(false)
@@ -67,10 +74,18 @@ function greedyMatch(pts, cloud) {
 }
 
 // Recognize a single symbol (array of {X,Y,ID} points) against prebuilt clouds. Returns ranked list.
+// Ranking is by `adjDist = dist / weight` (a more-trusted template — e.g. a user correction — wins close
+// calls); `dist` stays the raw geometric distance for display/telemetry. weight defaults to 1.
 export function recognize(points, clouds) {
   if (!clouds.length || points.length < 2) return []
   const p = makeCloud('', points)
-  return clouds.map((c) => { const d = greedyMatch(p.points, c); return { name: c.name, dist: d, score: d > 0 ? 1 / d : 1 } }).sort((a, b) => a.dist - b.dist)
+  return clouds
+    .map((c) => {
+      const d = greedyMatch(p.points, c)
+      const w = c.weight ?? 1
+      return { name: c.name, dist: d, score: d > 0 ? 1 / d : 1, adjDist: w > 0 ? d / w : d }
+    })
+    .sort((a, b) => a.adjDist - b.adjDist)
 }
 
 // ---------- geometry on raw {x,y} strokes ----------
@@ -100,7 +115,8 @@ function rotateStroke(stroke, cx, cy, ang) {
 // Returns { ring, center, groups:[{role,cx,cy,angle,match,strokes}], composition }.
 export function analyzeStrokes(strokes, templates, opts = {}) {
   const gap = opts.gap ?? 45
-  const clouds = templates.map((t) => makeCloud(t.name, t.points))
+  const confidenceMinPct = opts.confidenceMinPct ?? 0
+  const clouds = templates.map((t) => makeCloud(t.name, t.points, t.weight))
   const drawn = strokes.filter((s) => s.length >= 2)
   if (!drawn.length || !clouds.length) return { ring: null, center: { x: 0, y: 0 }, groups: [], composition: null }
 
@@ -139,9 +155,15 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
       const pts = []
       g.strokes.forEach((s, si) => rotateStroke(s, g.cx, g.cy, (deg * Math.PI) / 180).forEach((p) => pts.push(P(p.x, p.y, si))))
       const ranked = recognize(pts, clouds)
-      if (ranked.length && (!best || ranked[0].dist < best.dist)) best = { name: ranked[0].name, dist: ranked[0].dist, rotation: deg }
+      if (ranked.length && (!best || ranked[0].adjDist < best.adjDist)) {
+        best = { name: ranked[0].name, dist: ranked[0].dist, adjDist: ranked[0].adjDist, rotation: deg }
+      }
     }
     g.match = best
+    // Confidence gate: a low-confidence guess is kept for display but flagged so the caller can render
+    // it as "unknown?" and exclude it from the engine input (SPEC A2).
+    g.confidence = best ? confidencePct(best.dist) : 0
+    g.confident = best ? g.confidence >= confidenceMinPct : false
   })
 
   return { ring, center, ringR, groups, composition: buildComposition(groups, center, ring) }

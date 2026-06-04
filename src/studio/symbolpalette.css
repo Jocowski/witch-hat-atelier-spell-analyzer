@@ -171,12 +171,6 @@
   color: var(--accent);
 }
 
-.sp-glyph-text {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: var(--accent);
-}
-
 .sp-glyph-circle {
   display: block;
   width: 14px;
