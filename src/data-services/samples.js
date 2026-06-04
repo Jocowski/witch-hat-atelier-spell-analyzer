@@ -1,7 +1,7 @@
 // data-services/samples.js — training_samples read/write/soft-delete/restore.
 import { supabase, hasSupabase } from './supabase.js'
 
-// TODO(orchestrator): wire verifiedMultiplier to rules.json recognition.verifiedMultiplier
+// Config source: rules.json recognition.verifiedMultiplier (passed in via activeTemplates(weightCfg)).
 const VERIFIED_MULTIPLIER_DEFAULT = 1.3
 
 /**

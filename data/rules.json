@@ -151,7 +151,40 @@
   "recognition": {
     "note": "Recognizer ($P) tuning. sampleWeights weights a template by where it came from (a user CORRECTION is the most trustworthy training signal, a CONFIRMED catalog harvest the least). Applied as adjDist = dist / weight before ranking. confidenceMinPct gates a detection: below it, the symbol is shown as 'unknown?' and kept OUT of the engine input so a wrong guess doesn't poison the deduction.",
     "sampleWeights": { "corrected": 1.5, "drawn": 1.0, "confirmed": 0.6 },
-    "confidenceMinPct": 30
+    "confidenceMinPct": 30,
+
+    "verifiedMultiplier": 1.3,
+
+    "_segNote": "Adaptive segmentation + ring closure (SPEC-ring-closure-floodfill.md). gap = clamp(gapK*ringR, gapMin, gapMax); cvThreshold gates the fast circularity heuristic, cvThresholdRelaxed the fallback; floodFill enables the MS-Paint topological closure confirmation.",
+    "gapK": 0.12,
+    "gapMin": 14,
+    "gapMax": 80,
+    "cvThreshold": 0.3,
+    "cvThresholdRelaxed": 0.45,
+    "minRingRadius": 40,
+    "rotationSteps": 24,
+    "floodFill": true,
+    "floodFillConfig": {
+      "cellSize": 2,
+      "padding": 24,
+      "inkRadius": 4,
+      "sampleStep": 1.5,
+      "minEnclosedAreaPx": 2000,
+      "minEnclosedAreaRatio": 0.06,
+      "maxNormalizedRmse": 0.22,
+      "minPerfection": 0.24
+    },
+    "rasterMatch": {
+      "_note": "Multi-layer raster cross-validation (SPEC-recognizer-matching.md 2.5). Used as a contamination veto over $P: a winning match with contaminationRisk above the threshold is suppressed to 'unknown?'. Live-pipeline veto wiring pending the reference-ink cache (2.5-C).",
+      "contaminationVetoThreshold": 0.55,
+      "tieBandPct": 0,
+      "inkSize": 40,
+      "coreRadius": 1,
+      "softRadius": 2,
+      "looseRadius": 4,
+      "gridSize": 10,
+      "rotationSet": [0, 45, 90, 135, 180, 225, 270, 315]
+    }
   },
 
   "mlReadiness": {

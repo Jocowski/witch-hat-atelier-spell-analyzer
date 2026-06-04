@@ -12,7 +12,7 @@
 //                 yes → suppress (unknown?)
 //                 no  → pass through
 //
-// TODO(orchestrator): wire to rules.json rasterMatch block
+// Config source: rules.json recognition.rasterMatch block (injected when the veto is wired live, 2.5-C).
 
 const DEFAULT_PARAMS = {
   inkSize: 40,          // pixel grid side length

@@ -11,7 +11,7 @@
 //   4. Score the outer ink edge with a circle fit.
 //   5. Accept as "ring closed" when enclosedArea + minRadius + perfection all pass.
 
-// TODO(orchestrator): wire to rules.json recognition.floodFillConfig
+// Config source: rules.json recognition.floodFillConfig (injected via StudioPage → analyzeStrokes).
 
 const DEFAULT_CONFIG = {
   cellSize: 2,            // px per raster cell (halved grid = 4× fewer cells)

@@ -7,12 +7,10 @@
 
 import { analyzeRingClosure } from './ringClosure.js'
 
-// TODO(orchestrator): wire opts.rotationSteps to rules.json recognition.rotationSteps
-// TODO(orchestrator): wire opts.gapK / gapMin / gapMax to rules.json recognition.gapK/gapMin/gapMax
-// TODO(orchestrator): wire opts.cvThreshold / cvThresholdRelaxed to rules.json recognition
-// TODO(orchestrator): wire opts.minRingRadius to rules.json recognition.minRingRadius
-// TODO(orchestrator): wire opts.floodFill to rules.json recognition.floodFill
-// TODO(orchestrator): wire raster veto opts to rules.json rasterMatch block
+// Config source: all opts below (rotationSteps, gapK/gapMin/gapMax, cvThreshold/cvThresholdRelaxed,
+// minRingRadius, floodFill/floodFillConfig, rasterMatch veto) are passed in by the caller
+// (StudioPage) from rules.json `recognition`; the `?? <default>` fallbacks keep this module pure
+// and runnable under node --test with no JSON import.
 
 const NUM_POINTS = 32
 const ORIGIN = { X: 0, Y: 0 }
@@ -129,7 +127,7 @@ function rotateStroke(stroke, cx, cy, ang) {
  * @returns {number}  gap in px
  */
 export function computeAdaptiveGap(ringR, strokes, config = {}) {
-  // TODO(orchestrator): wire to rules.json recognition.gapK / gapMin / gapMax
+  // Config source: rules.json recognition.gapK / gapMin / gapMax (injected via StudioPage).
   const gapK   = config.gapK   ?? 0.12
   const gapMin = config.gapMin ?? 14
   const gapMax = config.gapMax ?? 80
