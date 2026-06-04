@@ -58,6 +58,8 @@ import {
   Stage, Layer, Line, Rect, Circle as KCircle, Path, Transformer, Text, Group,
 } from 'react-konva'
 import { line, rect, triangle, circle, brush } from './tools/shapes.js'
+import { beautifyStroke, weldsRingGap } from './tools/beautify.js'
+import { findFillTarget } from './tools/fill.js'
 import { getComponentDef } from '../engine/data.js'
 import ToolDock from './ToolDock.jsx'
 import EffectCanvas from './render/EffectCanvas.jsx'
@@ -70,9 +72,17 @@ Konva.dragButtons = [0, 1, 2]
 
 const HISTORY_LIMIT = 50  // max undo depth
 
+// Beautify assist persisted prefs (SPEC-stroke-beautify.md) — default OFF (app unchanged until opted in).
+const LS_AUTO_BEAUTIFY = 'studio.beautify.auto'
+const LS_STREAMLINE    = 'studio.beautify.streamline'
+const readBeautifyPref = (key) => { try { return localStorage.getItem(key) === '1' } catch { return false } }
+const HOLD_SNAP_MS  = 450   // QuickShape: pause this long at the end of a brush stroke to snap it (Phase 2)
+const STREAMLINE_ALPHA = 0.45  // live smoothing: new point = lerp(prev, raw, alpha); lower = smoother/laggier
+
 // ── constants ─────────────────────────────────────────────────────────────────
 
 const RING_RADIUS   = 180   // faint guide ring (world coords)
+const TRACE_SCALE   = 2.8   // svgPath (-50..50 viewBox) → world units for the tracing guide
 const SYMBOL_SIZE   = 20    // default half-size when rendering a symbol glyph (world units)
 const MIN_ZOOM      = 0.15
 const MAX_ZOOM      = 8
@@ -152,6 +162,17 @@ function rectsIntersect(a, b) {
   return !(b.minX > a.maxX || b.maxX < a.minX || b.minY > a.maxY || b.maxY < a.minY)
 }
 
+/** True when two point arrays are the same stroke (reference, or matching length + endpoints/mid). */
+function samePoints(a, b) {
+  if (a === b) return true
+  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length || a.length === 0) return false
+  const i = a.length - 1
+  const m = a.length >> 1
+  return a[0].x === b[0].x && a[0].y === b[0].y &&
+         a[m].x === b[m].x && a[m].y === b[m].y &&
+         a[i].x === b[i].x && a[i].y === b[i].y
+}
+
 // ── model import helpers ──────────────────────────────────────────────────────
 
 /** Validate and normalise a single stroke from a loadModel() call. Returns null if invalid. */
@@ -168,6 +189,7 @@ function normStroke(s) {
     color: typeof s.color === 'string' ? s.color : '#c9a24a',
     width: typeof s.width === 'number' ? Math.max(1, s.width) : 3,
     dyeId: s.dyeId ?? null,
+    fill: typeof s.fill === 'string' ? s.fill : null,
     points,
   }
 }
@@ -200,6 +222,9 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     onChange,
     compact         = false,
     overlays,        // Array<{ box:{x,y,w,h}, label, kind }> | undefined
+    traceSvg,        // string | null — an svgPath drawn faintly on the canvas as a tracing guide
+    traceOpacity = 0.18, // opacity of the tracing guide
+    highlight,       // { x,y,w,h } | null — a glowing box (e.g. the hovered Identified-panel row)
     spellIR,         // SpellIR | null — passed from StudioPage after Analyze
     ringGeom,        // { center:{x,y}, radius:number, found:boolean } | null
     effectsEnabled = false,  // master switch for the visual effect overlay
@@ -211,6 +236,12 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   const [color,     setColor]     = useState('#c9a24a')
   const [dyeId,     setDyeId]     = useState(null)
   const [brushSize, setBrushSize] = useState(3)
+
+  // ── beautify assist (SPEC-stroke-beautify.md) — persisted user prefs ─────────
+  const [autoBeautify, setAutoBeautify] = useState(() => readBeautifyPref(LS_AUTO_BEAUTIFY))
+  const [streamline,   setStreamline]   = useState(() => readBeautifyPref(LS_STREAMLINE))
+  useEffect(() => { try { localStorage.setItem(LS_AUTO_BEAUTIFY, autoBeautify ? '1' : '0') } catch { /* ignore */ } }, [autoBeautify])
+  useEffect(() => { try { localStorage.setItem(LS_STREAMLINE,   streamline   ? '1' : '0') } catch { /* ignore */ } }, [streamline])
 
   // ── view (zoom + pan) — Konva-friendly: layer transform = pan + centre + zoom ─
   const [zoom,    setZoom]    = useState(1)
@@ -241,6 +272,10 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   const drawingRef  = useRef(false)
   const startRef    = useRef(null)              // world start point of current drag
   const livePtsRef  = useRef([])                // accumulating brush points (world)
+  const lastMoveRef = useRef({ t: 0, x: 0, y: 0 })  // last brush move (time + world pos) → hold-to-snap (Phase 2)
+  // live refs so gesture handlers read current prefs without re-subscribing
+  const autoBeautifyRef = useRef(autoBeautify); autoBeautifyRef.current = autoBeautify
+  const streamlineRef   = useRef(streamline);   streamlineRef.current   = streamline
   const [preview, setPreview] = useState(null)  // { tool,color,width,points } in-progress
   const [marquee, setMarquee] = useState(null)  // { x0,y0,x1,y1 } in world coords (rubber-band)
   const erasedRef   = useRef(false)             // a delete happened in this gesture
@@ -274,7 +309,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     const placed  = []
     for (const n of ns) {
       if (n.kind === 'stroke') {
-        strokes.push({ tool: n.tool, color: n.color, width: n.width, dyeId: n.dyeId, points: n.points })
+        strokes.push({ tool: n.tool, color: n.color, width: n.width, dyeId: n.dyeId, fill: n.fill ?? null, points: n.points })
       } else {
         placed.push({
           id: n.type, type: n.type, kind: n.symKind,
@@ -333,6 +368,56 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     if (t !== 'select' && t !== 'move' && t !== 'rotate') setSelectedIds([])
   }, [])
 
+  // Manual beautify (Beautify button / Q): snap the selected stroke(s) to clean shapes.
+  // Falls back to the most recent stroke when nothing is selected. One undo step for the batch.
+  // Defined before the keydown effect that lists it as a dependency (avoids a TDZ on mount).
+  const beautifySelected = useCallback(() => {
+    const all = nodesRef.current
+    const selected = new Set(selectedIds)
+    let targets = all.filter((n) => n.kind === 'stroke' && selected.has(n.id))
+    if (targets.length === 0) {
+      const last = [...all].reverse().find((n) => n.kind === 'stroke')
+      if (last) targets = [last]
+    }
+    if (targets.length === 0) return
+    const ids = new Set(targets.map((n) => n.id))
+    let changed = false
+    // Manual = intentional cleanup: smooth curvy/organic strokes (spirals etc.) that match no
+    // primitive, instead of leaving them raw. (Auto stays snap-only — see commitStroke.)
+    const next = all.map((n) => {
+      if (!ids.has(n.id)) return n
+      const res = beautifyStroke(n.points, { smoothFallback: true })
+      if (res.kind === 'none') return n
+      changed = true
+      return { ...n, points: res.points }
+    })
+    if (!changed) return
+    snapshot()
+    setNodes(next); nodesRef.current = next
+    fireChange(next)
+  }, [selectedIds, snapshot, fireChange])
+
+  // Duplicate the current selection (strokes + symbols), offset slightly, and select the copies.
+  // One undo step. Bound to Ctrl/Cmd+D and the ToolDock "Duplicate" button.
+  const duplicateSelected = useCallback(() => {
+    const sel = new Set(selectedIds)
+    const originals = nodesRef.current.filter((n) => sel.has(n.id))
+    if (originals.length === 0) return
+    const OFF = 24 // world-px offset so the copy is visibly displaced
+    const clones = originals.map((n) => {
+      if (n.kind === 'stroke') {
+        return { ...n, id: nextId(), points: n.points.map((p) => (Number.isNaN(p.x) ? p : { x: p.x + OFF, y: p.y + OFF })) }
+      }
+      return { ...n, id: nextId(), x: (n.x || 0) + OFF, y: (n.y || 0) + OFF }
+    })
+    snapshot()
+    const next = [...nodesRef.current, ...clones]
+    nodesRef.current = next
+    setNodes(next)
+    setSelectedIds(clones.map((c) => c.id))
+    fireChange(next)
+  }, [selectedIds, snapshot, fireChange])
+
   // ── imperative API (contract preserved + new methods) ───────────────────────
   useImperativeHandle(ref, () => ({
     // ── EXISTING (contract unchanged) ───────────────────────────────────────
@@ -376,6 +461,80 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
       setSelectedIds([sym.id])
     },
     selectNone() { setSelectedIds([]) },
+
+    // ── NEW: smoothStrokes ───────────────────────────────────────────────────
+    // Beautify specific strokes IN PLACE — snap to a clean shape when one fits, else smooth the
+    // jitter — keeping each stroke's size/position/style (no SVG swap). Used by the Identified panel
+    // to clean a recognized symbol's actual drawing. One undo step. Returns the count changed.
+    //   strokeRefs: array of point-arrays ([{x,y}][]) identifying the strokes to clean.
+    smoothStrokes(strokeRefs) {
+      if (!Array.isArray(strokeRefs) || strokeRefs.length === 0) return 0
+      const updates = new Map() // node id → new points
+      for (const sref of strokeRefs) {
+        const node = nodesRef.current.find((n) => n.kind === 'stroke' && samePoints(n.points, sref))
+        if (!node || updates.has(node.id)) continue
+        const res = beautifyStroke(node.points, { smoothFallback: true })
+        if (res.kind === 'none') continue
+        updates.set(node.id, res.points)
+      }
+      if (updates.size === 0) return 0
+      snapshot()
+      const next = nodesRef.current.map((n) => (updates.has(n.id) ? { ...n, points: updates.get(n.id) } : n))
+      nodesRef.current = next
+      setNodes(next)
+      fireChange(next)
+      return updates.size
+    },
+
+    // ── NEW: erase helpers (used by the Identified panel's per-row delete) ────
+    // Remove the stroke nodes belonging to a recognized group. Matches by reference/endpoints first
+    // (samePoints); if that finds nothing (stale refs after a re-detect/beautify), falls back to
+    // point-membership against the group's full point cloud `fallbackPts` (g.pts). Returns the count.
+    eraseStrokesByRefs(strokeRefs, fallbackPts) {
+      const ids = new Set()
+      for (const sref of (strokeRefs || [])) {
+        const node = nodesRef.current.find((n) => n.kind === 'stroke' && samePoints(n.points, sref))
+        if (node) ids.add(node.id)
+      }
+      // Fallback: a node belongs to the group when most of its points are inside the group's cloud.
+      if (ids.size === 0 && Array.isArray(fallbackPts) && fallbackPts.length) {
+        const key = (p) => `${Math.round(p.x)},${Math.round(p.y)}`
+        const cloud = new Set(fallbackPts.filter((p) => p && !Number.isNaN(p.x)).map(key))
+        for (const n of nodesRef.current) {
+          if (n.kind !== 'stroke') continue
+          const pts = n.points.filter((p) => p && !Number.isNaN(p.x))
+          if (pts.length === 0) continue
+          let inside = 0
+          for (const p of pts) if (cloud.has(key(p))) inside++
+          if (inside / pts.length >= 0.6) ids.add(n.id)
+        }
+      }
+      if (ids.size === 0) return 0
+      snapshot()
+      const next = nodesRef.current.filter((n) => !ids.has(n.id))
+      nodesRef.current = next
+      setNodes(next)
+      setSelectedIds((prev) => prev.filter((id) => !ids.has(id)))
+      fireChange(next)
+      return ids.size
+    },
+    // Remove the placed symbol of `type` nearest (x,y). Returns 1 if removed, else 0.
+    erasePlacedSymbol(type, x, y) {
+      let best = null, bestD = Infinity
+      for (const n of nodesRef.current) {
+        if (n.kind !== 'symbol' || n.type !== type) continue
+        const d = Math.hypot((n.x || 0) - (x || 0), (n.y || 0) - (y || 0))
+        if (d < bestD) { bestD = d; best = n }
+      }
+      if (!best) return 0
+      snapshot()
+      const next = nodesRef.current.filter((n) => n.id !== best.id)
+      nodesRef.current = next
+      setNodes(next)
+      setSelectedIds((prev) => prev.filter((id) => id !== best.id))
+      fireChange(next)
+      return 1
+    },
 
     // ── NEW: toDataURL ───────────────────────────────────────────────────────
     // Captures a PNG of the content layer only (overlay + Transformer excluded).
@@ -454,7 +613,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   // ── keyboard: space-to-pan · undo/redo · tool shortcuts (Items 2 + 3) ─────────
   useEffect(() => {
     // Tool letters. `t` would collide with rotate's mnemonic, so triangle uses `g`.
-    const TOOL_KEYS = { b: 'brush', l: 'line', r: 'rect', g: 'triangle', c: 'circle', a: 'arrow', v: 'select', m: 'move', t: 'rotate' }
+    const TOOL_KEYS = { b: 'brush', l: 'line', r: 'rect', g: 'triangle', c: 'circle', a: 'arrow', f: 'fill', v: 'select', m: 'move', t: 'rotate' }
     const isTyping = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
     const down = (e) => {
       if (e.code === 'Space') { spaceRef.current = true; return }
@@ -463,18 +622,20 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
         const k = e.key.toLowerCase()
         if (k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo() }
         else if (k === 'y') { e.preventDefault(); redo() }
+        else if (k === 'd') { e.preventDefault(); duplicateSelected() }  // duplicate selection
         return
       }
       if (e.altKey) return
       const k = e.key.toLowerCase()
       if (k === 'e') { e.preventDefault(); selectTool(e.shiftKey ? 'eraserPixel' : 'eraserStroke') }
+      else if (k === 'q') { e.preventDefault(); beautifySelected() }  // QuickShape: beautify selection
       else if (TOOL_KEYS[k]) { e.preventDefault(); selectTool(TOOL_KEYS[k]) }
     }
     const up = (e) => { if (e.code === 'Space') spaceRef.current = false }
     window.addEventListener('keydown', down)
     window.addEventListener('keyup', up)
     return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up) }
-  }, [undo, redo, selectTool])
+  }, [undo, redo, selectTool, beautifySelected, duplicateSelected])
 
   // ── attach Transformer to current selection ──────────────────────────────────
   useEffect(() => {
@@ -518,10 +679,32 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   // ── selection helpers ──────────────────────────────────────────────────────────
   const isTransformTool = tool === 'select' || tool === 'move' || tool === 'rotate'
 
-  function commitStroke(points, toolName) {
+  function commitStroke(points, toolName, { beautify = false } = {}) {
     if (!points || points.length < 2) return
+    let pts = points
+    // Auto-beautify (QuickShape): only freehand strokes; shape tools already emit clean geometry.
+    // Snap only on a confident shape match (smoothFallback off ⇒ freeform strokes stay raw).
+    if (beautify && toolName === 'brush') {
+      const res = beautifyStroke(points, { smoothFallback: false })
+      if (res.kind !== 'none') pts = res.points
+    }
+    // Close-the-ring weld: when beautify is active, a stroke that bridges an existing open ring's
+    // gap merges into one closed circle (prepared spell → cast) instead of adding a separate line.
+    if (beautify || autoBeautifyRef.current) {
+      for (const n of nodesRef.current) {
+        if (n.kind !== 'stroke') continue
+        const circ = weldsRingGap(n.points, pts)
+        if (circ) {
+          maybeSnap()
+          const next = nodesRef.current.map((x) => (x.id === n.id ? { ...x, points: circ } : x))
+          setNodes(next); nodesRef.current = next
+          fireChange(next)
+          return
+        }
+      }
+    }
     maybeSnap()
-    const node = { id: nextId(), kind: 'stroke', tool: toolName, color, width: brushSize, dyeId, points }
+    const node = { id: nextId(), kind: 'stroke', tool: toolName, color, width: brushSize, dyeId, points: pts }
     setNodes((prev) => {
       const next = [...prev, node]
       nodesRef.current = next
@@ -597,6 +780,24 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     }
   }
 
+  // ── fill (ink bucket) — flood a CLOSED stroke with the active ink ─────────────
+  // One click = one undo step. No-op when the click isn't inside a closed shape (an open
+  // shape, or empty space). Clicking a shape already filled with the active color clears it
+  // (toggle), so the same tool both fills and un-fills.
+  function fillAt(wp) {
+    const strokeNodes = nodesRef.current.filter((n) => n.kind === 'stroke')
+    const target = findFillTarget(strokeNodes, wp)
+    if (!target) return  // open shape or empty space → nothing to fill
+    const nextFill = target.fill === color ? null : color
+    snapshot()
+    const next = nodesRef.current.map((n) => (n.id === target.id ? { ...n, fill: nextFill } : n))
+    setNodes(next); nodesRef.current = next
+    // Filling with a dyed ink registers the dye on the spell (same as a dyed stroke).
+    let ds = dyesRef.current
+    if (nextFill && dyeId && !ds.includes(dyeId)) { ds = [...ds, dyeId]; setDyes(ds); dyesRef.current = ds }
+    fireChange(next, ds)
+  }
+
   // ── pointer / gesture handlers (on Stage) ────────────────────────────────────
   function onStageMouseDown(e) {
     const stage = stageRef.current
@@ -616,6 +817,9 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     // ── erasers ───────────────────────────────────────────────────────────────
     if (tool === 'eraserStroke') { drawingRef.current = true; erasedRef.current = false; pendingSnapRef.current = true; eraseStrokeAt(wp); return }
     if (tool === 'eraserPixel')  { drawingRef.current = true; erasedRef.current = false; pendingSnapRef.current = true; erasePixelAt(wp); return }
+
+    // ── fill (single click, no drag) ──────────────────────────────────────────
+    if (tool === 'fill') { fillAt(wp); return }
 
     // ── transform tools (select / move / rotate) ──────────────────────────────
     if (isTransformTool) {
@@ -637,7 +841,11 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
       drawingRef.current = true
       pendingSnapRef.current = true  // commitStroke takes the snapshot on mouseup (one step per stroke)
       startRef.current = wp
-      if (tool === 'brush') { livePtsRef.current = [wp]; setPreview({ tool: 'brush', color, width: brushSize, points: [wp] }) }
+      if (tool === 'brush') {
+        livePtsRef.current = [wp]
+        lastMoveRef.current = { t: performance.now(), x: wp.x, y: wp.y }
+        setPreview({ tool: 'brush', color, width: brushSize, points: [wp] })
+      }
     }
   }
 
@@ -655,7 +863,14 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     }
 
     if (tool === 'brush') {
-      livePtsRef.current.push(wp)
+      // Streamline (Phase 3): pull each new point toward the previous one to damp hand jitter.
+      let p = wp
+      if (streamlineRef.current && livePtsRef.current.length) {
+        const prev = livePtsRef.current[livePtsRef.current.length - 1]
+        p = { x: prev.x + (wp.x - prev.x) * STREAMLINE_ALPHA, y: prev.y + (wp.y - prev.y) * STREAMLINE_ALPHA }
+      }
+      livePtsRef.current.push(p)
+      lastMoveRef.current = { t: performance.now(), x: wp.x, y: wp.y }  // for hold-to-snap
       setPreview({ tool: 'brush', color, width: brushSize, points: livePtsRef.current.slice() })
       return
     }
@@ -698,9 +913,13 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
 
     if (tool === 'brush') {
       const pts = brush(livePtsRef.current)
+      // Phase 2 (QuickShape hold-to-snap): pausing at the end of the stroke snaps it even when
+      // Auto is off. Held = no pointer movement for HOLD_SNAP_MS before release.
+      const held = (performance.now() - lastMoveRef.current.t) >= HOLD_SNAP_MS
+      const beautify = autoBeautifyRef.current || held
       livePtsRef.current = []
       setPreview(null)
-      commitStroke(pts, 'brush')
+      commitStroke(pts, 'brush', { beautify })
       return
     }
     if (SHAPE_TOOLS.has(tool) && startRef.current && wp) {
@@ -791,6 +1010,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   function cursorForTool(t) {
     switch (t) {
       case 'eraserStroke': case 'eraserPixel': return 'cell'
+      case 'fill': return 'pointer'
       case 'select': return 'default'
       case 'move': return 'move'
       case 'rotate': return 'crosshair'
@@ -804,6 +1024,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   // Overlays use the same layer transform (layerProps) so they track pan/zoom exactly.
   // Font size and stroke width are divided by zoom to stay constant in screen pixels.
   const hasOverlays = Array.isArray(overlays) && overlays.length > 0
+  const hasHighlight = !!(highlight && highlight.w > 0 && highlight.h > 0)
   const overlayStrokeW = 1.5 / zoom
   const labelFontSize  = OVERLAY_FONT_SIZE / zoom
   const labelPad       = 2 / zoom
@@ -822,6 +1043,11 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
         onZoomOut={() => zoomAtCenter(-ZOOM_STEP)}
         onZoomReset={resetView}
         onRecenter={() => setPan({ x: 0, y: 0 })}
+        autoBeautify={autoBeautify} setAutoBeautify={setAutoBeautify}
+        streamline={streamline} setStreamline={setStreamline}
+        onBeautify={beautifySelected}
+        onDuplicate={duplicateSelected}
+        hasSelection={selectedIds.length > 0}
       />
 
       <div
@@ -868,6 +1094,19 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
               strokeWidth={2 / zoom} dash={[dash(8), dash(6)]} listening={false} />
             <KCircle x={0} y={0} radius={3 / zoom} fill="rgba(201,162,74,0.25)" listening={false} />
 
+            {/* optional tracing guide: a faint reference glyph to draw over (Training) */}
+            {traceSvg && (
+              <Path
+                data={traceSvg}
+                x={0} y={0}
+                scaleX={TRACE_SCALE} scaleY={TRACE_SCALE}
+                fill={OVERLAY_ACCENT}
+                fillRule="evenodd"
+                opacity={traceOpacity}
+                listening={false}
+              />
+            )}
+
             {/* committed nodes */}
             {nodes.map((n) => {
               const selectable = isTransformTool
@@ -879,6 +1118,8 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
                     points={flatten(n.points)}
                     stroke={n.color || '#c9a24a'}
                     strokeWidth={n.width || 3}
+                    closed={!!n.fill}
+                    fill={n.fill || undefined}
                     lineCap="round"
                     lineJoin="round"
                     hitStrokeWidth={Math.max(n.width || 3, 12)}
@@ -960,13 +1201,27 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
           </Layer>
 
           {/* ── Overlay layer (non-interactive, always on top) ──────────────── */}
-          {hasOverlays && (
+          {(hasOverlays || hasHighlight) && (
             <Layer
               {...layerProps}
               ref={overlayLayerRef}
               listening={false}
             >
-              {overlays.map((ov, i) => {
+              {/* glow box for the hovered Identified-panel row — drawn under the dashed overlays */}
+              {hasHighlight && (
+                <Rect
+                  x={highlight.x} y={highlight.y} width={highlight.w} height={highlight.h}
+                  stroke={OVERLAY_ACCENT}
+                  strokeWidth={2.5 / zoom}
+                  cornerRadius={4 / zoom}
+                  fill="rgba(201,162,74,0.12)"
+                  shadowColor={OVERLAY_ACCENT}
+                  shadowBlur={16 / zoom}
+                  shadowOpacity={0.9}
+                  listening={false}
+                />
+              )}
+              {hasOverlays && overlays.map((ov, i) => {
                 if (!ov || !ov.box) return null
                 const { x, y, w, h } = ov.box
                 const label = String(ov.label ?? '')

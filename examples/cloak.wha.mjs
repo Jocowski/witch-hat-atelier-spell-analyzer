@@ -11,7 +11,7 @@ import { SPELL, CIRCLE, GROUP, SIGIL, SIGN, CARDINAL, DIAGONAL, IN, OUT, AROUND,
 // One diagonal arm: an eye (innermost), a bend further out, two columns aimed outward at the bend.
 const shadowArm = GROUP('shadow_arm',
   SIGN('EYE'),
-  SIGN('BEND', { radius: OUT_R }),
+  SIGN('ENVELOPMENT', { radius: OUT_R }),
   SIGN('COLUMN', 2, { face: OUT, spread: 24 }),
 )
 
@@ -30,7 +30,7 @@ const chanRegion = CIRCLE('chan_region', { radius: 205 },
 )
 
 const chanBend = CIRCLE('chan_bend', { radius: 235 },
-  SIGN('BEND', 24, { face: AROUND }), // channelway, braided rim
+  SIGN('ENVELOPMENT', 24, { face: AROUND }), // channelway, braided rim
 )
 
 export default SPELL('Cloak Spell').stack(inner, body, chanRegion, chanBend)

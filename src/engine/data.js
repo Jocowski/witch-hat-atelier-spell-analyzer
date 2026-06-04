@@ -41,13 +41,26 @@ export function isSigilType(type) {
   return Boolean(SIGIL_MAP[type])
 }
 
+// Roles a symbol can play: 'sign', 'sigil', or both. An explicit `roles` array on the entry wins;
+// otherwise it is derived — a sigil entry is ['sigil']; a sign entry is ['sign'] plus 'sigil' when it
+// can occupy the centre (canBeCenter). This is the single source of truth for "sign / sigil / both".
+export function symbolRoles(type) {
+  const def = getComponentDef(type)
+  if (!def) return []
+  if (Array.isArray(def.roles) && def.roles.length) return def.roles
+  if (SIGIL_MAP[type]) return ['sigil']
+  const roles = ['sign']
+  if (def.canBeCenter) roles.push('sigil')
+  return roles
+}
+
 // Signs que podem ocupar o centro (núcleo) como sigil.
 export function signCanBeCenter(type) {
   const s = SIGN_MAP[type]
-  return Boolean(s && s.canBeCenter)
+  return Boolean(s && (s.canBeCenter || (Array.isArray(s.roles) && s.roles.includes('sigil'))))
 }
 
-// Núcleo válido = sigil OU sign que pode ser centro.
+// Núcleo válido = sigil OU sign que pode ser centro (role 'sigil').
 export function canBeCore(type) {
   return isSigilType(type) || signCanBeCenter(type)
 }

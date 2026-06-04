@@ -2,7 +2,7 @@
 // The Studio is the front door, so it loads eagerly; the Admin and Login screens are code-split
 // (React.lazy) so the Studio's initial bundle doesn't pull in admin-only views or the auth UI.
 import { Suspense, lazy, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import StudioPage from './studio/StudioPage.jsx'
 import RequireAdmin from './admin/RequireAdmin.jsx'
 import { loadDbSymbols } from './engine/symbolLoader.js'
@@ -19,25 +19,13 @@ function RouteFallback() {
   )
 }
 
-function Nav() {
-  const { pathname } = useLocation()
-  // The login/admin screens are full-page and carry their own chrome — hide the top nav there.
-  if (pathname.startsWith('/admin') || pathname.startsWith('/login')) return null
-  return (
-    <nav className="app-nav">
-      <Link className={pathname === '/' ? 'on' : ''} to="/">Studio</Link>
-      <Link to="/admin">Admin</Link>
-    </nav>
-  )
-}
-
 export default function AppRouter() {
   // Load the DB symbol overlay once at boot (baseline ⊕ overlay). No-ops without Supabase.
   useEffect(() => { loadDbSymbols() }, [])
 
+  // Navigation between Studio and Admin is by URL (/, /admin) — no top nav bar.
   return (
     <BrowserRouter>
-      <Nav />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<StudioPage />} />

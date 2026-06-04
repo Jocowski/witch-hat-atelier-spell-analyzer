@@ -24,7 +24,7 @@ const MAP = {
   'Fire.png': 'fire', 'Unburning_Flame.png': 'unburning_flame', 'Light.png': 'light',
   'Water.png': 'water', 'Earth.png': 'earth',
   'Wind.png': 'wind', 'Aeriforms.png': 'aeriforms', 'Wind_Underfoot.png': 'wind_underfoot', 'Whorling_Winds.png': 'whorling_wind',
-  'Repetition.png': 'repetition_sigil', 'Time_Stop.jpg': 'stop',
+  'Time_Stop.jpg': 'stop',
   'Bird_A.png': 'bird_a', 'Bird_B.png': 'bird_b', 'Dragon.png': 'dragon', 'Flower.png': 'flower', 'Flower_Water.png': 'flower_water',
   'Horse.png': 'horse', 'Owlcat.png': 'owlcat', 'Owlcat_Head.png': 'owlcat_head', 'Scalewolf.png': 'scalewolf',
   'Torchstag.png': 'torchstag', 'Liongoat.png': 'liongoat', 'Valance_Leech.png': 'valance_leech',
@@ -41,7 +41,7 @@ const SIGILS_JSON = path.join(ROOT, 'data', 'sigils.json');
 
 // Sigils whose source art is NOT centered in its 100x100 image: re-center them
 // on their actual bounding box instead of the image center.
-const BBOX_CENTER = new Set(['repetition_sigil', 'bird_a']);
+const BBOX_CENTER = new Set(['bird_a']);
 
 // Sigils whose source PNG is NOT 100x100 (arbitrary crop): recenter on the bbox
 // and scale to fit the viewBox, like the unknown-sign vectorizer (no -50 center).

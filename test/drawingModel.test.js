@@ -97,12 +97,12 @@ test('toComposition: isSigil predicate classifies types correctly', () => {
 
 test('toComposition: isSigil predicate overrides kind field', () => {
   // kind:'sign' but isSigil says it IS a sigil → treated as sigil
-  const customOpts = { isSigil: (type) => type === 'vision_sigil' }
+  const customOpts = { isSigil: (type) => type === 'vision' }
   const placed = [
-    { id: 'v', kind: 'sign', type: 'vision_sigil', x: 0, y: 0, rotation: 0, scale: 1, inverted: false },
+    { id: 'v', kind: 'sign', type: 'vision', x: 0, y: 0, rotation: 0, scale: 1, inverted: false },
   ]
   const comp = toComposition({ strokes: [], placed, dyes: [] }, customOpts)
-  assert.equal(comp.circles[0].core?.type, 'vision_sigil')
+  assert.equal(comp.circles[0].core?.type, 'vision')
 })
 
 // ---------- component roles ----------

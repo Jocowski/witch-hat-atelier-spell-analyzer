@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DrawingSurface from '../studio/DrawingSurface.jsx'
 import { recognize, makeCloud, strokesToTemplate } from '../draw/recognizer.js'
+import { getComponentDef } from '../engine/data.js'
 import { listSymbols, addSymbol } from '../data-services/symbols.js'
 import { addSample, listSamples } from '../data-services/samples.js'
 import rules from '../../data/rules.json'
@@ -93,6 +94,26 @@ function rankOverRotations(pts, clouds) {
   return [...best.values()].sort((a, b) => a.adjDist - b.adjDist).slice(0, 3)
 }
 
+// Reference image of the symbol being trained — the SVG the app actually renders (DB svg_path
+// overlay, falling back to the JSON baseline via getComponentDef). Lets the user copy the original
+// shape while drawing a sample.
+function SymbolPreview({ sym }) {
+  if (!sym) return null
+  const def = getComponentDef(sym.engine_id || sym.name)
+  const svgPath = sym.svg_path || def?.svgPath
+  return (
+    <div className="admin-symbol-preview" title="The original symbol to draw">
+      {svgPath ? (
+        <svg viewBox="-50 -50 100 100" width="120" height="120" aria-label={`${sym.label || sym.name} reference`}>
+          <path d={svgPath} fill="currentColor" fillRule="evenodd" />
+        </svg>
+      ) : (
+        <div className="admin-hint" style={{ padding: 20, textAlign: 'center' }}>No reference image for this symbol yet.</div>
+      )}
+    </div>
+  )
+}
+
 export default function TrainingView() {
   const canvasRef = useRef(null)
 
@@ -100,6 +121,7 @@ export default function TrainingView() {
   const [symbolsErr, setSymbolsErr] = useState(null)
   const [selectedId, setSelectedId] = useState('')
   const [exampleCount, setExampleCount] = useState(0)
+  const [showTrace, setShowTrace] = useState(false)   // overlay the reference glyph on the canvas to trace over
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [addForm, setAddForm] = useState(EMPTY_FORM)
@@ -203,6 +225,11 @@ export default function TrainingView() {
 
   const grouped = useMemo(() => groupByKind(symbols), [symbols])
   const selectedSym = symbols.find((s) => s.id === selectedId)
+  // The reference glyph's svgPath (DB overlay, else JSON baseline) — shared by the side preview and
+  // the optional on-canvas tracing guide.
+  const tracePath = selectedSym
+    ? (selectedSym.svg_path || getComponentDef(selectedSym.engine_id || selectedSym.name)?.svgPath || null)
+    : null
 
   return (
     <div className="admin-train-wrap">
@@ -210,12 +237,18 @@ export default function TrainingView() {
 
       <div className="admin-train-layout">
         <div className="admin-train-canvas-col">
-          <DrawingSurface ref={canvasRef} palette="bw" enableSymbols={false} compact onChange={handleChange} />
+          <DrawingSurface ref={canvasRef} palette="bw" enableSymbols={false} compact onChange={handleChange}
+            traceSvg={showTrace ? tracePath : null} />
           <div className="admin-train-actions">
             <button className="admin-btn" onClick={() => { canvasRef.current?.clear(); setLiveGuess(null); setSaveMsg(null); setSaveErr(null) }}>Clear</button>
             <button className="admin-btn admin-btn-primary" onClick={handleSave} disabled={saving || !selectedId}>
               {saving ? 'Saving…' : 'Save sample'}
             </button>
+            <label className="admin-label admin-train-trace-toggle" title="Show the reference glyph faintly on the canvas to draw over"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+              <input type="checkbox" checked={showTrace} onChange={(e) => setShowTrace(e.target.checked)} disabled={!tracePath} />
+              Trace overlay
+            </label>
           </div>
           {saveMsg && <p className="admin-ok">{saveMsg}</p>}
           {saveErr && <p className="admin-error">{saveErr}</p>}
@@ -246,6 +279,7 @@ export default function TrainingView() {
                 {' · '}<strong>{exampleCount} example{exampleCount !== 1 ? 's' : ''}</strong>
               </p>
             )}
+            {selectedSym && <SymbolPreview sym={selectedSym} />}
           </div>
 
           <button className="admin-btn admin-btn-ghost" style={{ alignSelf: 'flex-start' }}

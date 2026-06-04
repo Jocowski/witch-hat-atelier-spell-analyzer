@@ -31,6 +31,11 @@ import rules from '../../data/rules.json'
 
 const BRIDGE_URL = import.meta.env.VITE_AI_BRIDGE_URL || 'http://localhost:8787'
 
+// Stable per-group id so the Identified-panel rows keep stable React keys across re-detects
+// (index keys made row-local state — open editors, status badges — bleed onto the wrong row).
+let GROUP_UID = 0
+const tagGroups = (groups) => { for (const g of groups || []) { if (!g._uid) g._uid = `g${++GROUP_UID}` } ; return groups }
+
 // Visual effect renderer config (from rules.json) — passed to DrawingSurface as-is.
 const RENDERER_CFG = rules.renderer ?? {}
 
@@ -107,6 +112,9 @@ export default function StudioPage() {
   // detection includes: placed, recGroups, ringClosed, dyes, detectedRings, relations
   const [detection, setDetection] = useState({ placed: [], recGroups: [], ringClosed: false, dyes: [], detectedRings: [], relations: [] })
   const [overlays, setOverlays] = useState([])
+  const [hovered, setHovered]   = useState(null)   // bbox of the row being hovered → canvas glow
+  const [showBoxes, setShowBoxes] = useState(true)  // toggle the detection overlay boxes on the canvas
+  const [tab, setTab] = useState('detected')        // results-drawer tab: 'detected' | 'analysis' | 'ai'
   const [composition, setComposition] = useState(null)
   const [result, setResult] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -216,7 +224,7 @@ export default function StudioPage() {
           nestCenterSlack:      rules.recognition?.nestCenterSlack      ?? 0.85,
           linkEndpointSlack:    rules.recognition?.linkEndpointSlack    ?? 0.12,
         })
-        recGroups = recognizerResult.groups || []
+        recGroups = tagGroups(recognizerResult.groups || [])
         ringClosed = !!recognizerResult.ring
       }
       const detectedRings  = recognizerResult?.rings     || []
@@ -226,7 +234,7 @@ export default function StudioPage() {
       setOverlays(overlaysFor(d))
       setComposition(buildComposition(d))
       setResult(null); setContributeMsg(null)
-      setPhase('detected')
+      setPhase('detected'); setTab('detected')
 
       // Derive ring geometry for the effect canvas (SPEC-visual-renderer §3.3).
       // The effect canvas is fixed-size (canvas px); center = stage center.
@@ -269,6 +277,7 @@ export default function StudioPage() {
     const merged = mergeGroups(groupsToMerge, clouds, { rotationSteps: ROTATION_STEPS, confidenceMinPct: CONFIDENCE_MIN_PCT })
     if (!merged) return
     merged._justMerged = true // signal IdentifiedPanel to open the label editor on this row
+    tagGroups([merged]) // stable React key for the new row
     const set = new Set(groupsToMerge)
     const recGroups = detection.recGroups.filter((g) => !set.has(g))
     recGroups.push(merged)
@@ -278,13 +287,47 @@ export default function StudioPage() {
     if (phase === 'analyzed') setResult(analyze(comp))
   }, [detection, templates, buildComposition, phase])
 
+  // Beautify recognized symbols: SMOOTH their actual drawn strokes in place (snap to a clean shape
+  // when one fits, else de-jitter) — keeping the drawn size/style/position. Not an SVG swap.
+  const handleBeautifyGroups = useCallback((groupsArr) => {
+    const list = (groupsArr || []).filter((g) => g && g.match)
+    if (list.length === 0 || !canvasRef.current) return
+    const refs = list.flatMap((g) => g.strokes || [])
+    const n = canvasRef.current.smoothStrokes(refs) || 0
+    toast(n ? `Smoothed ${n} stroke${n === 1 ? '' : 's'}` : 'Nothing to smooth')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Erase a listed symbol from the drawing: remove its strokes (recognized) or placed node, then
+  // drop it from the detection and refresh composition/overlays.
+  const handleEraseRow = useCallback((payload) => {
+    if (!canvasRef.current || !payload) return
+    let d
+    if (payload.group) {
+      const g = payload.group
+      // Pass g.pts so erase works even when stroke references went stale (re-detect/beautify).
+      const removed = canvasRef.current.eraseStrokesByRefs(g.strokes || [], g.pts || [])
+      if (!removed) { toast('Could not find this symbol on the canvas'); return }
+      d = { ...detection, recGroups: detection.recGroups.filter((x) => x !== g) }
+    } else if (payload.placed) {
+      const sym = payload.placed
+      const removed = canvasRef.current.erasePlacedSymbol(sym.type, sym.x, sym.y)
+      if (!removed) { toast('Could not find this symbol on the canvas'); return }
+      d = { ...detection, placed: detection.placed.filter((p) => p !== sym) }
+    } else return
+    setDetection(d); setOverlays(overlaysFor(d)); setHovered(null)
+    const comp = buildComposition(d); setComposition(comp)
+    if (phase === 'analyzed') setResult(analyze(comp))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detection, phase, buildComposition])
+
   // STEP 2 — analyze (+ A0: log the analysis + corrections for the improvement loop)
   const handleAnalyze = useCallback(() => {
     if (!composition || busy) return
     setBusy(true)
     try {
       const res = analyze(composition)
-      setResult(res); setPhase('analyzed')
+      setResult(res); setPhase('analyzed'); setTab('analysis')
       const corrections = correctionsRef.current.length ? { items: [...correctionsRef.current] } : null
       logAnalysis({ composition, engine_result: res, corrections }).catch(() => {})
 
@@ -365,7 +408,8 @@ export default function StudioPage() {
               ref={canvasRef}
               palette="dyes"
               enableSymbols
-              overlays={overlays}
+              overlays={showBoxes ? overlays : []}
+              highlight={hovered}
               spellIR={spellIRShim}
               ringGeom={ringGeom}
               effectsEnabled={phase === 'analyzed' && !!spellIRShim}
@@ -419,6 +463,15 @@ export default function StudioPage() {
                   {' Ring gating'}
                 </label>
               )}
+              {overlays.length > 0 && (
+                <button
+                  className={`srh-btn${showBoxes ? '' : ' srh-btn-off'}`}
+                  onClick={() => setShowBoxes((s) => !s)}
+                  title={showBoxes ? 'Hide the detection boxes on the canvas' : 'Show the detection boxes'}
+                >
+                  {showBoxes ? '◳ boxes' : '◳ boxes off'}
+                </button>
+              )}
               <button className="srh-btn" onClick={() => setCollapsed((c) => !c)} title={collapsed ? 'Expand' : 'Minimize'}>
                 {collapsed ? '▢ expand' : '— minimize'}
               </button>
@@ -427,33 +480,47 @@ export default function StudioPage() {
           </div>
 
           {!collapsed && (
-            <div className="studio-results-inner">
-              <div className="detect-block">
-                <div className="detect-head">
-                  <p className="detect-hint">Review the detected symbols (boxed on the canvas). Correct any that were misidentified, then analyze.</p>
-                  {phase === 'detected' && (
-                    <button className="primary" onClick={handleAnalyze} disabled={busy || !composition}>
-                      {busy ? 'Analyzing…' : 'Analyze spell'}
-                    </button>
-                  )}
-                </div>
-                <IdentifiedPanel placed={detection.placed} groups={detection.recGroups} onRelabel={handleCorrect} onMerge={handleMerge} />
-                {canContribute && (
-                  <div className="contribute-box">
-                    <p className="detect-hint">This matches <strong>{result.similar.match.name}</strong> — its symbols are confirmed and can seed the training set.</p>
-                    <button className="primary" onClick={handleContribute}>＋ Contribute symbols to training</button>
-                    {contributeMsg && <span className="contribute-msg">{contributeMsg}</span>}
-                  </div>
-                )}
+            <>
+              {/* Tabs — each panel gets the full drawer width instead of one long scroll. */}
+              <div className="studio-results-tabs" role="tablist">
+                <button className={`srt-tab${tab === 'detected' ? ' active' : ''}`} role="tab" aria-selected={tab === 'detected'}
+                  onClick={() => setTab('detected')}>Detected</button>
+                <button className={`srt-tab${tab === 'analysis' ? ' active' : ''}`} role="tab" aria-selected={tab === 'analysis'}
+                  onClick={() => setTab('analysis')} disabled={phase !== 'analyzed'}>Analysis</button>
+                <button className={`srt-tab${tab === 'ai' ? ' active' : ''}`} role="tab" aria-selected={tab === 'ai'}
+                  onClick={() => setTab('ai')} disabled={phase !== 'analyzed'}>AI Report</button>
               </div>
 
-              {phase === 'analyzed' && result && (
-                <>
-                  <ResultPanel result={result} />
+              <div className="studio-results-inner">
+                {tab === 'detected' && (
+                  <div className="detect-block">
+                    <div className="detect-head">
+                      <p className="detect-hint">Review the detected symbols (boxed on the canvas). Correct any that were misidentified, then analyze.</p>
+                      {phase === 'detected' && (
+                        <button className="primary" onClick={handleAnalyze} disabled={busy || !composition}>
+                          {busy ? 'Analyzing…' : 'Analyze spell'}
+                        </button>
+                      )}
+                    </div>
+                    <IdentifiedPanel placed={detection.placed} groups={detection.recGroups} onRelabel={handleCorrect} onMerge={handleMerge}
+                      onBeautify={(g) => handleBeautifyGroups([g])} onBeautifyAll={(gs) => handleBeautifyGroups(gs)}
+                      onHover={setHovered} onErase={handleEraseRow} />
+                    {canContribute && (
+                      <div className="contribute-box">
+                        <p className="detect-hint">This matches <strong>{result.similar.match.name}</strong> — its symbols are confirmed and can seed the training set.</p>
+                        <button className="primary" onClick={handleContribute}>＋ Contribute symbols to training</button>
+                        {contributeMsg && <span className="contribute-msg">{contributeMsg}</span>}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {tab === 'analysis' && phase === 'analyzed' && result && <ResultPanel result={result} />}
+                {tab === 'ai' && phase === 'analyzed' && result && (
                   <AIReportPanel composition={composition} engineResult={result} bridgeUrl={BRIDGE_URL} />
-                </>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}

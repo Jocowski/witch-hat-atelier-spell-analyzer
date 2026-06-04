@@ -210,11 +210,11 @@ test('Light Beam: light + COLUMN×4 CARDINAL IN ⇒ valid, radial, columns', () 
   assert.equal(k.core.id, 'light')
 })
 
-test('Gathering Shadows: VISION core + EYE×4 DIAGONAL + BEND×4 ⇒ valid, radial, eye+bend', () => {
+test('Gathering Shadows: VISION core + EYE×4 DIAGONAL + ENVELOP×4 ⇒ valid, radial, eye+envelop', () => {
   __resetIds()
   const c = CIRCLE({ core: SIGN('VISION') },
     SIGN('EYE', 4, { at: DIAGONAL }),
-    SIGN('BEND', 4, { at: CARDINAL }),
+    SIGN('ENVELOPMENT', 4, { at: CARDINAL }),
   )
   const sp = SPELL('Gathering Shadows'); sp.circles.push(c)
   const f = facts(sp.emit())
@@ -222,9 +222,11 @@ test('Gathering Shadows: VISION core + EYE×4 DIAGONAL + BEND×4 ⇒ valid, radi
   assert.deepEqual(f.unknownIds, [])
   const k = f.circles[0]
   // VISION (a center-capable sign) maps to its *_sigil substance form as the core.
-  assert.equal(k.core.id, 'vision_sigil')
+  assert.equal(k.core.id, 'vision')
   assert.equal(k.symmetry, 'radial')
-  assert.deepEqual(new Set(k.operatorsByKind.special), new Set(['eye', 'bend']))
+  // Envelop is a FORM operator (wraps its target); Eye is the special operator here.
+  assert.deepEqual(new Set(k.operatorsByKind.special), new Set(['eye']))
+  assert.ok(k.operatorsByKind.form?.includes('envelopment'))
 })
 
 test('Cloak Spell (4-ring device): stack ⇒ valid wha-spell@2, no unknownIds', async () => {
@@ -241,11 +243,12 @@ test('Cloak Spell (4-ring device): stack ⇒ valid wha-spell@2, no unknownIds', 
   assert.equal(f.circleCount, 4)
 
   const byId = Object.fromEntries(f.circles.map((c) => [c.id, c]))
-  // inner: vision core + winds + the eye/bend/column arms — all inside the ring.
-  assert.equal(byId.inner.core.id, 'vision_sigil')
+  // inner: vision core + winds + the eye/envelop/column arms — all inside the ring.
+  assert.equal(byId.inner.core.id, 'vision')
   assert.equal(byId.inner.zones.outside, 0)
   assert.ok(byId.inner.operatorsByKind.form?.includes('column'))
-  assert.deepEqual(new Set(byId.inner.operatorsByKind.special), new Set(['eye', 'bend']))
+  assert.ok(byId.inner.operatorsByKind.form?.includes('envelopment'))
+  assert.deepEqual(new Set(byId.inner.operatorsByKind.special), new Set(['eye']))
   // body: puppet + region (coreless modifier ring around the heart).
   assert.ok(byId.body.operatorsByKind.motion?.includes('dancing_puppet'))
   assert.ok(byId.body.operatorsByKind.direction?.includes('direction'))
@@ -288,14 +291,14 @@ test('core must be a sigil or a canBeCore sign', () => {
   assert.throws(() => sp.emit(), /cannot occupy the center/)
 })
 
-test('aliases resolve to data ids (REGION→direction, PUPPET→dancing_puppet, VISION core→vision_sigil)', () => {
+test('aliases resolve to data ids (REGION→direction, PUPPET→dancing_puppet, VISION core→vision)', () => {
   __resetIds()
   const c = CIRCLE({ core: SIGN('VISION') }, SIGN('REGION', 4, { at: CARDINAL }), SIGN('PUPPET', 4, { at: DIAGONAL }))
   const sp = SPELL('a'); sp.circles.push(c)
   const ir = sp.emit()
   const comp = ir.composition || ir.circles?.[0]
   const core = comp.core
-  assert.equal(core.type, 'vision_sigil')
+  assert.equal(core.type, 'vision')
   const types = new Set((comp.components || ir.circles[0].components).map((x) => x.type))
   assert.ok(types.has('direction'))
   assert.ok(types.has('dancing_puppet'))

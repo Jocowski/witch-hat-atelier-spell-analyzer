@@ -42,7 +42,7 @@
 
 .ds-dock {
   flex-shrink: 0;
-  width: 76px;
+  width: 92px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -206,13 +206,14 @@
 /* ── Color palette ─────────────────────────────────────────── */
 
 .ds-palette {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, auto);  /* two dye swatches per row */
   gap: 4px;
-  align-items: center;
+  justify-content: center;
 }
 
 .ds-dock-compact .ds-palette {
+  display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 }

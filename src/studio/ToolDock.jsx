@@ -22,7 +22,7 @@
  *
  * Tool IDs
  * ────────
- *   brush | line | rect | triangle | circle | arrow
+ *   brush | fill | line | rect | triangle | circle | arrow
  *   eraserStroke | eraserPixel
  *   select | move | rotate
  */
@@ -34,7 +34,10 @@ function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v }
 const TOOL_GROUPS = [
   {
     label: 'Draw',
-    tools: [{ id: 'brush', label: 'Brush', icon: '✏' }],
+    tools: [
+      { id: 'brush', label: 'Brush', icon: '✏' },
+      { id: 'fill',  label: 'Fill',  icon: '🪣' },
+    ],
   },
   {
     label: 'Shapes',
@@ -65,7 +68,7 @@ const TOOL_GROUPS = [
 
 // Keyboard shortcuts (mirror DrawingSurface's keydown map) shown in tooltips for discoverability.
 const HOTKEYS = {
-  brush: 'B', line: 'L', rect: 'R', triangle: 'G', circle: 'C', arrow: 'A',
+  brush: 'B', fill: 'F', line: 'L', rect: 'R', triangle: 'G', circle: 'C', arrow: 'A',
   eraserStroke: 'E', eraserPixel: 'Shift+E', select: 'V', move: 'M', rotate: 'T',
 }
 
@@ -85,6 +88,12 @@ export default function ToolDock({
   compact      = false,
   zoom         = 1,
   onZoomIn, onZoomOut, onZoomReset, onRecenter,
+  // ── Assist (stroke beautify, SPEC-stroke-beautify.md) — optional; omit to hide the section ──
+  autoBeautify, setAutoBeautify,   // QuickShape: auto-snap freehand strokes to clean shapes on finish
+  streamline,   setStreamline,     // Streamline: live jitter-smoothing while drawing
+  onBeautify,                      // manual: beautify the current selection (or last stroke)
+  onDuplicate,                     // duplicate the current selection
+  hasSelection = false,            // whether anything is selected (enables selection actions)
 }) {
   const colors = palette === 'bw' ? BW_COLORS : DYES
 
@@ -117,6 +126,59 @@ export default function ToolDock({
           <div className="ds-sep" />
         </div>
       ))}
+
+      {/* ── Assist: beautify / smooth (QuickShape + Streamline) ─── */}
+      {(onBeautify || setAutoBeautify || setStreamline || onDuplicate) && (
+        <div className="ds-tool-group ds-assist-group">
+          {!compact && <div className="ds-group-label">Assist</div>}
+          <div className="ds-tool-row">
+            {onBeautify && (
+              <button
+                className="ds-tool-btn"
+                title={`Beautify: snap the selected stroke to a clean shape (Q)`}
+                onClick={onBeautify}
+              >
+                <span className="ds-tool-icon">✦</span>
+                {!compact && <span className="ds-tool-label">Beautify</span>}
+              </button>
+            )}
+            {setAutoBeautify && (
+              <button
+                className={`ds-tool-btn${autoBeautify ? ' ds-active' : ''}`}
+                title="Auto-beautify (QuickShape): freehand strokes snap to clean shapes when you finish drawing"
+                onClick={() => setAutoBeautify(!autoBeautify)}
+                aria-pressed={!!autoBeautify}
+              >
+                <span className="ds-tool-icon">◎</span>
+                {!compact && <span className="ds-tool-label">Auto{autoBeautify ? ' ✓' : ''}</span>}
+              </button>
+            )}
+            {setStreamline && (
+              <button
+                className={`ds-tool-btn${streamline ? ' ds-active' : ''}`}
+                title="Streamline: smooth out hand jitter live as you draw"
+                onClick={() => setStreamline(!streamline)}
+                aria-pressed={!!streamline}
+              >
+                <span className="ds-tool-icon">∿</span>
+                {!compact && <span className="ds-tool-label">Smooth{streamline ? ' ✓' : ''}</span>}
+              </button>
+            )}
+            {onDuplicate && (
+              <button
+                className="ds-tool-btn"
+                title="Duplicate the selection (Ctrl+D). Use Select/Move/Rotate + Shift-click to pick several first."
+                onClick={onDuplicate}
+                disabled={!hasSelection}
+              >
+                <span className="ds-tool-icon">⧉</span>
+                {!compact && <span className="ds-tool-label">Duplicate</span>}
+              </button>
+            )}
+          </div>
+          <div className="ds-sep" />
+        </div>
+      )}
 
       {/* ── Color / dye palette ───────────────────────────────── */}
       <div className="ds-palette-group">
