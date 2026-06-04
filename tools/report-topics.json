@@ -1,0 +1,52 @@
+[
+  {
+    "id": "feasibility",
+    "title": "Would it work? & why",
+    "prompt": "Decide whether this spell would work as composed, and explain why. Reason strictly from the substances, operators, and geometry present in the FACTS, using docs/CORE.md (substance semantics, operator preconditions, failure modes) and the relevant docs/lexicon/ dossiers. State your verdict clearly (works / works with caveats / likely fails), then give the first-principles chain that supports it. Answer ONLY this topic, in concise Markdown."
+  },
+  {
+    "id": "effect",
+    "title": "The effect, simply",
+    "prompt": "Describe what this spell does in plain, vivid language a player or reader would enjoy — as if narrating the moment it fires. Avoid mechanical jargon; convey the sensory experience (sight, sound, movement, outcome). Base the description on the substances, operators, and geometry in the FACTS and docs/CORE.md. Answer ONLY this topic, in concise Markdown (2–4 sentences, no headers needed)."
+  },
+  {
+    "id": "symbols",
+    "title": "What each symbol does here",
+    "prompt": "For each sigil and sign listed in the FACTS, explain the specific role it plays in THIS spell — not a generic definition, but how it shapes the actual effect given the other symbols present and the geometry. Use docs/lexicon/ dossiers and docs/CORE.md operator semantics. Format as a short bullet per symbol (name: role). Answer ONLY this topic, in concise Markdown."
+  },
+  {
+    "id": "canon",
+    "title": "How canon is it?",
+    "prompt": "Assess how close this spell is to established canon. Use the catalog neighbours in the FACTS (closest canon match + similarity score) and docs/CORE.md / docs/lexicon/ findings to judge: does the composition follow patterns seen in real Witch Hat Atelier spells, or does it diverge? Note the provenance of the closest match (canon / wiki-sourced / fan). Be honest about uncertainty. Answer ONLY this topic, in concise Markdown."
+  },
+  {
+    "id": "power",
+    "title": "Power & danger",
+    "prompt": "Estimate the power level of this spell and any stability or safety risks. Reason from operator kinds (motion, form, power signs in the FACTS), geometry (symmetry, zone distribution, spin), and docs/CORE.md substance properties. Flag any backfire risk, forbidden-magic proximity (docs/forbidden-magic.md if relevant), or instability from unusual combinations. Answer ONLY this topic, in concise Markdown."
+  },
+  {
+    "id": "casting",
+    "title": "Casting & appearance",
+    "prompt": "Describe what it looks and feels like to cast this spell in-world, and what the effect looks like to an observer. Draw on the substances' elemental character (docs/CORE.md), the operator types (motion/form/direction), and any dyes noted in the FACTS for color/quality. This is flavor — immersive, grounded in the system, not a mechanical list. Answer ONLY this topic, in concise Markdown (3–5 sentences)."
+  },
+  {
+    "id": "tweaks",
+    "title": "Tweaks & variations",
+    "prompt": "Suggest 2–4 concrete, buildable modifications to this spell — adding, removing, replacing, or repositioning a sign — that would meaningfully strengthen it, change its range or direction, add a secondary effect, or improve safety. For each tweak name the change and briefly state the expected effect difference, grounded in docs/CORE.md operator semantics. Do not invent symbols not in docs/lexicon/ or signs.json. Answer ONLY this topic, in concise Markdown."
+  },
+  {
+    "id": "closest",
+    "title": "Closest canon spells",
+    "prompt": "Compare this spell to the closest named canon spells from the catalog neighbours in the FACTS. For each named spell: what do they share (same sigil family, overlapping sign set, similar geometry) and how does this spell differ? If the closest match is not meaningful (low similarity), say so. Ground all comparisons in the FACTS and docs/CORE.md. Answer ONLY this topic, in concise Markdown."
+  },
+  {
+    "id": "lore",
+    "title": "Name & lore",
+    "prompt": "Propose a fitting in-world name for this spell (in the style of Witch Hat Atelier naming — descriptive, evocative, not overly grandiose) and write one or two sentences of in-world lore: who might use it, where it might appear in a witch's repertoire, any cultural or elemental resonance. Ground the name in the dominant substance and primary operator from the FACTS. Answer ONLY this topic, in concise Markdown."
+  },
+  {
+    "id": "uses",
+    "title": "Practical uses",
+    "prompt": "List 3–5 practical applications of this spell across combat, utility, and everyday life, grounded in what the spell actually does (from the FACTS and effect reasoning). For each use give a one-line scenario. Be specific and realistic within the Witch Hat Atelier world — avoid vague generalities. Answer ONLY this topic, in concise Markdown."
+  }
+]

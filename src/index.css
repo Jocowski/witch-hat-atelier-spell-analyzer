@@ -202,6 +202,16 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 .modal-error { color: var(--err); font-size: 0.8rem; margin-top: 8px; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 
+/* ---- Draw modal (recognizer) ---- */
+.draw-tmpl-list { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 5px; max-height: 200px; overflow: auto; }
+.draw-tmpl-list li { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--panel-2); border-radius: 7px; padding: 5px 8px; font-size: 0.85rem; }
+.draw-tmpl-list li em { font-style: normal; }
+.draw-tmpl-list li button { background: none; border: none; color: var(--err); cursor: pointer; padding: 0 4px; }
+.draw-comp { background: #0c0a11; border: 1px solid var(--line); border-radius: 8px; padding: 8px; font-size: 0.72rem; max-height: 180px; overflow: auto; color: var(--ok, #6ee7a8); white-space: pre; }
+
+/* ---- AI analysis (local bridge) ---- */
+.ai-analysis { margin-top: 10px; padding: 10px 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; font-size: 0.82rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; max-height: 420px; overflow: auto; }
+
 .selected-toolbar {
   display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
   background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px; width: 100%;

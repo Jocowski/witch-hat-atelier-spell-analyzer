@@ -17,6 +17,18 @@ The project is re-architected so the **AI reasons the magic from first principle
 
 Consequence: `grammar.json` + `deduce.js` produce a **heuristic** effect string — a scaffold, not ground truth. Prefer `--facts` (structured observations) + CORE/lexicon reasoning. The deterministic deduction is kept for the GUI's live readout.
 
+### The app today: Spell Studio (draw → recognize → analyze, + Admin)
+
+The app evolved from the drag-drop editor into **Spell Studio** (entry: `src/main.jsx` → `src/router.jsx`). Routes: `/` Studio · `/login` · `/admin/*` (admin-gated). **The legacy drag-drop editor (`App.jsx` + `components/{GlyphCanvas,Inspector,SpellTree,InkPanel,Palette}`, `DrawModal`) was removed** — only `components/ResultPanel.jsx` remains from the old UI.
+
+- **Studio** (`src/studio/`): a near-fullscreen **react-konva** canvas (`DrawingSurface.jsx`) with paint tools (brush/line/rect/triangle/circle/arrow, stroke + pixel erasers, select/move/rotate, area-select, right-click/space pan, Shift+wheel zoom) + dye colors; place registered sigils/signs from `SymbolPalette.jsx`. **Detect** runs the `$P` recognizer (`src/draw/recognizer.js`) over the drawn strokes (+ placed symbols) → a `composition` (overlay boxes show each detection, correctable); **Analyze** runs the engine + a streaming multi-topic **AI report** (`src/ai/report.js`). Copy-image + JSON export/import via the `DrawingSurface` ref. Corrections and confident catalog matches feed the training set.
+- **Admin** (`src/admin/`): Supabase Auth login + role guard; **Training** (`TrainingView`: draw → save a labeled `training_sample`), **Registry** (`RegistryView`: CRUD the `symbols` registry), **Review** (`ReviewView`: filter/rollback/delete/see a sample's replay).
+- **Themes** (`src/theme/`): 4 CSS-variable themes (brown default / dark / light / arcane) + themed scrollbars (in `themes.css`).
+- **Data** (`src/data-services/` → Supabase): tables `profiles`, `symbols`, `training_samples` (the recognizer templates), `analyses`, `audit_log`. Schema in `supabase/migrations/`; local stack via the `supabase` CLI; the browser client (`supabase.js`) reads `.env` (`VITE_SUPABASE_*`) and degrades gracefully when absent.
+- **AI**: the local **bridge** (`tools/ai-bridge.mjs`, `npm run ai`) runs `claude -p` (Claude Code, **no API token cost**) — routes `/health`, `/analyze`, `/report/stream` (SSE, parallel topics from `tools/report-topics.json`). The browser gates the AI UI on `/health`. Prod AI = your local bridge via a tunnel, or BYO API key (see APP-PLAN).
+
+Plans/specs live in **[docs/app/](docs/app/)**: [APP-PLAN.md](docs/app/APP-PLAN.md) (master), [SPEC.md](docs/app/SPEC.md) (workstreams WS0–WS11), [DRAWING-APP.md](docs/app/DRAWING-APP.md), [SPEC-cluster-recognition.md](docs/app/SPEC-cluster-recognition.md). Manual test plan: [TEST-PLAN.md](docs/app/TEST-PLAN.md). Improvement backlog: [IMPROVEMENTS.md](docs/app/IMPROVEMENTS.md). (The magic-system source + reasoning docs stay in `docs/`.)
+
 ## Commands
 
 ```bash
@@ -36,6 +48,13 @@ npm run vectorize:signs
 npm run facts -- path/to/spell.json     # structured observations (tools/spell-engine-cli.mjs --facts)
 node tools/spell-engine-cli.mjs --text path/to/spell.json   # heuristic readout (scaffold, not truth)
 npm run render -- path/to/spell.json -o spell.svg           # IR → SVG picture (tools/render.mjs)
+
+# --- Spell Studio app (Studio + Admin) ---
+npm run ai                  # local AI bridge (claude -p): /health · /analyze · /report/stream (http://localhost:8787)
+npx supabase start          # local Supabase stack (Docker): DB + Auth + Storage
+npx supabase status         # local URLs + keys → fill .env (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY)
+npx supabase migration up   # apply pending migrations (schema in supabase/migrations/)
+node tools/seed-admin.mjs <email> <pass> [user]   # create/promote a local admin (SUPABASE_SECRET env)
 ```
 
 There is no linter configured.
@@ -47,8 +66,8 @@ There is no linter configured.
 The engine has almost no hardcoded domain knowledge — everything lives in JSON:
 
 - `rules.json` — validation rules (blocking/inactive/warning/info), advanced mechanics, polar coordinate model, matcher weights/threshold (0.7).
-- `sigils.json` — 29 sigils (the *substance*). Each has a `family` (fire/water/earth/air/time/decorative/misc/special), an `element`, and either an `svgPath` or a `text` glyph (Guidance "G", Calling "C").
-- `signs.json` — 40 signs (operators on the substance). Each documented sign has a `family` = one of the 4 doc categories (directional/semi-directional/non-directional/asymmetric); 3 (`bird`, `animal_signs`, `unknown_sign`) keep family `other` and stay hidden. A 5th palette family, `unknown`, holds **catalogued-but-unidentified** signs (`unknown_NN`, e.g. `unknown_01` from Water Horse) — these are visible. Carries `effectTags`, `invertible`, `canBeCenter`, `surrounds`.
+- `sigils.json` — 33 sigils (the *substance*). Each has a `family` (fire/water/earth/air/time/decorative/misc/special), an `element`, and either an `svgPath` or a `text` glyph (Guidance "G", Calling "C").
+- `signs.json` — 52 signs (operators on the substance). Each documented sign has a `family` = one of the 4 doc categories (directional/semi-directional/non-directional/asymmetric); 3 (`bird`, `animal_signs`, `unknown_sign`) keep family `other` and stay hidden. A 5th palette family, `unknown`, holds **catalogued-but-unidentified** signs (`unknown_NN`, e.g. `unknown_01` from Water Horse) — these are visible. Carries `effectTags`, `invertible`, `canBeCenter`, `surrounds`.
 - `dyes.json` — magical dyes mixed into the conjuring ink (kind/color/effect).
 - `grammar.json` — the **deduction grammar**: per-element `substance`, per-sign `operator` (`kind` + `verb`/`invertedVerb`), and `interactions` (synergies/warnings). This is what lets the app explain novel combinations.
 - `spells.json` — catalog of "recipes" for the matcher. **Populated with canon spells** documented so far. Each record carries a provenance pair: **`origin`** (where the recipe *came from* — `canon` = taken directly from the manga/anime; `wiki` = obtained from the fan wiki at `witchhatatelier.telepedia.net`, fan-curated from canon; `fan` = purely fan-invented) and **`source`** (a free-text citation — telepedia URL + manga debut chapter, character/arc, or who reconstructed it). `origin` is **provenance, independent of `confidence`** (recipe certainty): a wiki-sourced recipe can still be high-confidence, so record recipe uncertainty in `confidence`, never by downgrading `origin`. **All 21 current catalog spells are `wiki`** — every one has a dedicated telepedia page that was the actual source (the manga's existence of the spell is real, but the *recipe data* came from the wiki). `canon` is reserved for recipes lifted straight from the manga/anime; `fan`-invented spells are **excluded** from the catalog (they'd produce false "canon match" results) and live only in `docs/spells/`. The engine doesn't branch on `origin` (curation metadata); it still handles an empty catalog gracefully (`catalogEmpty`).

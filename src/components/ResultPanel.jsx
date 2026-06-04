@@ -1,6 +1,10 @@
 // Analysis panel: shows everything derivable from a spell — validity, deduced effect,
 // sigils, signs, similar spells, ink dyes and geometry. Handles single- and multi-circle spells.
 
+// The AI reading now lives in the Studio's streaming <AIReportPanel/> (multi-topic, SSE). ResultPanel
+// stays purely the deterministic engine reading; the legacy single-call AI section was removed here to
+// avoid duplicating the AI surface.
+
 function Section({ title, sub, children }) {
   return (
     <section className="result-section">

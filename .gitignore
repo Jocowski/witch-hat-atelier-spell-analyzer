@@ -9,3 +9,11 @@ manga/
 
 # Scratch dir: working renders, JSON drafts, pasted source dumps
 tmp/
+
+# Secrets — never commit real keys (.env.example is the committed template)
+.env
+.env.local
+
+# Supabase local stack runtime (config.toml + migrations/ + seed.sql ARE committed)
+supabase/.branches/
+supabase/.temp/

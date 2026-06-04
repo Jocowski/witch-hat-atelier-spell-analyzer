@@ -1,0 +1,219 @@
+/* symbolpalette.css — layout overrides for SymbolPalette.
+   Imported by SymbolPalette.jsx only.
+   Uses only theme CSS custom properties: --bg, --panel, --panel-2,
+   --ink, --ink-dim, --line, --accent, --accent-2.
+   ----------------------------------------------------------------
+   Design goal: ONE vertical scroll region for the whole palette.
+   The header (title + toggle) and search box are sticky / fixed-
+   height; everything below them scrolls together in a single
+   overflow container — no nested scrollbars.
+   ---------------------------------------------------------------- */
+
+/* ── Root container ─────────────────────────────────────────── */
+
+.sp-palette {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;           /* clips children; scroll lives below */
+  background: var(--panel);
+}
+
+/* ── Sticky header ──────────────────────────────────────────── */
+
+.sp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.sp-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sp-toggle {
+  background: none;
+  border: none;
+  color: var(--ink-dim);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.sp-toggle:hover { color: var(--ink); background: var(--panel-2); }
+
+/* ── Search row — fixed, never scrolls ──────────────────────── */
+
+.sp-search-row {
+  position: relative;
+  padding: 6px 8px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.sp-search {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  padding: 5px 28px 5px 8px;
+  font: inherit;
+  font-size: 0.8rem;
+}
+.sp-search:focus { outline: none; border-color: var(--accent); }
+
+.sp-clear {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--ink-dim);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px;
+}
+.sp-clear:hover { color: var(--ink); }
+
+/* ── Single scroll body — contains ALL groups ───────────────── */
+
+.sp-body {
+  flex: 1;
+  min-height: 0;             /* crucial: lets flexbox shrink below natural height */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ── Section group (Sigils / Signs) ─────────────────────────── */
+
+.sp-group {
+  /* No overflow of its own — parent .sp-body scrolls */
+}
+
+.sp-group-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-dim);
+  padding: 6px 8px 3px;
+  border-top: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  z-index: 1;
+}
+
+/* ── Responsive auto-fill grid ──────────────────────────────── */
+
+.sp-grid {
+  display: grid;
+  /* Fill available width; each tile is at least 52 px wide.
+     At 210 px sidebar width this gives ~3 columns (3 × 64 px + gaps). */
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 3px;
+  padding: 4px 6px 8px;
+}
+
+/* ── Symbol tile ─────────────────────────────────────────────── */
+
+.sp-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 6px 2px 4px;
+  font: inherit;
+  font-size: 0.62rem;
+  text-align: center;
+  line-height: 1.15;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  min-height: 52px;
+  overflow: hidden;           /* guard against any child overflow */
+}
+.sp-tile:hover {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+.sp-tile.sp-tile--active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--panel-2);
+}
+
+/* ── Glyph area ──────────────────────────────────────────────── */
+
+.sp-glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.sp-glyph-text {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.sp-glyph-circle {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+
+/* ── Name caption ─────────────────────────────────────────────
+   Two lines max, then ellipsis.  overflow:hidden on the tile
+   prevents any horizontal bleed.
+   ---------------------------------------------------------------- */
+
+.sp-name {
+  font-size: 0.6rem;
+  color: inherit;
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* ── Empty state ─────────────────────────────────────────────── */
+
+.sp-empty {
+  padding: 12px 8px;
+  color: var(--ink-dim);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* ── Collapsed state: just show the thin header bar ─────────── */
+
+.sp-palette--collapsed .sp-search-row,
+.sp-palette--collapsed .sp-body {
+  display: none;
+}

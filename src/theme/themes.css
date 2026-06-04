@@ -1,0 +1,93 @@
+/* ============================================================
+   Witch Hat Atelier Spell Analyzer — Theme System
+   All themes redefine the same variable contract so every
+   consumer in index.css is always styled regardless of theme.
+   ============================================================ */
+
+/* ── Brown / Atelier (DEFAULT) ─────────────────────────────
+   Exact values copied from the original :root in index.css.
+   ─────────────────────────────────────────────────────────── */
+:root,
+[data-theme="brown"] {
+  --bg:           #1b1814;
+  --panel:        #262019;
+  --panel-2:      #2f2820;
+  --ink:          #e9e0d0;
+  --ink-dim:      #a99e8a;
+  --line:         #4a3f30;
+  --accent:       #c9a24a;
+  --accent-2:     #d6713a;
+  --ok:           #6fbf73;
+  --warn:         #e0b341;
+  --err:          #d65a4a;
+  --parchment:    #f3ead4;
+  --parchment-ink:#5a3b1e;
+}
+
+/* ── Dark ───────────────────────────────────────────────────
+   Charcoal base, cool-grey panels, teal accent.
+   ─────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg:           #0d0d0d;
+  --panel:        #161616;
+  --panel-2:      #1e1e1e;
+  --ink:          #e2e2e2;
+  --ink-dim:      #888888;
+  --line:         #2e2e2e;
+  --accent:       #4ec9b0;
+  --accent-2:     #569cd6;
+  --ok:           #6fbf73;
+  --warn:         #e0b341;
+  --err:          #f44747;
+  --parchment:    #d4d4d4;
+  --parchment-ink:#a0a0a0;
+}
+
+/* ── Light ──────────────────────────────────────────────────
+   Off-white parchment base, warm sand panels, amber accent.
+   ─────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:           #f5f0e8;
+  --panel:        #ece6d8;
+  --panel-2:      #e0d8c8;
+  --ink:          #2a201a;
+  --ink-dim:      #7a6a58;
+  --line:         #c8baa8;
+  --accent:       #9a6a20;
+  --accent-2:     #c05428;
+  --ok:           #3a8a40;
+  --warn:         #b07a10;
+  --err:          #c03030;
+  --parchment:    #faf6ee;
+  --parchment-ink:#5a3b1e;
+}
+
+/* ── Arcane ─────────────────────────────────────────────────
+   Dark purple/blue base from prototypes/shape-recognizer/index.html.
+   bg:#14121a  panel:#1e1b27  line:#322c42  ink:#e8e3f5  accent:#b98cff
+   ─────────────────────────────────────────────────────────── */
+[data-theme="arcane"] {
+  --bg:           #14121a;
+  --panel:        #1e1b27;
+  --panel-2:      #272233;
+  --ink:          #e8e3f5;
+  --ink-dim:      #9b93b3;
+  --line:         #322c42;
+  --accent:       #b98cff;
+  --accent-2:     #7fd1ff;
+  --ok:           #6ee7a8;
+  --warn:         #ffd27f;
+  --err:          #ff8aa0;
+  --parchment:    #d8d0f0;
+  --parchment-ink:#9b93b3;
+}
+
+/* ── Themed scrollbars (global; read the active theme's vars) ────────────────── */
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }   /* Firefox */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--line); border-radius: 8px; border: 2px solid var(--panel);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+*::-webkit-scrollbar-corner { background: transparent; }
