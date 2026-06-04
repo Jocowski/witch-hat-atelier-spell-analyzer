@@ -67,6 +67,32 @@ function groupByKind(symbols) {
 // stroke objects from DrawingSurface ({tool,color,width,points}) → point arrays for the recognizer.
 const toPointArrays = (strokes) => (strokes || []).map((s) => s.points).filter((p) => p && p.length >= 2)
 
+// Rotation-tolerant ranking for the live guess (mirrors the spell pipeline's de-rotation sweep —
+// $P itself is NOT rotation-invariant, so a symbol drawn at an angle would otherwise tank). We rotate
+// the drawn points around their centroid over a sweep, recognize() at each angle, and keep the best
+// score per symbol name. Without this, drawing a sign even slightly rotated mis-ranks badly.
+const GUESS_ROTATIONS = [0, 45, 90, 135, 180, 225, 270, 315]
+function rankOverRotations(pts, clouds) {
+  if (pts.length < 2 || !clouds.length) return []
+  let cx = 0, cy = 0
+  for (const p of pts) { cx += p.X; cy += p.Y }
+  cx /= pts.length; cy /= pts.length
+  const best = new Map()
+  for (const deg of GUESS_ROTATIONS) {
+    const r = (deg * Math.PI) / 180, co = Math.cos(r), si = Math.sin(r)
+    const rot = pts.map((p) => ({
+      X: cx + (p.X - cx) * co - (p.Y - cy) * si,
+      Y: cy + (p.X - cx) * si + (p.Y - cy) * co,
+      ID: p.ID,
+    }))
+    for (const m of recognize(rot, clouds)) {
+      const cur = best.get(m.name)
+      if (!cur || m.adjDist < cur.adjDist) best.set(m.name, m)
+    }
+  }
+  return [...best.values()].sort((a, b) => a.adjDist - b.adjDist).slice(0, 3)
+}
+
 export default function TrainingView() {
   const canvasRef = useRef(null)
 
@@ -115,8 +141,8 @@ export default function TrainingView() {
     let cancelled = false
     listSamples().then((rows) => {
       if (cancelled || !rows?.length) return
-      const byName = {}
       const bySymbol = {}
+      const built = []
       let total = 0
       for (const r of rows) {
         if (r.deleted_at) continue
@@ -124,9 +150,13 @@ export default function TrainingView() {
         bySymbol[r.symbol_id] = (bySymbol[r.symbol_id] || 0) + 1
         const sym = symbols.find((s) => s.id === r.symbol_id)
         const name = sym?.engine_id || sym?.name || r.symbol_id
-        ;(byName[name] ||= []).push(...(r.points ?? []))
+        const pts = r.points ?? []
+        // ONE cloud PER sample — do NOT merge all samples of a symbol into one blob: that concatenates
+        // separate drawings (with colliding per-stroke IDs) and resample() walks across them, producing
+        // a garbled cloud that matches nothing. recognize() ranks across all per-sample clouds; the
+        // guess (rankOverRotations) then keeps the best score per symbol name.
+        if (pts.length >= 2) built.push(makeCloud(name, pts))
       }
-      const built = Object.entries(byName).filter(([, p]) => p.length >= 2).map(([name, p]) => makeCloud(name, p))
       if (!cancelled) { setClouds(built); setCounts({ bySymbol, total }) }
     }).catch(() => {})
     return () => { cancelled = true }
@@ -138,7 +168,7 @@ export default function TrainingView() {
     const arrays = toPointArrays(canvasRef.current.getStrokes())
     if (!arrays.length) { setLiveGuess(null); return }
     const pts = arrays.flatMap((s, id) => s.map((p) => ({ X: p.x, Y: p.y, ID: id })))
-    setLiveGuess(recognize(pts, clouds).slice(0, 3))
+    setLiveGuess(rankOverRotations(pts, clouds))
   }, [clouds])
 
   async function handleSave() {
