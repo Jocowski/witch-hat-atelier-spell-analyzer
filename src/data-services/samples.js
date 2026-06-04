@@ -32,9 +32,14 @@ export async function activeTemplates(weightCfg) {
     sampleWeights      = { corrected: 1.5, drawn: 1.0, confirmed: 0.6 },
     verifiedMultiplier = VERIFIED_MULTIPLIER_DEFAULT,
   } = weightCfg ?? {}
+  // NOTE: select `*` (not an explicit `verified` column) so this still works BEFORE the
+  // 20260605000000_verified_samples migration is applied — otherwise PostgREST errors on the
+  // missing column, activeTemplates throws, the Studio falls back to empty templates, and Detect
+  // silently recognizes nothing. `row.verified` is simply undefined (→ treated as unverified)
+  // until the migration lands; the weight bump then activates automatically.
   const { data, error } = await supabase
     .from('training_samples')
-    .select('role, points, source, verified, symbols(engine_id, name, kind)')
+    .select('*, symbols(engine_id, name, kind)')
     .is('deleted_at', null)
   if (error) throw new Error(error.message)
   return data.map((row) => {
