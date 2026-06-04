@@ -30,6 +30,19 @@
 > **Shipped (2026-06-04):** ESLint + Prettier · dead-CSS prune · lazy Admin route · the whole canvas-UX
 > batch · recognizer flywheel A0–A3 · match breakdown (B1) · forbidden-magic (B4) · magnitude Layer 1 ·
 > text-glyph removal + symbol-versioning Fase 1.
+>
+> **Shipped (2026-06-05/06 — the big spec-batch build, all on `feat/spell-studio`, 356 tests green, Vite build OK):**
+> - **Conjuration:** numeric SpellIR + 3D tilt (1.2, 1.5) · SpellIR-driven animated effect renderer for
+>   fire/water/wind/earth/light + Prepared/Active (off by default) + failure visuals (1.1, 1.3, 1.4).
+> - **Recognizer:** flood-fill ring closure + adaptive segmentation (2.2, 2.3) · rotation-tolerant guess +
+>   raster matcher module (2.4, 2.5) · multi-ring detection + nest/link relations + wha-spell@2 (Track 5 core).
+> - **Analysis:** dyes-in-deduction + shared magnitude plumbing + variants L2/L3 (3.1, 3.2, Track 4) ·
+>   AI report cache + calibrated confidence + "disagrees with engine" badge (3.3, 3.5).
+> - **Lifecycle/Admin/Tools:** verified-sample flag (2.6) · symbol-versioning Fase 2/3 (Track 6) ·
+>   standalone tuning tools (7.4).
+> - **Remaining tails (phased sub-items, not core):** raster-veto live wiring (2.5-C reference-ink cache) ·
+>   disagreement DB-write (3.5 §6) · cluster contraptions (5.6) · multi-ring authoring UI (5.5B–D) ·
+>   remove `spellIRShim` by adding `element` to the SpellIR block · effect-canvas zoom.
 
 ## A. App / UX
 - ~~**P1 — Canvas pan (right-drag) + Recenter button.**~~ **Done (2026-06-04).** Root cause was
