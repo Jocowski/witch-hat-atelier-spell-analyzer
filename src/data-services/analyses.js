@@ -29,6 +29,29 @@ export async function logAnalysis({ composition, engine_result, ai_report, corre
 }
 
 /**
+ * Look up an existing `ai_report` from the `analyses` table by its composition
+ * hash.  Returns the most recently created matching row, or null if not found
+ * or Supabase is unconfigured.
+ *
+ * Uses the PostgREST JSON path operator (`->>`) on the `ai_report` JSONB
+ * column — no schema migration needed.
+ *
+ * @param {string} hash  8-char hex hash produced by `compositionHash`.
+ * @returns {Promise<{ ai_report: object, created_at: string }|null>}
+ */
+export async function findCachedReport(hash) {
+  if (!hasSupabase()) return null
+  const { data } = await supabase
+    .from('analyses')
+    .select('ai_report, created_at')
+    .filter('ai_report->>hash', 'eq', hash)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return data ?? null
+}
+
+/**
  * Fetch the most recent analyses visible to the current user
  * (own rows for regular users, all rows for admins — enforced by RLS).
  *

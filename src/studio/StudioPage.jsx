@@ -306,7 +306,7 @@ export default function StudioPage() {
               {phase === 'analyzed' && result && (
                 <>
                   <ResultPanel result={result} />
-                  <AIReportPanel composition={composition} bridgeUrl={BRIDGE_URL} />
+                  <AIReportPanel composition={composition} engineResult={result} bridgeUrl={BRIDGE_URL} />
                 </>
               )}
             </div>
