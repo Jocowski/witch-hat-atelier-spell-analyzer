@@ -81,6 +81,7 @@ const STREAMLINE_ALPHA = 0.45  // live smoothing: new point = lerp(prev, raw, al
 // ── constants ─────────────────────────────────────────────────────────────────
 
 const RING_RADIUS   = 180   // faint guide ring (world coords)
+const TRACE_SCALE   = 2.8   // svgPath (-50..50 viewBox) → world units for the tracing guide
 const SYMBOL_SIZE   = 20    // default half-size when rendering a symbol glyph (world units)
 const MIN_ZOOM      = 0.15
 const MAX_ZOOM      = 8
@@ -219,6 +220,8 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     onChange,
     compact         = false,
     overlays,        // Array<{ box:{x,y,w,h}, label, kind }> | undefined
+    traceSvg,        // string | null — an svgPath drawn faintly on the canvas as a tracing guide
+    traceOpacity = 0.18, // opacity of the tracing guide
     highlight,       // { x,y,w,h } | null — a glowing box (e.g. the hovered Identified-panel row)
     spellIR,         // SpellIR | null — passed from StudioPage after Analyze
     ringGeom,        // { center:{x,y}, radius:number, found:boolean } | null
@@ -1066,6 +1069,19 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
             <KCircle x={0} y={0} radius={RING_RADIUS} stroke="rgba(201,162,74,0.18)"
               strokeWidth={2 / zoom} dash={[dash(8), dash(6)]} listening={false} />
             <KCircle x={0} y={0} radius={3 / zoom} fill="rgba(201,162,74,0.25)" listening={false} />
+
+            {/* optional tracing guide: a faint reference glyph to draw over (Training) */}
+            {traceSvg && (
+              <Path
+                data={traceSvg}
+                x={0} y={0}
+                scaleX={TRACE_SCALE} scaleY={TRACE_SCALE}
+                fill={OVERLAY_ACCENT}
+                fillRule="evenodd"
+                opacity={traceOpacity}
+                listening={false}
+              />
+            )}
 
             {/* committed nodes */}
             {nodes.map((n) => {

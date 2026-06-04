@@ -1,5 +1,7 @@
 # Signs Explained
 
+> **Synced from the [telepedia wiki](https://witchhatatelier.telepedia.net/wiki/Signs_Explained) (2026 update).** Notable changes since the last sync: **Bind**, **Solidify**, and **Envelop** are now *officially named* signs; **Radial** may be retconned into **Bind**; **Bend** is now officially **Envelop** (same artwork); **Repetition** was retconned from a sign to a sigil. Sign artwork was re-vectorized from the wiki's current images.
+
 Signs are a component of seals, special shapes drawn with conjuring ink through which magic can be harnessed in the form of spells. Signs control what form a spell will take. They serve as modifiers, allowing the effect of a spell to be altered. Each sign has a unique effect which it can contribute to a spell, with 44 being deciphered so far.
 
 ## Sign Categories
@@ -214,6 +216,30 @@ Glaives function to determine how deeply magic will embed itself into an animal'
 
 **Spells Using Glaives:** Memory Erasure • Slime Rendering Seal
 
+### Solidify
+
+![Solidify](../assets/images/signs/Solidify.png)
+
+Solidification (凝固の矢) likely causes the magic drawn within or connecting to it to become more solid. The sign can be written both on its own and with signs/sigils/seals written within one of its circles, and warrants the same effect either way (a rule of thumb to tell it apart from linked seals). It is unclear whether the lines must be straight or whether multiple of its circles can be occupied.
+
+**Spells Using Solidify:** Raincleaver • Sand Bridge
+
+### Bind
+
+![Bind](../assets/images/signs/Bind.png)
+
+Bind (留める矢) — based on its name and its use in Raincleaver — may halt the movement of material and bind it together, causing it to act and be moved as a single unit. **This sign may be the same as what was previously known as "Radial."** (Promoted to an officially-named sign in the wiki's 2026 update; the older fan reading of "Bind" as a glue-like sign in Wall Bend is superseded.)
+
+**Spells Using Bind:** Raincleaver
+
+### Envelop
+
+![Envelop](../assets/images/signs/Bend.png)
+
+Envelop (衣まといの矢) likely causes a magic effect to envelop or surround what it is targeting. In Raincleaver it is likely what causes the water to wrap around the entire sword rather than just manifesting out of the seals, and it has a similar effect in Gathering Shadows. **This is the officially-named successor to the fan-named "Bend" sign** (same artwork) — see Bend below.
+
+**Spells Using Envelop:** Raincleaver • Gathering Shadows • Cloak Spell • Petrification
+
 ## Unofficially Named
 
 ### Diamond
@@ -254,7 +280,9 @@ Crosshair is a component of the rainflinger seal. The sign is non-directional. L
 
 Radial is a component of the snugstone spell. While its exact function is unclear, it likely serves to decrease the power of the spells it is used in, such as converting fire into heat. It is most likely semi-directional and has never been seen inverted.
 
-**Spells Using Radial:** Snugstone Spell
+> **Possible retcon (wiki 2026):** Radial may have been retconned and is now known officially as **[Bind](#bind)** (留める矢). Treat the two as likely the same sign pending confirmation.
+
+**Spells Using Radial:** Snugstone Spell • Sand Bridge
 
 ### Bolt
 
@@ -280,14 +308,6 @@ The vision sign has been seen four times in total: twice within variants of the 
 
 **Spells Using Vision:** Gathering Shadows • Makeover Mask Spell • Cloak Spell
 
-### Bend
-
-![Bend](../assets/images/signs/Bend.png)
-
-Bend is a non-directional sign that has been seen in a number of spells, including gathering shadows, petrification, and possibly paired with weave to form a compound sign within the wall bend spell. When combined with eye and vision, bend will make things disappear into a pitch black shadow. In wall bend, its possible pairing with weave may suggest that within this spell, it is somehow meant to make walls more pliable. Petrification has too much going on to say for sure what purpose bend may serve within it, but between the three spells, the most obvious theme is some form of "bending or altering of reality." Whether that be bending vision for gathering shadows, physical objects for wall bend, or reality itself for petrification, all three spells seem to change the structure of things around them in some way. It is impossible to say for sure what this sign does as of current, but a common theme seems to exist.
-
-**Spells Using Bend:** Wall Bend • Gathering Shadows • Cloak Spell • Petrification
-
 ### Rain
 
 ![Rain](../assets/images/signs/Rain.png)
@@ -303,14 +323,6 @@ Rain causes its spell to produce an effect very similar to rainfall down into it
 Puppet (踊る人形の矢, odoru ningyō no ya) is highly unusual, appearing to be the only sign (aside from sights set) that allows one to control a spell with their mind. More specifically, puppet seems to allow a "user" (possibly either the person who drew or last touched the spell) to control the movement of the object it is drawn on. The nature of this movement seems to be dependent on the sigil of the spell. For example, wind-based puppet spells, such as the flying puppet of diversion and cloak spell, only seem to be capable of aerial movement. While it is never stated, directly or otherwise, that puppet spells move in accordance with the user's mind, there is strong circumstantial evidence to support the idea. For example, Sasaran was able to maneuver his cloak with incredible accuracy and precision during his fight with Qifrey. With his cloak lacking any visible controls through which this could be explained, it is reasonable to assume that he piloted it using his mind. Interestingly, the sealchair, which is similar to Sasaran's cloak in that it lacks visible controls yet can still be operated with clear precision and intent, features a number of signs on its underside which closely resemble puppet. It is possible that these are variants. It is possible that puppet can be turned inside out to reverse its effect, in which case it would be considered semi-directional. However, this is currently unknown.
 
 **Spells Using Puppet:** Flying Puppet of Diversion • Cloak Spell
-
-### Bind
-
-![Bind](../assets/images/signs/Bind.png)
-
-Bind can be found in the wall bend spell. While its exact function is unclear, the dominant theory is that it acts akin to glue, securely attaching itself to the surface of an object that the seal touches. Another less prominent theory is that it acts to hold an object it is drawn on together, preventing it from breaking apart. Bind is most likely semi-directional.
-
-**Spells Using Bind:** Wall Bend
 
 ### Orb
 
@@ -336,106 +348,3 @@ The exact effects of Link are unknown, but it is confirmed that this sign functi
 
 **Spells Using Link:** Light Tracer
 
-## Unknown / Unidentified Signs
-
-This section is a catalog of signs that appear in canon spells but have **no name and no
-deciphered function** — distinct from the "Unofficially Named" signs above, which at least
-have a proposed name or effect. Each one is given a theory-neutral catalog number
-(`Unknown Sign N`, id `unknown_NN`) and tracked so that, as the same mark turns up across
-more spells, evidence can accumulate and a theory can eventually be proposed. Until then the
-analyzer treats them as effect-unknown and flags any spell that uses one as having an
-**incomplete deduced effect**.
-
-> This is separate from the generic `unknown_sign` placeholder, which is only a catch-all for
-> marks that have not yet been isolated into their own entry.
-
-### Unknown Sign 1
-
-![Unknown Sign 1](../assets/images/signs/unknown/Unknown_01.png)
-
-First catalogued from the **Water Horse** spell, where it appears on the **left and right of
-the central water sigil as a bilaterally mirrored pair**. Its function is unknown.
-
-- **Observations:** The mirrored left/right placement (a clear front-to-front pairing flanking
-  the core) is consistent with a *directional* sign, but this is unconfirmed — it has only been
-  seen in one spell so far, so nothing can be said about how angling, inverting, or mirroring it
-  changes its behavior. The sign is **stored upright** (top = top); the two copies in a seal are
-  horizontal mirror images, placed with the editor's **mirror** control (a left↔right flip,
-  separate from invert).
-- **Theories:** *None yet — insufficient data (seen in only one spell).*
-
-**Spells Using Unknown Sign 1:** Water Horse
-
-### Unknown Sign 2
-
-![Unknown Sign 2](../assets/images/signs/unknown/Unknown_02.png)
-
-A simple **line / bar-shaped** mark, catalogued from the **Water Horse** spell, where it runs
-along the **bottom row beneath the water sigil, alternating with the Region (chevron) signs**.
-Its function is unknown.
-
-- **Observations:** Just a straight line, interleaved with Region signs. With only one appearance
-  there is no basis yet for what the line contributes.
-- **Theories:** *None yet — insufficient data (seen in only one spell).*
-
-**Spells Using Unknown Sign 2:** Water Horse
-
-### Unknown Sign 3
-
-![Unknown Sign 3](../assets/images/signs/unknown/Unknown_03.png)
-
-A **triangle-like (A-shaped)** mark with a small curl at each lower corner, catalogued from the
-**Water Pen** spell, where a single copy sits **alone at the bottom of the seal, below the central
-water sigil**. Its function is unknown; it reads as decorative.
-
-- **Observations:** Single, bottom-centered placement (not a mirrored pair), so there is no evidence
-  yet that orientation or inversion changes its behavior. In Water Pen it sits where the dagger / pen-nib
-  glob's downward point hangs, which *may* mean it shapes the nib's tip — but this is unconfirmed (one spell).
-- **Theories:** *None yet — insufficient data (seen in only one spell).*
-
-**Spells Using Unknown Sign 3:** Water Pen
-
-### Unknown Sign 4
-
-![Unknown Sign 4](../assets/images/signs/unknown/Unknown_04.png)
-
-An **arc-shaped** mark (a segment of a circle's perimeter), catalogued from the **Water Pen** spell,
-where it appears as a **bilaterally mirrored left/right pair enclosing the central water sigil**. Its
-function is unknown.
-
-- **Observations:** The mirrored left/right placement (a front-to-front pairing hugging the core) is
-  consistent with a *directional* or *enclosing* sign, but this is unconfirmed — it has only been seen
-  in one spell. In Water Pen the two arcs trace the curved flanks of the dagger / pen-nib glob, which
-  *may* mean they shape its body — unconfirmed. The sign is **stored upright**; the two copies are
-  horizontal mirror images, placed with the editor's **mirror** control (separate from invert).
-- **Theories:** *None yet — insufficient data (seen in only one spell).*
-
-**Spells Using Unknown Sign 4:** Water Pen
-
-### Unknown Sign 5
-
-![Unknown Sign 5](../assets/images/signs/unknown/Unknown_05.png)
-
-A **half-circle** (semicircular arc) mark, catalogued from the **Sand Cage** spell, where it appears as a
-**top/bottom pair at the seal's north and south points**, on the vertical axis just outboard of the inverted
-Crush signs (between them and the ring). Its function is unknown.
-
-- **Observations:** The arc's **convex (closed) side faces the core** and its **open mouth faces outward**
-  toward the ring — it curves *around* the core's poles rather than capping an outer shell. It sits exactly at
-  the two poles that the side Column "bars" leave uncovered. The two copies are horizontal mirror images of one
-  another.
-- **Theories (unconfirmed):**
-  - *Closing hoop/band* — the top and bottom rings that bind the side Columns into a closed, **rigid** cage
-    frame (like the hoops of a barrel or birdcage), turning open bars into a sealed enclosure. This fits Sand
-    Cage's "rigid cage" result.
-  - *Inward-recurving lip (anti-escape)* — the cage wall folding back inward at the poles (like the recurved rim
-    of a jar) to seal the weak top/bottom points so a struggling captive cannot push out.
-  - It is **not** assumed to be the same sign as Unknown Sign 4: that arc traces a body's *outward*-bulging flank
-    (convex outward), whereas this one's convex faces the core (opposite concavity), so they likely differ.
-- **Caveat:** seen in only one spell (Sand Cage) — insufficient data; a second appearance is needed to confirm.
-
-**Spells Using Unknown Sign 5:** Sand Cage
-
----
-
-Source: <https://witchhatatelier.telepedia.net/wiki/Signs_Explained>

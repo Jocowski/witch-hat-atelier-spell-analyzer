@@ -81,6 +81,8 @@ function formToRow(f) {
     op_inverted_verb: orNull(f.op_inverted_verb),
     op_directional: triToBool(f.op_directional),
     op_default_direction: orNull(f.op_default_direction),
+    // A centre-capable sign (roles: sign + sigil) carries its own substance element.
+    element: orNull(f.element),
   }
 }
 
@@ -272,7 +274,7 @@ export default function SymbolEditor({ sym, onSaved, onCancel }) {
                   {TRISTATE.map((v) => <option key={v} value={v}>{v || '(inherit)'}</option>)}
                 </select>
               </label>
-              <label className="admin-label">Can be center
+              <label className="admin-label">Can be center <span className="admin-hint">(yes ⇒ this sign also acts as a sigil/core — roles: sign + sigil; set its Element below)</span>
                 <select className="admin-select admin-select-sm" value={form.can_be_center} onChange={f('can_be_center')}>
                   {TRISTATE.map((v) => <option key={v} value={v}>{v || '(inherit)'}</option>)}
                 </select>
@@ -283,6 +285,11 @@ export default function SymbolEditor({ sym, onSaved, onCancel }) {
                 </select>
               </label>
             </div>
+            {form.can_be_center === 'yes' && (
+              <label className="admin-label">Element <span className="admin-hint">(its substance when used as a core, e.g. transmutation / light / time)</span>
+                <input className="admin-input" value={form.element} onChange={f('element')} placeholder="grammar element id" />
+              </label>
+            )}
           </fieldset>
         ) : (
           <fieldset className="admin-sym-fs">

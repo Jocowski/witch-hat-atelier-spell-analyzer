@@ -19,7 +19,8 @@
     "flag:impact": "node tools/flag-impact.mjs",
     "facts": "node tools/spell-engine-cli.mjs --facts",
     "render": "node tools/render.mjs",
-    "ai": "node tools/ai-bridge.mjs"
+    "ai": "node tools/ai-bridge.mjs",
+    "seed:training": "node tools/seed-training.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",

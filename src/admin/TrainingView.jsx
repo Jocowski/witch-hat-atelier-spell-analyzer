@@ -121,6 +121,7 @@ export default function TrainingView() {
   const [symbolsErr, setSymbolsErr] = useState(null)
   const [selectedId, setSelectedId] = useState('')
   const [exampleCount, setExampleCount] = useState(0)
+  const [showTrace, setShowTrace] = useState(false)   // overlay the reference glyph on the canvas to trace over
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [addForm, setAddForm] = useState(EMPTY_FORM)
@@ -224,6 +225,11 @@ export default function TrainingView() {
 
   const grouped = useMemo(() => groupByKind(symbols), [symbols])
   const selectedSym = symbols.find((s) => s.id === selectedId)
+  // The reference glyph's svgPath (DB overlay, else JSON baseline) — shared by the side preview and
+  // the optional on-canvas tracing guide.
+  const tracePath = selectedSym
+    ? (selectedSym.svg_path || getComponentDef(selectedSym.engine_id || selectedSym.name)?.svgPath || null)
+    : null
 
   return (
     <div className="admin-train-wrap">
@@ -231,12 +237,18 @@ export default function TrainingView() {
 
       <div className="admin-train-layout">
         <div className="admin-train-canvas-col">
-          <DrawingSurface ref={canvasRef} palette="bw" enableSymbols={false} compact onChange={handleChange} />
+          <DrawingSurface ref={canvasRef} palette="bw" enableSymbols={false} compact onChange={handleChange}
+            traceSvg={showTrace ? tracePath : null} />
           <div className="admin-train-actions">
             <button className="admin-btn" onClick={() => { canvasRef.current?.clear(); setLiveGuess(null); setSaveMsg(null); setSaveErr(null) }}>Clear</button>
             <button className="admin-btn admin-btn-primary" onClick={handleSave} disabled={saving || !selectedId}>
               {saving ? 'Saving…' : 'Save sample'}
             </button>
+            <label className="admin-label admin-train-trace-toggle" title="Show the reference glyph faintly on the canvas to draw over"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+              <input type="checkbox" checked={showTrace} onChange={(e) => setShowTrace(e.target.checked)} disabled={!tracePath} />
+              Trace overlay
+            </label>
           </div>
           {saveMsg && <p className="admin-ok">{saveMsg}</p>}
           {saveErr && <p className="admin-error">{saveErr}</p>}

@@ -1,7 +1,7 @@
 // beautify.test.js — pure-module tests for stroke beautification (no JSON/DOM).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { beautifyStroke, rdp, fitCircle, chaikin, weldsRingGap } from '../src/studio/tools/beautify.js'
+import { beautifyStroke, rdp, fitCircle, chaikin, weldsRingGap, selfIntersects } from '../src/studio/tools/beautify.js'
 
 // ---------- helpers: synthesize hand-drawn-ish strokes ----------
 
@@ -177,6 +177,32 @@ test('retraced line (drawn out and back over itself) → kind line, no degenerat
   assert.equal(res.kind, 'line')
   const xs = res.points.map((p) => p.x)
   assert.ok(Math.min(...xs) < -60 && Math.max(...xs) > 60, 'line should span the drawn extent')
+})
+
+// ---------- figure-8 / self-intersecting strokes (billow) are not snapped ----------
+
+// Gerono lemniscate (a horizontal figure-8 that crosses itself at the origin)
+function figure8(cx, cy, a, n = 96, jitter = 1.5, seed = 91) {
+  const rnd = noise(seed)
+  const pts = []
+  for (let i = 0; i <= n; i++) {
+    const t = (2 * Math.PI * i) / n
+    pts.push({ x: cx + a * Math.cos(t) + rnd() * jitter, y: cy + a * Math.sin(t) * Math.cos(t) + rnd() * jitter })
+  }
+  return pts
+}
+
+test('selfIntersects: true for a crossing polyline, false for a simple square', () => {
+  assert.equal(selfIntersects([{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }, { x: 10, y: 0 }]), true)
+  assert.equal(selfIntersects([{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }], true), false)
+})
+
+test('figure-8 (billow) is NOT snapped to an oval or a straight-edged 8', () => {
+  const pts = figure8(0, 0, 60)
+  const auto = beautifyStroke(pts) // Auto / QuickShape (smoothFallback off)
+  assert.equal(auto.kind, 'none', `expected raw, got ${auto.kind}`)
+  const manual = beautifyStroke(pts, { smoothFallback: true }) // manual Smooth
+  assert.equal(manual.kind, 'smoothed')
 })
 
 // ---------- beautifyStroke: gating / no false positives ----------

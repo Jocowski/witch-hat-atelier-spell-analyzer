@@ -91,6 +91,35 @@ function meanResidualToPolyline(points, poly) {
   return sum / points.length
 }
 
+// ---------- self-intersection (figure-8 / complex strokes aren't simple primitives) ----------
+
+/** Do segments p1→p2 and p3→p4 properly cross? (CCW orientation test; ignores collinear touch.) */
+function segmentsCross(p1, p2, p3, p4) {
+  const ccw = (a, b, c) => (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x)
+  return ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4)
+}
+
+/**
+ * Does the polyline cross itself? A circle/ellipse/triangle/rect is a *simple* (non-self-intersecting)
+ * curve, so a self-intersection means the stroke is NOT one of those primitives (e.g. a figure-8 /
+ * billow). Tested on the simplified corners, so it's cheap. `closed` adds the closing edge.
+ */
+export function selfIntersects(poly, closed = false) {
+  const n = poly.length
+  if (n < 4) return false
+  const edges = []
+  for (let i = 0; i < n - 1; i++) edges.push([poly[i], poly[i + 1]])
+  if (closed && n > 2) edges.push([poly[n - 1], poly[0]])
+  const m = edges.length
+  for (let i = 0; i < m; i++) {
+    for (let j = i + 2; j < m; j++) {
+      if (i === 0 && j === m - 1 && (closed || poly[0] === poly[n - 1])) continue // adjacent at the wrap
+      if (segmentsCross(edges[i][0], edges[i][1], edges[j][0], edges[j][1])) return true
+    }
+  }
+  return false
+}
+
 // ---------- Ramer–Douglas–Peucker (inline; ref: simplify-js) ----------
 
 /** Simplify a polyline, keeping points farther than eps from the running chord. */
@@ -303,10 +332,15 @@ export function beautifyStroke(points, opts = {}) {
 
   let result = null
 
+  // A figure-8 / billow / any self-crossing stroke is NOT a simple primitive — don't snap it to a
+  // circle/ellipse/polygon/line (that's what turned the billow "8" into an oval or a straight-edged 8).
+  // Such strokes fall through to smoothing (manual) or stay raw (auto).
+  const simple = !selfIntersects(corners, closed)
+
   // 1) Circle / arc — detected independently of the closed-flag so a deliberately GAPPED ring
   //    (open ring = a *prepared*, not-yet-cast spell) is preserved as a clean OPEN arc rather than
   //    snapped shut. A near-closed loop becomes a perfect closed circle (or ellipse if oblong).
-  const fit = fitCircle(pts)
+  const fit = simple ? fitCircle(pts) : null
   if (fit && fit.residNorm < o.circleResidNorm) {
     const arc = arcGeometry(pts, fit)
     if (arc.spanDeg >= o.minCircleSpanDeg) {
@@ -322,13 +356,13 @@ export function beautifyStroke(points, opts = {}) {
   }
 
   // 2) Polygon: a closed loop with a few dominant corners → straight edges through them.
-  if (!result && closed && cornersN >= 3 && cornersN <= 6) {
+  if (!result && simple && closed && cornersN >= 3 && cornersN <= 6) {
     const kind = cornersN === 3 ? 'triangle' : cornersN === 4 ? 'rect' : 'polygon'
     result = accept({ kind, poly: polylineThrough(corners, step, true) })
   }
   // 3) Thin sliver (a line traced back over itself — the "overflow" of retracing the same stroke)
   //    → collapse to a single straight line along the long axis instead of a degenerate ellipse.
-  if (!result) {
+  if (!result && simple) {
     const aspect = bb.w === 0 || bb.h === 0 ? 0 : Math.min(bb.w, bb.h) / Math.max(bb.w, bb.h)
     if (aspect < 0.18) {
       const horiz = bb.w >= bb.h
@@ -342,11 +376,11 @@ export function beautifyStroke(points, opts = {}) {
     }
   }
   // 4) Smooth oblong closed loop (no sharp corners) → ellipse.
-  if (!result && closed && cornersN >= 7) {
+  if (!result && simple && closed && cornersN >= 7) {
     result = accept({ kind: 'ellipse', poly: ellipseShape({ x: bb.minX, y: bb.minY }, { x: bb.maxX, y: bb.maxY }) })
   }
   // 4) Open straight stroke → line.
-  if (!result && !closed && cornersN === 2) {
+  if (!result && simple && !closed && cornersN === 2) {
     result = accept({ kind: 'line', poly: line(corners[0], corners[1], step) })
   }
 

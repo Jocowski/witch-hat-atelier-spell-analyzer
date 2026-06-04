@@ -334,20 +334,6 @@
             "placement": "bottom",
             "orientation": "front",
             "inverted": false
-          },
-          {
-            "id": "unknown_01",
-            "count": 2,
-            "placement": "sides",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_02",
-            "count": 3,
-            "placement": "bottom",
-            "orientation": "inward",
-            "inverted": false
           }
         ],
         "symmetry": "bilateral"
@@ -377,20 +363,6 @@
             "count": 2,
             "placement": "top",
             "orientation": "front",
-            "inverted": false
-          },
-          {
-            "id": "unknown_04",
-            "count": 2,
-            "placement": "sides",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_03",
-            "count": 1,
-            "placement": "bottom",
-            "orientation": "inward",
             "inverted": false
           }
         ],
@@ -578,13 +550,6 @@
             "count": 8,
             "placement": "intercardinals",
             "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_05",
-            "count": 2,
-            "placement": "north-south poles",
-            "orientation": "convex-inward",
             "inverted": false
           }
         ],
@@ -947,7 +912,7 @@
       "confidence": "medium",
       "effect": "Makes the object it is drawn on absorb all light that hits it, so the user can conceal themselves in shadow by covering up with the object.",
       "composition": {
-        "core": "vision_sigil",
+        "core": "vision",
         "signs": [
           {
             "id": "eye",
@@ -957,7 +922,7 @@
             "inverted": false
           },
           {
-            "id": "bend",
+            "id": "envelopment",
             "count": 4,
             "placement": "the other 4 points",
             "orientation": "inward",
@@ -987,27 +952,6 @@
             "inverted": false
           },
           {
-            "id": "unknown_05",
-            "count": 4,
-            "placement": "flanking the N/S Columns",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_09",
-            "count": 4,
-            "placement": "flanking the N/S Columns",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_11",
-            "count": 2,
-            "placement": "east-west (the bridge glyph)",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
             "id": "radial",
             "count": 2,
             "placement": "east-west (outermost)",
@@ -1018,20 +962,6 @@
             "id": "strengthen",
             "count": 4,
             "placement": "diagonals",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_10",
-            "count": 4,
-            "placement": "diagonals (outboard)",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_06",
-            "count": 2,
-            "placement": "inner circle, flanking the core",
             "orientation": "inward",
             "inverted": false
           }
@@ -1103,13 +1033,6 @@
       "composition": {
         "core": "warding_pillar",
         "signs": [
-          {
-            "id": "unknown_12",
-            "count": 2,
-            "placement": "top",
-            "orientation": "outward",
-            "inverted": false
-          },
           {
             "id": "column",
             "count": 4,
@@ -1237,7 +1160,7 @@
       "confidence": "high",
       "effect": "Shrinks a nearby object (inverted Enlarge), scoped to a neighbour by Diamond; the Repetition sigil lets the change be undone/restored.",
       "composition": {
-        "core": "repetition_sigil",
+        "core": "repetition",
         "signs": [
           {
             "id": "enlarge",
@@ -1320,7 +1243,7 @@
       "confidence": "medium",
       "effect": "Resets dirty or damaged clothing back to its original clean, undamaged state — Repetition's time-reversal applied to a garment.",
       "composition": {
-        "core": "repetition_sigil",
+        "core": "repetition",
         "signs": [],
         "symmetry": "radial"
       },
@@ -1335,7 +1258,7 @@
       "confidence": "medium",
       "effect": "Aids sight or dims incoming light — a visual-correction spell drawn on Qifrey's glasses, distinct from illusion-making (Vision + Eye). Vision alone, without Eye, targets perception rather than illusion.",
       "composition": {
-        "core": "vision_sigil",
+        "core": "vision",
         "signs": [
           {
             "id": "convergence",
@@ -1381,7 +1304,7 @@
       "confidence": "medium",
       "effect": "A two-ring contraption on capture pennants that lets a knight mentally target a person or object, wraps the pennant around them via Entwine signs, and uses a Repetition sigil core to continuously reset the banner to its original form.",
       "composition": {
-        "core": "repetition_sigil",
+        "core": "repetition",
         "signs": [
           {
             "id": "sights_set",
@@ -1417,7 +1340,7 @@
       "confidence": "medium",
       "effect": "Continuously resets whatever it touches to the state it was in when the spell first activated — keeping food fresh, clothes clean, soft structures undamaged, and materials elastic indefinitely.",
       "composition": {
-        "core": "repetition_sigil",
+        "core": "repetition",
         "signs": [
           {
             "id": "column",
@@ -1447,15 +1370,7 @@
       "effect": "A Counterclock seal scoped to valance leeches via a central Valance Leech decorative sigil — reverses a targeted leech to its physical state 24 hours prior, returning any absorbed matter to its sources.",
       "composition": {
         "core": "valance_leech",
-        "signs": [
-          {
-            "id": "unknown_sign",
-            "count": 6,
-            "placement": "around",
-            "orientation": "inward",
-            "inverted": false
-          }
-        ],
+        "signs": [],
         "symmetry": "radial"
       }
     },
@@ -1468,7 +1383,7 @@
       "confidence": "medium",
       "effect": "Drapes the host object in shadow (Gathering Shadows), makes it fly and dart remotely (Flying Puppet of Diversion), and opens a spatial passage through it (Windowway) — a remote-controlled shadow-cloaked flying portal.",
       "composition": {
-        "core": "vision_sigil",
+        "core": "vision",
         "signs": [
           {
             "id": "eye",
@@ -1478,7 +1393,7 @@
             "inverted": false
           },
           {
-            "id": "bend",
+            "id": "envelopment",
             "count": 4,
             "placement": "alternating",
             "orientation": "inward",
@@ -1496,57 +1411,6 @@
       }
     },
     {
-      "id": "windowway_spell",
-      "name": "Windowway Spell",
-      "category": "niche",
-      "origin": "wiki",
-      "source": "telepedia 'Windowway Spell': https://witchhatatelier.telepedia.net/wiki/Windowway_Spell — manga debut ch. 2 (per wiki). Sign ids inferred from wiki visual descriptions; medium confidence. Central mark unidentified (unknown_sigil).",
-      "confidence": "medium",
-      "effect": "Opens a paired spatial gateway between two linked Windowway seals; objects and people passing through one emerge at the other — requires both ends to function.",
-      "composition": {
-        "core": "unknown_sigil",
-        "signs": [
-          {
-            "id": "bolt",
-            "count": 8,
-            "placement": "ring",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "direction",
-            "count": 8,
-            "placement": "ring",
-            "orientation": "outward",
-            "inverted": false
-          }
-        ],
-        "symmetry": "radial"
-      }
-    },
-    {
-      "id": "lockwax",
-      "name": "Lockwax",
-      "category": "niche",
-      "origin": "wiki",
-      "source": "telepedia 'Lockwax': https://witchhatatelier.telepedia.net/wiki/Lockwax — manga debut ch. 50 (per wiki). Core sigil unidentified; Pull ×3 inferred from 'arrow with triangle tip pointing toward center.'",
-      "confidence": "low",
-      "effect": "Seals a scroll's wax closure shut with a three-point magical lock; reserved for important documents.",
-      "composition": {
-        "core": "unknown_sigil",
-        "signs": [
-          {
-            "id": "pull",
-            "count": 3,
-            "placement": "around",
-            "orientation": "inward",
-            "inverted": false
-          }
-        ],
-        "symmetry": "radial"
-      }
-    },
-    {
       "id": "makeover_mask_spell",
       "name": "Makeover Mask Spell",
       "category": "vision",
@@ -1555,7 +1419,7 @@
       "confidence": "medium",
       "effect": "Makes the wearer's face appear clean and at its most beautiful to observers — magical cosmetics that project an idealized appearance.",
       "composition": {
-        "core": "vision_sigil",
+        "core": "vision",
         "signs": [
           {
             "id": "eye",
@@ -1584,41 +1448,12 @@
       "confidence": "high",
       "effect": "Collects material from the surrounding area via Collection signs and transmutes it into a soft, fluffy cloud using the central Billowing sigil.",
       "composition": {
-        "core": "billowing_sigil",
+        "core": "billowing",
         "signs": [
           {
             "id": "collection",
             "count": 4,
             "placement": "around",
-            "orientation": "inward",
-            "inverted": false
-          }
-        ],
-        "symmetry": "radial"
-      }
-    },
-    {
-      "id": "fish_guidance",
-      "name": "Fish Guidance",
-      "category": "niche",
-      "origin": "wiki",
-      "source": "telepedia 'Fish Guidance' (unofficial name): https://witchhatatelier.telepedia.net/wiki/Fish_Guidance — manga debut ch. 63 (per wiki). Coco/Jujy, Golden Eve Procession. Signs_Explained names this spell as the canon Float+Crosshair target-levitation example.",
-      "confidence": "medium",
-      "effect": "Attracts magic fish (or other guidance-parameterized objects) toward the seal and makes them float through the air via the Float+Crosshair target-levitation mechanism.",
-      "composition": {
-        "core": "guidance",
-        "signs": [
-          {
-            "id": "float",
-            "count": 4,
-            "placement": "around",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "crosshair",
-            "count": 1,
-            "placement": "center",
             "orientation": "inward",
             "inverted": false
           }
@@ -1707,27 +1542,6 @@
             "count": 9,
             "placement": "around",
             "orientation": "alternating",
-            "inverted": false
-          },
-          {
-            "id": "unknown_07",
-            "count": 6,
-            "placement": "around",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_02",
-            "count": 6,
-            "placement": "around",
-            "orientation": "inward",
-            "inverted": false
-          },
-          {
-            "id": "unknown_08",
-            "count": 3,
-            "placement": "satellite",
-            "orientation": "outward",
             "inverted": false
           }
         ],
@@ -1869,7 +1683,7 @@
             "inverted": false
           },
           {
-            "id": "bend",
+            "id": "envelopment",
             "count": 2,
             "placement": "around",
             "orientation": "inward",

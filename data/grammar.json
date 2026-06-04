@@ -108,16 +108,6 @@
       "raw": "takes the shape of the living thing it depicts",
       "qualities": []
     },
-    "guidance": {
-      "substance": "a gathering pull",
-      "raw": "draws matching objects toward the glyph",
-      "qualities": []
-    },
-    "calling": {
-      "substance": "a recorded sound",
-      "raw": "echoes back a recorded phrase",
-      "qualities": []
-    },
     "mind": {
       "substance": "memory",
       "raw": "acts upon the mind",
@@ -168,11 +158,6 @@
     "rain": {
       "kind": "form",
       "verb": "falls as rain across the surrounding area",
-      "surrounds": true
-    },
-    "bird": {
-      "kind": "form",
-      "verb": "gathers into the shape of a bird that flies about",
       "surrounds": true
     },
     "weave": {
@@ -268,10 +253,6 @@
       "kind": "special",
       "verb": "absorbs light into shadow"
     },
-    "bend": {
-      "kind": "special",
-      "verb": "bends light and shadow around its target"
-    },
     "sights_set": {
       "kind": "target",
       "verb": "is aimed at a chosen target (seemingly mind-directed)"
@@ -330,62 +311,6 @@
     "sign_of_wind": {
       "kind": "motion",
       "verb": "is set whirling into a spinning spiral (a 'whirlwind keystone')"
-    },
-    "animal_signs": {
-      "kind": "none",
-      "verb": "adds a decorative animal motif with no magical effect"
-    },
-    "unknown_sign": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_01": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_02": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_03": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_04": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_05": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_07": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_08": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_06": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_09": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_10": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_11": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
-    },
-    "unknown_12": {
-      "kind": "unknown",
-      "verb": "contributes an effect that has not yet been identified"
     }
   },
   "interactions": [
@@ -465,23 +390,23 @@
       "when": {
         "has": [
           "eye",
-          "bend"
+          "envelopment"
         ],
-        "core": "vision_sigil"
+        "core": "vision"
       },
-      "text": "Vision + Eye + Bend meld the object — and whatever it covers — into the shadows (concealment)."
+      "text": "Vision + Eye + Envelop meld the object — and whatever it covers — into the shadows (concealment)."
     },
     {
       "id": "vision-incomplete",
       "type": "note",
       "when": {
-        "core": "vision_sigil",
+        "core": "vision",
         "missing": [
           "eye",
-          "bend"
+          "envelopment"
         ]
       },
-      "text": "On its own Vision only stirs light; pair it with Eye and Bend for true concealment."
+      "text": "On its own Vision only stirs light; pair it with Eye and Envelop for true concealment."
     },
     {
       "id": "pull-vortex",

@@ -25,9 +25,10 @@ const MAP = {
   'Aeriforms_Defined.png': 'aeriforms_defined', 'Glaives.png': 'glaives', 'Bind.png': 'bind', 'Link.png': 'link',
   'Float.png': 'float', 'Billowing.png': 'billowing', 'Repetition.png': 'repetition',
   'Diamond.png': 'diamond', 'Window.png': 'window', 'Crosshair.png': 'crosshair',
-  'Bolt.png': 'bolt', 'Eye.png': 'eye', 'Vision.png': 'vision', 'Bend.png': 'bend',
+  'Bolt.png': 'bolt', 'Eye.png': 'eye', 'Vision.png': 'vision', 'Envelop.png': 'envelopment',
   'Cooling.png': 'cool', 'Orb.png': 'orb',
   'Sign_of_Wind.png': 'sign_of_wind', 'Purify.png': 'purify',
+  'Solidify.png': 'solidification',
 };
 
 const TRACE_OPTS = { threshold: 170, turdSize: 2, optTolerance: 0.2, turnPolicy: 'minority' };

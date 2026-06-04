@@ -83,12 +83,9 @@ const ALIASES = {
   ENTWINING: 'entwine',
 }
 // A center-capable sign maps to its *_sigil substance form when used as a core (spec §5).
-const CORE_SIGIL_OF = {
-  vision: 'vision_sigil',
-  billowing: 'billowing_sigil',
-  repetition: 'repetition_sigil',
-  unknown_sign: 'unknown_sigil',
-}
+// Centre-capable signs (billowing/vision/repetition) now carry their own substance (roles: sign+sigil),
+// so a sign-as-core emits its own id — no *_sigil remap. Kept for any future sign→sigil aliases.
+const CORE_SIGIL_OF = {}
 
 // Levenshtein for the "nearest valid id" suggestion on an unknown TYPE.
 function editDistance(a, b) {
@@ -369,7 +366,7 @@ function resolveGroup(node, R, idGen) {
     // Distance along the local outward axis, as a fraction of the group's LOCAL extent. The
     // local origin (the group anchor) is 0; a child at zone Z sits Z·localR_base further out
     // along the arm. Default MID (the middle of the arm); an absolute number is raw local px.
-    // (Spec §10 narrates the bare EYE as the "innermost" element and the bend, at radius=OUT,
+    // (Spec §10 narrates the bare EYE as the "innermost" element and the envelop, at radius=OUT,
     // as "further out" — MID-vs-OUT preserves that inner→outer ordering within the arm.)
     const childRadiusOpt = childOpts.radius ?? MID
     const localR =
@@ -482,7 +479,8 @@ class Circle {
       if (!canCore) {
         throw new Error(`wha-lang: core must be a sigil or a canBeCore sign; "${coreType}" cannot occupy the center.`)
       }
-      // Map a center-capable sign to its *_sigil substance form (spec §5: VISION→vision_sigil).
+      // Centre-capable signs carry their own substance now (roles: sign+sigil), so a sign-as-core
+      // keeps its own id. CORE_SIGIL_OF stays as a hook for any future sign→sigil alias.
       if (!isSigil && CORE_SIGIL_OF[coreType]) coreType = CORE_SIGIL_OF[coreType]
       core = {
         id: `${this.id}c`,
