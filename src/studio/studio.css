@@ -744,11 +744,66 @@
 .ai-card.loading { opacity: 0.7; }
 .ai-card.error   { border-color: var(--err); }
 
+/* card header: title + confidence meter + disagree badge in one row */
+.ai-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
 .ai-card-title {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--accent);
-  margin-bottom: 4px;
+}
+
+/* confidence meter — inline pill, ~48 px wide × 6 px tall */
+.ai-confidence-meter {
+  display: inline-flex;
+  width: 48px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--panel);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+}
+
+.ai-confidence-meter .conf-fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.2s;
+}
+
+.ai-confidence-meter.conf-high .conf-fill { background: var(--ok); }
+.ai-confidence-meter.conf-mid  .conf-fill { background: var(--warn); }
+.ai-confidence-meter.conf-low  .conf-fill { background: var(--err); }
+
+/* "AI disagrees with engine" badge — amber warning pill */
+.ai-disagree-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(224, 179, 65, 0.18);
+  color: var(--warn);
+  border: 1px solid rgba(224, 179, 65, 0.35);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* cache status line */
+.ai-cache-status {
+  font-size: 0.74rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 .ai-card-spinner {

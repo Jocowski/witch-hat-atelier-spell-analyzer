@@ -66,6 +66,82 @@ function readBody(req) {
   })
 }
 
+// ---- response parsing --------------------------------------------------------
+
+/**
+ * Parse the raw text returned by callClaude for a per-topic prompt.
+ *
+ * The bridge appends a CONFIDENCE instruction to every topic prompt, and an
+ * additional EFFECT_CLAIM instruction to the `effect` topic.  Claude is
+ * expected to emit these as structured lines at the end of its response:
+ *
+ *   CONFIDENCE: <float>
+ *   EFFECT_CLAIM: {"element":"fire","primaryClause":"launch","direction":"outward"}
+ *
+ * This helper strips those lines from the visible markdown and returns them as
+ * typed fields.  If Claude doesn't emit a line (old bridge, model skip,
+ * malformed value) the field degrades gracefully:
+ *   - confidence  → null   (meter not rendered)
+ *   - effectClaim → null   (disagreement check skipped)
+ *
+ * This function is pure (no I/O, no side-effects) and exported so it can be
+ * unit-tested with `node --test`.
+ *
+ * @param {string} raw  Raw text from callClaude.
+ * @returns {{ markdown: string, confidence: number|null, effectClaim: object|null }}
+ */
+export function parseTopicResponse(raw) {
+  const lines = raw.trimEnd().split('\n')
+
+  let confidence = null
+  let effectClaim = null
+  let trimCount = 0
+
+  // Scan from the end; the structured lines (CONFIDENCE, EFFECT_CLAIM) should
+  // be the last 1–2 lines.  We tolerate them in either order.
+  for (let i = lines.length - 1; i >= Math.max(0, lines.length - 4); i--) {
+    const line = lines[i].trim()
+
+    if (confidence === null) {
+      // Allow optional leading minus so Claude's -0.x or out-of-range values
+      // are captured and then clamped rather than silently discarded.
+      const mConf = line.match(/^CONFIDENCE:\s*(-?[\d.]+)\s*$/)
+      if (mConf) {
+        const v = parseFloat(mConf[1])
+        confidence = Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : null
+        trimCount = Math.max(trimCount, lines.length - i)
+        continue
+      }
+    }
+
+    if (effectClaim === null) {
+      // Accept anything after 'EFFECT_CLAIM:' so the line is always consumed
+      // (trimCount updated) even if the JSON is malformed — this prevents
+      // a bad EFFECT_CLAIM line from blocking CONFIDENCE extraction.
+      const mClaim = line.match(/^EFFECT_CLAIM:\s*(.+)$/)
+      if (mClaim) {
+        try {
+          effectClaim = JSON.parse(mClaim[1])
+          // Only accept plain objects; reject arrays, primitives, etc.
+          if (effectClaim === null || typeof effectClaim !== 'object' || Array.isArray(effectClaim)) {
+            effectClaim = null
+          }
+        } catch {
+          effectClaim = null
+        }
+        trimCount = Math.max(trimCount, lines.length - i)
+        continue
+      }
+    }
+
+    // Stop as soon as we hit a non-structured line.
+    break
+  }
+
+  const markdown = lines.slice(0, lines.length - trimCount).join('\n').trim()
+  return { markdown, confidence, effectClaim }
+}
+
 // ---- the prompt --------------------------------------------------------------
 // We hand Claude the engine FACTS (ground-truth observations) and let it reason the EFFECT from the
 // repo's first-principles docs. Claude Code reads CORE.md / lexicon itself, so we keep this short.
@@ -222,12 +298,37 @@ const server = createServer(async (req, res) => {
 
       const preamble = buildReportPreamble(factsRaw, heuristicText, name)
 
+      // Suffix appended to every topic prompt so Claude emits a structured CONFIDENCE line.
+      const CONFIDENCE_SUFFIX = `
+
+After your Markdown answer, output EXACTLY one line:
+CONFIDENCE: <float 0.0–1.0>
+where 1.0 = very confident (well-attested in canon/FACTS, unambiguous operators),
+      0.5 = moderate (plausible but inferred, limited canon grounding),
+      0.0 = highly speculative (novel symbols, conflicting operators, no canon analog).
+Do not add any text after the CONFIDENCE line.`
+
+      // Additional suffix for the `effect` topic: emit a machine-readable claim for
+      // the AI-vs-engine disagreement check.
+      const EFFECT_CLAIM_SUFFIX = `
+Also output EXACTLY one line (after the CONFIDENCE line):
+EFFECT_CLAIM: {"element":"<id>","primaryClause":"<verb>","direction":"<label|null>"}
+where:
+  element       = the sigil's element id as in the FACTS (e.g. "fire", "water", "earth", "air", "time")
+  primaryClause = the dominant verb/action (e.g. "launch", "form", "pull", "expand", "transmute")
+  direction     = the dominant direction label if present (e.g. "outward", "inward", "upward") or null`
+
       // Run requested topics with a concurrency cap; emit each result as it arrives.
       await concurrentMap(requested, REPORT_CONCURRENCY, async (topic) => {
-        const fullPrompt = preamble + topic.prompt
+        const isEffect = topic.id === 'effect'
+        const suffix = CONFIDENCE_SUFFIX + (isEffect ? EFFECT_CLAIM_SUFFIX : '')
+        const fullPrompt = preamble + topic.prompt + suffix
         try {
-          const markdown = await callClaude(fullPrompt)
-          emit('topic', { id: topic.id, title: topic.title, markdown })
+          const raw = await callClaude(fullPrompt)
+          const { markdown, confidence, effectClaim } = parseTopicResponse(raw)
+          const payload = { id: topic.id, title: topic.title, markdown, confidence }
+          if (isEffect && effectClaim != null) payload.effectClaim = effectClaim
+          emit('topic', payload)
         } catch (err) {
           emit('topic', { id: topic.id, title: topic.title, error: String(err.message || err) })
         }
@@ -244,11 +345,15 @@ const server = createServer(async (req, res) => {
   return send(res, 404, { ok: false, error: 'not found' })
 })
 
-server.listen(PORT, () => {
-  console.log(`✦ AI bridge on http://localhost:${PORT}`)
-  console.log(`  GET  /health          → liveness + claude version`)
-  console.log(`  POST /analyze         → { composition }  ->  AI spell analysis (via claude -p)`)
-  console.log(`  GET  /report/topics   → topic catalog (${TOPICS.length} topics)`)
-  console.log(`  POST /report/stream   → { composition, topics[] }  ->  SSE topic cards (concurrency: ${REPORT_CONCURRENCY})`)
-  claudeVersion().then((v) => console.log(v ? `  claude CLI: ${v}` : '  ⚠ claude CLI not found on PATH — /analyze will fail.'))
-})
+// Only start listening when the file is run directly (not imported by tests).
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])
+if (isMain) {
+  server.listen(PORT, () => {
+    console.log(`✦ AI bridge on http://localhost:${PORT}`)
+    console.log(`  GET  /health          → liveness + claude version`)
+    console.log(`  POST /analyze         → { composition }  ->  AI spell analysis (via claude -p)`)
+    console.log(`  GET  /report/topics   → topic catalog (${TOPICS.length} topics)`)
+    console.log(`  POST /report/stream   → { composition, topics[] }  ->  SSE topic cards (concurrency: ${REPORT_CONCURRENCY})`)
+    claudeVersion().then((v) => console.log(v ? `  claude CLI: ${v}` : '  ⚠ claude CLI not found on PATH — /analyze will fail.'))
+  })
+}
