@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stroke Template Viewer — WHA Spell Analyzer</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: system-ui, sans-serif; background: #1a1208; color: #e8d5a3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+      header { padding: 10px 16px; background: #261a08; border-bottom: 1px solid #5a3a10; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      header h1 { font-size: 1rem; font-weight: 600; color: #f5c842; }
+      header a { color: #a08040; font-size: 0.8rem; text-decoration: none; }
+      header a:hover { color: #f5c842; }
+      button { background: #3d2a0e; color: #e8d5a3; border: 1px solid #7a5a20; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 0.85rem; }
+      button:hover { background: #5a3a10; }
+      button.primary { background: #5a3a10; border-color: #f5c842; color: #f5c842; }
+      button.primary:hover { background: #7a5020; }
+      .main { display: flex; flex: 1; overflow: hidden; }
+      .left-pane { flex: 0 0 380px; display: flex; flex-direction: column; gap: 10px; padding: 12px; border-right: 1px solid #3a2a08; overflow-y: auto; }
+      .canvas-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; }
+      canvas#viewCanvas { background: #12080a; border: 2px solid #5a3a10; border-radius: 4px; display: block; }
+      textarea { width: 100%; background: #12080a; color: #b8c8a0; border: 1px solid #3a2a08; border-radius: 4px; padding: 8px; font-family: 'Courier New', monospace; font-size: 0.75rem; resize: vertical; }
+      pre { background: #12080a; border: 1px solid #3a2a08; border-radius: 4px; padding: 8px; font-family: 'Courier New', monospace; font-size: 0.75rem; color: #b8c8a0; white-space: pre-wrap; overflow-y: auto; }
+      .section-title { font-size: 0.75rem; font-weight: 600; color: #a08040; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #3a2a08; padding-bottom: 4px; }
+      .section { display: flex; flex-direction: column; gap: 6px; }
+      .btn-row { display: flex; gap: 6px; }
+      .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; background: #3d2a0e; border: 1px solid #5a3a10; }
+      .pill.ok { background: #0e3d1a; border-color: #2a7a40; color: #6dcc8a; }
+      .pill.error { background: #3d0e0e; border-color: #7a2a2a; color: #cc6a6a; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Stroke Template Viewer</h1>
+      <a href="/tools/strokeTemplateMaker.html">← Maker</a>
+      <a href="/tools/sigilSignDetectorLab.html">→ Detector Lab</a>
+      <span id="statusPill" class="pill">Paste a template to begin</span>
+    </header>
+
+    <div class="main">
+      <div class="left-pane">
+        <div class="section">
+          <div class="section-title">Paste template JSON</div>
+          <textarea id="templateInput" rows="12" placeholder='{
+  "name": "fire",
+  "role": "sigil",
+  "points": [{"X":...,"Y":...,"ID":0}, ...]
+}
+
+Also accepts a training_samples DB row:
+{ "symbol_id": "fire", "points": [...] }'></textarea>
+          <div class="btn-row">
+            <button id="btnRender" class="primary">Render</button>
+            <button id="btnClear">Clear</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Metrics (after makeCloud normalization)</div>
+          <pre id="metricsBlock">—</pre>
+        </div>
+      </div>
+
+      <div class="canvas-area">
+        <canvas id="viewCanvas" width="600" height="600"></canvas>
+      </div>
+    </div>
+
+    <script type="module" src="/tools/strokeTemplateViewer.js"></script>
+  </body>
+</html>

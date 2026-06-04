@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stroke Template Maker — WHA Spell Analyzer</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: system-ui, sans-serif; background: #1a1208; color: #e8d5a3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+      header { padding: 10px 16px; background: #261a08; border-bottom: 1px solid #5a3a10; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      header h1 { font-size: 1rem; font-weight: 600; color: #f5c842; }
+      header a { color: #a08040; font-size: 0.8rem; text-decoration: none; }
+      header a:hover { color: #f5c842; }
+      .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      select, input { background: #2d1f0a; color: #e8d5a3; border: 1px solid #5a3a10; border-radius: 4px; padding: 4px 8px; font-size: 0.85rem; }
+      button { background: #3d2a0e; color: #e8d5a3; border: 1px solid #7a5a20; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 0.85rem; }
+      button:hover { background: #5a3a10; }
+      button.primary { background: #5a3a10; border-color: #f5c842; color: #f5c842; }
+      button.primary:hover { background: #7a5020; }
+      .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; background: #3d2a0e; border: 1px solid #5a3a10; }
+      .pill.ok { background: #0e3d1a; border-color: #2a7a40; color: #6dcc8a; }
+      .pill.info { background: #0e2d3d; border-color: #2a5a7a; color: #6ab0cc; }
+      .main { display: flex; flex: 1; overflow: hidden; gap: 0; }
+      .canvas-area { flex: 0 0 auto; position: relative; display: flex; align-items: center; justify-content: center; padding: 12px; }
+      canvas#drawCanvas { background: #12080a; border: 2px solid #5a3a10; border-radius: 4px; cursor: crosshair; touch-action: none; display: block; }
+      .sidebar { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 12px; overflow-y: auto; min-width: 280px; max-width: 400px; }
+      .sidebar label { font-size: 0.8rem; color: #a08040; display: block; margin-bottom: 3px; }
+      .sidebar select { width: 100%; }
+      textarea { width: 100%; background: #12080a; color: #b8c8a0; border: 1px solid #3a2a08; border-radius: 4px; padding: 8px; font-family: 'Courier New', monospace; font-size: 0.75rem; resize: vertical; flex: 1; min-height: 120px; }
+      .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+      .section { display: flex; flex-direction: column; gap: 6px; }
+      .section-title { font-size: 0.75rem; font-weight: 600; color: #a08040; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #3a2a08; padding-bottom: 4px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Stroke Template Maker</h1>
+      <a href="/tools/strokeTemplateViewer.html">→ Viewer</a>
+      <a href="/tools/sigilSignDetectorLab.html">→ Detector Lab</a>
+      <div class="controls">
+        <label style="font-size:0.8rem;color:#a08040">Symbol:</label>
+        <select id="symbolSelect"><option value="">— loading —</option></select>
+        <label style="font-size:0.8rem;color:#a08040">Role:</label>
+        <select id="roleSelect">
+          <option value="sigil">sigil</option>
+          <option value="sign">sign</option>
+        </select>
+        <input id="nameInput" type="text" placeholder="custom name" style="width:130px" />
+      </div>
+      <span id="statusPill" class="pill">Ready</span>
+    </header>
+
+    <div class="main">
+      <div class="canvas-area">
+        <canvas id="drawCanvas" width="700" height="700"></canvas>
+      </div>
+
+      <div class="sidebar">
+        <div class="section">
+          <div class="section-title">Drawing</div>
+          <div class="btn-row">
+            <button id="btnUndo">Undo</button>
+            <button id="btnClear">Clear</button>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;cursor:pointer">
+              <input type="checkbox" id="overlayCheck" /> Show SVG overlay
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Export</div>
+          <div class="btn-row">
+            <button id="btnExport" class="primary">Export template</button>
+            <button id="btnCopy">Copy JSON</button>
+            <button id="btnSave">Save to localStorage</button>
+          </div>
+          <label>Template JSON (normalized, 32 pts)</label>
+          <textarea id="outputArea" rows="10" placeholder="Draw a symbol, then click Export."></textarea>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Stored templates</div>
+          <div id="storedInfo" style="font-size:0.78rem;color:#a08040">Loading…</div>
+          <button id="btnClearLS" style="align-self:flex-start">Clear localStorage</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/tools/strokeTemplateMaker.js"></script>
+  </body>
+</html>

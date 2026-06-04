@@ -38,10 +38,17 @@ export default [
     },
   },
 
-  // Node tooling — tools/**, *.cjs, *.mjs
+  // Node tooling — tools/*.mjs, *.cjs, *.mjs (Node scripts: ai-bridge, seed-admin, etc.)
   {
-    files: ['tools/**/*.{js,mjs,cjs}', '*.cjs', '*.mjs'],
+    files: ['tools/**/*.{mjs,cjs}', '*.cjs', '*.mjs'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
+    rules: { 'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }] },
+  },
+
+  // Browser tool pages — tools/*.js (standalone HTML+JS dev tools served by Vite)
+  {
+    files: ['tools/**/*.js'],
+    languageOptions: { sourceType: 'module', globals: { ...globals.browser } },
     rules: { 'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }] },
   },
 

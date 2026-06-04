@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sigil/Sign Detector Lab — WHA Spell Analyzer</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: system-ui, sans-serif; background: #1a1208; color: #e8d5a3; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+      header { padding: 10px 16px; background: #261a08; border-bottom: 1px solid #5a3a10; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      header h1 { font-size: 1rem; font-weight: 600; color: #f5c842; }
+      header a { color: #a08040; font-size: 0.8rem; text-decoration: none; }
+      header a:hover { color: #f5c842; }
+      select, input { background: #2d1f0a; color: #e8d5a3; border: 1px solid #5a3a10; border-radius: 4px; padding: 4px 8px; font-size: 0.85rem; }
+      button { background: #3d2a0e; color: #e8d5a3; border: 1px solid #7a5a20; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 0.85rem; }
+      button:hover { background: #5a3a10; }
+      .main { display: flex; flex: 1; overflow: hidden; }
+      .canvas-wrap { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; padding: 10px; gap: 8px; }
+      canvas#labCanvas { background: #12080a; border: 2px solid #5a3a10; border-radius: 4px; cursor: crosshair; touch-action: none; display: block; }
+      .toolbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+      .right-panel { flex: 1; display: flex; flex-direction: column; gap: 0; overflow: hidden; border-left: 1px solid #3a2a08; }
+      .decision { padding: 12px; border-bottom: 1px solid #3a2a08; background: #160e04; }
+      .decision .top-match { font-size: 1.4rem; font-weight: 700; color: #f5c842; }
+      .decision .sub { font-size: 0.8rem; color: #a08040; }
+      .confidence-bar { height: 6px; border-radius: 3px; background: #3a2a08; margin: 6px 0; overflow: hidden; }
+      .confidence-bar .fill { height: 100%; border-radius: 3px; transition: width 0.15s, background 0.15s; }
+      .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; font-size: 0.78rem; margin-top: 8px; }
+      .stats-grid .lbl { color: #a08040; }
+      .stats-grid .val { color: #e8d5a3; font-variant-numeric: tabular-nums; }
+      .gate-pass { color: #6dcc8a; font-weight: 600; }
+      .gate-fail { color: #cc6a6a; font-weight: 600; }
+      .match-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+      .match-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 4px; background: #1e1206; border: 1px solid #3a2a08; font-size: 0.78rem; }
+      .match-item.winner { border-color: #f5c842; background: #261a06; }
+      .match-item .rank { width: 18px; color: #5a3a10; text-align: right; font-variant-numeric: tabular-nums; }
+      .match-item .mid { flex: 1; min-width: 0; }
+      .match-item .sym-id { font-weight: 600; color: #e8d5a3; }
+      .match-item .sym-role { color: #7a5a20; font-size: 0.72rem; }
+      .match-item .metrics { color: #a08040; font-variant-numeric: tabular-nums; }
+      .match-item canvas { flex: 0 0 60px; height: 60px; border-radius: 3px; background: #12080a; border: 1px solid #2a1a06; }
+      .info-block { padding: 8px 12px; border-top: 1px solid #3a2a08; background: #160e04; font-size: 0.72rem; color: #7a5a20; }
+      .info-block .section-title { color: #a08040; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem; }
+      pre.raw-json { font-family: 'Courier New', monospace; font-size: 0.68rem; white-space: pre-wrap; color: #7a8a60; max-height: 100px; overflow-y: auto; background: #12080a; border: 1px solid #2a1a06; border-radius: 3px; padding: 4px; }
+      textarea.paste-area { width: 100%; background: #12080a; color: #b8c8a0; border: 1px solid #2a1a06; border-radius: 4px; padding: 6px; font-family: 'Courier New', monospace; font-size: 0.72rem; resize: none; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Sigil/Sign Detector Lab</h1>
+      <a href="/tools/strokeTemplateMaker.html">← Maker</a>
+      <a href="/tools/strokeTemplateViewer.html">← Viewer</a>
+      <span style="color:#5a3a10">|</span>
+      <label style="font-size:0.8rem;color:#a08040">Mode:</label>
+      <select id="modeSelect">
+        <option value="all">Sigils + Signs</option>
+        <option value="sigil">Sigils only</option>
+        <option value="sign">Signs only</option>
+      </select>
+      <label style="font-size:0.8rem;color:#a08040">Overlay:</label>
+      <select id="overlaySelect"><option value="">— none —</option></select>
+    </header>
+
+    <div class="main">
+      <div class="canvas-wrap">
+        <canvas id="labCanvas" width="560" height="560"></canvas>
+        <div class="toolbar">
+          <button id="btnUndo">Undo</button>
+          <button id="btnClear">Clear</button>
+          <span style="font-size:0.78rem;color:#5a3a10">Draw → recognition runs on each stroke commit</span>
+        </div>
+        <div style="padding:0 4px;width:100%">
+          <div class="section-title" style="font-size:0.7rem;color:#a08040;text-transform:uppercase;letter-spacing:.05em;padding-bottom:3px;border-bottom:1px solid #3a2a08;margin-bottom:6px">Paste templates (overrides localStorage)</div>
+          <textarea class="paste-area" id="pasteTemplates" rows="3" placeholder='Paste a JSON array of { name, role, points } templates, then click Apply.'></textarea>
+          <div style="display:flex;gap:6px;margin-top:4px">
+            <button id="btnApplyTemplates" style="font-size:0.78rem">Apply</button>
+            <button id="btnResetTemplates" style="font-size:0.78rem">Reset to localStorage</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="decision" id="decisionPanel">
+          <div class="top-match" id="topMatchName">—</div>
+          <div class="sub" id="topMatchRole">Draw a symbol to recognize</div>
+          <div class="confidence-bar"><div class="fill" id="confFill" style="width:0%;background:#5a3a10"></div></div>
+          <div class="stats-grid">
+            <span class="lbl">Confidence</span><span class="val" id="confVal">—</span>
+            <span class="lbl">Raw dist</span><span class="val" id="rawDist">—</span>
+            <span class="lbl">Adj dist</span><span class="val" id="adjDist">—</span>
+            <span class="lbl">De-rotation</span><span class="val" id="deRot">—</span>
+            <span class="lbl">Gate</span><span class="val" id="gateVal">—</span>
+            <span class="lbl">Threshold</span><span class="val" id="threshVal">—</span>
+          </div>
+        </div>
+
+        <div class="match-list" id="matchList">
+          <div style="color:#5a3a10;font-size:0.8rem;padding:8px">Top-8 matches will appear here.</div>
+        </div>
+
+        <div class="info-block">
+          <div class="section-title">Template set</div>
+          <div id="templateSetInfo" style="margin-bottom:6px">—</div>
+          <div class="section-title">Recognition JSON (raw)</div>
+          <pre class="raw-json" id="rawJson">—</pre>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/tools/sigilSignDetectorLab.js"></script>
+  </body>
+</html>

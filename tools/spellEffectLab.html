@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spell Effect Lab — WHA Spell Analyzer</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: system-ui, sans-serif; background: #0e0a16; color: #d8c8f0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+      header { padding: 10px 16px; background: #1a1228; border-bottom: 1px solid #3a2a60; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      header h1 { font-size: 1rem; font-weight: 600; color: #c0a0f8; }
+      header a { color: #7060a0; font-size: 0.8rem; text-decoration: none; }
+      header a:hover { color: #c0a0f8; }
+      .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; background: #1a1228; border: 1px solid #3a2a60; }
+      .pill.stub { background: #2a1a00; border-color: #7a5a00; color: #d0a040; }
+      select, input[type=text] { background: #1a1228; color: #d8c8f0; border: 1px solid #3a2a60; border-radius: 4px; padding: 4px 8px; font-size: 0.85rem; }
+      button { background: #2a1a40; color: #d8c8f0; border: 1px solid #5a3a90; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 0.85rem; }
+      button:hover { background: #3a2a58; }
+      button.primary { background: #3a2a60; border-color: #c0a0f8; color: #c0a0f8; }
+      button.primary:hover { background: #5040a0; }
+      .main { display: flex; flex: 1; overflow: hidden; }
+      /* Canvas column */
+      .canvas-col { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; padding: 12px; gap: 8px; }
+      .canvas-stack { position: relative; width: 520px; height: 520px; }
+      canvas { position: absolute; top: 0; left: 0; border-radius: 4px; }
+      #underlayCanvas { background: #08060e; border: 2px solid #3a2a60; }
+      #effectCanvas { background: transparent; }
+      .canvas-label { font-size: 0.7rem; color: #5040a0; }
+      /* Controls column */
+      .controls-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-left: 1px solid #2a1a40; }
+      .controls-scroll { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+      .section-title { font-size: 0.72rem; font-weight: 600; color: #7060a0; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #2a1a40; padding-bottom: 3px; margin-bottom: 6px; }
+      .slider-row { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin-bottom: 4px; }
+      .slider-row label { width: 130px; flex: 0 0 130px; color: #a090c0; }
+      .slider-row input[type=range] { flex: 1; accent-color: #a080f0; }
+      .slider-row .val { width: 48px; text-align: right; color: #d8c8f0; font-variant-numeric: tabular-nums; }
+      .slider-row .desc { width: 180px; color: #5040a0; font-size: 0.7rem; }
+      .section { display: flex; flex-direction: column; }
+      textarea.paste-area { width: 100%; background: #08060e; color: #b0c8a0; border: 1px solid #2a1a40; border-radius: 4px; padding: 8px; font-family: 'Courier New', monospace; font-size: 0.72rem; resize: vertical; min-height: 80px; }
+      pre.ir-block { background: #08060e; color: #a0c0b0; border: 1px solid #2a1a40; border-radius: 4px; padding: 8px; font-family: 'Courier New', monospace; font-size: 0.72rem; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+      .btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+      .todo-notice { background: #1a1000; border: 1px dashed #7a6000; border-radius: 4px; padding: 8px 10px; font-size: 0.75rem; color: #a08030; margin-bottom: 4px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Spell Effect Lab</h1>
+      <a href="/tools/strokeTemplateMaker.html">← Maker</a>
+      <a href="/tools/sigilSignDetectorLab.html">← Detector</a>
+      <span class="pill stub">Shell — renderer not yet wired (SPEC-visual-renderer)</span>
+      <label style="font-size:0.8rem;color:#7060a0">Element:</label>
+      <select id="elementSelect"><option value="">— loading —</option></select>
+      <button id="btnReset">Reset</button>
+    </header>
+
+    <div class="main">
+      <div class="canvas-col">
+        <div class="canvas-stack">
+          <canvas id="underlayCanvas" width="520" height="520"></canvas>
+          <canvas id="effectCanvas" width="520" height="520"></canvas>
+        </div>
+        <span class="canvas-label">underlay (glyph guide) · effect overlay (placeholder)</span>
+      </div>
+
+      <div class="controls-col">
+        <div class="controls-scroll">
+
+          <div class="todo-notice">
+            <!-- TODO: wire to src/studio/render/effects/* once SPEC-visual-renderer lands -->
+            Renderer not yet implemented. Sliders update the <strong>SpellIR</strong> parameter object
+            (shown below) which will drive <code>SpellEffectRenderer</code> once that module lands.
+            Paste a <code>wha-spell@1</code> JSON to pre-fill from the engine's deduced values.
+          </div>
+
+          <div class="section">
+            <div class="section-title">Effect parameters</div>
+            <!-- Sliders are rendered programmatically by spellEffectLab.js -->
+            <div id="sliderBlock"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Paste wha-spell@1 JSON</div>
+            <textarea class="paste-area" id="spellJsonInput" rows="5"
+              placeholder='Paste a wha-spell@1 export here and click Apply to pre-fill sliders with deduced parameters.'></textarea>
+            <div class="btn-row">
+              <button id="btnApplySpell" class="primary">Apply spell JSON</button>
+              <button id="btnCopyIR">Copy current IR</button>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Current SpellIR object (live)</div>
+            <pre class="ir-block" id="irBlock">{}</pre>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/tools/spellEffectLab.js"></script>
+  </body>
+</html>
