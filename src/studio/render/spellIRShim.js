@@ -21,7 +21,7 @@
  *
  * Returns a SpellIR object suitable for feeding into SpellEffectRenderer.
  */
-export function buildSpellIRShim(result, ringClosed, activatedAt) {
+export function buildSpellIRShim(result, ringClosed, activatedAt, opts = {}) {
   if (!result) return null
 
   // Element: derive from the primary sigil family (first sigil in the result)
@@ -33,6 +33,7 @@ export function buildSpellIRShim(result, ringClosed, activatedAt) {
 
   // Use the real spellIR block if available (analyze() emits it)
   const base = result.spellIR ?? {}
+  const power = opts.power ?? 1 // Blood dye → dramatic amplification (see params below)
 
   return {
     // Core validity / activation
@@ -44,19 +45,29 @@ export function buildSpellIRShim(result, ringClosed, activatedAt) {
     // Element routing
     element,
 
-    // Numeric params from real SpellIR when available; fallback to sensible defaults
-    force: base.force ?? 0.5,
-    spread: base.spread ?? 0.4,
+    // Numeric params from real SpellIR when available; fallback to sensible defaults.
+    // `power` (Blood dye) is a dramatic amplifier — canon: blood turns a simple light spell into a
+    // giant flash, an earth-crush into a canyon. We don't simulate 1000×, but a powered cast erupts
+    // much bigger (effectScale), faster/farther (force/range), and wider (spread). `duration`
+    // overrides the run length (Azuremoon dye doubles it).
+    force: Math.min(2.2, (base.force ?? 0.5) * (power > 1 ? 3 : 1)),
+    spread: power > 1 ? Math.min(1, (base.spread ?? 0.4) + 0.32) : (base.spread ?? 0.4),
     focus: base.focus ?? 0.6,
-    range: base.range ?? 0.5,
-    duration: base.duration ?? 3.0,
+    range: power > 1 ? Math.min(1.6, (base.range ?? 0.5) * 1.7) : (base.range ?? 0.5),
+    duration: opts.duration ?? base.duration ?? 3.0,
+    effectScale: power > 1 ? 2.6 : (base.effectScale ?? 1),
     stability: base.stability ?? 0.7,
     gravity: base.gravity ?? 1.0,
     dirCoherence: base.dirCoherence ?? 0,
-    direction: base.direction ?? { x: 0, y: 0, z: 1, xTiltDeg: 0, yTiltDeg: 0, tiltFromZDeg: 0 },
+    // Direction drives WHERE the effect goes. Prefer the caller's einlair-derived direction
+    // (radial x/y + upward z), falling back to the engine block, then a gentle upward spout.
+    direction: opts.direction ?? base.direction ?? { x: 0, y: 0, z: 1, xTiltDeg: 0, yTiltDeg: 0, tiltFromZDeg: 0 },
 
     // Quality (used for partial-failure threshold)
     quality: base.quality ?? 1.0,
+
+    // Practice trial: keep the stream emitting continuously (no end-of-duration fade).
+    sustain: !!opts.sustain,
 
     // Signature for particle flush
     signature,

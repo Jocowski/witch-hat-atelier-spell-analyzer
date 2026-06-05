@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "license": "MIT",
   "description": "Simulador do sistema mágico de Witch Hat Atelier — compõe glyphs por arrasto e reconhece/valida spells.",
   "scripts": {
     "dev": "vite",
@@ -20,7 +21,9 @@
     "facts": "node tools/spell-engine-cli.mjs --facts",
     "render": "node tools/render.mjs",
     "ai": "node tools/ai-bridge.mjs",
-    "seed:training": "node tools/seed-training.mjs"
+    "seed:training": "node tools/seed-training.mjs",
+    "build:seed": "node tools/build-training-seed.mjs",
+    "seed:refresh": "npm run seed:training && npm run build:seed"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",

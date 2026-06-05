@@ -9,6 +9,9 @@ export const DEFAULT_RENDERER_CONFIG = {
     preparedActiveGating: false,
     stabilityFailThreshold: 0.25,
     qualityFailThreshold: 0.20,
+    // Draw style: 'glow' (additive particles) | 'toon' (cel-shaded ink silhouette).
+    // Currently only the water effect honours 'toon' (PoC); other elements fall back to glow.
+    style: 'glow',
   },
 }
 

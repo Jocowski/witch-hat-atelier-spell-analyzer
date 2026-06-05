@@ -39,6 +39,7 @@ function confidencePct(dist) {
 function Row({
   type, kind, dist, isRecognized, confident = true, group, onRelabel,
   selectable = false, selected = false, onToggleSelect, autoEdit = false, onBeautify, onHover, onErase,
+  trainingEnabled = false,
 }) {
   const [editing, setEditing] = useState(() => !!autoEdit)
   const [newType, setNewType] = useState(type || '')
@@ -55,15 +56,16 @@ function Row({
   }, [autoEdit])
 
   // Feed this drawing to the training set under its CURRENT label — no relabel needed.
+  // Only writes to the DB when trainingEnabled is true; inert otherwise.
   async function doTrain() {
     const target = (type || '').trim()
-    if (!isRecognized || !group || !target) return
+    if (!isRecognized || !group || !target || !trainingEnabled) return
     try {
       const symbol = await getSymbolByEngineId(target)
       if (!symbol) { setStatus('error'); return } // no DB or unknown id
       const role = group.role === 'core' ? 'sigil' : 'sign'
       const points = groupToTemplate(group, target, role).points
-      await addSample({ symbol_id: symbol.id, points, role, source: 'drawn', app_version: 'studio' })
+      await addSample({ symbol_id: symbol.id, points, role, source: 'web', app_version: 'studio' })
       setStatus('trained')
     } catch {
       setStatus('error')
@@ -80,14 +82,15 @@ function Row({
     setForceTrain(false)
     if (changed) onRelabel?.(group, target) // group present for recognized rows; undefined for placed
     setEditing(false)
-    // For a recognized symbol we have the drawn strokes → save a (corrected/confirmed) training example.
-    if (!isRecognized || !group) { setStatus('saved'); return }
+    // For a recognized symbol we have the drawn strokes → save a training example when enabled.
+    // When trainingEnabled is false, relabel is still applied locally but nothing is written to DB.
+    if (!isRecognized || !group || !trainingEnabled) { setStatus('saved'); return }
     try {
       const symbol = await getSymbolByEngineId(target)
       if (!symbol) { setStatus('saved'); return } // no DB or unknown id → relabel only
       const role = group.role === 'core' ? 'sigil' : 'sign'
       const points = groupToTemplate(group, target, role).points
-      await addSample({ symbol_id: symbol.id, points, role, source: 'corrected', app_version: 'studio' })
+      await addSample({ symbol_id: symbol.id, points, role, source: 'web', app_version: 'studio' })
       setStatus('trained')
     } catch {
       setStatus('error')
@@ -139,7 +142,7 @@ function Row({
             {status === 'trained' && <span className="identified-saved" title="Saved as a training example">trained ✓</span>}
             {status === 'saved' && <span className="identified-saved">relabeled</span>}
             {status === 'error' && <span className="note warn">save failed</span>}
-            {isRecognized && (
+            {isRecognized && trainingEnabled && (
               <button className="identified-icon" onClick={doTrain} aria-label={`Train as ${type}`}
                 title={`Add this drawing to the training set as "${type}" (no relabel needed)`}>
                 ⊕
@@ -178,7 +181,7 @@ function placedBox(sym) {
   return { x: (sym.x || 0) - half, y: (sym.y || 0) - half, w: half * 2, h: half * 2 }
 }
 
-export default function IdentifiedPanel({ placed = [], groups = [], onRelabel, onMerge, onBeautify, onBeautifyAll, onHover, onErase }) {
+export default function IdentifiedPanel({ placed = [], groups = [], onRelabel, onMerge, onBeautify, onBeautifyAll, onHover, onErase, trainingEnabled = false }) {
   const recognized = groups.filter((g) => g.match)
   // Selected recognized groups (by reference) for the merge action. Reset whenever the group set
   // changes (a merge/correction replaces the array), so stale references never linger.
@@ -244,14 +247,16 @@ export default function IdentifiedPanel({ placed = [], groups = [], onRelabel, o
           <Row key={`placed-${sym.id || sym.type}-${i}`} type={sym.type || sym.id} kind={sym.kind === 'sigil' ? 'sigil' : 'sign'}
             isRecognized={false} onRelabel={onRelabel}
             onHover={(on) => onHover?.(on ? placedBox(sym) : null)}
-            onErase={onErase ? () => onErase({ placed: sym }) : undefined} />
+            onErase={onErase ? () => onErase({ placed: sym }) : undefined}
+            trainingEnabled={trainingEnabled} />
         ))}
         {recognized.map((g, i) => (
           <Row key={g._uid || `rec-${i}`} type={g.match.name} kind={g.role === 'core' ? 'sigil' : 'sign'}
             dist={g.match.dist} isRecognized confident={g.confident !== false} group={g} onRelabel={onRelabel}
             selectable={canMerge} selected={selected.has(g)} onToggleSelect={toggle} autoEdit={!!g._justMerged}
             onBeautify={onBeautify} onHover={(on) => onHover?.(on ? groupBox(g) : null)}
-            onErase={onErase ? () => onErase({ group: g }) : undefined} />
+            onErase={onErase ? () => onErase({ group: g }) : undefined}
+            trainingEnabled={trainingEnabled} />
         ))}
       </ul>
     </div>

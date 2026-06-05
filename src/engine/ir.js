@@ -11,7 +11,7 @@
 //
 // `assembleSpellIR(facts, cfg)` — main export.
 // `directionFromSurfaceVector(sv, force, cfg)` — exported for unit tests.
-import { clamp, canSteer, CANVAS_RADIUS } from './geometry.js'
+import { clamp, canSteer, CANVAS_RADIUS, computeContainment } from './geometry.js'
 
 // ---------- 3D direction with tilt (SPEC §1.5) ----------
 // Adapted from the sibling project's directionFromSurfaceVector() in spellDirection.js.
@@ -122,7 +122,13 @@ export function assembleSpellIR(facts, cfg) {
   })
   const levCount = levitationSigns.length
   const liftStrength = levCount / (cfg.gravityLevitationDivisor ?? 3)
-  const gravity = clamp(1 - liftStrength * (cfg.gravityLevitationScale ?? 0.42))
+  let gravity = clamp(1 - liftStrength * (cfg.gravityLevitationScale ?? 0.42))
+
+  // --- containment (orb-container model, SPEC-orb-container §L4) ---
+  // isContainer is built from grammarOps (same source used for all other operator checks) so this
+  // module stays JSON-free. signComps is the same list used for levitation above.
+  const isContainer = (type) => grammarOps?.[type]?.container === 'sphere'
+  const containment = computeContainment(signComps || [], familyOf ?? (() => null), isContainer)
 
   // --- 3D direction ---
   // Surface vector from computeOrientationAim (vx/vy already in the paper-plane frame).
@@ -130,7 +136,34 @@ export function assembleSpellIR(facts, cfg) {
   const sv = wsum > 0
     ? { x: (aim?.vx ?? 0) / wsum, y: (aim?.vy ?? 0) / wsum }
     : { x: 0, y: 0 }
-  const direction = directionFromSurfaceVector(sv, force, cfg)
+  let direction = directionFromSurfaceVector(sv, force, cfg)
+
+  // --- container overrides ---
+  // When the spell has a container form (orb): the substance rises into the suspended sphere rather
+  // than jetting laterally. Suppress the in-plane aim (scale x/y down) and ensure a positive z so
+  // particles climb into the vessel. Gravity drops to a low "floating" value.
+  if (containment) {
+    // Gravity: the sphere floats — clamp to cfg.containerGravity (default 0.15)
+    gravity = clamp(Math.min(gravity, cfg.containerGravity ?? 0.15))
+    // Direction: preserve shape (same keys) but suppress lateral jet
+    const lateralScale = cfg.containerLateralScale ?? 0.15
+    const z = Math.max(direction.z, cfg.containerMinZ ?? 0.3)
+    const x = direction.x * lateralScale
+    const y = direction.y * lateralScale
+    // Re-derive tilt angles from the clamped vector (it may no longer be unit-length after scaling)
+    const xTiltDeg = (Math.atan2(x, z) * 180) / Math.PI
+    const yTiltDeg = (Math.atan2(y, z) * 180) / Math.PI
+    const tiltFromZDeg = (Math.acos(clamp(z, -1, 1)) * 180) / Math.PI
+    direction = { x, y, z, xTiltDeg, yTiltDeg, tiltFromZDeg }
+
+    return {
+      force, spread, focus, range, duration, stability, gravity, dirCoherence, direction,
+      contained: true,
+      containRadius: containment.radiusFrac,
+      fillRate: containment.fillFrac,
+      capacity: containment.capacity,
+    }
+  }
 
   return { force, spread, focus, range, duration, stability, gravity, dirCoherence, direction }
 }

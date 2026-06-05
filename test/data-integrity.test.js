@@ -7,6 +7,7 @@ const require = createRequire(import.meta.url)
 const sigilsDoc = require('../data/sigils.json')
 const signsDoc = require('../data/signs.json')
 const spellsDoc = require('../data/spells.json')
+const grammarDoc = require('../data/grammar.json')
 
 const sigilIds = new Set(sigilsDoc.sigils.map((s) => s.id))
 const signIds = new Set(signsDoc.signs.map((s) => s.id))
@@ -79,6 +80,66 @@ describe('symbol lifecycle', () => {
             `Update the spell's composition or mark it archived.`,
         )
       }
+    }
+  })
+})
+
+// ----- L6 Orb-container: data-integrity assertions (SPEC-orb-container §L6) -----
+
+describe('orb-container grammar integrity', () => {
+  // Every operator that declares container:"sphere" must also be kind:"form" and directional:false.
+  // These are invariants of the container model (§0): a container is always a form operator
+  // that does not aim a jet.
+  test('every operator with container:"sphere" has kind:"form" and directional:false', () => {
+    const operators = grammarDoc.operators ?? {}
+    for (const [id, op] of Object.entries(operators)) {
+      if (op.container === 'sphere') {
+        assert.equal(
+          op.kind,
+          'form',
+          `operator "${id}" has container:"sphere" but kind is "${op.kind}" (expected "form")`,
+        )
+        assert.equal(
+          op.directional,
+          false,
+          `operator "${id}" has container:"sphere" but directional is ${op.directional} (expected false)`,
+        )
+      }
+    }
+  })
+
+  // The orb-column and orb-rigid-earth interactions reference operator/element ids that
+  // actually exist in the grammar. A typo here would silently prevent the interactions from firing.
+  test('orb-column interaction references operators that exist (orb, column)', () => {
+    const interactions = grammarDoc.interactions ?? []
+    const orbColumn = interactions.find((i) => i.id === 'orb-column')
+    assert.ok(orbColumn, 'orb-column interaction missing from grammar.json')
+    for (const opId of orbColumn.when?.has ?? []) {
+      assert.ok(
+        grammarDoc.operators?.[opId],
+        `orb-column interaction references operator "${opId}" which does not exist in grammar.operators`,
+      )
+    }
+  })
+
+  test('orb-rigid-earth interaction references operators and elements that exist', () => {
+    const interactions = grammarDoc.interactions ?? []
+    const orbRigid = interactions.find((i) => i.id === 'orb-rigid-earth')
+    assert.ok(orbRigid, 'orb-rigid-earth interaction missing from grammar.json')
+    // All ids in when.has must be valid operator ids
+    for (const opId of orbRigid.when?.has ?? []) {
+      assert.ok(
+        grammarDoc.operators?.[opId],
+        `orb-rigid-earth interaction references operator "${opId}" which does not exist in grammar.operators`,
+      )
+    }
+    // when.element must be a valid element id
+    const elemId = orbRigid.when?.element
+    if (elemId) {
+      assert.ok(
+        grammarDoc.elements?.[elemId],
+        `orb-rigid-earth interaction references element "${elemId}" which does not exist in grammar.elements`,
+      )
     }
   })
 })

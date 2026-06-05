@@ -55,7 +55,7 @@ import {
 } from 'react'
 import Konva from 'konva'
 import {
-  Stage, Layer, Line, Rect, Circle as KCircle, Path, Transformer, Text, Group,
+  Stage, Layer, Line, Rect, Circle as KCircle, Path, Transformer, Text, Group, Arrow,
 } from 'react-konva'
 import { line, rect, triangle, circle, brush } from './tools/shapes.js'
 import { beautifyStroke, weldsRingGap } from './tools/beautify.js'
@@ -97,6 +97,18 @@ const OVERLAY_ACCENT = '#c9a24a'
 const OVERLAY_LABEL_BG = 'rgba(201,162,74,0.85)'
 const OVERLAY_LABEL_COLOR = '#1a1208'
 const OVERLAY_FONT_SIZE = 11   // world units (will be divided by zoom when rendered)
+
+// Vector overlay colors: per-sign force arrows vs. the net (resultant) aim arrow.
+const VEC_SIGN_COLOR  = '#3aa0e8'   // per-sign direction+force
+const VEC_NET_COLOR   = '#e0683a'   // net resultant (in-plane / radial steer)
+const VEC_FORCE_COLOR = '#8a7bd8'   // non-directional sign: force, no steer (ring, no arrow)
+const VEC_UP_COLOR    = '#5ec8a0'   // out-of-plane "upward flow" (einlair U): balanced columns → up
+const VEC_SPREAD_COLOR = '#d8923a'  // inverted columns (Φ<0): magic spreads radially outward
+// Arrow length (world px) for a unit-magnitude vector; total length = base + magnitude·gain.
+const VEC_SIGN_BASE = 16
+const VEC_SIGN_GAIN = 52
+const VEC_NET_BASE  = 70
+const VEC_NET_GAIN  = 150
 
 function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v }
 let UID = 0
@@ -190,6 +202,7 @@ function normStroke(s) {
     width: typeof s.width === 'number' ? Math.max(1, s.width) : 3,
     dyeId: s.dyeId ?? null,
     fill: typeof s.fill === 'string' ? s.fill : null,
+    fillDyeId: s.fillDyeId ?? null,
     points,
   }
 }
@@ -210,6 +223,7 @@ function normPlaced(p) {
     scale: typeof p.scale === 'number' ? Math.max(0.1, p.scale) : 1,
     inverted: !!p.inverted,
     color: typeof p.color === 'string' ? p.color : '#c9a24a',
+    dyeId: p.dyeId ?? null,
   }
 }
 
@@ -225,6 +239,8 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     traceSvg,        // string | null — an svgPath drawn faintly on the canvas as a tracing guide
     traceOpacity = 0.18, // opacity of the tracing guide
     highlight,       // { x,y,w,h } | null — a glowing box (e.g. the hovered Identified-panel row)
+    vectors,         // Array<{ x,y, angle:(deg|null), magnitude, kind:'sign'|'net' }> | undefined
+    //                  per-sign direction+force arrows (world coords); angle null = force-only ring
     spellIR,         // SpellIR | null — passed from StudioPage after Analyze
     ringGeom,        // { center:{x,y}, radius:number, found:boolean } | null
     effectsEnabled = false,  // master switch for the visual effect overlay
@@ -304,20 +320,26 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   }, [toWorld])
 
   // ── model change notifier ────────────────────────────────────────────────────
-  const buildModel = useCallback((ns, ds) => {
+  // `dyes` is DERIVED from the current content (stroke ink, stroke fill, placed symbols) — NOT an
+  // append-only list — so erasing a dyed stroke removes its dye (e.g. Blood) from the spell.
+  const buildModel = useCallback((ns) => {
     const strokes = []
     const placed  = []
+    const dyeSet  = new Set()
     for (const n of ns) {
       if (n.kind === 'stroke') {
         strokes.push({ tool: n.tool, color: n.color, width: n.width, dyeId: n.dyeId, fill: n.fill ?? null, points: n.points })
+        if (n.dyeId) dyeSet.add(n.dyeId)
+        if (n.fillDyeId) dyeSet.add(n.fillDyeId)
       } else {
         placed.push({
           id: n.type, type: n.type, kind: n.symKind,
-          x: n.x, y: n.y, rotation: n.rotation, scale: n.scale, inverted: n.inverted,
+          x: n.x, y: n.y, rotation: n.rotation, scale: n.scale, inverted: n.inverted, dyeId: n.dyeId ?? null,
         })
+        if (n.dyeId) dyeSet.add(n.dyeId)
       }
     }
-    return { strokes, placed, dyes: ds.slice() }
+    return { strokes, placed, dyes: [...dyeSet] }
   }, [])
 
   const fireChange = useCallback((ns, ds) => {
@@ -448,7 +470,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
       const sym = {
         id: nextId(), kind: 'symbol',
         type, symKind: kind || 'sign',
-        x: Math.round(wc.x), y: Math.round(wc.y), rotation: 0, scale: 1, inverted: false, color,
+        x: Math.round(wc.x), y: Math.round(wc.y), rotation: 0, scale: 1, inverted: false, color, dyeId,
       }
       setNodes((prev) => {
         const next = [...prev, sym]
@@ -539,7 +561,11 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     // ── NEW: toDataURL ───────────────────────────────────────────────────────
     // Captures a PNG of the content layer only (overlay + Transformer excluded).
     // opts is forwarded to Konva Stage.toDataURL (supports pixelRatio, mimeType, quality).
+    // Dye filtering (for the render backdrop's per-dye effects):
+    //   opts.hideDyeIds : string[]  — temporarily hide strokes drawn with these dye ids
+    //   opts.soloDyeIds : string[]  — show ONLY strokes drawn with these dye ids (hide the rest)
     toDataURL(opts = {}) {
+      const { hideDyeIds, soloDyeIds, ...stageOpts } = opts
       const stage = stageRef.current
       const overlayLayer = overlayLayerRef.current
       const tr = trRef.current
@@ -547,17 +573,32 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
       // Temporarily hide elements that must not appear in the export.
       const overlayWasVisible = overlayLayer?.visible()
       if (overlayLayer) overlayLayer.visible(false)
-
-      // Hide Transformer nodes
       if (tr) tr.visible(false)
+
+      // Per-dye stroke filtering: toggle the matching Konva stroke nodes' visibility.
+      const dyeHidden = []
+      const solo = Array.isArray(soloDyeIds) && soloDyeIds.length ? soloDyeIds : null
+      const hide = Array.isArray(hideDyeIds) && hideDyeIds.length ? hideDyeIds : null
+      if (solo || hide) {
+        for (const n of nodesRef.current) {
+          const knode = nodeRefs.current.get(n.id)
+          if (!knode) continue
+          // solo: keep ONLY strokes drawn with a soloed dye (hide everything else, symbols included);
+          // hide: drop strokes drawn with a hidden dye.
+          const shouldHide = solo
+            ? !(n.kind === 'stroke' && solo.includes(n.dyeId))
+            : (n.kind === 'stroke' && hide.includes(n.dyeId))
+          if (shouldHide) { dyeHidden.push([knode, knode.visible()]); knode.visible(false) }
+        }
+      }
 
       let dataURL
       try {
-        dataURL = stage?.toDataURL({ pixelRatio: 1, ...opts }) ?? ''
+        dataURL = stage?.toDataURL({ pixelRatio: 1, ...stageOpts }) ?? ''
       } finally {
-        // Restore visibility
         if (overlayLayer) overlayLayer.visible(overlayWasVisible ?? true)
         if (tr) tr.visible(true)
+        for (const [k, v] of dyeHidden) k.visible(v)
         stage?.batchDraw()
       }
       return dataURL
@@ -790,7 +831,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     if (!target) return  // open shape or empty space → nothing to fill
     const nextFill = target.fill === color ? null : color
     snapshot()
-    const next = nodesRef.current.map((n) => (n.id === target.id ? { ...n, fill: nextFill } : n))
+    const next = nodesRef.current.map((n) => (n.id === target.id ? { ...n, fill: nextFill, fillDyeId: nextFill ? dyeId : null } : n))
     setNodes(next); nodesRef.current = next
     // Filling with a dyed ink registers the dye on the spell (same as a dyed stroke).
     let ds = dyesRef.current
@@ -1025,6 +1066,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   // Font size and stroke width are divided by zoom to stay constant in screen pixels.
   const hasOverlays = Array.isArray(overlays) && overlays.length > 0
   const hasHighlight = !!(highlight && highlight.w > 0 && highlight.h > 0)
+  const hasVectors = Array.isArray(vectors) && vectors.length > 0
   const overlayStrokeW = 1.5 / zoom
   const labelFontSize  = OVERLAY_FONT_SIZE / zoom
   const labelPad       = 2 / zoom
@@ -1201,7 +1243,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
           </Layer>
 
           {/* ── Overlay layer (non-interactive, always on top) ──────────────── */}
-          {(hasOverlays || hasHighlight) && (
+          {(hasOverlays || hasHighlight || hasVectors) && (
             <Layer
               {...layerProps}
               ref={overlayLayerRef}
@@ -1260,6 +1302,83 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
                       </Group>
                     )}
                   </Group>
+                )
+              })}
+
+              {/* ── Per-sign direction + force vectors (and the net resultant) ──── */}
+              {hasVectors && vectors.map((v, i) => {
+                if (!v || !Number.isFinite(v.x) || !Number.isFinite(v.y)) return null
+                const mag = Math.max(0, v.magnitude ?? 0)
+                // Out-of-plane "upward flow" (einlair U): concentric ⊙ at the seal centre, ∝ U.
+                if (v.kind === 'up') {
+                  const r = 12 + mag * 46
+                  return (
+                    <Group key={`v${i}`} listening={false}>
+                      <KCircle x={v.x} y={v.y} radius={r} stroke={VEC_UP_COLOR} strokeWidth={2.4 / zoom}
+                        dash={[dash(6), dash(5)]} listening={false} />
+                      <KCircle x={v.x} y={v.y} radius={r * 0.58} stroke={VEC_UP_COLOR} strokeWidth={1.6 / zoom}
+                        dash={[dash(4), dash(4)]} opacity={0.6} listening={false} />
+                      <KCircle x={v.x} y={v.y} radius={3.5 / zoom} fill={VEC_UP_COLOR} listening={false} />
+                      <Text x={v.x + 6 / zoom} y={v.y - r - 16 / zoom} text="↑ up-flow"
+                        fontSize={12 / zoom} fontStyle="bold" fill={VEC_UP_COLOR} listening={false} />
+                    </Group>
+                  )
+                }
+                // Inverted columns (Φ<0): magic spreads radially OUTWARD — dashed ring + outward ticks.
+                if (v.kind === 'spread') {
+                  const r = 18 + mag * 40
+                  const tick = 12 / zoom
+                  const ticks = []
+                  for (let k = 0; k < 8; k++) {
+                    const a = (k * Math.PI) / 4
+                    const c = Math.cos(a), s = Math.sin(a)
+                    ticks.push(
+                      <Line key={k} points={[v.x + c * r, v.y + s * r, v.x + c * r + c * tick, v.y + s * r + s * tick]}
+                        stroke={VEC_SPREAD_COLOR} strokeWidth={2 / zoom} lineCap="round" listening={false} />,
+                    )
+                  }
+                  return (
+                    <Group key={`v${i}`} listening={false}>
+                      <KCircle x={v.x} y={v.y} radius={r} stroke={VEC_SPREAD_COLOR} strokeWidth={2.2 / zoom}
+                        dash={[dash(6), dash(5)]} listening={false} />
+                      {ticks}
+                    </Group>
+                  )
+                }
+                // Non-directional sign: no front → show a force RING (radius ∝ force), no arrow.
+                if (v.angle == null) {
+                  return (
+                    <KCircle
+                      key={`v${i}`}
+                      x={v.x} y={v.y}
+                      radius={(6 + mag * 10)}
+                      stroke={VEC_FORCE_COLOR}
+                      strokeWidth={2 / zoom}
+                      dash={[dash(3), dash(3)]}
+                      listening={false}
+                    />
+                  )
+                }
+                const isNet = v.kind === 'net'
+                const rad = (v.angle * Math.PI) / 180
+                const dx = Math.sin(rad)
+                const dy = -Math.cos(rad) // 0° = north (−y) in the y-down world
+                const len = isNet ? VEC_NET_BASE + mag * VEC_NET_GAIN : VEC_SIGN_BASE + mag * VEC_SIGN_GAIN
+                const x2 = v.x + dx * len
+                const y2 = v.y + dy * len
+                const color = isNet ? VEC_NET_COLOR : VEC_SIGN_COLOR
+                return (
+                  <Arrow
+                    key={`v${i}`}
+                    points={[v.x, v.y, x2, y2]}
+                    stroke={color}
+                    fill={color}
+                    strokeWidth={(isNet ? 3.2 : 2.2) / zoom}
+                    pointerLength={(isNet ? 13 : 10) / zoom}
+                    pointerWidth={(isNet ? 12 : 9) / zoom}
+                    opacity={isNet ? 0.95 : 0.85}
+                    listening={false}
+                  />
                 )
               })}
             </Layer>

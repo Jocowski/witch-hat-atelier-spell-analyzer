@@ -6,6 +6,7 @@
 // Keep it JSON-free so it stays trivially testable (mirrors the geometry.js/deduce.js convention).
 
 import { analyzeRingClosure } from './ringClosure.js'
+import { directedAxisFacing } from '../engine/geometry.js' // pure (no JSON) — safe under node --test
 
 // Config source: all opts below (rotationSteps, gapK/gapMin/gapMax, cvThreshold/cvThresholdRelaxed,
 // minRingRadius, floodFill/floodFillConfig, rasterMatch veto) are passed in by the caller
@@ -386,7 +387,11 @@ function classifyAndRecognize(groups, center, effectiveRingR, rotationSteps, clo
     g.confident = g.match ? g.confidence >= confidenceMinPct : false
 
     if (g.confident && g.match && g.role === 'sign' && effectiveRingR > 0) {
-      const facingAngle = g.match.rotation ?? 0
+      // Facing from the DRAWN geometry (the sign's middle line), NOT match.rotation — the recognizer's
+      // rotation is a template-alignment offset, not where the sign points (see einlair analysis).
+      const geomFacing = directedAxisFacing(g.pts, center)
+      if (geomFacing != null) g.facing = geomFacing
+      const facingAngle = g.facing ?? g.match.rotation ?? 0
       const mag = extractAxisLengthAlongFacing(g.strokes, facingAngle, effectiveRingR)
       g.metrics = { directionalMagnitude: mag }
     }

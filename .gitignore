@@ -19,3 +19,9 @@ supabase/.branches/
 supabase/.temp/
 
 .claude/
+
+# Vendored agent skills (regenerable from skills-lock.json; uses symlinks that don't port cross-OS)
+.agents/
+
+# Local-only prod DB connection string (never commit)
+supabase/.prod-conn

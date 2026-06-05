@@ -33,22 +33,17 @@ export default function EffectCanvas({ spellIR, ringGeom, enabled, rulesRenderer
   const ringGeomRef = useRef(ringGeom)
   const enabledRef = useRef(enabled)
   const activatedAtRef = useRef(null)
-  const prevActiveRef = useRef(false)
 
   // Keep refs fresh without re-creating the rAF loop
   spellIRRef.current = spellIR
   ringGeomRef.current = ringGeom
   enabledRef.current = enabled
 
-  // Track activation event (prepared → active flip) to stamp activatedAt
+  // Restart the run timer on every NEW spell (each cast is a fresh shim object). This is what makes
+  // an auto-reanalysis / re-cast actually replay — without it the old activatedAt left the new cast
+  // already "expired" (emission past its duration → no particles).
   useEffect(() => {
-    const current = spellIR?.active ?? false
-    const prev = prevActiveRef.current
-    if (current && !prev) {
-      // Activation event: open ring → closed ring (or first Analyze with toggle off)
-      activatedAtRef.current = performance.now()
-    }
-    prevActiveRef.current = current
+    if (spellIR) activatedAtRef.current = performance.now()
   }, [spellIR])
 
   // Canvas setup + resize observer
@@ -77,7 +72,10 @@ export default function EffectCanvas({ spellIR, ringGeom, enabled, rulesRenderer
     ro.observe(canvas.parentElement || document.body)
 
     return () => ro.disconnect()
-  }, [rulesRenderer])
+    // `enabled` is a dep so the renderer is (re)created once the canvas actually mounts: when the
+    // component first renders with enabled=false it returns null (no canvas), so without this the
+    // renderer would never be built and nothing would draw until a remount.
+  }, [rulesRenderer, enabled])
 
   // rAF loop
   const tick = useCallback((timestamp) => {
@@ -91,8 +89,8 @@ export default function EffectCanvas({ spellIR, ringGeom, enabled, rulesRenderer
     let ir = spellIRRef.current
     const ring = ringGeomRef.current
 
-    // Stamp activatedAt into the SpellIR when it's active (renderer uses it for emission fade)
-    if (ir && ir.active && activatedAtRef.current !== null) {
+    // Stamp the run-start time into the SpellIR (renderer uses it for the emission/end-of-run fade)
+    if (ir && activatedAtRef.current !== null) {
       ir = { ...ir, activatedAt: activatedAtRef.current }
     }
 

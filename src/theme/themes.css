@@ -22,6 +22,7 @@
   --err:          #d65a4a;
   --parchment:    #f3ead4;
   --parchment-ink:#5a3b1e;
+  --portal-void:  #241b16;
 }
 
 /* ── Dark ───────────────────────────────────────────────────
@@ -41,6 +42,7 @@
   --err:          #f44747;
   --parchment:    #d4d4d4;
   --parchment-ink:#a0a0a0;
+  --portal-void:  #060608;
 }
 
 /* ── Light ──────────────────────────────────────────────────
@@ -60,6 +62,7 @@
   --err:          #c03030;
   --parchment:    #faf6ee;
   --parchment-ink:#5a3b1e;
+  --portal-void:  #faf5ec;
 }
 
 /* ── Arcane ─────────────────────────────────────────────────
@@ -80,6 +83,7 @@
   --err:          #ff8aa0;
   --parchment:    #d8d0f0;
   --parchment-ink:#9b93b3;
+  --portal-void:  #161024;
 }
 
 /* ── Themed scrollbars (global; read the active theme's vars) ────────────────── */

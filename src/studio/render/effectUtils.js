@@ -69,19 +69,20 @@ export function spellLifetimeFrames(spellIR, extraFrames = 36) {
 
 // ── Portal / ring helpers ────────────────────────────────────────────────────
 
-// The activated paper is drawn as a tilted ellipse; effects emit from that same screen-space portal.
+// Shared 2.5D portal projection. KEEP IN SYNC with the CSS tilt of the trial backdrop
+// (.spell-trial-bg in studio.css): the seal lies on a floor plane tilted by PORTAL_TILT_DEG and
+// anchored at PORTAL_ANCHOR_FRAC of the stage height, so its foreshortening is scaleY = cos(tilt).
+// Particles emit from this same ellipse, so the energy rises out of exactly where the seal sits.
+export const PORTAL_TILT_DEG = 60
+export const PORTAL_ANCHOR_FRAC = 0.62
+export const PORTAL_SCALE_Y = Math.cos((PORTAL_TILT_DEG * Math.PI) / 180) // 0.5 at 60°
+
 export function activePortalPlane(canvas, ring) {
-  const scaleY = 0.44
-  const originY = canvas.height * 0.64
-  const liftY = canvas.height * 0.16
   return {
-    center: {
-      x: ring.center.x,
-      y: originY + (ring.center.y - originY) * scaleY + liftY,
-    },
+    center: { x: ring.center.x, y: canvas.height * PORTAL_ANCHOR_FRAC },
     radiusX: ring.radius,
-    radiusY: ring.radius * scaleY,
-    scaleY,
+    radiusY: ring.radius * PORTAL_SCALE_Y,
+    scaleY: PORTAL_SCALE_Y,
   }
 }
 
@@ -100,11 +101,10 @@ export function portalOutDirection(spellIR) {
   const paperX = direction.x ?? 0
   const paperY = direction.y ?? -1
   const paperZ = direction.z ?? 0
-  const paperYScreenScale = 0.44
 
   return normalizeVector({
     x: paperX,
-    y: paperY * paperYScreenScale - paperZ,
+    y: paperY * PORTAL_SCALE_Y - paperZ,
   })
 }
 

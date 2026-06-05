@@ -46,7 +46,15 @@ for (const r of data || []) {
   )
 }
 
-const block = [BEGIN, `-- ${rows.length} real training samples snapshotted from ${url}.`, ...rows, END, ''].join('\n')
+// Ship the seed pre-verified so a fresh `supabase db reset` comes up with a trained DB-overlay base
+// (the verified=true path). verified_by stays null (system seed, not an admin action).
+const VERIFY_ALL = [
+  '-- Seed baseline pre-verified: a fresh clone gets a trained DB-overlay base out of the box.',
+  'update public.training_samples set verified = true, verified_at = now()',
+  ' where verified = false and deleted_at is null;',
+].join('\n')
+
+const block = [BEGIN, `-- ${rows.length} real training samples snapshotted from ${url}.`, ...rows, VERIFY_ALL, END, ''].join('\n')
 
 let sql = fs.readFileSync(SEED, 'utf8')
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
