@@ -1,7 +1,7 @@
 // beautify.test.js — pure-module tests for stroke beautification (no JSON/DOM).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { beautifyStroke, rdp, fitCircle, chaikin, weldsRingGap, selfIntersects } from '../src/studio/tools/beautify.js'
+import { beautifyStroke, rdp, fitCircle, chaikin, weldsRingGap, selfIntersects, edgesAreStraight } from '../src/studio/tools/beautify.js'
 
 // ---------- helpers: synthesize hand-drawn-ish strokes ----------
 
@@ -156,6 +156,47 @@ test('shaky square → kind rect', () => {
   const pts = wobblyPolygon(verts, 22, 4, 6)
   const res = beautifyStroke(pts)
   assert.equal(res.kind, 'rect')
+})
+
+// a smooth teardrop / droplet: sharp tip at top, rounded belly, CURVED sides (MathWorld teardrop curve).
+// tip (cusp) at t=0; m controls pointiness. Oriented tip-up, centered on (cx,cy).
+function teardrop(cx, cy, width, height, m = 3, n = 96, jitter = 0, seed = 61) {
+  const rnd = noise(seed)
+  const jx = () => (jitter ? rnd() * jitter : 0)
+  const pts = []
+  for (let i = 0; i <= n; i++) {
+    const t = (2 * Math.PI * i) / n
+    const px = Math.sin(t) * Math.pow(Math.sin(t / 2), m) // width axis (±~0.4)
+    const py = Math.cos(t)                                 // height axis (tip at t=0 ⇒ py=1)
+    pts.push({ x: cx + width * px + jx(), y: cy - height * py + jx() })
+  }
+  return pts
+}
+
+test('teardrop (droplet) is NOT faceted into a triangle/polygon', () => {
+  const pts = teardrop(0, 0, 120, 80, 3, 96, 1.5, 71)
+  const auto = beautifyStroke(pts) // Auto / QuickShape (smoothFallback off)
+  assert.ok(!['triangle', 'rect', 'polygon'].includes(auto.kind), `got faceted: ${auto.kind}`)
+  assert.equal(auto.kind, 'none', `expected raw, got ${auto.kind}`)
+  // manual Smooth still de-jitters it (stays a curve, never a polygon)
+  const manual = beautifyStroke(pts, { smoothFallback: true })
+  assert.equal(manual.kind, 'smoothed')
+})
+
+test('edgesAreStraight: true for straight edges, false for a bowed one', () => {
+  const a = { x: 0, y: 0 }, b = { x: 120, y: 0 }, c = { x: 60, y: 90 }
+  const interior = (p, q, k = 6) => {
+    const o = []
+    for (let i = 1; i < k; i++) { const t = i / k; o.push({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t }) }
+    return o
+  }
+  const corners = [a, b, c]
+  const straight = [a, ...interior(a, b), b, ...interior(b, c), c, ...interior(c, a)]
+  assert.equal(edgesAreStraight(straight, corners, true, 0.08), true)
+  // bow the a→b edge: its interior points bulge ~25% of the chord ⇒ not a straight edge
+  const bowedAB = bow(a, b, 0.25, 8).slice(1, -1)
+  const bowed = [a, ...bowedAB, b, ...interior(b, c), c, ...interior(c, a)]
+  assert.equal(edgesAreStraight(bowed, corners, true, 0.08), false)
 })
 
 test('drifting line → kind line, endpoints preserved', () => {

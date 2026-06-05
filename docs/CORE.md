@@ -95,6 +95,7 @@ State decides whether an operator's mechanic even fits. Example: **Orb** fills a
 bottom-to-top under gravity. A fluid or granular substance pools cleanly; a rigid one
 (rock, wood) would stack and jam and needs a compaction operator (e.g. convergence) first.
 Match the operator's assumed physics to the substance's state, and call out the mismatch.
+See also: full container model (capture-U, substance gating, pump+vessel, failure modes) in [`theories/orb-container-analysis/analysis.md`](theories/orb-container-analysis/analysis.md).
 
 ### 2c. Source & cost — does running it consume something, and how much?
 

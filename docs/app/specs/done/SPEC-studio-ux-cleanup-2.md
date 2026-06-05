@@ -1,14 +1,14 @@
 # SPEC — Studio UX round 2 (full-width analysis, nav, merge fix, dye grid)
 
-> Status: **proposed** · Scope: **Studio layout + the overflow-merge algorithm** ·
+> Status: **done - shipped (merge feature removed)** · Scope: **Studio layout + the overflow-merge algorithm** ·
 > Branch: `feat/spell-studio-experiments` · Cross-refs:
-> [router.jsx](../../src/router.jsx), [studio.css](../../src/studio/studio.css),
-> [drawing.css](../../src/studio/drawing.css), [ResultPanel.jsx](../../src/components/ResultPanel.jsx),
-> [tools/beautify.js](../../src/studio/tools/beautify.js), [SPEC-studio-ux-cleanup.md](SPEC-studio-ux-cleanup.md).
+> [router.jsx](../../../../src/router.jsx), [studio.css](../../../../src/studio/studio.css),
+> [drawing.css](../../../../src/studio/drawing.css), [ResultPanel.jsx](../../../../src/components/ResultPanel.jsx),
+> [tools/beautify.js](../../../../src/studio/tools/beautify.js), [SPEC-studio-ux-cleanup.md](SPEC-studio-ux-cleanup.md).
 
 ## 1. Analysis tab — use the full page width
 Now that the drawer is tabbed (one panel at a time), the old side-by-side sizing wastes space: the
-Analysis panel is capped at `max-width: 600px` ([studio.css:222](../../src/studio/studio.css#L222)),
+Analysis panel is capped at `max-width: 600px` ([studio.css:222](../../../../src/studio/studio.css#L222)),
 so it sits in a corner. Fix:
 - Drop the 600px cap and the side-border on `.studio-results-inner .panel.result` (and the AI panel) —
   full drawer width.
@@ -17,7 +17,7 @@ so it sits in a corner. Fix:
   one stretched strip. Add comfortable padding.
 
 ## 2. Remove the top Studio / Admin nav
-The `Nav()` in [router.jsx:22](../../src/router.jsx#L22) renders a `Studio | Admin` bar. Remove it
+The `Nav()` in [router.jsx:22](../../../../src/router.jsx#L22) renders a `Studio | Admin` bar. Remove it
 (navigation is by URL). Studio keeps its own header; Admin/Login carry their own chrome. Delete the
 `<Nav/>` render + the component.
 
@@ -45,7 +45,7 @@ re-trace pair overlaps; small mark on a long line does **not**; perpendicular cr
 two distinct strokes do not.
 
 ## 4. Dye palette — two columns
-`.ds-palette` ([drawing.css:208](../../src/studio/drawing.css#L208)) is a single vertical column. Make it
+`.ds-palette` ([drawing.css:208](../../../../src/studio/drawing.css#L208)) is a single vertical column. Make it
 a **2-column grid** (two swatches per row) in the full (non-compact) dock; compact stays a wrapping row.
 
 ## Testing

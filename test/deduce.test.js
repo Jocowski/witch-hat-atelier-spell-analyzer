@@ -159,3 +159,41 @@ test('every sigil element has a grammar element entry (coverage)', () => {
     assert.ok(grammar.elements[s.element], `missing grammar element for "${s.element}" (sigil ${s.id})`)
   }
 })
+
+// ----- L3 Orb-container tests -----
+
+test('water + orb ×4 + column ×2 => contained sphere, filling bottom-to-top (Water Orb)', () => {
+  const r = D('water', [
+    { type: 'orb' }, { type: 'orb' }, { type: 'orb' }, { type: 'orb' },
+    { type: 'column' }, { type: 'column' },
+  ])
+  assert.ok(r.ok)
+  assert.match(r.summary, /sphere/i)
+  assert.match(r.summary, /filling bottom-to-top/i)
+  // direction label must be 'contained sphere', not the jet "above the seal"
+  assert.equal(r.direction, 'contained sphere')
+  assert.notEqual(r.direction, 'above the seal')
+  // orb-column synergy note fires
+  assert.ok(r.notes.some((n) => /pump and vessel/i.test(n)))
+  // water is fluid => pools cleanly note
+  assert.ok(r.notes.some((n) => /pools cleanly/i.test(n)))
+})
+
+test('earth + orb => rigid warning fires (orb-rigid-earth interaction)', () => {
+  const r = D('earth', [{ type: 'orb' }])
+  assert.ok(r.ok)
+  // The L1 grammar interaction 'orb-rigid-earth' must be in warnings
+  assert.ok(r.warnings.some((w) => /rigid/i.test(w) && /orb/i.test(w)), 'expected orb-rigid-earth warning')
+  // direction is contained sphere
+  assert.equal(r.direction, 'contained sphere')
+})
+
+test('regression: water + column ×4 (no orb) still reads as jet above the seal', () => {
+  const r = D('water', [{ type: 'column' }, { type: 'column' }, { type: 'column' }, { type: 'column' }])
+  assert.ok(r.ok)
+  assert.match(r.summary, /above the seal/i)
+  assert.equal(r.direction, 'above the seal')
+  // must NOT be a contained sphere
+  assert.notEqual(r.direction, 'contained sphere')
+  assert.doesNotMatch(r.summary, /filling bottom-to-top/i)
+})

@@ -1,11 +1,11 @@
 # SPEC — Standalone Tuning Tools (7.4)
 
-> Status: **proposed** · Scope: **developer tooling only** — three standalone HTML pages for iterating
+> Status: **done - shipped (7.4)** · Scope: **developer tooling only** — three standalone HTML pages for iterating
 > on templates, recognition, and visual effects without running the full Studio/Admin app.
 > Branch: `feat/spell-studio`
-> Cross-refs: [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (the detector lab exercises
-> $P + A1 weighting), [APP-PLAN.md](APP-PLAN.md) (rendering + recognizer context),
-> [SPEC.md](SPEC.md) (WS1 canvas, WS2 recognize).
+> Cross-refs: [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (the detector lab exercises
+> $P + A1 weighting), [APP-PLAN.md](../../APP-PLAN.md) (rendering + recognizer context),
+> [SPEC.md](../../SPEC.md) (WS1 canvas, WS2 recognize).
 
 These tools live in `tools/` as plain HTML+JS pages, opened directly through the Vite dev server
 (`http://localhost:5173/tools/<name>.html`). Vite already exposes `tools/*.html` as static assets

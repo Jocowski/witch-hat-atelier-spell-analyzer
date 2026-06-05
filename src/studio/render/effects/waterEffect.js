@@ -14,6 +14,7 @@ import {
   effectScale,
   effectSuspension,
   particleAlpha,
+  PORTAL_SCALE_Y,
   portalOutDirection,
   perpendicularVector,
   pruneParticles,
@@ -21,9 +22,27 @@ import {
   spellLifetimeFrames,
   steadyParticleAlpha,
 } from '../effectUtils.js'
+import { drawToonLiquid } from '../toonLiquid.js'
 
 const DEPTH_SCALE = 0.58
 const WATER_ALPHA_SCALE = 0.58
+
+// Cel-shaded ("anime ink") water palette + tuning. Derived from ring size + spell params so the
+// silhouette/outline scale with the spell. Used when config.renderer.style === 'toon'.
+function toonWaterOptions(ring, spellIR) {
+  const r = ring.radius
+  return {
+    cell: clamp(r / 20, 6, 13),
+    threshold: 0.95,
+    innerThreshold: 2.6,
+    influence: 2.4,
+    baseColor: '#2f8fd6',                 // mid blue body
+    innerColor: '#7cc4f2',                // lighter blue interior (2nd tone)
+    outlineColor: '#0a2238',              // near-black ink outline
+    outlineWidth: Math.max(2.2, r * 0.018) * (0.9 + (spellIR.force ?? 0.5) * 0.3),
+    highlightColor: 'rgba(236, 248, 255, 0.95)',
+  }
+}
 
 function waterFlowConfig(spellIR, ring, portal, frame) {
   const scale = effectScale(spellIR)
@@ -45,7 +64,7 @@ function waterFlowConfig(spellIR, ring, portal, frame) {
   const suspendedRadius = ring.radius * (0.18 + spellIR.spread * 0.18 + scale * 0.035) * (1 - convergenceStrength * 0.5) * (1 - focus * 0.28)
   const travelFactor = 1 - suspension * 0.78
 
-  return {
+  const base = {
     suspended,
     gravity,
     suspension,
@@ -57,8 +76,10 @@ function waterFlowConfig(spellIR, ring, portal, frame) {
     convergenceProgress,
     sourceRadiusX: portal.radiusX * sourceScale,
     sourceRadiusY: portal.radiusY * sourceScale,
-    horizontalSpeed: pressure * (0.08 + (0.22 + horizontalShare * 0.86) * travelFactor),
-    verticalSpeed: pressure * (0.16 + (0.62 + verticalShare * 0.52) * travelFactor),
+    // Speed split is DIRECTION-DRIVEN (einlair): a horizontal jet (z≈0) barely rises, a balanced
+    // column (z≈1) shoots up. The old fixed 0.62 vertical base made every spell go up regardless.
+    horizontalSpeed: pressure * (0.1 + (0.16 + horizontalShare * 0.95) * travelFactor),
+    verticalSpeed: pressure * (0.06 + (0.12 + verticalShare * 1.05) * travelFactor),
     gravityForce:
       (0.052 + spellIR.force * 0.038 + (1 - spellIR.stability) * 0.018) *
       gravity *
@@ -96,6 +117,32 @@ function waterFlowConfig(spellIR, ring, portal, frame) {
     minRadius: 3.6 * (0.86 + scale * 0.14),
     radiusScale: (0.82 + scale * 0.2) * (0.92 + spellIR.force * 0.18) * (1 - convergenceStrength * 0.14),
   }
+
+  // Contained (orb) mode: compute sphere geometry above the portal center.
+  // The sphere center is screen-up from the portal — using -y since screen y increases downward.
+  // containRadius is a 0..1 normalized radius; we scale by ring.radius to get screen pixels.
+  if (spellIR.contained) {
+    const containRadius = spellIR.containRadius ?? 0.4
+    const sphereRadius = ring.radius * containRadius
+    // Rise = ring.radius * (0.6 + containRadius) puts the bottom of the sphere just above the portal.
+    const sphereCenterY = portal.center.y - ring.radius * (0.6 + containRadius)
+    const sphereCenterX = portal.center.x
+    // The sphere is on the 2.5D plane: foreshorten the Y extent (depth axis) by PORTAL_SCALE_Y
+    // so the ellipse matches the plane tilt. The X extent is full (lateral axis is not foreshortened).
+    const sphereRadiusY = sphereRadius * PORTAL_SCALE_Y
+    base.container = {
+      cx: sphereCenterX,
+      cy: sphereCenterY,
+      rx: sphereRadius,    // screen-x (lateral) radius — full
+      ry: sphereRadiusY,   // screen-y (depth-foreshortened) radius
+      sphereRadius,        // used for 3D home-point sampling
+      fillRate: spellIR.fillRate ?? 0.5,
+      // Particle life = full spell duration so the fill ramps over the whole cast.
+      particleLife: spellLifetimeFrames(spellIR),
+    }
+  }
+
+  return base
 }
 
 function randomPortalSource(portal, flow) {
@@ -232,6 +279,110 @@ function updateWaterParticle(particle, flow, dt) {
   }
 }
 
+// ── Contained (orb) mode ─────────────────────────────────────────────────────
+// Each particle gets a fixed "home" inside the sphere volume (random point in the 3D ball, projected
+// to the 2.5D plane). A rising fill line controls visibility: only particles whose home is at or
+// below the current fill level are active. The sphere fills bottom-to-top over the cast duration.
+
+function spawnContainedWaterParticle(flow) {
+  const c = flow.container
+  // Random point inside a 3D unit sphere via rejection-free cube-root trick (no rejection needed
+  // since we only need uniform 3D distribution, not necessarily uniform surface).
+  // We treat (u, v, w) as local sphere coords: u=lateral, v=depth, w=height (screen-up).
+  // The sphere home is then mapped to screen coords below.
+  const theta = Math.random() * Math.PI * 2
+  const phi = Math.acos(2 * Math.random() - 1)
+  const r = Math.cbrt(Math.random()) * c.sphereRadius // uniform in ball volume
+  // Local 3D position inside sphere
+  const localLateral = r * Math.sin(phi) * Math.cos(theta)
+  const localDepth = r * Math.sin(phi) * Math.sin(theta)
+  const localHeight = r * Math.cos(phi) // positive = up, negative = down
+
+  // Convert to 2.5D screen home: lateral → screen-x; depth foreshortened by PORTAL_SCALE_Y → screen-y
+  // contribution; height (screen-up = negative screen-y) adds a direct -y contribution.
+  const homeX = c.cx + localLateral
+  const homeY = c.cy + localDepth * PORTAL_SCALE_Y - localHeight * (1 - PORTAL_SCALE_Y)
+
+  const phase = randomBetween(0, Math.PI * 2)
+  const baseRadius = randomBetween(6, 11) * (0.82 + Math.random() * 0.2)
+
+  return {
+    // Current screen position (starts at home; jostle is applied during update).
+    x: homeX,
+    y: homeY,
+    // Velocity for liquid jostling (small, mean-reverting).
+    vx: randomBetween(-0.4, 0.4),
+    vy: randomBetween(-0.3, 0.3),
+    // Fixed home inside the sphere (the fill-line gate uses localHeight).
+    homeX,
+    homeY,
+    localHeight, // local height coord in the sphere — determines fill-line visibility
+    sphereRadius: c.sphereRadius,
+    phase,
+    baseRadius,
+    radius: baseRadius,
+    age: 0,
+    life: c.particleLife,
+  }
+}
+
+function updateContainedWaterParticle(particle, flow, dt) {
+  particle.age += dt
+  // Small liquid jostle: particles wander a bit around their home point (spring tension).
+  const tension = 0.008
+  const damping = 0.94
+  particle.vx += (particle.homeX - particle.x) * tension * dt
+  particle.vy += (particle.homeY - particle.y) * tension * dt
+  // Add a gentle upward swirl mimicking convection inside the sphere.
+  const swirl = Math.sin(particle.phase + particle.age * 0.04) * 0.12
+  particle.vx += swirl * dt
+  particle.vy -= Math.abs(swirl) * 0.06 * dt
+  particle.x += particle.vx * dt
+  particle.y += particle.vy * dt
+  particle.vx *= damping
+  particle.vy *= damping
+  // Shimmer radius
+  const shimmer = 0.96 + Math.sin(particle.phase + particle.age * 0.1) * 0.04
+  particle.radius = Math.max(3.2, particle.baseRadius * shimmer)
+}
+
+// Returns the current fill-line level (0 = empty bottom of sphere, 1 = full top).
+// Driven by fillRate and the frame clock; saturates at 1 (full sphere holds indefinitely).
+function containedFillLevel(flow, frame) {
+  const c = flow.container
+  // fillRate=1 → fills in ~(duration*60) frames; lower rates fill more slowly.
+  // We use waterFrame (the running frame clock) to let the fill persist after emission fades.
+  const totalFrames = flow.suspendedLife // same lifetime as other modes (duration*60 + buffer)
+  const rampFrames = totalFrames / Math.max(0.05, c.fillRate)
+  return clamp(frame / rampFrames)
+}
+
+// Project a contained particle to screen space. The particle already holds screen-space x/y after
+// jostling, so projection is trivial — we just return {x, y} plus a simple depth cue.
+function projectContainedParticle(particle) {
+  return { x: particle.x, y: particle.y }
+}
+
+// Draw the faint spherical boundary of the container (one stroked ellipse on the 2.5D plane).
+// The ellipse matches the sphere geometry: radiusX = lateral extent, radiusY = depth-foreshortened.
+// Shown even when the sphere is partly empty so the vessel reads as a container from the start.
+function drawContainerBoundary(ctx, flow, opacity) {
+  const c = flow.container
+  // Thin, desaturated ring — visible but not distracting.
+  ctx.save()
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.strokeStyle = `rgba(180, 210, 240, ${opacity * 0.38})`
+  ctx.lineWidth = Math.max(1, c.rx * 0.028)
+  ctx.setLineDash([Math.round(c.rx * 0.12), Math.round(c.rx * 0.08)])
+  ctx.beginPath()
+  ctx.ellipse(c.cx, c.cy, c.rx, c.ry, 0, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.setLineDash([])
+  ctx.restore()
+}
+
+// ── End contained mode ────────────────────────────────────────────────────────
+
 function projectWaterParticle(particle, flow) {
   const base = {
     x: particle.sourceX + flow.direction.x * particle.forward + flow.side.x * particle.lateral,
@@ -299,6 +450,82 @@ export function drawWaterEffect(ctx, state, spellIR, ring, dt, config) {
   const portal = activePortalPlane(ctx.canvas, ring)
   state.waterFrame = (state.waterFrame ?? 0) + dt
   const flow = waterFlowConfig(spellIR, ring, portal, state.waterFrame)
+
+  // ── Contained (orb) mode — sphere that fills bottom-to-top ───────────────
+  // Gate: spellIR.contained is set by the engine when an orb-type form sign is present.
+  // This branch runs BEFORE the stream/suspended logic; the two existing modes are untouched.
+  if (spellIR.contained && flow.container) {
+    const c = flow.container
+    const opacity = effectOpacity(spellIR)
+    const fillLevel = containedFillLevel(flow, state.waterFrame)
+
+    // Particle pool: all particles are pre-placed inside the sphere; only those below the fill
+    // line are active. Target count scales with sphere size (containRadius) and spell params.
+    const baseCount = 80 + spellIR.force * 48 + (spellIR.containRadius ?? 0.4) * 120
+    const targetCount = scaledParticleCount(baseCount * (0.6 + scale * 0.22), spellIR, config)
+
+    while (state.particles.length < targetCount) {
+      state.particles.push(spawnContainedWaterParticle(flow))
+    }
+
+    // Fill line in local sphere space: runs from bottom (−sphereRadius) to top (+sphereRadius).
+    // fillLevel=0 → fillLineLocal = −sphereRadius (nothing visible); 1 → +sphereRadius (full).
+    const fillLineLocal = -c.sphereRadius + 2 * c.sphereRadius * fillLevel
+
+    // Update all particles; collect those below the fill line (active/visible).
+    const visibleParticles = []
+    for (const particle of state.particles) {
+      updateContainedWaterParticle(particle, flow, dt)
+      // Only show particles whose home height is at or below the current fill line.
+      if (particle.localHeight > fillLineLocal) continue
+      // Fade in as the fill line passes over each particle's home.
+      // Particles near the surface get a soft 0..1 fade over a small band.
+      const bandWidth = c.sphereRadius * 0.12
+      const depthBelow = fillLineLocal - particle.localHeight
+      const surfaceFade = clamp(depthBelow / Math.max(1, bandWidth))
+      const fadeIn = Math.min(1, particle.age / 10)
+      const alpha = steadyParticleAlpha(particle, spellIR, 12) * surfaceFade * fadeIn
+      if (alpha <= 0) continue
+      const projected = projectContainedParticle(particle)
+      if (!Number.isFinite(projected.x) || !Number.isFinite(projected.y)) continue
+      visibleParticles.push({ particle, projected, alpha: alpha * WATER_ALPHA_SCALE })
+    }
+
+    // Draw the sphere boundary first (behind particles) so the vessel reads as a container
+    // even when partly empty. Use source-over so it's never additive-blown.
+    drawContainerBoundary(ctx, flow, opacity)
+
+    // Draw particles (in-fill liquid).
+    if (config.renderer?.style === 'toon') {
+      // Toon: feed active particles to the metaball renderer — same water palette as stream mode.
+      const blobs = visibleParticles.map(({ particle, projected }) => ({
+        x: projected.x,
+        y: projected.y,
+        r: particle.radius,
+        hl: Math.sin(particle.phase * 1.7) > 0.32,
+      }))
+      drawToonLiquid(ctx, blobs, toonWaterOptions(ring, spellIR))
+    } else {
+      // Glow: additive radial gradients (same helpers as stream mode, just smaller).
+      ctx.save()
+      ctx.globalCompositeOperation = 'source-over'
+      for (const { particle, projected, alpha } of visibleParticles) {
+        drawWaterMass(ctx, projected, particle, flow, alpha)
+      }
+      ctx.globalCompositeOperation = 'screen'
+      for (const { particle, projected, alpha } of visibleParticles) {
+        drawWaterCore(ctx, projected, particle, flow, alpha)
+        drawWaterHighlight(ctx, projected, particle, alpha)
+      }
+      ctx.restore()
+    }
+
+    pruneParticles(state)
+    return
+  }
+  // ── End contained mode ────────────────────────────────────────────────────
+
+  // Stream and suspended modes — UNCHANGED from original implementation.
   const baseCount = flow.suspended ? 118 + spellIR.force * 74 + spellIR.spread * 56 : 96 + spellIR.force * 122
   const targetCount = scaledParticleCount(baseCount * (0.66 + scale * 0.22), spellIR, config)
 
@@ -311,6 +538,19 @@ export function drawWaterEffect(ctx, state, spellIR, ring, dt, config) {
     updateWaterParticle(particle, flow, dt)
     const visible = visibleWaterParticle(particle, flow, spellIR)
     if (visible) visibleParticles.push({ particle, ...visible })
+  }
+
+  // Toon mode: reuse the same projected particles as metaball blobs → cel-shaded ink water.
+  if (config.renderer?.style === 'toon') {
+    const blobs = visibleParticles.map(({ particle, projected }) => ({
+      x: projected.x,
+      y: projected.y,
+      r: particle.radius,
+      hl: Math.sin(particle.phase * 1.7) > 0.32, // sparse highlights (mirrors the glow gate)
+    }))
+    drawToonLiquid(ctx, blobs, toonWaterOptions(ring, spellIR))
+    pruneParticles(state)
+    return
   }
 
   ctx.save()

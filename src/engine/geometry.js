@@ -161,6 +161,52 @@ export function outwardRotation(x, y) {
   return (inwardRotation(x, y) + 180) % 360
 }
 
+// Directed facing of a directional sign from its DRAWN GEOMETRY (not the recognizer's template-
+// alignment angle, which is unrelated to where the sign points). A column reads as a vector along
+// its middle line (einlair-vector-analysis): we take the principal axis (PCA) of the drawn points
+// as the stem, then orient it toward the HEAD — the narrow open end, opposite the wide crossbar.
+// When the crossbar is ambiguous we fall back to the einlair basic case: point toward the centre
+// (inward). Returns a facing in degrees (0 = north, clockwise), or null for too few points.
+export function directedAxisFacing(points, center = { x: 0, y: 0 }) {
+  const pts = []
+  for (const p of points || []) if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) pts.push(p)
+  if (pts.length < 3) return null
+  let mx = 0, my = 0
+  for (const p of pts) { mx += p.x; my += p.y }
+  mx /= pts.length; my /= pts.length
+  let sxx = 0, sxy = 0, syy = 0
+  for (const p of pts) { const dx = p.x - mx, dy = p.y - my; sxx += dx * dx; sxy += dx * dy; syy += dy * dy }
+  // Principal axis (stem) angle via PCA closed form; u = unit along stem, v = perpendicular.
+  const theta = 0.5 * Math.atan2(2 * sxy, sxx - syy)
+  const ux = Math.cos(theta), uy = Math.sin(theta)
+  const vx = -uy, vy = ux
+  // Crossbar detection: split points by projection onto u; the half with the larger perpendicular
+  // spread is the crossbar (the tail). The head — where the sign points — is the narrower end.
+  let posPerp = 0, posN = 0, negPerp = 0, negN = 0
+  for (const p of pts) {
+    const dx = p.x - mx, dy = p.y - my
+    const t = dx * ux + dy * uy
+    const s = dx * vx + dy * vy
+    if (t >= 0) { posPerp += s * s; posN++ } else { negPerp += s * s; negN++ }
+  }
+  const posSpread = posN ? posPerp / posN : 0
+  const negSpread = negN ? negPerp / negN : 0
+  const denom = Math.max(posSpread, negSpread) || 1
+  let dx, dy
+  if (Math.abs(posSpread - negSpread) / denom > 0.18) {
+    const towardPos = posSpread < negSpread // head = narrower end
+    dx = towardPos ? ux : -ux
+    dy = towardPos ? uy : -uy
+  } else {
+    const dot = (center.x - mx) * ux + (center.y - my) * uy // ambiguous → orient inward
+    dx = dot >= 0 ? ux : -ux
+    dy = dot >= 0 ? uy : -uy
+  }
+  let angle = (Math.atan2(dx, -dy) * 180) / Math.PI
+  if (angle < 0) angle += 360
+  return angle
+}
+
 // SPIN = tangential cant of a sign's facing off its radial (inward/outward) axis. A sign
 // aimed inward or outward is ORIENTED (steering the spell), not spinning; one canted toward
 // the tangent (~90° off radial) spins the spell. Only signs with a front (directional) can
@@ -215,6 +261,99 @@ export function computeOrientationAim(signs, familyOf = () => null) {
 export function magnitudeOf(c) {
   const m = c?.metrics?.directionalMagnitude
   return typeof m === 'number' && m > 0 ? m : (c?.scale ?? 1)
+}
+
+// einlair flow model (docs/theories/einlair-vector-analysis). Treats each directional sign as a
+// flow vector cᵢ = magnitude · facing-unit. The flow that exits the seal RADIALLY is R = |Σ cᵢ|;
+// the total flow in is T = Σ|cᵢ|; the part that cancels radially is forced OUT OF PLANE (upward),
+// U = T − R. The signed flux Φ = Σ (cᵢ · inward) tells inward (Φ>0, basic) from outward/inverted
+// (Φ<0): when inverted, the magic spreads radially OUTWARD and there is no upward flow.
+// Returns null when there are no steering signs.
+//   netAngle/netFrac — in-plane resultant direction + share (R/T); upFrac — out-of-plane share (U/T).
+export function computeColumnFlow(components, familyOf = () => null) {
+  const signs = (components || []).filter((c) => c.role === 'sign')
+  let Rx = 0, Ry = 0, T = 0, flux = 0, n = 0
+  const parts = [] // per-sign breakdown for the Flow view: { type, facing, magnitude, a (radial in), b (tangential) }
+  for (const c of signs) {
+    const facing = signFacing(c, familyOf(c.type))
+    if (facing == null) continue // only signs with a front contribute to the flow
+    const m = magnitudeOf(c)
+    const rad = (facing * Math.PI) / 180
+    const dx = Math.sin(rad), dy = -Math.cos(rad)
+    Rx += dx * m; Ry += dy * m; T += m
+    const plen = Math.hypot(c.x ?? 0, c.y ?? 0)
+    // radial (inward-positive) and tangential components of cᵢ at its seal position (einlair §gen).
+    let a = 0, b = 0
+    if (plen > 1e-6) {
+      const inx = -(c.x ?? 0) / plen, iny = -(c.y ?? 0) / plen // inward unit
+      const tx = -iny, ty = inx                                  // tangential unit (CCW)
+      a = m * (dx * inx + dy * iny)
+      b = m * (dx * tx + dy * ty)
+      flux += a
+    }
+    parts.push({ type: c.type, facing, magnitude: m, a, b })
+    n++
+  }
+  if (n === 0) return null
+  const R = Math.hypot(Rx, Ry)
+  const Tsafe = T || 1
+  const U = flux > 0 ? Math.max(0, T - R) : 0
+  let netAngle = (Math.atan2(Rx, -Ry) * 180) / Math.PI
+  if (netAngle < 0) netAngle += 360
+  return { T, R, U, flux, netAngle, netFrac: R / Tsafe, upFrac: U / Tsafe, inverted: flux < 0, count: n, parts }
+}
+
+// Container model (docs/theories/orb-container-analysis). Detects orb-type form signs and quantifies
+// the vessel: capacity from orb count·size, fill rate from the seal's upward einlair flow U.
+// `isContainer(type)` is injected (analyze.js passes grammar: op.container === 'sphere'), keeping
+// this module JSON-free. Returns null when no container sign is present.
+//   { contained:true, orbCount, capacity, fillFrac, radiusFrac }
+export function computeContainment(components, familyOf = () => null, isContainer = () => false) {
+  const signs = (components || []).filter((c) => c.role === 'sign')
+  const orbSigns = signs.filter((c) => isContainer(c.type))
+  const orbCount = orbSigns.length
+  if (orbCount === 0) return null
+
+  // capacity = Σ magnitudeOf(orbSign) — total vessel size (count × size)
+  const capacity = orbSigns.reduce((sum, c) => sum + magnitudeOf(c), 0)
+
+  // Reuse the einlair upward flow U as the fill driver (pump + vessel model)
+  const flow = computeColumnFlow(components, familyOf)
+  // When there is no pump (no directional signs), default to a small fill fraction —
+  // the orb is defined but has no driving flow; substance trickles in slowly.
+  const fillFrac = flow ? clamp(flow.upFrac) : 0.15
+
+  // Sphere radius grows with orb count and with extra capacity beyond count·1
+  // (i.e. oversized orbs inflate the vessel more). Constants are tunable.
+  const radiusFrac = clamp(0.25 + 0.12 * orbCount + 0.04 * (capacity - orbCount))
+
+  return { contained: true, orbCount, capacity, fillFrac, radiusFrac }
+}
+
+// Per-sign direction + force vectors, for the visualization overlay. PURE.
+// Each sign → { x, y, type, magnitude, angle } where:
+//   - magnitude = the sign's directional FORCE (its variant metric or scale) — how hard it pushes;
+//   - angle     = its steering FACING (0 = north, clockwise), or null when the sign has no front
+//                 (non-/semi-directional, asymmetric) → it exerts force but does not steer.
+// `net` is the orientation-aim resultant; `flow` is the einlair radial/upward decomposition.
+// `containment` is the orb-container result (null when no container sign is present).
+// `isContainer` is optional and injected so this module stays JSON-free.
+export function computeSignVectors(components, familyOf = () => null, isContainer = () => false) {
+  const signs = (components || []).filter((c) => c.role === 'sign')
+  const list = signs.map((c) => ({
+    x: c.x,
+    y: c.y,
+    type: c.type,
+    magnitude: magnitudeOf(c),
+    angle: signFacing(c, familyOf(c.type)),
+  }))
+  const aim = computeOrientationAim(signs, familyOf)
+  return {
+    signs: list,
+    net: { angle: aim.angle, magnitude: aim.magnitude, aimed: aim.aimed },
+    flow: computeColumnFlow(components, familyOf),
+    containment: computeContainment(components, familyOf, isContainer),
+  }
 }
 
 // Positional resultant of WHERE region signs sit on the ring (scale-weighted unit vectors

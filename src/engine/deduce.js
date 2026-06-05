@@ -122,11 +122,16 @@ export function deduceWith(g, sigilMap, signMap, composition) {
   //   column/dispersion (FORM directional) — beams ABOVE the seal by default; positional
   //     imbalance skews the beam (the Watershot lesson). "Above the seal" is the out-of-plane
   //     default, NOT a compass north — only a genuine lateral bias gets a compass label.
+  //   orb (FORM container) — captures the seal's upward flow into a suspended sphere that fills
+  //     bottom-to-top. Replaces the "above the seal" jet clause when present.
   // Aim/region/balance read only INSIDE-ring signs — an outside mark (zone 'outside') is an
   // external protrusion and must not steer the spell. (Components are zone-tagged in compose.js;
   // pure deduce tests pass no zone, so everything counts as inside there.)
   const signComps = composition.components.filter((c) => c.role === 'sign' && c.zone !== 'outside')
   const familyOf = (t) => signMap[t]?.family
+
+  // Container detection: find a form sign with container === 'sphere' (data-driven, not id-literal).
+  const container = byKind.form?.find((f) => f.op?.container === 'sphere')
 
   const aimSigns = signComps.filter((c) => g.operators[c.type]?.kind === 'direction')
   const region = aimSigns.length ? classifyRegion(aimSigns, familyOf) : null
@@ -157,6 +162,13 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     } else if (lift) {
       if (lift.mode === 'aligned') { aimLabel = directionLabel(lift.angle); directionClause = `, carried ${aimLabel}` }
       else { aimLabel = 'above the seal'; directionClause = `, centered above the seal` }
+    } else if (container) {
+      // Orb is directional:false so it never enters the formDirSigns branch.
+      // Container form: the substance fills a suspended sphere above the seal, bottom-to-top.
+      // The orb's own verb ("gathers into a sphere held above the glyph") already places the
+      // sphere; the clause only adds the fill behavior so we don't repeat "sphere ... above".
+      aimLabel = 'contained sphere'
+      directionClause = ', filling bottom-to-top'
     } else if (form?.op?.directional) {
       if (formBiased) { aimLabel = directionLabel(formBalance.angle); directionClause = `, skewed toward ${aimLabel} (unbalanced signs)` }
       else { aimLabel = 'above the seal'; directionClause = `, above the seal` }
@@ -222,6 +234,21 @@ export function deduceWith(g, sigilMap, signMap, composition) {
     if (!interactionApplies(rule.when, ctx)) continue
     if (rule.type === 'warning') warnings.push(rule.text)
     else notes.push(rule.text)
+  }
+
+  // ----- Substance notes for container form (data-driven: reads el.state / el.capability) -----
+  // These are generic, element-agnostic notes based on the element's physical properties.
+  // The L1 grammar interaction 'orb-rigid-earth' handles the element-specific warning; these
+  // notes cover the general state/capability layer without duplicating that warning verbatim.
+  if (container) {
+    if (el.state === 'fluid' || el.state === 'granular') {
+      notes.push(`${capitalize(substance)} pools cleanly as it fills the sphere.`)
+    } else if (el.state === 'rigid') {
+      notes.push(`${capitalize(substance)} is rigid — without a compaction sign (Convergence) it jams instead of pooling.`)
+    }
+    if (el.capability === 'manipulate' || el.capability === 'collect') {
+      notes.push(`The orb is only a vessel — it needs a real source of ${substance} to fill (this element cannot create its own).`)
+    }
   }
 
   // Unidentified signs: their operator contributes nothing to the sentence, so the

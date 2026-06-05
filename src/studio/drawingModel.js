@@ -87,6 +87,7 @@ function buildCircleDescriptor(placed, isItemSigil, center, radius, ringClosed, 
       rotation: item.rotation ?? 0,
       scale:    item.scale    ?? 1,
       inverted: !!item.inverted,
+      ...(item.metrics ? { metrics: item.metrics } : {}),
     })),
   ]
 
@@ -192,6 +193,7 @@ export function toComposition(model, opts = {}) {
       rotation: item.rotation ?? 0,
       scale:    item.scale    ?? 1,
       inverted: !!item.inverted,
+      ...(item.metrics ? { metrics: item.metrics } : {}),
     })),
   ]
 
@@ -305,8 +307,12 @@ export function recognizedToPlaced(groups) {
       type:     g.match.name,
       x:        Math.round(g.cx || 0),
       y:        Math.round(g.cy || 0),
-      rotation: g.match.rotation ?? 0,
+      // Prefer the geometry-derived facing (where the sign actually points); fall back to the
+      // recognizer's template-alignment rotation only when geometry wasn't computed.
+      rotation: typeof g.facing === 'number' ? g.facing : (g.match.rotation ?? 0),
       scale:    1,
       inverted: false,
+      // Carry the drawn directional magnitude (stem length) so the einlair flow weights by length.
+      ...(g.metrics ? { metrics: g.metrics } : {}),
     }))
 }

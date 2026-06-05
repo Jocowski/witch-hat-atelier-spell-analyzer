@@ -1,9 +1,9 @@
 # SPEC — Admin "verify" flag on training samples (A6)
 
-> Status: **proposed** · Scope: **training governance → recognizer weighting → Review UI**
+> Status: **done - shipped (2.6)** · Scope: **training governance → recognizer weighting → Review UI**
 > Branch: `feat/spell-studio`
-> Cross-refs: [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (item A6 origin, A1 source
-> weighting), [IMPROVEMENTS.md](IMPROVEMENTS.md) (§B AI training), CLAUDE.md §recognizer / §data layer.
+> Cross-refs: [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (item A6 origin, A1 source
+> weighting), [IMPROVEMENTS.md](../../IMPROVEMENTS.md) (§B AI training), CLAUDE.md §recognizer / §data layer.
 > Data layer: `src/data-services/samples.js`, `src/admin/ReviewView.jsx`,
 > `src/draw/recognizer.js`, `data/rules.json`, `supabase/migrations/`.
 

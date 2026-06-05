@@ -1,10 +1,10 @@
 # SPEC — Symbol roles (sign / sigil / both); drop the duplicate `*_sigil` entries
 
-> Status: **proposed** · Scope: **data model + engine + admin + DB** ·
+> Status: **done - shipped** · Scope: **data model + engine + admin + DB** ·
 > Branch: `feat/spell-studio-experiments` · Cross-refs:
-> [data/signs.json](../../data/signs.json), [data/sigils.json](../../data/sigils.json),
-> [src/engine/data.js](../../src/engine/data.js), [src/engine/deduce.js](../../src/engine/deduce.js),
-> [src/admin/SymbolEditor.jsx](../../src/admin/SymbolEditor.jsx), `supabase/`.
+> [data/signs.json](../../../../data/signs.json), [data/sigils.json](../../../../data/sigils.json),
+> [src/engine/data.js](../../../../src/engine/data.js), [src/engine/deduce.js](../../../../src/engine/deduce.js),
+> [src/admin/SymbolEditor.jsx](../../../../src/admin/SymbolEditor.jsx), `supabase/`.
 
 ## Problem
 A "sign-as-sigil" (a sign that can occupy the centre — **billowing**, **vision**, **repetition**) is

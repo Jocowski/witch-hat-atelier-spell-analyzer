@@ -1,12 +1,12 @@
 # SPEC — Stroke beautify (QuickShape-style shape snapping + smoothing)
 
-> Status: **implemented** (Phases 1–3) · Scope: **Studio drawing tools (pure geometry + UI)**
+> Status: **done - shipped** (Phases 1–3) · Scope: **Studio drawing tools (pure geometry + UI)**
 > Branch: `feat/spell-studio-experiments` · Cross-refs:
-> [src/studio/tools/shapes.js](../../src/studio/tools/shapes.js) (clean-shape emitters — reused),
-> [src/studio/DrawingSurface.jsx](../../src/studio/DrawingSurface.jsx) (`commitStroke` — the hook point),
-> [src/studio/ToolDock.jsx](../../src/studio/ToolDock.jsx) (toolbar — Beautify button + toggle),
-> [src/draw/recognizer.js](../../src/draw/recognizer.js) ($P classifier — optional shared classification),
-> [src/draw/ringClosure.js](../../src/draw/ringClosure.js) (closure heuristic — reused).
+> [src/studio/tools/shapes.js](../../../../src/studio/tools/shapes.js) (clean-shape emitters — reused),
+> [src/studio/DrawingSurface.jsx](../../../../src/studio/DrawingSurface.jsx) (`commitStroke` — the hook point),
+> [src/studio/ToolDock.jsx](../../../../src/studio/ToolDock.jsx) (toolbar — Beautify button + toggle),
+> [src/draw/recognizer.js](../../../../src/draw/recognizer.js) ($P classifier — optional shared classification),
+> [src/draw/ringClosure.js](../../../../src/draw/ringClosure.js) (closure heuristic — reused).
 
 ## The problem
 
@@ -21,17 +21,17 @@ toggle**, not a forced behavior: *they* decide whether to use it.
 
 The hard parts already exist in the codebase — beautify is a thin transform on top:
 
-- **Clean-shape emitters** — [shapes.js](../../src/studio/tools/shapes.js) already turns
+- **Clean-shape emitters** — [shapes.js](../../../../src/studio/tools/shapes.js) already turns
   parameters into perfect point arrays: `circle(center, r)`, `ellipse(a, b)`, `triangle(a, b)`,
   `rect(a, b)`, `line(a, b)`. Beautify *re-uses these* to regenerate the clean stroke.
-- **A shape classifier** — the `$P` recognizer ([recognizer.js](../../src/draw/recognizer.js))
+- **A shape classifier** — the `$P` recognizer ([recognizer.js](../../../../src/draw/recognizer.js))
   already understands stroke shapes; closure logic lives in
-  [ringClosure.js](../../src/draw/ringClosure.js).
+  [ringClosure.js](../../../../src/draw/ringClosure.js).
 - **A simple stroke model** — `{ tool, color, width, points:[{x,y}] }`
-  ([drawingModel.js:17](../../src/studio/drawingModel.js#L17)). Beautify is `points → points`;
+  ([drawingModel.js:17](../../../../src/studio/drawingModel.js#L17)). Beautify is `points → points`;
   nothing else in the model changes.
 - **A single commit funnel** — every drawn stroke (brush *and* shapes) lands in
-  `commitStroke(points, toolName)` ([DrawingSurface.jsx:521](../../src/studio/DrawingSurface.jsx#L521)).
+  `commitStroke(points, toolName)` ([DrawingSurface.jsx:521](../../../../src/studio/DrawingSurface.jsx#L521)).
   Auto-beautify hooks **one place**.
 - **Undo/redo** — `maybeSnap()`/`snapshot()` already wraps each stroke as one history step, so
   beautify is automatically undoable; that is the safety net that lets us *replace* points instead
@@ -112,7 +112,7 @@ Pure helpers to add (all testable): `closedness(points)`, `rdp(points, eps)`,
 Two triggers share the one function (matches Procreate: QuickShape *and* a manual path):
 
 1. **Auto-beautify toggle** (the user's ask — *they* decide). A switch in
-   [ToolDock.jsx](../../src/studio/ToolDock.jsx), in its own section near the tool groups.
+   [ToolDock.jsx](../../../../src/studio/ToolDock.jsx), in its own section near the tool groups.
    - **Off (default)** → `commitStroke` behaves exactly as today (raw ink). Zero behavior change.
    - **On** → in `commitStroke`, before building the node, run `beautifyStroke(points)`; if
      `kind !== 'none'`, substitute the returned points. Still **one** undo step (the hook is inside
@@ -161,22 +161,22 @@ Detect accuracy and yield cleaner training samples — a virtuous loop with the 
 - degenerate inputs (< 4 pts, zero bbox, duplicate points) → original returned, no throw.
 - **purity**: module imports no JSON/DOM (so the suite stays green under plain Node).
 
-Manual (add a row to [TEST-PLAN.md](TEST-PLAN.md)): toggle On → draw shapes → they snap, one
+Manual (add a row to [TEST-PLAN.md](../../TEST-PLAN.md)): toggle On → draw shapes → they snap, one
 Ctrl+Z reverts to raw; toggle Off → raw; Beautify button cleans selection; placed symbols
 untouched; Detect still works on beautified strokes.
 
 ## Implementation status (shipped on `feat/spell-studio-experiments`)
 
-- **Core** — [src/studio/tools/beautify.js](../../src/studio/tools/beautify.js): pure
+- **Core** — [src/studio/tools/beautify.js](../../../../src/studio/tools/beautify.js): pure
   `beautifyStroke(points, opts) → {points, kind, confidence}` with inline RDP, angle-based corner
   filtering, Kåsa circle fit, and Chaikin fallback; reuses `shapes.js` emitters. Exports
   `rdp`, `fitCircle`, `chaikin`, `filterCornersByAngle` for testing.
-- **Tests** — [test/beautify.test.js](../../test/beautify.test.js): 13 cases (circle/ellipse/
+- **Tests** — [test/beautify.test.js](../../../../test/beautify.test.js): 13 cases (circle/ellipse/
   triangle/rect/line snapping, no-false-positive gate, degenerate inputs, purity). Full suite
   387/387 green; lint clean; production build OK.
 - **Phase 1** — Auto-beautify toggle + Beautify button + **Q** hotkey in
-  [ToolDock.jsx](../../src/studio/ToolDock.jsx) (new "Assist" section, props optional). Wired in
-  [DrawingSurface.jsx](../../src/studio/DrawingSurface.jsx): `commitStroke(pts,'brush',{beautify})`
+  [ToolDock.jsx](../../../../src/studio/ToolDock.jsx) (new "Assist" section, props optional). Wired in
+  [DrawingSurface.jsx](../../../../src/studio/DrawingSurface.jsx): `commitStroke(pts,'brush',{beautify})`
   snaps freehand strokes; `beautifySelected()` cleans the selection (or last stroke) as one undo
   step. Prefs persist in localStorage (`studio.beautify.auto`, default **Off**).
 - **Phase 2** — QuickShape hold-to-snap: pausing ≥ `HOLD_SNAP_MS` (450 ms) at the end of a brush
@@ -188,7 +188,7 @@ untouched; Detect still works on beautified strokes.
   (`kind:'smoothed'`) rather than left raw; **Auto stays snap-only** (`smoothFallback: false`) so it
   never forces a doodle into a shape. Canon-perfect cleanup of a *named* glyph remains the job of
   **Detect → canonical SVG** (carrying `scale`/`rotation`/`metrics`, per the variant note below).
-- **Identified-symbols panel actions** ([IdentifiedPanel.jsx](../../src/studio/IdentifiedPanel.jsx)):
+- **Identified-symbols panel actions** ([IdentifiedPanel.jsx](../../../../src/studio/IdentifiedPanel.jsx)):
   - **✦ Smooth** (per row) + **✦ Smooth all** (header) — clean a recognized symbol's *actual drawn
     strokes* **in place** (snap to a clean shape if one fits, else de-jitter), keeping the drawn
     size/style/position. *No SVG swap* — it does **not** replace the ink with the canonical glyph
@@ -204,7 +204,7 @@ untouched; Detect still works on beautified strokes.
     see *where* each listed symbol is.
 - **Close-the-ring weld (cross-stroke)** — `weldsRingGap(arcPts, bridgePts, opts) → circle | null`
   (pure, exported, tested): when a freshly committed stroke bridges the two open ends of an existing
-  **open ring**, [DrawingSurface.jsx](../../src/studio/DrawingSurface.jsx) `commitStroke` replaces
+  **open ring**, [DrawingSurface.jsx](../../../../src/studio/DrawingSurface.jsx) `commitStroke` replaces
   the arc + bridge with one **closed circle** (one undo step) — the closing gesture *casts* the
   prepared spell. Gated by the Auto-beautify flag (or a hold), keeping the "Auto off ⇒ nothing
   changes" contract. Reuses `fitCircle`/`arcGeometry`; no per-stroke metadata needed (recomputed).

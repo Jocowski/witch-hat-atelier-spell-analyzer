@@ -38,6 +38,79 @@ test('single-circle: a water core ringed by Column signs matches the Watershot S
   )
 })
 
+// ----- L6 Orb-container: Water Orb catalog verification (SPEC-orb-container §L6) -----
+// Exercises the full pipeline: compose → CLI analyze → deduction + catalog match.
+// The composition mirrors data/spells.json water_orb: water core + orb×4 around + column×2 sides.
+test('Water Orb: deduced effect mentions sphere and filling bottom-to-top', () => {
+  const r = runCli({
+    name: 'Water Orb',
+    ring: { closed: true },
+    core: { id: 'c0', type: 'water', x: 0, y: 0 },
+    components: [
+      // 4 orbs equally around the ring
+      { id: 'o1', type: 'orb', role: 'sign', x: 0,    y: -150, rotation: 0,   scale: 1 },
+      { id: 'o2', type: 'orb', role: 'sign', x: 150,  y: 0,    rotation: 90,  scale: 1 },
+      { id: 'o3', type: 'orb', role: 'sign', x: 0,    y: 150,  rotation: 180, scale: 1 },
+      { id: 'o4', type: 'orb', role: 'sign', x: -150, y: 0,    rotation: 270, scale: 1 },
+      // 2 opposing inward columns (east/west sides)
+      { id: 'c1', type: 'column', role: 'sign', x: 150,  y: 0, rotation: 90,  scale: 1 },
+      { id: 'c2', type: 'column', role: 'sign', x: -150, y: 0, rotation: 270, scale: 1 },
+    ],
+  })
+  const summary = r.deduction?.summary ?? r.combined?.summary ?? ''
+  // Container clause: substance gathers into a sphere, filling bottom-to-top
+  assert.match(summary, /sphere/i, `deduction summary should mention sphere; got: "${summary}"`)
+  assert.match(
+    summary,
+    /filling bottom-to-top/i,
+    `deduction summary should mention "filling bottom-to-top"; got: "${summary}"`,
+  )
+})
+
+test('Water Orb: catalog match returns water_orb as the top hit', () => {
+  const r = runCli({
+    name: 'Water Orb',
+    ring: { closed: true },
+    core: { id: 'c0', type: 'water', x: 0, y: 0 },
+    components: [
+      { id: 'o1', type: 'orb', role: 'sign', x: 0,    y: -150, rotation: 0,   scale: 1 },
+      { id: 'o2', type: 'orb', role: 'sign', x: 150,  y: 0,    rotation: 90,  scale: 1 },
+      { id: 'o3', type: 'orb', role: 'sign', x: 0,    y: 150,  rotation: 180, scale: 1 },
+      { id: 'o4', type: 'orb', role: 'sign', x: -150, y: 0,    rotation: 270, scale: 1 },
+      { id: 'c1', type: 'column', role: 'sign', x: 150,  y: 0, rotation: 90,  scale: 1 },
+      { id: 'c2', type: 'column', role: 'sign', x: -150, y: 0, rotation: 270, scale: 1 },
+    ],
+  })
+  assert.ok(r.similar.match, 'expected a catalog match for the Water Orb composition')
+  assert.equal(
+    r.similar.match.name,
+    'Water Orb',
+    `expected top catalog match to be "Water Orb", got "${r.similar.match.name}"`,
+  )
+})
+
+test('Water Orb: deduction direction is "contained sphere", not a lateral jet', () => {
+  const r = runCli({
+    name: 'Water Orb',
+    ring: { closed: true },
+    core: { id: 'c0', type: 'water', x: 0, y: 0 },
+    components: [
+      { id: 'o1', type: 'orb', role: 'sign', x: 0,    y: -150, rotation: 0,   scale: 1 },
+      { id: 'o2', type: 'orb', role: 'sign', x: 150,  y: 0,    rotation: 90,  scale: 1 },
+      { id: 'o3', type: 'orb', role: 'sign', x: 0,    y: 150,  rotation: 180, scale: 1 },
+      { id: 'o4', type: 'orb', role: 'sign', x: -150, y: 0,    rotation: 270, scale: 1 },
+      { id: 'c1', type: 'column', role: 'sign', x: 150,  y: 0, rotation: 90,  scale: 1 },
+      { id: 'c2', type: 'column', role: 'sign', x: -150, y: 0, rotation: 270, scale: 1 },
+    ],
+  })
+  const direction = r.deduction?.direction ?? r.combined?.direction
+  assert.equal(
+    direction,
+    'contained sphere',
+    `deduction direction should be "contained sphere", got "${direction}"`,
+  )
+})
+
 test('multi-circle: the nested Vapor Bubble matches its own catalog recipe via the combined signature', () => {
   const vapor = {
     format: 'wha-spell@2',

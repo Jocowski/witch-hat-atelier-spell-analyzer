@@ -6,18 +6,21 @@
  * matches a known recipe — contribute the detected symbols to the training set.
  */
 
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import './studio.css'
 
 import DrawingSurface  from './DrawingSurface.jsx'
 import SymbolPalette   from './SymbolPalette.jsx'
 import IdentifiedPanel from './IdentifiedPanel.jsx'
 import AIReportPanel   from './AIReportPanel.jsx'
+import SpellTrial      from './SpellTrial.jsx'
+import FlowPanel       from './FlowPanel.jsx'
 import ThemeSwitcher   from '../theme/ThemeSwitcher.jsx'
 
 import ResultPanel from '../components/ResultPanel.jsx'
 import { analyze } from '../engine/analyze.js'
-import { isSigilType } from '../engine/data.js'
+import { isSigilType, getComponentDef } from '../engine/data.js'
+import { computeSignVectors, computeColumnFlow } from '../engine/geometry.js'
 import { useSymbolData } from '../engine/useSymbolData.js'
 import { loadDbSymbols } from '../engine/symbolLoader.js'
 import { toComposition, recognizedToPlaced } from './drawingModel.js'
@@ -92,6 +95,48 @@ function overlaysFor(d) {
   return [...rings, ...rec, ...placed]
 }
 
+// einlair direction for the renderer: flatten the composition's sign components → computeColumnFlow,
+// then map the radial resultant (in-plane x/y) + the upward share (z) into the SpellIR.direction the
+// effect renderer consumes. No steering signs → a gentle upward spout (z=1). Convention: 0°=north CW;
+// paper y is south-positive (so north → up-screen after the renderer's foreshortening).
+function einlairDirection(comp) {
+  const familyOf = (t) => getComponentDef(t)?.family
+  const comps = []
+  for (const circle of comp?.circles || []) {
+    const cx = circle.center?.x || 0
+    const cy = circle.center?.y || 0
+    for (const c of circle.components || []) comps.push({ ...c, x: (c.x || 0) + cx, y: (c.y || 0) + cy })
+  }
+  const flow = computeColumnFlow(comps, familyOf)
+  if (!flow) return { x: 0, y: 0, z: 1 } // nothing steers it → gentle upward spout
+  const rad = (flow.netAngle * Math.PI) / 180
+  return {
+    x: Math.sin(rad) * flow.netFrac,
+    y: -Math.cos(rad) * flow.netFrac,
+    z: flow.inverted ? 0 : flow.upFrac,
+  }
+}
+
+// ── Dye effects on the render (data/dyes.json ids) ──────────────────────────────
+const DYE_AZUREMOON  = 'azuremoon_flower'        // longer duration
+const DYE_BLOOD      = 'blood'                   // stronger jet + more water
+const DYE_INVISIBLE  = 'blushing_bride_scales'   // those strokes hidden from the render backdrop
+const DYE_GLOW       = 'golden_blaze_wyrm_scales' // those strokes keep glowing
+const TRIAL_BASE_SECONDS    = 5    // default single-run length (#4)
+const AZUREMOON_DURATION_MULT = 2
+const BLOOD_POWER             = 4   // Blood dye: dramatic amplification (bigger/faster/farther/more)
+
+// All dye ids present anywhere in the composition.
+function compositionDyes(comp) {
+  const set = new Set()
+  for (const circle of comp?.circles || []) for (const d of circle.dyes || []) set.add(d)
+  return set
+}
+// Count of sign components across all circles.
+function signCountOf(comp) {
+  return (comp?.circles || []).reduce((n, c) => n + (c.components || []).filter((x) => x.role === 'sign').length, 0)
+}
+
 export default function StudioPage() {
   // Re-render the palette + canvas when the DB symbol overlay loads or an Admin edit lands.
   useSymbolData()
@@ -114,6 +159,7 @@ export default function StudioPage() {
   const [overlays, setOverlays] = useState([])
   const [hovered, setHovered]   = useState(null)   // bbox of the row being hovered → canvas glow
   const [showBoxes, setShowBoxes] = useState(true)  // toggle the detection overlay boxes on the canvas
+  const [showVectors, setShowVectors] = useState(false) // toggle per-sign direction/force arrows
   const [tab, setTab] = useState('detected')        // results-drawer tab: 'detected' | 'analysis' | 'ai'
   const [composition, setComposition] = useState(null)
   const [result, setResult] = useState(null)
@@ -126,8 +172,62 @@ export default function StudioPage() {
   // Visual effect renderer state (1.1, 1.3, 1.4)
   const [spellIRShim, setSpellIRShim] = useState(null)          // SpellIR object for EffectCanvas
   const [ringGeom, setRingGeom] = useState(null)                  // ring geometry in canvas px
-  const [activatedAt, setActivatedAt] = useState(null)            // timestamp of last activation
   const [preparedActiveGating, setPreparedActiveGating] = useState(readGatingSetting)
+
+  // Spell Trial — after the first Analyze the centre SPLITS: drawing on one half, render on the other.
+  // The render pane is PERSISTENT (stays open across edits); it shows the last cast and a "stale" badge
+  // when the drawing changed since. Auto-analyze (opt-in) re-casts it automatically, debounced.
+  const [trialReady, setTrialReady] = useState(false)
+  const [trialStale, setTrialStale] = useState(false) // drawing changed since the shown cast
+  const [trialBg, setTrialBg] = useState(null)        // PNG data URL of the drawing (cast backdrop)
+  const [trialGlow, setTrialGlow] = useState(null)    // PNG of just the Golden-Blaze strokes (glow layer)
+  const [splitFrac, setSplitFrac] = useState(0.5)     // drawing-pane share of the centre width (0.2..0.8)
+  const trialReadyRef = useRef(false)
+  trialReadyRef.current = trialReady
+  const workRef = useRef(null)
+
+  // Auto-analyze: re-detect + re-analyze on every drawing change (engine + trial only — no AI, no log).
+  const AUTO_LS_KEY = 'studio.autoAnalyze'
+  const AUTO_DELAY_LS_KEY = 'studio.autoDelay'
+  const [autoAnalyze, setAutoAnalyze] = useState(() => localStorage.getItem(AUTO_LS_KEY) === '1')
+  const [autoDelay, setAutoDelay] = useState(() => Number(localStorage.getItem(AUTO_DELAY_LS_KEY)) || 600)
+  const autoAnalyzeRef = useRef(autoAnalyze)
+  autoAnalyzeRef.current = autoAnalyze
+  const autoDelayRef = useRef(autoDelay)
+  autoDelayRef.current = autoDelay
+  const autoTimerRef = useRef(null)
+  const runAutoRef = useRef(null)   // points at runAutoAnalyze (set below; ref breaks the definition cycle)
+  useEffect(() => { localStorage.setItem(AUTO_LS_KEY, autoAnalyze ? '1' : '0') }, [autoAnalyze])
+  useEffect(() => { localStorage.setItem(AUTO_DELAY_LS_KEY, String(autoDelay)) }, [autoDelay])
+  useEffect(() => () => clearTimeout(autoTimerRef.current), [])
+
+  // Any edit to the drawing marks the open render stale; with auto-analyze on, schedule a debounced re-cast.
+  const handleDrawingChange = useCallback(() => {
+    if (trialReadyRef.current) setTrialStale(true)
+    if (autoAnalyzeRef.current) {
+      clearTimeout(autoTimerRef.current)
+      autoTimerRef.current = setTimeout(() => runAutoRef.current?.(), autoDelayRef.current)
+    }
+  }, [])
+
+  // Dismiss the render pane (the user closed it) — drawing returns to full width.
+  const closeTrial = useCallback(() => {
+    trialReadyRef.current = false
+    setTrialReady(false)
+    setSpellIRShim(null)
+  }, [])
+
+  // Drag the divider between the drawing and render panes.
+  const startSplitResize = useCallback((e) => {
+    e.preventDefault()
+    const el = workRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const onMove = (ev) => setSplitFrac(Math.max(0.2, Math.min(0.8, (ev.clientX - rect.left) / rect.width)))
+    const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp) }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }, [])
 
   // A0: accumulate the user's label corrections across the session so logAnalysis can record them.
   const correctionsRef = useRef([])
@@ -198,61 +298,67 @@ export default function StudioPage() {
     )
   }, [])
 
-  // STEP 1 — detect
+  // Run the recognizer over the current canvas → { d, comp, ringGeomVal }. PURE of state (callers set it).
+  const runRecognition = useCallback(() => {
+    if (!canvasRef.current) return null
+    const model = canvasRef.current.getModel()
+    const drawn = (canvasRef.current.getStrokes() || []).map((s) => s.points).filter((p) => p && p.length >= 2)
+    let recGroups = [], ringClosed = false, recognizerResult = null
+    if (drawn.length > 0 && templates.length > 0) {
+      recognizerResult = analyzeStrokes(drawn, templates, {
+        adaptiveGap:          true,
+        gapK:                 rules.recognition?.gapK                 ?? 0.12,
+        gapMin:               rules.recognition?.gapMin               ?? 14,
+        gapMax:               rules.recognition?.gapMax               ?? 80,
+        cvThreshold:          rules.recognition?.cvThreshold          ?? 0.3,
+        cvThresholdRelaxed:   rules.recognition?.cvThresholdRelaxed   ?? 0.45,
+        minRingRadius:        rules.recognition?.minRingRadius        ?? 40,
+        floodFill:            rules.recognition?.floodFill            ?? true,
+        floodFillConfig:      rules.recognition?.floodFillConfig      ?? {},
+        rotationSteps:        rules.recognition?.rotationSteps        ?? 24,
+        confidenceMinPct:     CONFIDENCE_MIN_PCT,
+        // Track 5: multi-ring tolerances (SPEC-nested-linked.md)
+        ringAssignSlack:      rules.recognition?.ringAssignSlack      ?? 1.15,
+        nestCenterSlack:      rules.recognition?.nestCenterSlack      ?? 0.85,
+        linkEndpointSlack:    rules.recognition?.linkEndpointSlack    ?? 0.12,
+      })
+      recGroups = tagGroups(recognizerResult.groups || [])
+      ringClosed = !!recognizerResult.ring
+    }
+    const detectedRings  = recognizerResult?.rings     || []
+    const detectedRelations = recognizerResult?.relations || []
+    const d = { placed: model.placed, recGroups, ringClosed, dyes: model.dyes, detectedRings, relations: detectedRelations }
+    const RING_RADIUS_FALLBACK = 180
+    const stageEl = canvasRef.current?.getStageElement?.()
+    const stageW = stageEl?.clientWidth ?? 800
+    const stageH = stageEl?.clientHeight ?? 600
+    const ringGeomVal = {
+      found: !!recognizerResult?.ring,
+      center: { x: stageW / 2, y: stageH / 2 },
+      radius: recognizerResult?.ring?.radius ?? RING_RADIUS_FALLBACK,
+    }
+    return { d, comp: buildComposition(d), ringGeomVal }
+  }, [templates, buildComposition])
+
+  // Push a recognition result into the detect-step state.
+  const applyDetection = useCallback(({ d, comp, ringGeomVal }, { keepResult = false } = {}) => {
+    setDetection(d)
+    setOverlays(overlaysFor(d))
+    setComposition(comp)
+    if (!keepResult) { setResult(null); setContributeMsg(null) }
+    setPhase((p) => (p === 'analyzed' && keepResult ? p : 'detected'))
+    setRingGeom(ringGeomVal)
+  }, [])
+
+  // STEP 1 — detect (manual button)
   const handleDetect = useCallback(() => {
     if (!canvasRef.current || busy) return
     setBusy(true)
     try {
-      const model = canvasRef.current.getModel()
-      const drawn = (canvasRef.current.getStrokes() || []).map((s) => s.points).filter((p) => p && p.length >= 2)
-      let recGroups = [], ringClosed = false, recognizerResult = null
-      if (drawn.length > 0 && templates.length > 0) {
-        recognizerResult = analyzeStrokes(drawn, templates, {
-          adaptiveGap:          true,
-          gapK:                 rules.recognition?.gapK                 ?? 0.12,
-          gapMin:               rules.recognition?.gapMin               ?? 14,
-          gapMax:               rules.recognition?.gapMax               ?? 80,
-          cvThreshold:          rules.recognition?.cvThreshold          ?? 0.3,
-          cvThresholdRelaxed:   rules.recognition?.cvThresholdRelaxed   ?? 0.45,
-          minRingRadius:        rules.recognition?.minRingRadius        ?? 40,
-          floodFill:            rules.recognition?.floodFill            ?? true,
-          floodFillConfig:      rules.recognition?.floodFillConfig      ?? {},
-          rotationSteps:        rules.recognition?.rotationSteps        ?? 24,
-          confidenceMinPct:     CONFIDENCE_MIN_PCT,
-          // Track 5: multi-ring tolerances (SPEC-nested-linked.md)
-          ringAssignSlack:      rules.recognition?.ringAssignSlack      ?? 1.15,
-          nestCenterSlack:      rules.recognition?.nestCenterSlack      ?? 0.85,
-          linkEndpointSlack:    rules.recognition?.linkEndpointSlack    ?? 0.12,
-        })
-        recGroups = tagGroups(recognizerResult.groups || [])
-        ringClosed = !!recognizerResult.ring
-      }
-      const detectedRings  = recognizerResult?.rings     || []
-      const detectedRelations = recognizerResult?.relations || []
-      const d = { placed: model.placed, recGroups, ringClosed, dyes: model.dyes, detectedRings, relations: detectedRelations }
-      setDetection(d)
-      setOverlays(overlaysFor(d))
-      setComposition(buildComposition(d))
-      setResult(null); setContributeMsg(null)
-      setPhase('detected'); setTab('detected')
-
-      // Derive ring geometry for the effect canvas (SPEC-visual-renderer §3.3).
-      // The effect canvas is fixed-size (canvas px); center = stage center.
-      // Ring radius: recognizer provides world-px radius; fall back to guide-ring size.
-      const RING_RADIUS_FALLBACK = 180
-      const detectedRingRadius = recognizerResult?.ring?.radius ?? RING_RADIUS_FALLBACK
-      // We derive the stage size from the wrapper element (DrawingSurface exposes no prop for this).
-      // Use a safe-to-compute heuristic: the canvas is 100% of ds-stage-wrap.
-      const stageEl = canvasRef.current?.getStageElement?.()
-      const stageW = stageEl?.clientWidth ?? 800
-      const stageH = stageEl?.clientHeight ?? 600
-      setRingGeom({
-        found: !!recognizerResult?.ring,
-        center: { x: stageW / 2, y: stageH / 2 },
-        radius: detectedRingRadius,
-      })
+      const det = runRecognition()
+      if (det) { applyDetection(det); setTab('detected') }
     } finally { setBusy(false) }
-  }, [busy, templates, buildComposition])
+  }, [busy, runRecognition, applyDetection])
 
   // correct a recognized label → update group + overlay + composition (+ record the correction for A0)
   function handleCorrect(group, newType) {
@@ -321,26 +427,61 @@ export default function StudioPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detection, phase, buildComposition])
 
-  // STEP 2 — analyze (+ A0: log the analysis + corrections for the improvement loop)
+  // Cast: run the engine on a composition, refresh the trial render + backdrop. `silent` (auto-analyze)
+  // skips the AI-loop logging and the tab switch so live re-casts don't spam the DB or steal the tab.
+  const castFrom = useCallback((comp, ringClosed, { silent = false } = {}) => {
+    if (!comp) return
+    const res = analyze(comp)
+    setResult(res); setPhase('analyzed'); setTrialStale(false)
+    if (!silent) {
+      setTab('analysis')
+      const corrections = correctionsRef.current.length ? { items: [...correctionsRef.current] } : null
+      logAnalysis({ composition: comp, engine_result: res, corrections }).catch(() => {})
+    }
+    const dyes = compositionDyes(comp)
+
+    // Build the SpellIR shim FIRST (before opening the trial) so SpellTrial mounts with the spell
+    // already present — otherwise EffectCanvas can mount disabled and never start.
+    // #3: a sigil with no signs doesn't form a directed spell → render nothing (just show the seal).
+    let shim = null
+    if (signCountOf(comp) > 0) {
+      // Each cast restarts its run (EffectCanvas also re-stamps on a new spell). #4 single run:
+      // a default duration (Azuremoon dye doubles it). #5 Blood: stronger jet + more water.
+      const newActivatedAt = performance.now()
+      const duration = TRIAL_BASE_SECONDS * (dyes.has(DYE_AZUREMOON) ? AZUREMOON_DURATION_MULT : 1)
+      const power = dyes.has(DYE_BLOOD) ? BLOOD_POWER : 1
+      shim = buildSpellIRShim(res, !!ringClosed, newActivatedAt, { direction: einlairDirection(comp), duration, power })
+    }
+    setSpellIRShim(shim)
+
+    // Per-dye backdrop captures: hide Blushing-Bride strokes; solo Golden-Blaze strokes for the glow.
+    let bg = null, glow = null
+    try {
+      bg = canvasRef.current?.toDataURL?.({ pixelRatio: 2, hideDyeIds: [DYE_INVISIBLE] }) ?? null
+      glow = dyes.has(DYE_GLOW) ? (canvasRef.current?.toDataURL?.({ pixelRatio: 2, soloDyeIds: [DYE_GLOW] }) ?? null) : null
+    } catch { /* capture unsupported */ }
+    setTrialBg(bg); setTrialGlow(glow)
+    trialReadyRef.current = true
+    setTrialReady(true)
+  }, [])
+
+  // STEP 2 — analyze (manual button: logs to the improvement loop + switches to the Analysis tab).
   const handleAnalyze = useCallback(() => {
     if (!composition || busy) return
     setBusy(true)
-    try {
-      const res = analyze(composition)
-      setResult(res); setPhase('analyzed'); setTab('analysis')
-      const corrections = correctionsRef.current.length ? { items: [...correctionsRef.current] } : null
-      logAnalysis({ composition, engine_result: res, corrections }).catch(() => {})
+    try { castFrom(composition, detection.ringClosed, { silent: false }) }
+    finally { setBusy(false) }
+  }, [composition, busy, detection.ringClosed, castFrom])
 
-      // Build the SpellIR shim for the visual effect renderer (SPEC-visual-renderer §8 Phase R1).
-      // The shim uses the real spellIR block from analyze() when available.
-      const ringClosed = composition?.ring?.closed ?? detection.ringClosed ?? false
-      const wasActive = spellIRShim?.active ?? false
-      const nowActive = ringClosed || !preparedActiveGating  // toggle-off: always active
-      const newActivatedAt = (!wasActive && nowActive) ? performance.now() : (activatedAt ?? performance.now())
-      setActivatedAt(newActivatedAt)
-      setSpellIRShim(buildSpellIRShim(res, ringClosed, newActivatedAt))
-    } finally { setBusy(false) }
-  }, [composition, busy, detection.ringClosed, spellIRShim, activatedAt, preparedActiveGating])
+  // Auto-analyze: debounced detect → analyze on every drawing change. Engine + trial only.
+  const runAutoAnalyze = useCallback(() => {
+    if (busy || !canvasRef.current) return
+    const det = runRecognition()
+    if (!det) return
+    applyDetection(det, { keepResult: true })
+    castFrom(det.comp, det.d.ringClosed, { silent: true })
+  }, [busy, runRecognition, applyDetection, castFrom])
+  runAutoRef.current = runAutoAnalyze
 
   function handleClear() {
     canvasRef.current?.clear()
@@ -348,7 +489,11 @@ export default function StudioPage() {
     setOverlays([]); setComposition(null); setResult(null); setContributeMsg(null)
     correctionsRef.current = []
     // Reset visual effect state
-    setSpellIRShim(null); setRingGeom(null); setActivatedAt(null)
+    setSpellIRShim(null); setRingGeom(null)
+    // Reset the Spell Trial split
+    trialReadyRef.current = false
+    setTrialReady(false); setTrialBg(null); setTrialGlow(null); setTrialStale(false)
+    clearTimeout(autoTimerRef.current)
   }
 
   // copy the drawing as a PNG to the clipboard
@@ -392,7 +537,48 @@ export default function StudioPage() {
   }
 
   const detectedCount = detection.placed.length + detection.recGroups.filter((g) => g.match).length
-  const canContribute = phase === 'analyzed' && (result?.similar?.match) && detection.recGroups.some((g) => g.match)
+  // Spell-match training contribution is PARKED until spell-level training is built (not yet a
+  // developed function). Flip SPELL_TRAINING_ENABLED to true to restore the "Contribute symbols
+  // to training" box (it offers to seed the training set from a confident catalog match).
+  const SPELL_TRAINING_ENABLED = false
+  const canContribute = SPELL_TRAINING_ENABLED && phase === 'analyzed' && (result?.similar?.match) && detection.recGroups.some((g) => g.match)
+
+  // Per-sign direction+force vectors via the engine geometry (einlair model). Computed once per render
+  // and shared by the canvas overlay (vectorOverlays) and the Flow tab (FlowPanel).
+  // NOTE: the composition is wha-spell@2 ({ circles:[{ components }] }) — sign components live inside
+  // each circle (their x/y are relative to that circle's centre), so flatten them back to world coords.
+  const signVectors = (() => {
+    if (!composition) return null
+    const familyOf = (t) => getComponentDef(t)?.family
+    const comps = []
+    let ringRadius = 180
+    for (const circle of composition.circles || []) {
+      ringRadius = circle.radius || ringRadius
+      const cx = circle.center?.x || 0
+      const cy = circle.center?.y || 0
+      for (const c of circle.components || []) comps.push({ ...c, x: (c.x || 0) + cx, y: (c.y || 0) + cy })
+    }
+    return { ...computeSignVectors(comps, familyOf), ringRadius }
+  })()
+
+  const vectorOverlays = (() => {
+    if (!signVectors) return []
+    const { signs, flow } = signVectors
+    const out = signs.map((s) => ({ x: s.x, y: s.y, angle: s.angle, magnitude: s.magnitude, kind: 'sign' }))
+    if (flow) {
+      // einlair flow: in-plane net (radial) + out-of-plane (upward) when columns cancel radially;
+      // inverted (Φ<0) → the magic spreads radially OUTWARD instead, with no upward flow.
+      if (flow.netFrac > 0.04) out.push({ x: 0, y: 0, angle: flow.netAngle, magnitude: flow.netFrac, kind: 'net' })
+      if (!flow.inverted && flow.upFrac > 0.06) out.push({ x: 0, y: 0, magnitude: flow.upFrac, kind: 'up' })
+      if (flow.inverted) out.push({ x: 0, y: 0, magnitude: 1, kind: 'spread' })
+    }
+    return out
+  })()
+  const hasFlow = (signVectors?.signs?.length ?? 0) > 0
+
+  // Stable renderer-config object for the trial (a new identity each render would make EffectCanvas
+  // rebuild its renderer + flush particles on every unrelated StudioPage re-render — e.g. hover).
+  const trialRenderer = useMemo(() => ({ ...RENDERER_CFG, preparedActiveGating }), [preparedActiveGating])
 
   return (
     <div className="studio-page">
@@ -403,30 +589,72 @@ export default function StudioPage() {
 
       <div className="studio-main">
         <div className="studio-centre">
-          <div className="studio-canvas-wrap">
-            <DrawingSurface
-              ref={canvasRef}
-              palette="dyes"
-              enableSymbols
-              overlays={showBoxes ? overlays : []}
-              highlight={hovered}
-              spellIR={spellIRShim}
-              ringGeom={ringGeom}
-              effectsEnabled={phase === 'analyzed' && !!spellIRShim}
-              rulesRenderer={{ ...RENDERER_CFG, preparedActiveGating }}
-            />
-          </div>
+          <div className={`studio-work${trialReady ? ' split' : ''}`} ref={workRef}>
+            {/* Drawing pane — takes the full width until Analyze splits it in half. */}
+            <div
+              className="studio-draw-pane"
+              style={trialReady ? { flexBasis: `${splitFrac * 100}%` } : undefined}
+            >
+              <div className="studio-canvas-wrap">
+                <DrawingSurface
+                  ref={canvasRef}
+                  palette="dyes"
+                  enableSymbols
+                  onChange={handleDrawingChange}
+                  overlays={showBoxes ? overlays : []}
+                  vectors={showVectors ? vectorOverlays : []}
+                  highlight={hovered}
+                />
+              </div>
 
-          <div className="studio-action-bar">
-            <button className="primary analyze-btn" onClick={handleDetect} disabled={busy}>
-              {busy && phase === 'idle' ? 'Detecting…' : 'Detect symbols'}
-            </button>
-            <button className="secondary clear-btn" onClick={handleClear}>Clear</button>
-            <span className="action-spacer" />
-            <button className="secondary" onClick={handleCopyImage} title="Copy the drawing as an image">⧉ Copy image</button>
-            <button className="secondary" onClick={handleExport} title="Export the drawing as JSON">↓ Export</button>
-            <button className="secondary" onClick={() => fileInputRef.current?.click()} title="Import a drawing JSON">↑ Import</button>
-            <input ref={fileInputRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={handleImport} />
+              <div className="studio-action-bar">
+                <button className="primary analyze-btn" onClick={handleDetect} disabled={busy}>
+                  {busy && phase === 'idle' ? 'Detecting…' : 'Detect symbols'}
+                </button>
+                <button className="secondary clear-btn" onClick={handleClear}>Clear</button>
+                <label className="auto-toggle" title="Auto-detect + analyze on every drawing change (engine + render only; AI report stays manual)">
+                  <input type="checkbox" checked={autoAnalyze} onChange={(e) => setAutoAnalyze(e.target.checked)} />
+                  {' ⚡ Auto'}
+                </label>
+                {autoAnalyze && (
+                  <select
+                    className="auto-delay"
+                    value={autoDelay}
+                    onChange={(e) => setAutoDelay(Number(e.target.value))}
+                    title="How long to wait after the last edit before auto-analyzing"
+                  >
+                    <option value={250}>0.25s</option>
+                    <option value={600}>0.6s</option>
+                    <option value={1000}>1s</option>
+                    <option value={2000}>2s</option>
+                    <option value={4000}>4s</option>
+                  </select>
+                )}
+                <span className="action-spacer" />
+                <button className="secondary" onClick={handleCopyImage} title="Copy the drawing as an image">⧉ Copy image</button>
+                <button className="secondary" onClick={handleExport} title="Export the drawing as JSON">↓ Export</button>
+                <button className="secondary" onClick={() => fileInputRef.current?.click()} title="Import a drawing JSON">↑ Import</button>
+                <input ref={fileInputRef} type="file" accept="application/json" style={{ display: 'none' }} onChange={handleImport} />
+              </div>
+            </div>
+
+            {/* Render pane — the live spell trial, beside the drawing. */}
+            {trialReady && (
+              <>
+                <div className="studio-split-divider" onPointerDown={startSplitResize} title="Drag to resize" />
+                <SpellTrial
+                  spellIR={spellIRShim}
+                  ringFound={ringGeom?.found}
+                  background={trialBg}
+                  glow={trialGlow}
+                  rulesRenderer={trialRenderer}
+                  spellName={result?.similar?.match?.name || result?.name}
+                  stale={trialStale}
+                  onReanalyze={handleAnalyze}
+                  onClose={closeTrial}
+                />
+              </>
+            )}
           </div>
         </div>
 
@@ -472,6 +700,17 @@ export default function StudioPage() {
                   {showBoxes ? '◳ boxes' : '◳ boxes off'}
                 </button>
               )}
+              {vectorOverlays.length > 0 && (
+                <button
+                  className={`srh-btn${showVectors ? '' : ' srh-btn-off'}`}
+                  onClick={() => setShowVectors((s) => !s)}
+                  title={showVectors
+                    ? 'Hide the per-sign direction/force arrows'
+                    : 'Show each sign’s direction + force (blue) and the net steer (orange)'}
+                >
+                  {showVectors ? '➜ vectors' : '➜ vectors off'}
+                </button>
+              )}
               <button className="srh-btn" onClick={() => setCollapsed((c) => !c)} title={collapsed ? 'Expand' : 'Minimize'}>
                 {collapsed ? '▢ expand' : '— minimize'}
               </button>
@@ -485,6 +724,8 @@ export default function StudioPage() {
               <div className="studio-results-tabs" role="tablist">
                 <button className={`srt-tab${tab === 'detected' ? ' active' : ''}`} role="tab" aria-selected={tab === 'detected'}
                   onClick={() => setTab('detected')}>Detected</button>
+                <button className={`srt-tab${tab === 'flow' ? ' active' : ''}`} role="tab" aria-selected={tab === 'flow'}
+                  onClick={() => setTab('flow')} disabled={!hasFlow} title="Why the spell is steered this way (vector flow)">Flow</button>
                 <button className={`srt-tab${tab === 'analysis' ? ' active' : ''}`} role="tab" aria-selected={tab === 'analysis'}
                   onClick={() => setTab('analysis')} disabled={phase !== 'analyzed'}>Analysis</button>
                 <button className={`srt-tab${tab === 'ai' ? ' active' : ''}`} role="tab" aria-selected={tab === 'ai'}
@@ -515,6 +756,9 @@ export default function StudioPage() {
                   </div>
                 )}
 
+                {tab === 'flow' && hasFlow && (
+                  <FlowPanel signs={signVectors.signs} flow={signVectors.flow} ringRadius={signVectors.ringRadius} />
+                )}
                 {tab === 'analysis' && phase === 'analyzed' && result && <ResultPanel result={result} />}
                 {tab === 'ai' && phase === 'analyzed' && result && (
                   <AIReportPanel composition={composition} engineResult={result} bridgeUrl={BRIDGE_URL} />
