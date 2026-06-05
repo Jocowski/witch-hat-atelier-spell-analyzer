@@ -5,6 +5,10 @@ known sigils/signs) on a canvas; the app **recognizes** the symbols, **analyzes*
 a deterministic engine, and produces a multi-topic **AI reading**. An admin area lets you **train** the
 recognizer and curate the symbol registry.
 
+**🔮 Live:** **<https://jocowski.github.io/witch-hat-atelier-spell-analyzer/>** — the public build runs the
+full **draw → detect → analyze** loop right in your browser (no login needed). Training and the admin
+area unlock behind the in-app config gear (⚙) for invited users; the AI report is local-dev only.
+
 ## What a spell is
 
 A glyph has three layers (see [ANALYSIS.md](ANALYSIS.md) and [docs/CORE.md](docs/CORE.md)):
