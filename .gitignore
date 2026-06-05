@@ -19,3 +19,6 @@ supabase/.branches/
 supabase/.temp/
 
 .claude/
+
+# Vendored agent skills (regenerable from skills-lock.json; uses symlinks that don't port cross-OS)
+.agents/
