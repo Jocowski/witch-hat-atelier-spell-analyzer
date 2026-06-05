@@ -84,15 +84,19 @@ allowed_cidrs_v6 = ["::/0"]
 # [db.ssl_enforcement]
 # enabled = true
 
+# TRIMMED: the Spell Analyzer app uses no live subscriptions. Re-enable if you
+# start streaming DB changes over websockets.
 [realtime]
-enabled = true
+enabled = false
 # Bind realtime via either IPv4 or IPv6. (default: IPv4)
 # ip_version = "IPv6"
 # The maximum length in bytes of HTTP request headers. (default: 4096)
 # max_header_length = 4096
 
+# TRIMMED: the admin dashboard UI. Re-enable for browsing tables/schema at
+# http://127.0.0.1:54323 (we use the in-app Admin views instead).
 [studio]
-enabled = true
+enabled = false
 # Port to use for Supabase Studio.
 port = 54323
 # External URL of the API server that frontend connects to.
@@ -102,8 +106,10 @@ openai_api_key = "env(OPENAI_API_KEY)"
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
+# TRIMMED: auth email confirmations are disabled locally, so no test mailbox is
+# needed. Re-enable if you turn on email confirmations / password-reset flows.
 [inbucket]
-enabled = true
+enabled = false
 # Port to use for the email testing server web interface.
 port = 54324
 # Uncomment to expose additional ports for testing user applications that send emails.
@@ -112,8 +118,11 @@ port = 54324
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# TRIMMED: no object/blob storage is used (Trace vectorizes images in-browser
+# and stores the resulting SVG path as text). Re-enable to add file buckets.
+# Disabling storage also drops the imgproxy container.
 [storage]
-enabled = true
+enabled = false
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
@@ -126,7 +135,7 @@ file_size_limit = "50MiB"
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]
-enabled = true
+enabled = false
 
 # Image transformation API is available to Supabase Pro plan.
 # [storage.image_transformation]
@@ -371,8 +380,10 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# TRIMMED: no Deno edge functions in this project. Re-enable if you add any
+# under supabase/functions/.
 [edge_runtime]
-enabled = true
+enabled = false
 # Supported request policies: `oneshot`, `per_worker`.
 # `per_worker` (default) — enables hot reload during local development.
 # `oneshot` — fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).
@@ -385,8 +396,10 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# TRIMMED: log analytics (Logflare + vector). Disabling drops two containers
+# and the bundled log shipper. Re-enable to inspect aggregated service logs.
 [analytics]
-enabled = true
+enabled = false
 port = 54327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"
