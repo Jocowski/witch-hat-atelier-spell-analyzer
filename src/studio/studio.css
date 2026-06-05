@@ -145,8 +145,9 @@
   perspective-origin: 50% 56%;
   transition: background 700ms ease;
 }
-/* When the portal awakens, darken the void so the additive (glowing) particles pop. */
-.spell-trial-stage.portal-active { background: #241b16; }
+/* When the portal awakens, darken the void so the additive (glowing) particles pop.
+   --portal-void is part of the theme contract (themes.css) so each theme tints it. */
+.spell-trial-stage.portal-active { background: var(--portal-void); }
 
 .spell-trial-bg {
   position: absolute;
@@ -185,7 +186,9 @@
   padding: 3px 9px;
   font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
-  color: var(--ink);
+  /* The chip has its own dark translucent pill background, so its text stays a fixed light tone
+     regardless of theme/void (var(--ink) would be dark on the light theme). */
+  color: #ece4d4;
   pointer-events: none;
   user-select: none;
 }
