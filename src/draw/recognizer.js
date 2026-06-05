@@ -56,6 +56,83 @@ export function makeCloud(name, points, weight = 1) {
   return { name, points: p, weight: weight > 0 ? weight : 1 }
 }
 
+// P3 internal helper: same normalization as makeCloud but for an arbitrary n-point cloud.
+// Used to build coarse descriptors at a configurable resolution without touching makeCloud's API.
+function makeCloudN(name, points, n, weight = 1) {
+  let p = resample(points.map((q) => P(q.X, q.Y, q.ID)), n)
+  p = scaleToSquare(p); p = translateToOrigin(p)
+  return { name, points: p, weight: weight > 0 ? weight : 1 }
+}
+
+// P3 internal helper: rotate a set of P-points ({X,Y,ID}) around the origin by deg degrees.
+// Used to build the coarse input cloud at multiple coarse angles for rotation-tolerant pre-filter.
+function rotateCloudPoints(points, deg) {
+  const rad = (deg * Math.PI) / 180
+  const co = Math.cos(rad), si = Math.sin(rad)
+  return points.map((p) => ({ X: p.X * co - p.Y * si, Y: p.X * si + p.Y * co, ID: p.ID }))
+}
+
+/**
+ * Build the recognizer's cloud objects once. Pure; safe under node --test.
+ * Carries each template's `role` field through so P2 role-split can filter without
+ * re-building. This is the cached, role-aware wrapper around makeCloud.
+ *
+ * P2 — Role-split pools are attached once as named properties so classifyAndRecognize
+ * can pick the right subset per group without recomputing on every call:
+ *   clouds.sigil — templates with role 'sigil' or 'core' (matched by core groups)
+ *   clouds.sign  — templates with role 'sign' (matched by sign groups)
+ * If a pool is empty the caller falls back to the full list.
+ *
+ * P3 — Each cloud also carries:
+ *   cloud.coarse      — an n-point cloud (default 8) for the cheap pre-filter distance.
+ *   cloud.strokeCount — number of distinct stroke IDs (cheap structural hint).
+ *
+ * @param {Array<{name, role, points, weight}>} templates
+ * @param {number} [coarseN=8]  resolution for the coarse descriptor
+ * @returns {Array<{name, role, weight, points, coarse, strokeCount}> & {sigil: Array, sign: Array}}
+ */
+export function buildClouds(templates, coarseN = 8) {
+  const clouds = templates.map((t) => {
+    const cloud = makeCloud(t.name, t.points, t.weight)
+    cloud.role = t.role
+    // P3: precompute coarse descriptor + stroke count (once per template change).
+    cloud.coarse = makeCloudN(t.name, t.points, coarseN, t.weight)
+    cloud.strokeCount = new Set(t.points.map((p) => p.ID)).size
+    return cloud
+  })
+  // P2: partition into role pools — computed once per template change, not per group.
+  clouds.sigil = clouds.filter((c) => c.role === 'sigil' || c.role === 'core')
+  clouds.sign  = clouds.filter((c) => c.role === 'sign')
+  return clouds
+}
+
+/**
+ * P3 — Rank `clouds` by a cheap coarse-cloud distance to `inputCoarseByAngle` and return the
+ * top-K clouds (by ascending best coarse distance).
+ *
+ * Rotation-tolerant: `inputCoarseByAngle` is an array of pre-rotated coarse clouds (each is an
+ * object with a `.points` array at one coarse angle).  For each candidate cloud the score is the
+ * minimum greedyMatch distance over all input angles, so a rotated sign is never penalised.
+ *
+ * @param {Array<{points: Array<{X,Y,ID}>}>} inputCoarseByAngle  coarse input at several angles
+ * @param {Array}                            clouds               pool to rank (each has .coarse)
+ * @param {number}                           K                    how many to return
+ * @returns {Array}  the top-K clouds from `clouds`, sorted by ascending coarse score
+ */
+export function prefilter(inputCoarseByAngle, clouds, K) {
+  if (!clouds.length) return []
+  const scored = clouds.map((c) => {
+    let best = Infinity
+    for (const ic of inputCoarseByAngle) {
+      const d = greedyMatch(ic.points, c.coarse)
+      if (d < best) best = d
+    }
+    return { cloud: c, score: best }
+  })
+  scored.sort((a, b) => a.score - b.score)
+  return scored.slice(0, K).map((s) => s.cloud)
+}
+
 // Recognition confidence (%) from a raw $P cloud distance. 0 dist = perfect (100%); larger = lower.
 // Kept here (pure) so the UI and the gate agree on one definition.
 export function confidencePct(dist) {
@@ -370,19 +447,51 @@ function extractNestRelations(rings, nestCenterSlack) {
 }
 
 // ---------- classify+recognize a group of strokes relative to a ring center ----------
-function classifyAndRecognize(groups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct) {
+// opts: { prefilterK, prefilterCoarsePoints } — P3 pre-filter settings (both optional with defaults)
+function classifyAndRecognize(groups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct, opts = {}) {
+  const prefilterK            = opts.prefilterK            ?? 15
+  const prefilterCoarsePoints = opts.prefilterCoarsePoints ?? 8
+  // Number of coarse angles to evaluate in the pre-filter (8 × 45° gives full rotation coverage).
+  const COARSE_ANGLE_STEPS = 8
+
   const innerR = 0.45 * effectiveRingR
   groups.forEach((g) => { const c = cxy(g.pts); g.cx = c.x; g.cy = c.y; g.distC = Math.hypot(c.x - center.x, c.y - center.y) })
   groups.sort((a, b) => a.distC - b.distC)
   const core = groups.length && groups[0].distC < innerR ? groups[0] : null
   groups.forEach((g) => { g.role = g === core ? 'core' : 'sign' })
 
+  // P2 — Role-split pools: a core group matches the sigil pool; a sign group matches the sign pool.
+  // Fall back to the full cloud list when the selected pool is empty (covers sign-as-sigil cores
+  // and any template set where a role bucket is unpopulated). Relies purely on cloud.role; no JSON import.
+  const sigilPool = (clouds.sigil && clouds.sigil.length > 0) ? clouds.sigil : clouds
+  const signPool  = (clouds.sign  && clouds.sign.length  > 0) ? clouds.sign  : clouds
+
   const sweep = Array.from({ length: rotationSteps }, (_, k) => k * (360 / rotationSteps))
   groups.forEach((g) => {
     g.angle = ((Math.atan2(g.cx - center.x, -(g.cy - center.y)) * 180) / Math.PI + 360) % 360
     const steps = g.role === 'core' ? [0] : sweep
+    const pool  = g.role === 'core' ? sigilPool : signPool
     const rawPts = g.strokes.flatMap((s, strokeIdx) => s.map((p) => ({ x: p.x, y: p.y, _id: strokeIdx })))
-    g.match = bestMatchOverRotations(rawPts, clouds, steps, { cx: g.cx, cy: g.cy })
+
+    // P3 — Cheap pre-filter: if the pool is larger than K, rank by coarse distance first
+    // and run the expensive sweep only on the top-K candidates.
+    // Guard: skip pre-filter when pool.length <= K (no gain; also guarantees no regression on small sets).
+    let matchPool = pool
+    if (pool.length > prefilterK) {
+      // Build the input coarse cloud (n=prefilterCoarsePoints) at COARSE_ANGLE_STEPS evenly-spaced
+      // angles so the ranking is rotation-tolerant (a sign at any orientation is ranked correctly).
+      const inputRaw = rawPts.map((p) => P(p.x, p.y, p._id ?? 0))
+      let inputNorm = resample(inputRaw, prefilterCoarsePoints)
+      inputNorm = scaleToSquare(inputNorm)
+      inputNorm = translateToOrigin(inputNorm)
+      const coarseAngles = Array.from({ length: COARSE_ANGLE_STEPS }, (_, k) => k * (360 / COARSE_ANGLE_STEPS))
+      const inputCoarseByAngle = coarseAngles.map((deg) => ({
+        points: deg === 0 ? inputNorm : rotateCloudPoints(inputNorm, deg),
+      }))
+      matchPool = prefilter(inputCoarseByAngle, pool, prefilterK)
+    }
+
+    g.match = bestMatchOverRotations(rawPts, matchPool, steps, { cx: g.cx, cy: g.cy })
     g.confidence = g.match ? confidencePct(g.match.dist) : 0
     g.confident = g.match ? g.confidence >= confidenceMinPct : false
 
@@ -425,7 +534,13 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
   const nestCenterSlack  = opts.nestCenterSlack  ?? 0.85
   const linkEndpointSlack = opts.linkEndpointSlack ?? 0.12
 
-  const clouds = templates.map((t) => makeCloud(t.name, t.points, t.weight))
+  // P3 pre-filter opts (defaulted here; actual values come from rules.json via caller)
+  const prefilterK            = opts.prefilterK            ?? 15
+  const prefilterCoarsePoints = opts.prefilterCoarsePoints ?? 8
+  const p3Opts = { prefilterK, prefilterCoarsePoints }
+
+  // Use prebuilt clouds if provided (P1 caching); otherwise build from templates (back-compat).
+  const clouds = opts.clouds ?? buildClouds(templates ?? [])
   const drawn = strokes.filter((s) => s.length >= 2)
   if (!drawn.length) return { ring: null, center: { x: 0, y: 0 }, groups: [], rings: [], ringGroups: [], relations: [], composition: null }
 
@@ -509,7 +624,7 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
     }
 
     const effectiveRingR = ringR ?? 200
-    classifyAndRecognize(groups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct)
+    classifyAndRecognize(groups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct, p3Opts)
 
     // Single ring descriptor for ringGroups
     const singleRingDesc = ring ? { cx: ring.cx, cy: ring.cy, r: ring.r, closed: true, id: 'k0' } : null
@@ -572,7 +687,7 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
     const myGroups = allGroups.filter((g) => g.ringIndex === ri)
     const center = { x: ring.cx, y: ring.cy }
     const effectiveRingR = ring.r
-    classifyAndRecognize(myGroups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct)
+    classifyAndRecognize(myGroups, center, effectiveRingR, rotationSteps, clouds, confidenceMinPct, p3Opts)
     return { ring: { cx: ring.cx, cy: ring.cy, r: ring.r, closed: ring.closed, id: ring.id }, groups: myGroups }
   })
 

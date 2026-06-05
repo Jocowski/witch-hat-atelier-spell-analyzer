@@ -12,6 +12,11 @@
 // All numeric params (force/spread/focus/range/duration/stability/gravity/direction) are
 // forwarded from the real spellIR when present.
 
+// Blood dye grows the held orb. Multiplier is modest (not BLOOD_POWER itself, which would dwarf the
+// stage) and capped so the sphere stays on-screen above the seal.
+const BLOOD_ORB_GROWTH = 1.6
+const BLOOD_ORB_RADIUS_MAX = 1.25
+
 /**
  * buildSpellIRShim(result, ringClosed, activatedAt)
  *
@@ -62,6 +67,20 @@ export function buildSpellIRShim(result, ringClosed, activatedAt, opts = {}) {
     // Direction drives WHERE the effect goes. Prefer the caller's einlair-derived direction
     // (radial x/y + upward z), falling back to the engine block, then a gentle upward spout.
     direction: opts.direction ?? base.direction ?? { x: 0, y: 0, z: 1, xTiltDeg: 0, yTiltDeg: 0, tiltFromZDeg: 0 },
+
+    // Container (orb) fields — forwarded straight from the engine IR so the renderer's
+    // contained-fill branch runs. Without these the low-gravity water falls into "suspended"
+    // mode and the sphere pops in all at once instead of filling bottom-to-top.
+    // Blood dye amplifies the vessel too: drawing the orb sigils in blood grows the held sphere
+    // (canon: blood makes the same seal erupt dramatically bigger). The orb radius is the visual
+    // lever (sphereRadius = ring.radius * containRadius), so scale it with the powered cast.
+    contained: base.contained ?? false,
+    containRadius:
+      base.containRadius != null
+        ? Math.min(BLOOD_ORB_RADIUS_MAX, base.containRadius * (power > 1 ? BLOOD_ORB_GROWTH : 1))
+        : base.containRadius,
+    fillRate: base.fillRate,
+    capacity: power > 1 && base.capacity != null ? base.capacity * BLOOD_ORB_GROWTH : base.capacity,
 
     // Quality (used for partial-failure threshold)
     quality: base.quality ?? 1.0,

@@ -44,6 +44,19 @@ function toonWaterOptions(ring, spellIR) {
   }
 }
 
+// Contained (orb) toon tuning: a FULL sphere should read as a solid round ball, not a lumpy cloud.
+// vs. the stream palette we lower the threshold and raise the metaball influence so the field stays
+// above threshold across the whole disk (rim included) → the iso-contour rounds out instead of
+// pulling in between sparse particles. Same blue ink palette/outline as the stream water.
+function toonContainedWaterOptions(ring, spellIR) {
+  return {
+    ...toonWaterOptions(ring, spellIR),
+    threshold: 0.5, // lower → silhouette reaches the full radius (fuller, rounder ball)
+    innerThreshold: 1.4, // 2nd tone follows the fuller body
+    influence: 3.4, // wider field per blob → neighbours fuse into a continuous mass
+  }
+}
+
 function waterFlowConfig(spellIR, ring, portal, frame) {
   const scale = effectScale(spellIR)
   const focus = effectFocus(spellIR)
@@ -124,17 +137,22 @@ function waterFlowConfig(spellIR, ring, portal, frame) {
   if (spellIR.contained) {
     const containRadius = spellIR.containRadius ?? 0.4
     const sphereRadius = ring.radius * containRadius
-    // Rise = ring.radius * (0.6 + containRadius) puts the bottom of the sphere just above the portal.
-    const sphereCenterY = portal.center.y - ring.radius * (0.6 + containRadius)
     const sphereCenterX = portal.center.x
-    // The sphere is on the 2.5D plane: foreshorten the Y extent (depth axis) by PORTAL_SCALE_Y
-    // so the ellipse matches the plane tilt. The X extent is full (lateral axis is not foreshortened).
-    const sphereRadiusY = sphereRadius * PORTAL_SCALE_Y
+    // A sphere floating in the air projects to a CIRCLE from any viewing angle — it is NOT lying on
+    // the tilted floor plane, so it must NOT be foreshortened like the portal ellipse. Depth (the
+    // viewer axis) only shades/sizes particles (front bigger/brighter); it does not flatten the
+    // silhouette. So rx == ry == sphereRadius → a round ball, not a squished blob.
+    // Height: the Orb forms a vessel that floats JUST above the seal — canon shows it resting a little
+    // above the glyph ("a bucket held above the seal"; docs/magic.md:35, orb-container-analysis). It is
+    // LEVITATION signs, NOT Orb, that lift an effect high into the air (docs/signs.md:57); plain Water
+    // Orb (orb×4 + column×2, no levitation) sits close. Seat the sphere's BOTTOM a small floatGap up.
+    const floatGap = ring.radius * 0.12
+    const sphereCenterY = portal.center.y - sphereRadius - floatGap
     base.container = {
       cx: sphereCenterX,
       cy: sphereCenterY,
-      rx: sphereRadius,    // screen-x (lateral) radius — full
-      ry: sphereRadiusY,   // screen-y (depth-foreshortened) radius
+      rx: sphereRadius,    // circle: full lateral radius
+      ry: sphereRadius,    // circle: full vertical radius (a floating sphere is round, not flattened)
       sphereRadius,        // used for 3D home-point sampling
       fillRate: spellIR.fillRate ?? 0.5,
       // Particle life = full spell duration so the fill ramps over the whole cast.
@@ -298,13 +316,19 @@ function spawnContainedWaterParticle(flow) {
   const localDepth = r * Math.sin(phi) * Math.sin(theta)
   const localHeight = r * Math.cos(phi) // positive = up, negative = down
 
-  // Convert to 2.5D screen home: lateral → screen-x; depth foreshortened by PORTAL_SCALE_Y → screen-y
-  // contribution; height (screen-up = negative screen-y) adds a direct -y contribution.
+  // Project to a ROUND silhouette: screen-x = lateral, screen-y = -height (full, screen-up). Depth is
+  // the viewer axis — it does NOT move the particle in screen-y (that would flatten the ball); instead
+  // it shades/sizes the particle (front = toward viewer = bigger/brighter) for spherical volume.
   const homeX = c.cx + localLateral
-  const homeY = c.cy + localDepth * PORTAL_SCALE_Y - localHeight * (1 - PORTAL_SCALE_Y)
+  const homeY = c.cy - localHeight
+
+  // Depth cue: localDepth in [-sphereRadius, +sphereRadius]; +ve = toward viewer. Front particles are
+  // a bit larger so the flat disk of (lateral, height) reads as a 3D ball.
+  const depthNorm = localDepth / Math.max(1, c.sphereRadius) // -1 (back) .. +1 (front)
+  const depthSize = 0.78 + 0.42 * (depthNorm * 0.5 + 0.5)    // ~0.78 back .. ~1.2 front
 
   const phase = randomBetween(0, Math.PI * 2)
-  const baseRadius = randomBetween(6, 11) * (0.82 + Math.random() * 0.2)
+  const baseRadius = randomBetween(6, 11) * (0.82 + Math.random() * 0.2) * depthSize
 
   return {
     // Current screen position (starts at home; jostle is applied during update).
@@ -350,10 +374,14 @@ function updateContainedWaterParticle(particle, flow, dt) {
 // Driven by fillRate and the frame clock; saturates at 1 (full sphere holds indefinitely).
 function containedFillLevel(flow, frame) {
   const c = flow.container
-  // fillRate=1 → fills in ~(duration*60) frames; lower rates fill more slowly.
-  // We use waterFrame (the running frame clock) to let the fill persist after emission fades.
-  const totalFrames = flow.suspendedLife // same lifetime as other modes (duration*60 + buffer)
-  const rampFrames = totalFrames / Math.max(0.05, c.fillRate)
+  // Fill in a SHORT, roughly FIXED time so the sphere is full for most of the cast — NOT tied to the
+  // spell duration. (The old `duration*60 / fillRate` meant the orb only filled up as the spell was
+  // already ending, and the Azuremoon "lasts longer" dye made it fill SLOWER, not hold longer.)
+  // A stronger pump (einlair U → fillRate≈1 for Water Orb's opposed columns) fills faster; a weak
+  // pump trickles in. Independent of duration → a longer cast just HOLDS the full sphere longer.
+  const baseFillFrames = 78 / Math.max(0.15, c.fillRate) // ~1.3s @ 60fps when fillRate=1
+  // Safety cap: even a very short cast (or weak pump) finishes filling within ~40% of its lifetime.
+  const rampFrames = Math.min(baseFillFrames, flow.suspendedLife * 0.4)
   return clamp(frame / rampFrames)
 }
 
@@ -392,7 +420,7 @@ function projectWaterParticle(particle, flow) {
 }
 
 function drawWaterMass(ctx, projected, particle, flow, alpha) {
-  const heightRatio = clamp(particle.height / Math.max(1, flow.maxHeightHint))
+  const heightRatio = clamp((particle.height ?? 0) / Math.max(1, flow.maxHeightHint))
   const radius = particle.radius * (1.5 + heightRatio * 0.22) * (1 - flow.convergenceProgress * 0.28)
   const gradient = ctx.createRadialGradient(
     projected.x - radius * 0.16, projected.y - radius * 0.18, 0,
@@ -409,7 +437,7 @@ function drawWaterMass(ctx, projected, particle, flow, alpha) {
 }
 
 function drawWaterCore(ctx, projected, particle, flow, alpha) {
-  const heightRatio = clamp(particle.height / Math.max(1, flow.maxHeightHint))
+  const heightRatio = clamp((particle.height ?? 0) / Math.max(1, flow.maxHeightHint))
   const radius = particle.radius * (0.94 + heightRatio * 0.18) * (1 - flow.convergenceProgress * 0.24)
   const core = ctx.createRadialGradient(
     projected.x - radius * 0.28, projected.y - radius * 0.3, 0,
@@ -457,11 +485,23 @@ export function drawWaterEffect(ctx, state, spellIR, ring, dt, config) {
   if (spellIR.contained && flow.container) {
     const c = flow.container
     const opacity = effectOpacity(spellIR)
-    const fillLevel = containedFillLevel(flow, state.waterFrame)
+    // Per-cast fill clock: reset to 0 whenever a NEW cast starts (activatedAt changes), so the orb
+    // refills from empty on every cast / Re-run. The free-running state.waterFrame only resets on a
+    // SIGNATURE change, so re-casting the same composition (or the persistent trial pane carrying a
+    // stale clock) would otherwise show the sphere already full instantly. See the fill ramp in
+    // containedFillLevel (driven by fillRate over the spell duration).
+    if (state.containActivatedAt !== spellIR.activatedAt) {
+      state.containActivatedAt = spellIR.activatedAt
+      state.containFrame = 0
+    }
+    state.containFrame = (state.containFrame ?? 0) + dt
+    const fillLevel = containedFillLevel(flow, state.containFrame)
 
     // Particle pool: all particles are pre-placed inside the sphere; only those below the fill
     // line are active. Target count scales with sphere size (containRadius) and spell params.
-    const baseCount = 80 + spellIR.force * 48 + (spellIR.containRadius ?? 0.4) * 120
+    // Denser pool than before: a solid full ball needs enough particles that the metaball field has
+    // no interior gaps and a smooth rim. Scales with sphere size (containRadius) + spell force.
+    const baseCount = 150 + spellIR.force * 70 + (spellIR.containRadius ?? 0.4) * 220
     const targetCount = scaledParticleCount(baseCount * (0.6 + scale * 0.22), spellIR, config)
 
     while (state.particles.length < targetCount) {
@@ -497,14 +537,15 @@ export function drawWaterEffect(ctx, state, spellIR, ring, dt, config) {
 
     // Draw particles (in-fill liquid).
     if (config.renderer?.style === 'toon') {
-      // Toon: feed active particles to the metaball renderer — same water palette as stream mode.
+      // Toon: feed active particles to the metaball renderer. Fatten each blob (×1.5) so the field
+      // fuses into a continuous rounded mass instead of reading as separate droplets.
       const blobs = visibleParticles.map(({ particle, projected }) => ({
         x: projected.x,
         y: projected.y,
-        r: particle.radius,
+        r: particle.radius * 1.5,
         hl: Math.sin(particle.phase * 1.7) > 0.32,
       }))
-      drawToonLiquid(ctx, blobs, toonWaterOptions(ring, spellIR))
+      drawToonLiquid(ctx, blobs, toonContainedWaterOptions(ring, spellIR))
     } else {
       // Glow: additive radial gradients (same helpers as stream mode, just smaller).
       ctx.save()
