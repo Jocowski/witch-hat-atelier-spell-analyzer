@@ -303,13 +303,42 @@ export function computeColumnFlow(components, familyOf = () => null) {
   return { T, R, U, flux, netAngle, netFrac: R / Tsafe, upFrac: U / Tsafe, inverted: flux < 0, count: n, parts }
 }
 
+// Container model (docs/theories/orb-container-analysis). Detects orb-type form signs and quantifies
+// the vessel: capacity from orb count·size, fill rate from the seal's upward einlair flow U.
+// `isContainer(type)` is injected (analyze.js passes grammar: op.container === 'sphere'), keeping
+// this module JSON-free. Returns null when no container sign is present.
+//   { contained:true, orbCount, capacity, fillFrac, radiusFrac }
+export function computeContainment(components, familyOf = () => null, isContainer = () => false) {
+  const signs = (components || []).filter((c) => c.role === 'sign')
+  const orbSigns = signs.filter((c) => isContainer(c.type))
+  const orbCount = orbSigns.length
+  if (orbCount === 0) return null
+
+  // capacity = Σ magnitudeOf(orbSign) — total vessel size (count × size)
+  const capacity = orbSigns.reduce((sum, c) => sum + magnitudeOf(c), 0)
+
+  // Reuse the einlair upward flow U as the fill driver (pump + vessel model)
+  const flow = computeColumnFlow(components, familyOf)
+  // When there is no pump (no directional signs), default to a small fill fraction —
+  // the orb is defined but has no driving flow; substance trickles in slowly.
+  const fillFrac = flow ? clamp(flow.upFrac) : 0.15
+
+  // Sphere radius grows with orb count and with extra capacity beyond count·1
+  // (i.e. oversized orbs inflate the vessel more). Constants are tunable.
+  const radiusFrac = clamp(0.25 + 0.12 * orbCount + 0.04 * (capacity - orbCount))
+
+  return { contained: true, orbCount, capacity, fillFrac, radiusFrac }
+}
+
 // Per-sign direction + force vectors, for the visualization overlay. PURE.
 // Each sign → { x, y, type, magnitude, angle } where:
 //   - magnitude = the sign's directional FORCE (its variant metric or scale) — how hard it pushes;
 //   - angle     = its steering FACING (0 = north, clockwise), or null when the sign has no front
 //                 (non-/semi-directional, asymmetric) → it exerts force but does not steer.
 // `net` is the orientation-aim resultant; `flow` is the einlair radial/upward decomposition.
-export function computeSignVectors(components, familyOf = () => null) {
+// `containment` is the orb-container result (null when no container sign is present).
+// `isContainer` is optional and injected so this module stays JSON-free.
+export function computeSignVectors(components, familyOf = () => null, isContainer = () => false) {
   const signs = (components || []).filter((c) => c.role === 'sign')
   const list = signs.map((c) => ({
     x: c.x,
@@ -323,6 +352,7 @@ export function computeSignVectors(components, familyOf = () => null) {
     signs: list,
     net: { angle: aim.angle, magnitude: aim.magnitude, aimed: aim.aimed },
     flow: computeColumnFlow(components, familyOf),
+    containment: computeContainment(components, familyOf, isContainer),
   }
 }
 

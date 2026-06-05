@@ -39,21 +39,27 @@
       "qualities": [
         "hot",
         "luminous"
-      ]
+      ],
+      "state": "energetic",
+      "capability": "create"
     },
     "unburning_flame": {
       "substance": "heatless flame",
       "raw": "burns as flame that gives off no heat",
       "qualities": [
         "luminous"
-      ]
+      ],
+      "state": "gaseous",
+      "capability": "create"
     },
     "water": {
       "substance": "water",
       "raw": "pours and flows outward",
       "qualities": [
         "fluid"
-      ]
+      ],
+      "state": "fluid",
+      "capability": "create"
     },
     "earth": {
       "substance": "earth, stone, and sand",
@@ -61,7 +67,10 @@
       "qualities": [
         "solid",
         "heavy"
-      ]
+      ],
+      "state": "granular",
+      "rigidWhenSet": true,
+      "capability": "manipulate"
     },
     "air": {
       "substance": "air",
@@ -69,14 +78,18 @@
       "qualities": [
         "mobile",
         "invisible"
-      ]
+      ],
+      "state": "gaseous",
+      "capability": "manipulate"
     },
     "light": {
       "substance": "light",
       "raw": "shines outward",
       "qualities": [
         "luminous"
-      ]
+      ],
+      "state": "energetic",
+      "capability": "create"
     },
     "crystal": {
       "substance": "crystal",
@@ -84,55 +97,73 @@
       "qualities": [
         "solid",
         "rigid"
-      ]
+      ],
+      "state": "rigid",
+      "capability": "create"
     },
     "transmutation": {
       "substance": "the affected matter",
       "raw": "is transmuted",
-      "qualities": []
+      "qualities": [],
+      "state": "immaterial",
+      "capability": "manipulate"
     },
     "time": {
       "substance": "the flow of time",
       "raw": "reverts what it touches to an earlier state",
-      "qualities": []
+      "qualities": [],
+      "state": "immaterial",
+      "capability": "manipulate"
     },
     "smoke": {
       "substance": "smoke",
       "raw": "billows out as smoke",
       "qualities": [
         "airy"
-      ]
+      ],
+      "state": "gaseous",
+      "capability": "create"
     },
     "decorative": {
       "substance": "the spell's magic",
       "raw": "takes the shape of the living thing it depicts",
-      "qualities": []
+      "qualities": [],
+      "state": "immaterial",
+      "capability": "create"
     },
     "mind": {
       "substance": "memory",
       "raw": "acts upon the mind",
       "qualities": [
         "forbidden-adjacent"
-      ]
+      ],
+      "state": "immaterial",
+      "capability": "manipulate"
     },
     "space": {
       "substance": "space itself",
       "raw": "links two distant points",
-      "qualities": []
+      "qualities": [],
+      "state": "immaterial",
+      "capability": "manipulate"
     },
     "forbidden": {
       "substance": "forbidden power",
       "raw": "warps its target in a forbidden way",
       "qualities": [
         "forbidden"
-      ]
+      ],
+      "state": "immaterial",
+      "capability": "create"
     },
     "unknown": {
       "substance": "an unknown force",
       "raw": "manifests in an unclear way",
       "qualities": [
         "uncertain"
-      ]
+      ],
+      "state": "immaterial",
+      "capability": "create"
     }
   },
   "operators": {
@@ -292,7 +323,10 @@
     },
     "orb": {
       "kind": "form",
-      "verb": "gathers into a sphere held above the glyph"
+      "verb": "gathers into a sphere held above the glyph",
+      "container": "sphere",
+      "fillsBottomToTop": true,
+      "directional": false
     },
     "purify": {
       "kind": "special",
@@ -463,6 +497,28 @@
         "element": "air"
       },
       "text": "With a wind element, Dancing Puppet sends objects darting through the open air."
+    },
+    {
+      "id": "orb-column",
+      "type": "synergy",
+      "when": {
+        "has": [
+          "orb",
+          "column"
+        ]
+      },
+      "text": "The columns drive the substance upward to fill the orb's sphere — pump and vessel."
+    },
+    {
+      "id": "orb-rigid-earth",
+      "type": "warning",
+      "when": {
+        "has": [
+          "orb"
+        ],
+        "element": "earth"
+      },
+      "text": "Earth is rigid and only manipulable — the orb needs a real earth source, and a Convergence sign to compact the grains, or it jams instead of pooling."
     }
   ],
   "stability": {

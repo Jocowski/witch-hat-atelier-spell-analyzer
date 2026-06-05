@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, computeOrientationAim, computeSignVectors, computeColumnFlow, directedAxisFacing, classifyZone, anchorToXY, xyToAnchor, CANVAS_RADIUS } from '../src/engine/geometry.js'
+import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, computeOrientationAim, computeSignVectors, computeColumnFlow, computeContainment, directedAxisFacing, classifyZone, anchorToXY, xyToAnchor, CANVAS_RADIUS } from '../src/engine/geometry.js'
 
 const directional = () => 'directional'
 
@@ -234,4 +234,99 @@ test('classifyRegion: tilted cluster => biased toward that diagonal', () => {
   const region = classifyRegion(comps, directional)
   assert.equal(region.mode, 'biased')
   assert.ok(region.angle > 45 && region.angle < 105, `expected upper-right, got ${region.angle}`)
+})
+
+// ---------- computeContainment (L2: orb container model) ----------
+
+// Helper: a sign at position angle `a` (deg) facing inward, with given type and family.
+const makeSign = (type, posAngle, family, scale = 1) => {
+  const r = 100 // ring radius for test positions
+  const rad = (posAngle * Math.PI) / 180
+  const x = r * Math.sin(rad)
+  const y = -r * Math.cos(rad)
+  // inward rotation: top of sign faces center
+  const rotation = ((Math.atan2(x, -y) * 180) / Math.PI + 180 + 360) % 360
+  return { role: 'sign', type, x, y, rotation, scale, _family: family }
+}
+
+// familyOf for mixed orb+column tests: orb is non-directional, column is directional.
+const orbColumnFamilyOf = (t) => (t === 'column' ? 'directional' : 'non-directional')
+
+test('computeContainment: empty components → null', () => {
+  assert.equal(computeContainment([], orbColumnFamilyOf, () => true), null)
+})
+
+test('computeContainment: isContainer always false → null even with signs present', () => {
+  // Signs exist but none match the container predicate — no orb → no container.
+  const comps = [
+    makeSign('column', 90, 'directional'),
+    makeSign('column', 270, 'directional'),
+  ]
+  assert.equal(computeContainment(comps, orbColumnFamilyOf, () => false), null)
+})
+
+test('computeContainment: 4 inward orbs + 2 opposed inward columns → contained, orbCount 4, fillFrac > 0.5', () => {
+  // 4 orb signs evenly spaced around the ring (non-directional, do not steer).
+  // 2 opposed inward columns (east/west, directional facing inward) → U ≈ T → upFrac ≈ 1.
+  const comps = [
+    makeSign('orb', 0,   'non-directional'),
+    makeSign('orb', 90,  'non-directional'),
+    makeSign('orb', 180, 'non-directional'),
+    makeSign('orb', 270, 'non-directional'),
+    // east column facing west (inward): position east (90°), rotation 270 (faces west = inward)
+    { role: 'sign', type: 'column', x: 100, y: 0, rotation: 270, scale: 1 },
+    // west column facing east (inward): position west (270°), rotation 90 (faces east = inward)
+    { role: 'sign', type: 'column', x: -100, y: 0, rotation: 90, scale: 1 },
+  ]
+  const isContainer = (t) => t === 'orb'
+  const result = computeContainment(comps, orbColumnFamilyOf, isContainer)
+  assert.ok(result !== null, 'should detect container')
+  assert.equal(result.contained, true)
+  assert.equal(result.orbCount, 4)
+  assert.ok(result.fillFrac > 0.5, `fillFrac should be high (> 0.5), got ${result.fillFrac}`)
+})
+
+test('computeContainment: 4 orbs → larger radiusFrac and capacity than 2 orbs', () => {
+  const isContainer = (t) => t === 'orb'
+  const familyOf = () => 'non-directional' // orbs only, no columns → fillFrac uses default
+
+  const comps2 = [
+    makeSign('orb', 0,   'non-directional'),
+    makeSign('orb', 180, 'non-directional'),
+  ]
+  const comps4 = [
+    makeSign('orb', 0,   'non-directional'),
+    makeSign('orb', 90,  'non-directional'),
+    makeSign('orb', 180, 'non-directional'),
+    makeSign('orb', 270, 'non-directional'),
+  ]
+
+  const r2 = computeContainment(comps2, familyOf, isContainer)
+  const r4 = computeContainment(comps4, familyOf, isContainer)
+
+  assert.ok(r2 !== null && r4 !== null, 'both should be non-null')
+  assert.ok(r4.capacity > r2.capacity, `4-orb capacity (${r4.capacity}) should exceed 2-orb (${r2.capacity})`)
+  assert.ok(r4.radiusFrac > r2.radiusFrac, `4-orb radiusFrac (${r4.radiusFrac}) should exceed 2-orb (${r2.radiusFrac})`)
+})
+
+test('computeSignVectors: containment field populated when isContainer matches', () => {
+  const comps = [
+    makeSign('orb', 0,   'non-directional'),
+    makeSign('orb', 90,  'non-directional'),
+    makeSign('orb', 180, 'non-directional'),
+    makeSign('orb', 270, 'non-directional'),
+  ]
+  const isContainer = (t) => t === 'orb'
+  const { containment } = computeSignVectors(comps, orbColumnFamilyOf, isContainer)
+  assert.ok(containment !== null, 'containment should be populated')
+  assert.equal(containment.orbCount, 4)
+})
+
+test('computeSignVectors: containment is null when no isContainer match (backward compat)', () => {
+  const comps = [
+    { role: 'sign', type: 'column', x: 0, y: -100, rotation: 0, scale: 1 },
+  ]
+  // Default isContainer = () => false (3rd param omitted) → no container
+  const { containment } = computeSignVectors(comps, directional)
+  assert.equal(containment, null)
 })
