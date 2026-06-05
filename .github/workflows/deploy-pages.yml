@@ -1,10 +1,11 @@
-name: Deploy Spell Studio (web prototype) to GitHub Pages
+name: Deploy Spell Studio to GitHub Pages
 
-# Builds the static Vite app and publishes dist/ to GitHub Pages.
+# Builds the unified gated static Vite app and publishes dist/ to GitHub Pages.
+# Deploys on every push to main (or manually via workflow_dispatch).
 # One-time setup: repo Settings → Pages → Source = "GitHub Actions".
 on:
   push:
-    branches: [spell-studio-web]
+    branches: [main]
   workflow_dispatch:
 
 # Allow the GITHUB_TOKEN to deploy to Pages.
