@@ -24,7 +24,8 @@ import { computeSignVectors, computeColumnFlow } from '../engine/geometry.js'
 import { useSymbolData } from '../engine/useSymbolData.js'
 import { loadDbSymbols } from '../engine/symbolLoader.js'
 import { toComposition, recognizedToPlaced } from './drawingModel.js'
-import { analyzeStrokes, groupToTemplate, mergeGroups, makeCloud } from '../draw/recognizer.js'
+import { buildClouds, groupToTemplate, mergeGroups } from '../draw/recognizer.js'
+import { useRecognizerWorker } from './useRecognizerWorker.js'
 import { addSample } from '../data-services/samples.js'
 import { getSymbolByEngineId } from '../data-services/symbols.js'
 import { logAnalysis } from '../data-services/analyses.js'
@@ -257,6 +258,14 @@ export default function StudioPage() {
 
   const templates = useTemplates({ useDbTraining })
 
+  // P1 — Cloud caching: build template clouds once per template-set change, not on every Detect call.
+  // Memoised on `templates` identity (useTemplates returns a stable reference when the set is unchanged).
+  const clouds = useMemo(() => buildClouds(templates), [templates])
+
+  // P4 — Web Worker offload: recognition runs off the main thread so the UI never freezes.
+  // Falls back to the synchronous path automatically when Worker is unavailable (SSR, old webview).
+  const { recognizeAsync } = useRecognizerWorker(templates, clouds)
+
   // persist drawer collapsed/height (Item 7)
   useEffect(() => { localStorage.setItem(DRAWER_C_KEY, collapsed ? '1' : '0') }, [collapsed])
   useEffect(() => { localStorage.setItem(DRAWER_H_KEY, String(drawerHeight)) }, [drawerHeight])
@@ -315,14 +324,15 @@ export default function StudioPage() {
     )
   }, [])
 
-  // Run the recognizer over the current canvas → { d, comp, ringGeomVal }. PURE of state (callers set it).
-  const runRecognition = useCallback(() => {
+  // Run the recognizer over the current canvas → Promise<{ d, comp, ringGeomVal }>.
+  // P4: delegates to recognizeAsync (Worker or sync fallback) so the main thread never blocks.
+  const runRecognition = useCallback(async () => {
     if (!canvasRef.current) return null
     const model = canvasRef.current.getModel()
     const drawn = (canvasRef.current.getStrokes() || []).map((s) => s.points).filter((p) => p && p.length >= 2)
     let recGroups = [], ringClosed = false, recognizerResult = null
     if (drawn.length > 0 && templates.length > 0) {
-      recognizerResult = analyzeStrokes(drawn, templates, {
+      recognizerResult = await recognizeAsync(drawn, {
         adaptiveGap:          true,
         gapK:                 rules.recognition?.gapK                 ?? 0.12,
         gapMin:               rules.recognition?.gapMin               ?? 14,
@@ -334,6 +344,9 @@ export default function StudioPage() {
         floodFillConfig:      rules.recognition?.floodFillConfig      ?? {},
         rotationSteps:        rules.recognition?.rotationSteps        ?? 24,
         confidenceMinPct:     CONFIDENCE_MIN_PCT,
+        // P3: cheap pre-filter — coarse descriptor → full match on top-K only
+        prefilterK:           rules.recognition?.prefilterK           ?? 15,
+        prefilterCoarsePoints: rules.recognition?.prefilterCoarsePoints ?? 8,
         // Track 5: multi-ring tolerances (SPEC-nested-linked.md)
         ringAssignSlack:      rules.recognition?.ringAssignSlack      ?? 1.15,
         nestCenterSlack:      rules.recognition?.nestCenterSlack      ?? 0.85,
@@ -355,7 +368,7 @@ export default function StudioPage() {
       radius: recognizerResult?.ring?.radius ?? RING_RADIUS_FALLBACK,
     }
     return { d, comp: buildComposition(d), ringGeomVal }
-  }, [templates, buildComposition])
+  }, [templates, recognizeAsync, buildComposition])
 
   // Push a recognition result into the detect-step state.
   const applyDetection = useCallback(({ d, comp, ringGeomVal }, { keepResult = false } = {}) => {
@@ -367,12 +380,13 @@ export default function StudioPage() {
     setRingGeom(ringGeomVal)
   }, [])
 
-  // STEP 1 — detect (manual button)
-  const handleDetect = useCallback(() => {
+  // STEP 1 — detect (manual button).
+  // P4: async so `busy` brackets the real async gap and the spinner can paint.
+  const handleDetect = useCallback(async () => {
     if (!canvasRef.current || busy) return
     setBusy(true)
     try {
-      const det = runRecognition()
+      const det = await runRecognition()
       if (det) { applyDetection(det); setTab('detected') }
     } finally { setBusy(false) }
   }, [busy, runRecognition, applyDetection])
@@ -396,7 +410,6 @@ export default function StudioPage() {
   // overlays + composition. The merged row auto-opens its label editor (see IdentifiedPanel).
   const handleMerge = useCallback((groupsToMerge) => {
     if (!groupsToMerge || groupsToMerge.length < 2) return
-    const clouds = templates.map((t) => makeCloud(t.name, t.points, t.weight))
     const merged = mergeGroups(groupsToMerge, clouds, { rotationSteps: ROTATION_STEPS, confidenceMinPct: CONFIDENCE_MIN_PCT })
     if (!merged) return
     merged._justMerged = true // signal IdentifiedPanel to open the label editor on this row
@@ -408,7 +421,7 @@ export default function StudioPage() {
     setDetection(d); setOverlays(overlaysFor(d))
     const comp = buildComposition(d); setComposition(comp)
     if (phase === 'analyzed') setResult(analyze(comp))
-  }, [detection, templates, buildComposition, phase])
+  }, [detection, clouds, buildComposition, phase])
 
   // Beautify recognized symbols: SMOOTH their actual drawn strokes in place (snap to a clean shape
   // when one fits, else de-jitter) — keeping the drawn size/style/position. Not an SVG swap.
@@ -491,9 +504,14 @@ export default function StudioPage() {
   }, [composition, busy, detection.ringClosed, castFrom])
 
   // Auto-analyze: debounced detect → analyze on every drawing change. Engine + trial only.
-  const runAutoAnalyze = useCallback(() => {
+  // P4: async so the worker path is used; a generation counter drops superseded runs.
+  const autoGenRef = useRef(0)
+  const runAutoAnalyze = useCallback(async () => {
     if (busy || !canvasRef.current) return
-    const det = runRecognition()
+    const gen = ++autoGenRef.current
+    const det = await runRecognition()
+    // Drop the result if a newer auto-analyze run has been started since this one was fired.
+    if (gen !== autoGenRef.current) return
     if (!det) return
     applyDetection(det, { keepResult: true })
     castFrom(det.comp, det.d.ringClosed, { silent: true })

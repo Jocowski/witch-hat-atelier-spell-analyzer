@@ -95,6 +95,12 @@ curl -s "http://127.0.0.1:54321/rest/v1/symbols?select=kind" -H "apikey: <anon>"
 - [ ] A `confirmed` training insert succeeds (it was rejected before the WS11a migration).
 - [ ] Soft-deleted samples don't appear in `activeTemplates()` (the recognizer ignores them).
 
+## 13. P4 — Web Worker offload (recognizer non-blocking)
+- [ ] Draw a complex spell (ring + 4–6 signs). Click **Detect** — the UI does **not** freeze; the busy spinner shows while recognition runs off the main thread.
+- [ ] Spam **Detect** repeatedly (click several times quickly) — only the last detection result is applied; no stale detections are ever displayed from earlier in-flight requests.
+- [ ] Disable the Worker (DevTools → Application → Service Workers, or via a browser that lacks `Worker`) and verify the result is **identical** to the Worker-enabled path — just blocking (sync fallback).
+- [ ] Auto-analyze on: draw rapidly — the UI stays responsive between auto-analyze cycles; stale generation runs are dropped and only the latest detection is applied.
+
 ## 12. Edge cases to probe
 - [ ] Analyze an **empty** canvas → no crash; sensible "nothing to analyze".
 - [ ] Analyze with **only placed symbols** (no strokes) → composition built from placed only.

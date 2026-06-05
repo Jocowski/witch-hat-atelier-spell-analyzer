@@ -168,6 +168,8 @@
     "cvThresholdRelaxed": 0.45,
     "minRingRadius": 40,
     "rotationSteps": 24,
+    "prefilterK": 15,
+    "prefilterCoarsePoints": 8,
     "floodFill": true,
     "floodFillConfig": {
       "cellSize": 2,
