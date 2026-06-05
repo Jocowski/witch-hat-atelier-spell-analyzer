@@ -1,14 +1,16 @@
 # SPEC — Recognizer flywheel + Analysis/AI surfacing
 
-> Status: **proposed** · Scope: **training data → recognizer → analysis → AI report** · Branch: `feat/spell-studio`
-> Cross-refs: [IMPROVEMENTS.md](IMPROVEMENTS.md) (§B AI training, §C Spell analysis), [SPEC.md](SPEC.md)
+> Status: **partial - core flywheel shipped; A7 ML + B5 cluster deferred** · Scope: **training data → recognizer → analysis → AI report** · Branch: `feat/spell-studio`
+> Cross-refs: [IMPROVEMENTS.md](../IMPROVEMENTS.md) (§B AI training, §C Spell analysis), [SPEC.md](../SPEC.md)
 > (WS9 improvement loop, WS11b cluster), [SPEC-cluster-recognition.md](SPEC-cluster-recognition.md).
 > Data layer: `src/data-services/{samples,analyses,symbols}.js`, `src/draw/recognizer.js`,
 > Supabase tables `training_samples` / `analyses` / `symbols` (`supabase/migrations/`).
 
 This groups the recognizer/training and analysis/AI items. It is **independent of** the (now shipped)
-canvas-UX batch and the symbol-versioning work ([SPEC-symbol-versioning.md](SPEC-symbol-versioning.md)).
-**Status:** A0–A3 + B1/B4 shipped (2026-06-04); A4–A7, B2, B5, B6 pending.
+canvas-UX batch and the symbol-versioning work ([SPEC-symbol-versioning.md](done/SPEC-symbol-versioning.md)).
+**Status:** core flywheel shipped — A0–A6 + B1–B4 + B6 (A4 rotation, A5 segmentation, A6 verify-flag,
+B2 report cache, B6 confidence-vs-engine landed in the 2026-06-05/06 batch). **Deferred:** A7 (real ML
+model + sample dedup) and B5 (cluster recognition, tracked in [SPEC-cluster-recognition.md](SPEC-cluster-recognition.md)).
 
 ---
 
@@ -16,16 +18,16 @@ canvas-UX batch and the symbol-versioning work ([SPEC-symbol-versioning.md](SPEC
 
 Current data shape (verified): `training_samples` rows carry `{ symbol_id, points (jsonb [{X,Y,ID}]),
 role, rotation, scale, source, app_version, created_by, created_at, deleted_at }`
-([samples.js](../../src/data-services/samples.js)). `activeTemplates()` flattens active rows into
+([samples.js](../../../src/data-services/samples.js)). `activeTemplates()` flattens active rows into
 `{ name, role, points }` for the `$P` recognizer; `addSample()` defaults `source:'drawn'`. Sources in
 use: **`drawn`** (Training tab), **`confirmed`** (harvested from a catalog match,
-[StudioPage.jsx:157](../../src/studio/StudioPage.jsx#L157)), **`corrected`** (user fixed a wrong guess,
-[IdentifiedPanel.jsx:47](../../src/studio/IdentifiedPanel.jsx#L47)). The `$P` matcher and pipeline are
-pure in [recognizer.js](../../src/draw/recognizer.js); `recognize()` already returns per-template
+[StudioPage.jsx:157](../../../src/studio/StudioPage.jsx#L157)), **`corrected`** (user fixed a wrong guess,
+[IdentifiedPanel.jsx:47](../../../src/studio/IdentifiedPanel.jsx#L47)). The `$P` matcher and pipeline are
+pure in [recognizer.js](../../../src/draw/recognizer.js); `recognize()` already returns per-template
 `{ name, dist, score }`.
 
 ## A0 — Wire `logAnalysis` (prerequisite for the loop)
-**What it is.** `logAnalysis()` ([analyses.js:13](../../src/data-services/analyses.js#L13)) writes a
+**What it is.** `logAnalysis()` ([analyses.js:13](../../../src/data-services/analyses.js#L13)) writes a
 snapshot of each analysis to the Supabase `analyses` table: the `composition` (the spell), the
 `engine_result` (what the engine deduced), the `ai_report`, and the `corrections` (which labels the user
 fixed, from→to). It is implemented but **never called**, so this history doesn't exist yet.
@@ -40,7 +42,7 @@ only exists once we record it. The improvement loop (flywheel) it enables:
    **engine-gap queue** (B6 — AI-vs-engine disagreements).
 
 **Do.** It's essentially **one call site**: at the end of `handleAnalyze`
-([StudioPage.jsx:111](../../src/studio/StudioPage.jsx#L111)), call `logAnalysis(...)` with the
+([StudioPage.jsx:111](../../../src/studio/StudioPage.jsx#L111)), call `logAnalysis(...)` with the
 `composition`, the engine `result`, and a `corrections` object accumulated from `handleCorrect`
 (catalog labels changed, from→to). Fire-and-forget; it already no-ops when Supabase is absent, so it's
 safe with or without a backend.
@@ -67,7 +69,7 @@ safe with or without a backend.
 ## A2 — Confidence gate (moved here from "code-quality")
 **Why it's here, not housekeeping:** it changes recognizer *behavior/UX*, not just style. Confidence
 already exists: `dist → confidencePct` and `conf-high/mid/low` classes
-([IdentifiedPanel.jsx:25-55](../../src/studio/IdentifiedPanel.jsx#L25-L55)).
+([IdentifiedPanel.jsx:25-55](../../../src/studio/IdentifiedPanel.jsx#L25-L55)).
 - **Do:** define a low-confidence threshold (start: `dist`-based, calibrated so ≈ <30% reads "unknown").
   Below it, **don't assert a wrong label** — render the detection as **"unknown?"** (with the top guess
   shown as a *suggestion*, not a committed label), and **exclude it from the composition** fed to the
@@ -100,7 +102,7 @@ already exists: `dist → confidencePct` and `conf-high/mid/low` classes
 
 ## A4 — Rotation tolerance for single-symbol / cluster guesses
 `$P` is not rotation-invariant. The spell pipeline already de-rotates per group via a 24-step sweep
-([recognizer.js:136-145](../../src/draw/recognizer.js#L136)), but Training's **live single-symbol
+([recognizer.js:136-145](../../../src/draw/recognizer.js#L136)), but Training's **live single-symbol
 guess** and any future **cluster** match do not.
 - **Do:** factor the sweep in `analyzeStrokes` into a reusable `bestMatchOverRotations(strokes, clouds,
   steps)` and use it for the Training live guess too (signs only; cores stay at 0° like the pipeline).
@@ -109,9 +111,9 @@ guess** and any future **cluster** match do not.
 - **Effort: S–M.**
 
 ## A5 — Adaptive segmentation + better ring detection
-The stroke-merge `gap` is hardcoded (45px in [StudioPage.jsx:87](../../src/studio/StudioPage.jsx#L87),
+The stroke-merge `gap` is hardcoded (45px in [StudioPage.jsx:87](../../../src/studio/StudioPage.jsx#L87),
 default in `analyzeStrokes`); ring detection uses a fixed `cv < 0.3` circularity
-([recognizer.js:109](../../src/draw/recognizer.js#L109)).
+([recognizer.js:109](../../../src/draw/recognizer.js#L109)).
 - **Do:** make `gap` scale with the detected ring radius / median symbol size (e.g. `gap = k * ringR`
   or a fraction of median nearest-neighbour stroke distance). Expose the circle-fit residual threshold
   as a tunable. Pass computed `gap` from the caller instead of the literal `45`.
@@ -126,7 +128,7 @@ default in `analyzeStrokes`); ring detection uses a fixed `cv < 0.3` circularity
   `training_samples` (new migration). RLS: only admins can set it.
 - **Recognizer/weighting:** a verified sample gets a weight bump (ties into A1's weight map, e.g.
   `× 1.3`); optionally a "verified-only" recognizer mode.
-- **Review UI:** a Verify toggle per row in [ReviewView.jsx](../../src/admin/ReviewView.jsx); a bulk
+- **Review UI:** a Verify toggle per row in [ReviewView.jsx](../../../src/admin/ReviewView.jsx); a bulk
   "exclude all from user X" already exists via `softDeleteByUser`.
 - **Acceptance:** admin can mark/unmark verified; verified samples rank higher; migration is reversible.
 - **Effort: M.**
@@ -145,7 +147,7 @@ milestone, not a near-term task.
 
 ## B1 — Surface the match breakdown + engine `--facts`/caveats
 **What it is (the user's question):** when a composition matches a catalog spell, the panel shows only
-the name + a single score % ([ResultPanel.jsx:136](../../src/components/ResultPanel.jsx#L136)). But
+the name + a single score % ([ResultPanel.jsx:136](../../../src/components/ResultPanel.jsx#L136)). But
 `match.js`/`analyze.js` compute that score from **parts** (sigil similarity + sign overlap + symmetry,
 weighted per `rules.json`). "Surfacing" = show *why* it matched — a small breakdown like
 `sigils 0.9 · signs 0.7 · symmetry 1.0 → 82%` — plus the engine's structured **facts** (the same
@@ -160,8 +162,8 @@ disclosure so the default view stays clean.
 - **Effort: M.**
 
 ## B2 — AI report cache by composition hash
-The streaming multi-topic report ([AIReportPanel.jsx](../../src/studio/AIReportPanel.jsx),
-[report.js](../../src/ai/report.js)) re-runs on every analyze.
+The streaming multi-topic report ([AIReportPanel.jsx](../../../src/studio/AIReportPanel.jsx),
+[report.js](../../../src/ai/report.js)) re-runs on every analyze.
 - **Do:** hash the canonical composition (stable JSON stringify → e.g. FNV/SHA over the wha-spell
   object + selected topics) and cache `{ hash → { topicId → markdown } }`. Tiers: in-memory for the
   session; optionally persist to the `analyses.ai_report` column (A0) so re-opening a known spell is
@@ -172,11 +174,11 @@ The streaming multi-topic report ([AIReportPanel.jsx](../../src/studio/AIReportP
 
 ## B3 — Topic selection UI — **already done**
 The per-topic checklist (toggle + select-all + count) exists at
-[AIReportPanel.jsx:153-169](../../src/studio/AIReportPanel.jsx#L153-L169). No work needed beyond
+[AIReportPanel.jsx:153-169](../../../src/studio/AIReportPanel.jsx#L153-L169). No work needed beyond
 confirming the selected set is what `streamReport` receives (it is, via `topics: selectedIds`).
 
 ## B4 — Forbidden-magic surfacing
-Flag compositions that trip forbidden patterns ([docs/forbidden-magic.md](../forbidden-magic.md)).
+Flag compositions that trip forbidden patterns ([docs/forbidden-magic.md](../../forbidden-magic.md)).
 - **Do:** encode forbidden patterns as data (extend `rules.json` or a new `forbidden.json`: e.g.
   body-affecting + healing/transmutation-on-living, etc.) and add a pure check in the engine that emits
   a **blocking/danger issue** + a dedicated red callout in `ResultPanel` (the `.spell-card.forbidden`

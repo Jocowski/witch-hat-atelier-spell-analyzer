@@ -290,8 +290,8 @@ supabase/                  NEW: config.toml + migrations/*.sql + seed.sql (CLI-m
 | WS8 AI streaming report | F | WS2 | todo (bridge `/analyze` done) |
 | WS9 improvement loop | G | WS2/WS7 | todo |
 | WS10 prod | H | functional app | deferred |
-| WS11a contribute fix | — | WS6 | todo (Phase 1 DB fix — see [SPEC-cluster-recognition.md](SPEC-cluster-recognition.md)) |
-| WS11b cluster recognition | — | WS11a | todo (Phase 2 — see [SPEC-cluster-recognition.md](SPEC-cluster-recognition.md)) |
+| WS11a contribute fix | — | WS6 | todo (Phase 1 DB fix — see [SPEC-cluster-recognition.md](specs/SPEC-cluster-recognition.md)) |
+| WS11b cluster recognition | — | WS11a | todo (Phase 2 — see [SPEC-cluster-recognition.md](specs/SPEC-cluster-recognition.md)) |
 
 **Already built on this track:** `draw/recognizer.js`, `draw/templates.js`, `components/DrawModal.jsx`,
 `tools/ai-bridge.mjs` (`/health`+`/analyze`, validated end-to-end), `docs/DRAWING-APP.md`, `docs/APP-PLAN.md`.

@@ -1,13 +1,13 @@
 # SPEC — AI report surfacing: cache + calibrated confidence + engine disagreement
 
-> Status: **proposed** · Scope: **AI report caching, per-topic confidence, AI-vs-engine disagreement**
+> Status: **done - shipped (3.3, 3.5); tail: disagreement DB-write** · Scope: **AI report caching, per-topic confidence, AI-vs-engine disagreement**
 > Branch: `feat/spell-studio`
-> Depends on: B2 + B6 sketches in [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (this
+> Depends on: B2 + B6 sketches in [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (this
 > spec supersedes those stubs with a full build design), A0 `logAnalysis` wired (prerequisite for
 > the persistence tier and the disagreement log).
-> Cross-refs: [APP-PLAN.md](APP-PLAN.md) §4 (AI report architecture),
-> [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (items B2 + B6),
-> [IMPROVEMENTS.md](IMPROVEMENTS.md) (WS9 improvement loop).
+> Cross-refs: [APP-PLAN.md](../../APP-PLAN.md) §4 (AI report architecture),
+> [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (items B2 + B6),
+> [IMPROVEMENTS.md](../../IMPROVEMENTS.md) (WS9 improvement loop).
 > Files touched: `src/ai/report.js`, `src/studio/AIReportPanel.jsx`,
 > `tools/ai-bridge.mjs`, `tools/report-topics.json`, `src/data-services/analyses.js`.
 
@@ -18,7 +18,7 @@
 Two tightly related improvements to the AI report layer:
 
 **3.3 — Cache by composition hash.** The streaming multi-topic report
-([AIReportPanel.jsx](../../src/studio/AIReportPanel.jsx) / [report.js](../../src/ai/report.js))
+([AIReportPanel.jsx](../../../../src/studio/AIReportPanel.jsx) / [report.js](../../../../src/ai/report.js))
 re-runs the full AI pipeline on every "Ask AI" press — even when the composition hasn't changed and
 the spell is already known. A two-tier cache (session in-memory + optional Supabase persistence) makes
 re-analysis instant, shows the user whether a result is fresh or cached, and provides a Regenerate

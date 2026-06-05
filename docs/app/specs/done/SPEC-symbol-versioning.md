@@ -1,8 +1,8 @@
 # SPEC — Symbol lifecycle & canon-update flagging
 
-> Status: **proposed** · Scope: **data model for evolving canon** (sigils/signs/spells) · Branch: `feat/spell-studio`
-> Cross-refs: [CLAUDE.md](../../CLAUDE.md) (data-driven model, `origin`/`source` provenance),
-> [docs/INGESTION.md](../INGESTION.md), [IMPROVEMENTS.md](IMPROVEMENTS.md).
+> Status: **done - shipped (Fase 1/2/3)** · Scope: **data model for evolving canon** (sigils/signs/spells) · Branch: `feat/spell-studio`
+> Cross-refs: [CLAUDE.md](../../../../CLAUDE.md) (data-driven model, `origin`/`source` provenance),
+> [docs/INGESTION.md](../../../INGESTION.md), [IMPROVEMENTS.md](../../IMPROVEMENTS.md).
 > Related memory: World Guide 2026 drop, Wiki 2026 expansion, Spell Checkers community.
 
 ## Motivation
@@ -62,12 +62,12 @@ This means the workflow for **any canon change** becomes:
    throughout (ids still resolve); a new test asserts "no spell references a `removed` symbol".
 
 ## UI surfacing
-- **Palette** ([SymbolPalette.jsx](../../src/studio/SymbolPalette.jsx)): hide `deprecated`/`removed`;
+- **Palette** ([SymbolPalette.jsx](../../../../src/studio/SymbolPalette.jsx)): hide `deprecated`/`removed`;
   show a small "revised"/"unverified" dot on others (tooltip = reason + date).
-- **Analysis** ([ResultPanel.jsx](../../src/components/ResultPanel.jsx)): when a matched catalog spell
+- **Analysis** ([ResultPanel.jsx](../../../../src/components/ResultPanel.jsx)): when a matched catalog spell
   is `unverified`/flagged, render a caveat ("⚠ recipe pending re-review after a canon update on <date>")
-  — reuse the issues styling. Pairs with B1 caveats in [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md).
-- **Admin Registry** ([RegistryView.jsx](../../src/admin/RegistryView.jsx)): edit `status`/`rev`, and a
+  — reuse the issues styling. Pairs with B1 caveats in [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md).
+- **Admin Registry** ([RegistryView.jsx](../../../../src/admin/RegistryView.jsx)): edit `status`/`rev`, and a
   "Review queue" filter listing all `unverified`/flagged entries.
 
 ## Applying it to the text-glyph removal (worked example)
@@ -79,7 +79,7 @@ sigils**. Under this system:
    is the nice property: the tool only flags when something *semantic* changed.
 2. Remove the dead `def?.text` branches in `SymbolPalette.jsx` + the fallback comment in
    `DrawingSurface.jsx`; drop `.sp-glyph-text` CSS.
-3. `guidance` stays the `core` of **Fish Guidance** ([spells.json](../../data/spells.json)) — untouched,
+3. `guidance` stays the `core` of **Fish Guidance** ([spells.json](../../../../data/spells.json)) — untouched,
    tests green.
 
 > Contrast: if you later **re-function** a sign (say Column's behavior is clarified by canon), you bump

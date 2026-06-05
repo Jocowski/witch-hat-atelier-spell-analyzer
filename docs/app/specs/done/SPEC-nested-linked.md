@@ -1,9 +1,9 @@
 # SPEC — Nested & Linked Spell Detection (Track 5)
 
-> Status: **proposed** · Branch: `feat/spell-studio` (sequence LAST in the backlog — highest conflict)
-> Cross-refs: [IMPROVEMENTS.md](IMPROVEMENTS.md) §D (the Track 5 sketch this refines),
-> [SPEC-cluster-recognition.md](SPEC-cluster-recognition.md) (5.6 extends WS11b),
-> [docs/IR.md](../IR.md) (wha-spell@2 format), [docs/contraptions.md](../contraptions.md) (assembly patterns).
+> Status: **done - core shipped (Track 5); tails 5.5B-D, 5.6** · Branch: `feat/spell-studio` (sequence LAST in the backlog — highest conflict)
+> Cross-refs: [IMPROVEMENTS.md](../../IMPROVEMENTS.md) §D (the Track 5 sketch this refines),
+> [SPEC-cluster-recognition.md](../SPEC-cluster-recognition.md) (5.6 extends WS11b),
+> [docs/IR.md](../../../IR.md) (wha-spell@2 format), [docs/contraptions.md](../../../contraptions.md) (assembly patterns).
 > Key files: `src/draw/recognizer.js`, `src/studio/drawingModel.js`, `src/engine/compose.js`.
 > **Not yet started.** Sequence after autosave, seed-from-SVG, dyes-in-deduction, recognizer
 > robustness (A4–A5), AI-report cache, symbol-versioning Fase 2/3, and cluster recognition WS11b.

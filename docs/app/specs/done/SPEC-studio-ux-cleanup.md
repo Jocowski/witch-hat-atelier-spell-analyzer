@@ -1,15 +1,15 @@
 # SPEC — Studio UX polish + canvas cleanup
 
-> Status: **proposed** · Scope: **Studio UI (ToolDock, IdentifiedPanel, results drawer) + canvas
+> Status: **done - shipped (item 5 removed by request)** · Scope: **Studio UI (ToolDock, IdentifiedPanel, results drawer) + canvas
 > stroke cleanup** · Branch: `feat/spell-studio-experiments` · Cross-refs:
-> [DrawingSurface.jsx](../../src/studio/DrawingSurface.jsx), [ToolDock.jsx](../../src/studio/ToolDock.jsx),
-> [IdentifiedPanel.jsx](../../src/studio/IdentifiedPanel.jsx), [StudioPage.jsx](../../src/studio/StudioPage.jsx),
-> [tools/beautify.js](../../src/studio/tools/beautify.js), [SPEC-stroke-beautify.md](SPEC-stroke-beautify.md).
+> [DrawingSurface.jsx](../../../../src/studio/DrawingSurface.jsx), [ToolDock.jsx](../../../../src/studio/ToolDock.jsx),
+> [IdentifiedPanel.jsx](../../../../src/studio/IdentifiedPanel.jsx), [StudioPage.jsx](../../../../src/studio/StudioPage.jsx),
+> [tools/beautify.js](../../../../src/studio/tools/beautify.js), [SPEC-stroke-beautify.md](SPEC-stroke-beautify.md).
 
 Six items, grouped: **layout/UX** (1, 2), **a bug** (3), **a toggle** (4), **an algorithm** (5).
 
 ## 1. ToolDock — wider + keep two columns
-The dock ([drawing.css](../../src/studio/drawing.css) `.ds-dock`) is 76px with a `1fr 1fr` tool grid.
+The dock ([drawing.css](../../../../src/studio/drawing.css) `.ds-dock`) is 76px with a `1fr 1fr` tool grid.
 - Widen to ~**92px** so the two-column tool labels (Brush/Line/…/Duplicate) aren't cramped.
 - Keep the existing 2-col `.ds-tool-row` grid (already correct).
 - ~~Fix a CSS comment bug at drawing.css:119~~ — **false alarm**: the comment is correct (`/* */`);
@@ -77,7 +77,7 @@ overflowing line. Collapse such near-duplicates into one.
 - `beautify.test.js`: `strokesOverlap` true for an out-and-back retrace pair / near-duplicate; false for
   two distinct strokes; `dedupeStrokes` keeps one of a duplicate pair, both of two distinct strokes.
 - Existing suite stays green; lint clean; production build OK.
-- Manual ([TEST-PLAN.md](TEST-PLAN.md)): erase removes from canvas + list together; Boxes toggle hides/
+- Manual ([TEST-PLAN.md](../../TEST-PLAN.md)): erase removes from canvas + list together; Boxes toggle hides/
   shows overlays; tabs switch; icon buttons have tooltips; Merge collapses a doubled line.
 
 ## Out of scope (noted, not built here)

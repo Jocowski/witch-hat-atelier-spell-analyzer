@@ -1,9 +1,9 @@
 # SPEC — Visual Effect Renderer
 
-> Status: **proposed** · Scope: **animated spell cast + prepared/active states + failure visuals** · Branch: `feat/spell-studio`
-> Cross-refs: [SPEC-spell-ir.md](SPEC-spell-ir.md) (SpellIR contract — **prerequisite**), [APP-PLAN.md](APP-PLAN.md)
-> (§2 Studio, react-konva canvas), [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (recognizer
-> confidence/stability inputs), [IMPROVEMENTS.md](IMPROVEMENTS.md). Sibling reference:
+> Status: **done - core shipped, off by default (1.1, 1.3, 1.4)** · Scope: **animated spell cast + prepared/active states + failure visuals** · Branch: `feat/spell-studio`
+> Cross-refs: [SPEC-spell-ir.md](SPEC-spell-ir.md) (SpellIR contract — **prerequisite**), [APP-PLAN.md](../../APP-PLAN.md)
+> (§2 Studio, react-konva canvas), [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (recognizer
+> confidence/stability inputs), [IMPROVEMENTS.md](../../IMPROVEMENTS.md). Sibling reference:
 > `wha-spell-simulator/src/renderer/` (proven particle loop + per-element effects to port).
 
 This spec covers three items from the visual-renderer work stream:

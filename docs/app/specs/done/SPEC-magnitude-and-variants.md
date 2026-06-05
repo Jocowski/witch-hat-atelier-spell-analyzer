@@ -1,21 +1,21 @@
 # SPEC — Magnitude plumbing, dyes-in-deduction, and sign variants & sizing (unified)
 
-> Status: **proposed** · Scope: **engine deduction + data schemas + recognizer metrics**
+> Status: **done - core shipped (3.1, 3.2, Track 4)** · Scope: **engine deduction + data schemas + recognizer metrics**
 > Branch: `feat/spell-studio`
 > Cross-refs:
 > [SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md) (superseded — Layers 1/2/3
 > with the Column "T" canonical example; Layer 1 already shipped),
-> [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (confidence gate bounds metric
+> [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (confidence gate bounds metric
 > precision — §A2),
 > [SPEC-symbol-versioning.md](SPEC-symbol-versioning.md) (a new variant bumps lifecycle.rev
 > and flags dependent spells),
-> [docs/CORE.md](../CORE.md) §1 (geometry as parameters), [docs/IR.md](../IR.md) §2 (the
+> [docs/CORE.md](../../../CORE.md) §1 (geometry as parameters), [docs/IR.md](../../../IR.md) §2 (the
 > `wha-spell` circle shape — dyes per-circle, component scale/metrics),
-> [docs/magical-dye.md](../magical-dye.md), [data/dyes.json](../../data/dyes.json),
-> [data/grammar.json](../../data/grammar.json), [data/rules.json](../../data/rules.json),
-> [src/engine/geometry.js](../../src/engine/geometry.js),
-> [src/engine/deduce.js](../../src/engine/deduce.js),
-> [src/engine/analyze.js](../../src/engine/analyze.js).
+> [docs/magical-dye.md](../../../magical-dye.md), [data/dyes.json](../../../../data/dyes.json),
+> [data/grammar.json](../../../../data/grammar.json), [data/rules.json](../../../../data/rules.json),
+> [src/engine/geometry.js](../../../../src/engine/geometry.js),
+> [src/engine/deduce.js](../../../../src/engine/deduce.js),
+> [src/engine/analyze.js](../../../../src/engine/analyze.js).
 
 ---
 

@@ -1,10 +1,12 @@
 # SPEC — Training contribution & cluster recognition
 
+> Status: **partial - Phase 1 implemented; Phase 2 (holistic cluster recognition) pending** · WS11.
+>
 > Spec for the "analyzing a spell feeds the training set" feature the user asked for: when a drawn
 > spell matches a known recipe (or a cluster of signs with a known effect), let it seed the training
 > data so future recognition gets easier. **Phase 1** (per-symbol contribution) is partly implemented
 > and needs one DB fix; **Phase 2** (holistic cluster recognition) is the design to build.
-> Companion to [SPEC.md](SPEC.md) (this is workstream **WS11**) and [APP-PLAN.md](APP-PLAN.md).
+> Companion to [SPEC.md](../SPEC.md) (this is workstream **WS11**) and [APP-PLAN.md](../APP-PLAN.md).
 
 ## 0. Why (the flywheel, reframed)
 
@@ -23,14 +25,14 @@ draw a known spell → engine matches a recipe → its symbols are confidently l
 ## 1. Phase 1 — per-symbol contribution (IMPLEMENTED, with a required fix)
 
 ### 1.1 Current behavior
-- In [src/studio/StudioPage.jsx](../../src/studio/StudioPage.jsx), after **Analyze**, when the engine
+- In [src/studio/StudioPage.jsx](../../../src/studio/StudioPage.jsx), after **Analyze**, when the engine
   returns a catalog match (`result.similar.match`) and there are recognized groups, a **"Contribute
   symbols to training"** box appears (`canContribute`).
 - `handleContribute()` iterates the recognized groups; for each it resolves the registry symbol via
-  `getSymbolByEngineId(label)` ([symbols.js](../../src/data-services/symbols.js)), derives the drawn
-  points with `groupToTemplate(group, label, role)` ([recognizer.js](../../src/draw/recognizer.js)), and
+  `getSymbolByEngineId(label)` ([symbols.js](../../../src/data-services/symbols.js)), derives the drawn
+  points with `groupToTemplate(group, label, role)` ([recognizer.js](../../../src/draw/recognizer.js)), and
   calls `addSample({ symbol_id, points, role, source: 'confirmed', app_version: 'studio' })`
-  ([samples.js](../../src/data-services/samples.js)).
+  ([samples.js](../../../src/data-services/samples.js)).
 
 ### 1.2 ⚠ Required fix (Phase 1 is currently broken at the DB)
 The initial migration constrains the column:
@@ -94,7 +96,7 @@ Data services: `addCluster({spell_id,label,cloud,layout,effect})`, `activeCluste
 Extend the Phase-1 contribute flow: when a spell matches a recipe (or the user confirms all symbols),
 **also** capture the whole-drawing cloud as a cluster example:
 - `cloud` = all drawn strokes' points combined, **normalized** (resample + scale-to-unit + translate
-  to centroid — reuse the `$P` `makeCloud` normalization in [recognizer.js](../../src/draw/recognizer.js)).
+  to centroid — reuse the `$P` `makeCloud` normalization in [recognizer.js](../../../src/draw/recognizer.js)).
 - `label`/`spell_id`/`effect` = from `result.similar.match`; `layout` = the produced `composition`.
 - A "Contribute spell shape" action (next to the per-symbol contribute), or fold both into one button.
 
@@ -132,7 +134,7 @@ A matched cluster carries a known `effect` (and `spell_id` → `spells.json`). S
   costs compute — cap the sweep and the cluster count, or precompute rotated variants.
 - **False positives:** an over-eager cluster match mislabels a novel spell as a known one — keep a
   conservative threshold and always allow override; treat cluster match as a *hint*, the engine +
-  user as the authority (consistent with [PLAN.md](../../PLAN.md): AI/engine reasons, recognizer scaffolds).
+  user as the authority (consistent with [PLAN.md](../../../PLAN.md): AI/engine reasons, recognizer scaffolds).
 - **Open:** store `cloud` normalized vs raw (normalized is smaller + match-ready; raw allows re-deriving
   layout) — recommend normalized + keep `layout` for the composition; store a thumbnail later if a
   gallery wants it.

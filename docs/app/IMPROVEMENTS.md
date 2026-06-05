@@ -3,26 +3,31 @@
 > Prioritized improvement ideas across **App/UX**, **AI training (recognizer)**, **Spell analysis
 > (engine + AI)**, and **Nested & linked spell detection**. P1 = high value / low-ish effort, P2 =
 > medium, P3 = larger / research. Cross-refs: [APP-PLAN.md](APP-PLAN.md), [SPEC.md](SPEC.md),
-> [SPEC-cluster-recognition.md](SPEC-cluster-recognition.md).
+> [SPEC-cluster-recognition.md](specs/SPEC-cluster-recognition.md).
 >
-> **Active detailed specs:**
-> - [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) — training flywheel + analysis surfacing
->   (A0–A3 + B1/B4 shipped; A4–A7, B2, B5, B6 pending).
-> - [SPEC-symbol-versioning.md](SPEC-symbol-versioning.md) — symbol lifecycle + canon-update flagging
->   (Fase 1 shipped; Fase 2/3 pending — build plan added).
-> - [SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md) — magnitude/variant model (Layer 1
->   shipped; superseded/unified by SPEC-magnitude-and-variants.md).
+> **Spec layout (2026-06-05):** the per-feature specs now live under [specs/](specs/); *active/partial*
+> ones at the top level, *shipped/superseded* ones archived under [specs/done/](specs/done/). Each spec
+> carries an updated `Status:` header. The shipped-batch ledger below is the change history.
 >
-> **New specs (2026-06-05 planning batch — conjuration + recognizer robustness + analysis):**
-> - [SPEC-spell-ir.md](SPEC-spell-ir.md) — numeric SpellIR `{force,spread,focus,range,duration,stability,gravity,direction}` + 3D tilt (1.2, 1.5).
-> - [SPEC-visual-renderer.md](SPEC-visual-renderer.md) — animated effect canvas + Prepared/Active (off-by-default) + failure visuals (1.1, 1.3, 1.4).
-> - [SPEC-ring-closure-floodfill.md](SPEC-ring-closure-floodfill.md) — flood-fill ring closure + adaptive segmentation (2.2, 2.3).
-> - [SPEC-recognizer-matching.md](SPEC-recognizer-matching.md) — rotation-tolerant guess + raster matcher cross-validation (2.4, 2.5).
-> - [SPEC-admin-verify.md](SPEC-admin-verify.md) — verified-sample flag + weight bump + bulk-exclude (2.6).
-> - [SPEC-magnitude-and-variants.md](SPEC-magnitude-and-variants.md) — shared magnitude plumbing + dyes-in-deduction + variants L2/L3 (3.1, 3.2, Track 4).
-> - [SPEC-ai-report-surfacing.md](SPEC-ai-report-surfacing.md) — report cache by hash + calibrated confidence + "disagrees with engine" (3.3, 3.5).
-> - [SPEC-nested-linked.md](SPEC-nested-linked.md) — multi-ring detection + nest/link relations + wha-spell@2 (Track 5).
-> - [SPEC-tuning-tools.md](SPEC-tuning-tools.md) — standalone template/detector/effect-lab HTML tools (7.4).
+> **Active / partial specs (still in [specs/](specs/)):**
+> - [SPEC-recognizer-analysis.md](specs/SPEC-recognizer-analysis.md) — training flywheel + analysis surfacing
+>   (core flywheel shipped; A7 real-ML + B5 cluster recognition deferred).
+> - [SPEC-cluster-recognition.md](specs/SPEC-cluster-recognition.md) — holistic cluster ID
+>   (Phase 1 partly implemented; Phase 2+ pending).
+>
+> **Done / superseded specs (archived in [specs/done/](specs/done/)):**
+> - [SPEC-symbol-versioning.md](specs/done/SPEC-symbol-versioning.md) — symbol lifecycle + canon-update flagging (Fase 1/2/3 shipped).
+> - [SPEC-sign-variants-sizing.md](specs/done/SPEC-sign-variants-sizing.md) — magnitude/variant model (Layer 1 shipped; superseded/unified by SPEC-magnitude-and-variants.md).
+> - [SPEC-spell-ir.md](specs/done/SPEC-spell-ir.md) — numeric SpellIR `{force,spread,focus,range,duration,stability,gravity,direction}` + 3D tilt (1.2, 1.5).
+> - [SPEC-visual-renderer.md](specs/done/SPEC-visual-renderer.md) — animated effect canvas + Prepared/Active (off-by-default) + failure visuals (1.1, 1.3, 1.4).
+> - [SPEC-ring-closure-floodfill.md](specs/done/SPEC-ring-closure-floodfill.md) — flood-fill ring closure + adaptive segmentation (2.2, 2.3).
+> - [SPEC-recognizer-matching.md](specs/done/SPEC-recognizer-matching.md) — rotation-tolerant guess + raster matcher cross-validation (2.4, 2.5).
+> - [SPEC-admin-verify.md](specs/done/SPEC-admin-verify.md) — verified-sample flag + weight bump + bulk-exclude (2.6).
+> - [SPEC-magnitude-and-variants.md](specs/done/SPEC-magnitude-and-variants.md) — shared magnitude plumbing + dyes-in-deduction + variants L2/L3 (3.1, 3.2, Track 4).
+> - [SPEC-ai-report-surfacing.md](specs/done/SPEC-ai-report-surfacing.md) — report cache by hash + calibrated confidence + "disagrees with engine" (3.3, 3.5).
+> - [SPEC-nested-linked.md](specs/done/SPEC-nested-linked.md) — multi-ring detection + nest/link relations + wha-spell@2 (Track 5).
+> - [SPEC-tuning-tools.md](specs/done/SPEC-tuning-tools.md) — standalone template/detector/effect-lab HTML tools (7.4).
+> - [SPEC-stroke-beautify.md](specs/done/SPEC-stroke-beautify.md) · [SPEC-symbol-roles.md](specs/done/SPEC-symbol-roles.md) · [SPEC-studio-ux-cleanup.md](specs/done/SPEC-studio-ux-cleanup.md) · [SPEC-studio-ux-cleanup-2.md](specs/done/SPEC-studio-ux-cleanup-2.md) — Studio drawing/UX polish.
 >
 > The canvas-UX spec (pan/recenter, undo/redo, shortcuts, pixel-eraser, drawer, text-glyph removal) was
 > **fully implemented** and its standalone doc retired — the remaining UX item is autosave (§A below).
@@ -54,18 +59,18 @@
 - ~~**P1 — Explicit "ring" affordance.**~~ **Dropped (2026-06-04):** the ring stays *inferred* — the
   validity/failure-mode deduction from an organically drawn seal is a feature, not a chore. Robust ring
   detection is covered instead by *adaptive segmentation* in
-  [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (A5).
+  [SPEC-recognizer-analysis.md](specs/SPEC-recognizer-analysis.md) (A5).
 - ~~**P2 — Pixel-eraser for placed symbols.**~~ **Done.**
 - ~~**P2 — Better placed-symbol rendering for text-glyphs ("G"/"C").**~~ **Done — removed instead:** the
   text-glyph mechanism is gone (the sigils now have real `svgPath`); see
-  [SPEC-symbol-versioning.md](SPEC-symbol-versioning.md) for the lifecycle pilot.
+  [SPEC-symbol-versioning.md](specs/done/SPEC-symbol-versioning.md) for the lifecycle pilot.
 - ~~**P2 — Prune dead CSS.**~~ **Done (2026-06-04)** — `src/index.css` rewritten to base + ResultPanel
   classes only (verified against the surviving JSX).
 - ~~**P2 — Results drawer polish** (resizable height; remember collapsed state).~~ **Done.**
 - **P3 — Named spell save/load + gallery** (Supabase `spells` table + Storage thumbnail) — APP-PLAN Phase I.
 
 ## B. AI training (the recognizer & flywheel)
-*Detailed in [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) Part A (source-weighting,
+*Detailed in [SPEC-recognizer-analysis.md](specs/SPEC-recognizer-analysis.md) Part A (source-weighting,
 confidence gate, active-learning + ML-readiness progress, rotation, segmentation, verify flag, ML).*
 - **P1 — Seed templates from canon SVGs.** Generate `$P` templates from the 33 sigil + 52 sign
   `svgPath`s so recognition works on day one without manual training (APP-PLAN Phase H / "seed").
@@ -88,12 +93,12 @@ confidence gate, active-learning + ML-readiness progress, rotation, segmentation
 - **P3 — Dedup near-identical samples** to avoid one drawing dominating a template set.
 
 ## C. Spell analysis (engine + AI)
-*Detailed in [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) Part B (match breakdown, AI
+*Detailed in [SPEC-recognizer-analysis.md](specs/SPEC-recognizer-analysis.md) Part B (match breakdown, AI
 report cache, forbidden-magic, cluster, confidence-vs-engine; topic-selection UI is **already done**).
-Magnitude/size effects (incl. dyes) are in [SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md).*
+Magnitude/size effects (incl. dyes) are in [SPEC-sign-variants-sizing.md](specs/done/SPEC-sign-variants-sizing.md).*
 - **P1 — Dyes affect the deduction.** Dyes are currently informational; wire them into power/duration/
   behavior per [docs/magical-dye.md](../magical-dye.md) so the analysis reflects the ink. *(Build on the
-  magnitude plumbing from [SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md).)*
+  magnitude plumbing from [SPEC-sign-variants-sizing.md](specs/done/SPEC-sign-variants-sizing.md).)*
 - ~~**P1 — Surface match breakdown.**~~ **Done (2026-06-04)** — "Why this match?" disclosure shows the
   weighted sub-scores (B1, `match.parts`/`weights`).
 - **P2 — AI report caching.** Cache the report per composition hash so re-analyzing is instant and
@@ -148,7 +153,7 @@ finds one ring). Closing this gap unlocks contraptions and nested seals from a d
   Studio's initial bundle.
 - **Onboarding / empty states** — the recognizer starts empty; a first-run flow (or seed-from-SVG)
   that explains training avoids a confusing "nothing recognized" first impression. *(Still open.)*
-- **Confidence gate** — *moved to [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) A2* (a
+- **Confidence gate** — *moved to [SPEC-recognizer-analysis.md](specs/SPEC-recognizer-analysis.md) A2* (a
   recognizer behavior/UX feature, not pure housekeeping): show low-confidence detections as "unknown?"
   and keep them out of the engine input; track per-symbol correction rate to drive active learning.
 
@@ -158,7 +163,7 @@ magnitude Layer 1, and symbol-versioning Fase 1 are **shipped**. Next:
 1. **Autosave** the drawing to `localStorage` (§A) — the last open canvas-UX item.
 2. **Seed templates from canon SVGs** (§B) — so recognition works before any training data exists.
 3. **Dyes-in-deduction + magnitude Layer 2** — build the shared magnitude plumbing
-   ([SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md)) so dyes and variant metrics both feed it.
+   ([SPEC-sign-variants-sizing.md](specs/done/SPEC-sign-variants-sizing.md)) so dyes and variant metrics both feed it.
 Then: recognizer robustness (A4 rotation, A5 segmentation, A6 verify flag), AI-report cache (B2) +
 confidence-vs-engine (B6), symbol-versioning Fase 2/3, and finally **nested/linked detection (§D)** +
 cluster recognition (WS11b) for holistic spell ID.

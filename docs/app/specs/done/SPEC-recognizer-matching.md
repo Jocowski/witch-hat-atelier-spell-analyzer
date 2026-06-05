@@ -1,8 +1,8 @@
 # SPEC — Recognizer matching enhancements
 
-> Status: **proposed** · Scope: **recognition robustness** · Branch: `feat/spell-studio`
-> Cross-refs: [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (items A4 refined here, 2.5 is new),
-> [IMPROVEMENTS.md](IMPROVEMENTS.md), [SPEC.md](SPEC.md) (WS9 improvement loop).
+> Status: **done - shipped (2.4, 2.5); tail 2.5-C raster-veto wiring** · Scope: **recognition robustness** · Branch: `feat/spell-studio`
+> Cross-refs: [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (items A4 refined here, 2.5 is new),
+> [IMPROVEMENTS.md](../../IMPROVEMENTS.md), [SPEC.md](../../SPEC.md) (WS9 improvement loop).
 > Modules: `src/draw/recognizer.js`, `src/admin/TrainingView.jsx`, proposed `src/draw/rasterMatch.js`.
 
 This spec covers two matching enhancements that are independent of each other and can ship in either

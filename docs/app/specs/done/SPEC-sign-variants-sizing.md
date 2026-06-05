@@ -3,9 +3,9 @@
 > **Superseded / extended by [SPEC-magnitude-and-variants.md](SPEC-magnitude-and-variants.md)**,
 > which unifies this spec with dyes-in-deduction (item 3.1) and the shared magnitude plumbing (item 3.2). Read that file for the current design; this document is kept as the historical record of Layers 1/2/3 and the Column "T" example.
 
-> Status: **proposed (research-leaning)** · Scope: **engine deduction + sign metadata + recognizer metrics**
-> Branch: `feat/spell-studio` · Cross-refs: [docs/CORE.md](../CORE.md) (geometry as parameters),
-> [ANALYSIS.md](../../ANALYSIS.md) §8 (deduction), [src/engine/geometry.js](../../src/engine/geometry.js),
+> Status: **superseded - Layer 1 shipped (see SPEC-magnitude-and-variants)** · Scope: **engine deduction + sign metadata + recognizer metrics**
+> Branch: `feat/spell-studio` · Cross-refs: [docs/CORE.md](../../../CORE.md) (geometry as parameters),
+> [ANALYSIS.md](../../../../ANALYSIS.md) §8 (deduction), [src/engine/geometry.js](../../../../src/engine/geometry.js),
 > [SPEC-symbol-versioning.md](SPEC-symbol-versioning.md) (variants are a kind of revision).
 
 ## The problem (the Column "T" example)
@@ -22,12 +22,12 @@ So two things matter that the engine doesn't fully model yet:
 
 ## What the engine does today (verified)
 The engine already has a **vector model with cancellation**, but it's magnitude-blind in the key place:
-- [`computeOrientationAim`](../../src/engine/geometry.js#L184) sums each directional sign's facing as a
+- [`computeOrientationAim`](../../../../src/engine/geometry.js#L184) sums each directional sign's facing as a
   **unit vector** (`vx += sin(f); vy += -cos(f)`), divides by count. **Two opposing facings cancel
   exactly regardless of size** — this is precisely why "bigger Column wins" can't be expressed yet.
-- [`computeDirectionalBias`](../../src/engine/geometry.js#L96) (position-based) and
-  [`computeRegionCoverage`](../../src/engine/geometry.js#L205) **already weight by `c.scale`** (`w = c.scale`).
-- [`computePower`](../../src/engine/geometry.js#L256) uses average `scale`.
+- [`computeDirectionalBias`](../../../../src/engine/geometry.js#L96) (position-based) and
+  [`computeRegionCoverage`](../../../../src/engine/geometry.js#L205) **already weight by `c.scale`** (`w = c.scale`).
+- [`computePower`](../../../../src/engine/geometry.js#L256) uses average `scale`.
 - The composition carries a per-component **uniform `scale`** but **no internal-proportion metric** (a T
   with a long stem and a T with a long base have the same `scale`).
 
@@ -58,7 +58,7 @@ Uniform `scale` can't tell "long stem" from "long base". Capture the **proportio
   normalize against (ring radius, base length) so it's scale-independent.
 - **Extraction:** two sources of the metric:
   - **Drawn symbols:** the recognizer already isolates each group's strokes
-    ([recognizer.js](../../src/draw/recognizer.js)). Extend group analysis to compute the declared
+    ([recognizer.js](../../../../src/draw/recognizer.js)). Extend group analysis to compute the declared
     `measure` (e.g. project the group's points onto the facing axis → length; ratio to `ringR`) and
     attach a `metrics` object to the emitted component.
   - **Placed symbols:** derive from the placed glyph's transform (non-uniform scale if we ever allow it,
@@ -76,7 +76,7 @@ Uniform `scale` can't tell "long stem" from "long base". Capture the **proportio
 ### Layer 3 — Sizing of sigils & circles (spell-level magnitude)
 Generalize "size matters" beyond signs.
 - **Ring radius → power/range baseline.** The recognizer already computes `ringR`
-  ([recognizer.js:111](../../src/draw/recognizer.js#L111)); feed it (normalized) into `computePower`/range
+  ([recognizer.js:111](../../../../src/draw/recognizer.js#L111)); feed it (normalized) into `computePower`/range
   so a bigger circle = a stronger / longer-range spell, per canon intuition. Today `ringR` is computed
   but not used as a power input.
 - **Sigil size → substance amount.** A larger core sigil ⇒ more substance/output (scales the effect
@@ -87,11 +87,11 @@ Generalize "size matters" beyond signs.
   scalar from radius).
 
 ## Interactions
-- **Dyes-in-deduction** ([IMPROVEMENTS.md](IMPROVEMENTS.md) §C/P1) is the *same shape of change* —
+- **Dyes-in-deduction** ([IMPROVEMENTS.md](../../IMPROVEMENTS.md) §C/P1) is the *same shape of change* —
   another magnitude/parameter input feeding power/duration. Build the **magnitude plumbing once** (a
   per-effect `{ direction, magnitude, params }` accumulator in the deduction) and let scale, variant
   metrics, ring size, sigil size, and dyes all contribute through it.
-- **Recognizer confidence** ([SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) A2): variant
+- **Recognizer confidence** ([SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) A2): variant
   measurement is only as good as the segmentation; low-confidence groups should not assert a precise
   magnitude.
 

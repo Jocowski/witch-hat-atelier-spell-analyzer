@@ -1,11 +1,11 @@
 # SPEC — Flood-fill ring-closure detection & adaptive segmentation
 
-> Status: **proposed** · Scope: **recognizer ring detection + segmentation tuning**
+> Status: **done - shipped (2.2, 2.3)** · Scope: **recognizer ring detection + segmentation tuning**
 > Branch: `feat/spell-studio`
-> Cross-refs: [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (A5 adaptive segmentation,
+> Cross-refs: [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (A5 adaptive segmentation,
 > A2 confidence gate), [SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md) (ring radius as a
-> reference denominator), [src/draw/recognizer.js](../../src/draw/recognizer.js) (ring detection,
-> `analyzeStrokes`, `circleScore`), [src/studio/StudioPage.jsx](../../src/studio/StudioPage.jsx)
+> reference denominator), [src/draw/recognizer.js](../../../../src/draw/recognizer.js) (ring detection,
+> `analyzeStrokes`, `circleScore`), [src/studio/StudioPage.jsx](../../../../src/studio/StudioPage.jsx)
 > (the hardcoded `gap: 45` call site), SPEC-visual-renderer 1.3 (prepared/active ring states — ring
 > closure is the exact trigger for "ring just activated").
 
@@ -22,7 +22,7 @@ either messy, very large, or very small. Both items keep `recognizer.js` (and an
 
 ### Problem
 
-`circleScore` ([recognizer.js:93–101](../../src/draw/recognizer.js#L93-L101)) detects the activation
+`circleScore` ([recognizer.js:93–101](../../../../src/draw/recognizer.js#L93-L101)) detects the activation
 ring by two independent checks:
 
 ```js
@@ -242,8 +242,8 @@ pipeline. That is a separate spec.
 ### Problem
 
 `analyzeStrokes` merges nearby strokes into symbol groups using a **fixed 45 px gap**
-([StudioPage.jsx:133](../../src/studio/StudioPage.jsx#L133), `opts.gap ?? 45` in
-[recognizer.js:117](../../src/draw/recognizer.js#L117)). This is calibrated for a "typical" drawing
+([StudioPage.jsx:133](../../../../src/studio/StudioPage.jsx#L133), `opts.gap ?? 45` in
+[recognizer.js:117](../../../../src/draw/recognizer.js#L117)). This is calibrated for a "typical" drawing
 but fails at the extremes:
 
 - **Large drawing / zoomed-in canvas:** a 45 px gap is much smaller than the natural inter-stroke

@@ -1,14 +1,14 @@
 # SPEC — Numeric SpellIR + 3D Direction with Tilt
 
-> Status: **proposed** · Scope: **engine numeric IR + 3D direction model**
+> Status: **done - shipped (1.2, 1.5)** · Scope: **engine numeric IR + 3D direction model**
 > Branch: `feat/spell-studio`
 > Cross-refs:
 > - [SPEC-visual-renderer.md](SPEC-visual-renderer.md) (primary consumer of the SpellIR block)
 > - [SPEC-sign-variants-sizing.md](SPEC-sign-variants-sizing.md) (Layer 1–3 magnitude → `force`/`power`)
-> - [SPEC-recognizer-analysis.md](SPEC-recognizer-analysis.md) (A2 confidence gate — low-confidence
+> - [SPEC-recognizer-analysis.md](../SPEC-recognizer-analysis.md) (A2 confidence gate — low-confidence
 >   symbols excluded from engine input, which affects all IR fields)
-> - [docs/CORE.md](../CORE.md) (first-principles semantics that ground the field derivations)
-> - [docs/IR.md](../IR.md) (the `wha-spell` JSON format; SpellIR is a new section of `analyze()` output,
+> - [docs/CORE.md](../../../CORE.md) (first-principles semantics that ground the field derivations)
+> - [docs/IR.md](../../../IR.md) (the `wha-spell` JSON format; SpellIR is a new section of `analyze()` output,
 >   not a replacement for it)
 > - Sibling reference: `wha-spell-simulator/docs/spell-ir.md` + `src/compiler/spellBuilder.js`
 >   (the proven design this spec adapts)
