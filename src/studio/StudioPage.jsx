@@ -6,16 +6,16 @@
  * matches a known recipe — contribute the detected symbols to the training set.
  */
 
-import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react'
 import './studio.css'
 
 import DrawingSurface  from './DrawingSurface.jsx'
 import SymbolPalette   from './SymbolPalette.jsx'
 import IdentifiedPanel from './IdentifiedPanel.jsx'
-import AIReportPanel   from './AIReportPanel.jsx'
 import SpellTrial      from './SpellTrial.jsx'
 import FlowPanel       from './FlowPanel.jsx'
 import ThemeSwitcher   from '../theme/ThemeSwitcher.jsx'
+import ConfigPanel     from './ConfigPanel.jsx'
 
 import ResultPanel from '../components/ResultPanel.jsx'
 import { analyze } from '../engine/analyze.js'
@@ -25,12 +25,18 @@ import { useSymbolData } from '../engine/useSymbolData.js'
 import { loadDbSymbols } from '../engine/symbolLoader.js'
 import { toComposition, recognizedToPlaced } from './drawingModel.js'
 import { analyzeStrokes, groupToTemplate, mergeGroups, makeCloud } from '../draw/recognizer.js'
-import { activeTemplates, addSample } from '../data-services/samples.js'
+import { addSample } from '../data-services/samples.js'
 import { getSymbolByEngineId } from '../data-services/symbols.js'
 import { logAnalysis } from '../data-services/analyses.js'
-import { loadTemplates } from '../draw/templates.js'
+import { useTemplates } from './useTemplates.js'
 import { buildSpellIRShim } from './render/spellIRShim.js'
 import rules from '../../data/rules.json'
+import { aiEnabled, useCapabilities } from '../app/capabilities.js'
+
+// AI Report panel — dynamically imported only when aiEnabled (build-time constant).
+// When aiEnabled is false (the published build), Rollup/Vite eliminates the dynamic import()
+// expression entirely, so react-markdown and the ai/* modules are never emitted to dist/.
+const AIReportPanel = aiEnabled ? lazy(() => import('./AIReportPanel.jsx')) : null
 
 const BRIDGE_URL = import.meta.env.VITE_AI_BRIDGE_URL || 'http://localhost:8787'
 
@@ -141,14 +147,17 @@ export default function StudioPage() {
   // Re-render the palette + canvas when the DB symbol overlay loads or an Admin edit lands.
   useSymbolData()
 
-  // Re-pull the overlay when the tab regains focus, so symbols added in a separate Admin tab/window
-  // show up without a manual reload (the store is per-tab; same-tab navigation already shares it).
+  const { isAuthed } = useCapabilities()
+
+  // Re-pull the overlay when the tab regains focus — authed sessions only.
+  // Anonymous visitors must never trigger a Supabase call; skip entirely when not signed in.
   useEffect(() => {
+    if (!isAuthed) return
     const refresh = () => { if (document.visibilityState !== 'hidden') loadDbSymbols() }
     window.addEventListener('focus', refresh)
     document.addEventListener('visibilitychange', refresh)
     return () => { window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh) }
-  }, [])
+  }, [isAuthed])
 
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
@@ -232,13 +241,21 @@ export default function StudioPage() {
   // A0: accumulate the user's label corrections across the session so logAnalysis can record them.
   const correctionsRef = useRef([])
 
-  const [templates, setTemplates] = useState([])
-  useEffect(() => {
-    (async () => {
-      try { const tpl = await activeTemplates(rules.recognition); setTemplates(tpl.length ? tpl : loadTemplates()) }
-      catch { setTemplates(loadTemplates()) }
-    })()
-  }, [])
+  // ── Config panel (gear) state ─────────────────────────────────────────────────
+  const [configOpen, setConfigOpen] = useState(false)
+
+  // localStorage-backed feature toggles (gated to authed users in ConfigPanel).
+  // Keys EXACTLY: 'studio.useDbTraining' and 'studio.showTrainingTools', values '1'/'0'.
+  const [useDbTraining, setUseDbTraining] = useState(
+    () => localStorage.getItem('studio.useDbTraining') === '1',
+  )
+  const [showTrainingTools, setShowTrainingTools] = useState(
+    () => localStorage.getItem('studio.showTrainingTools') === '1',
+  )
+  useEffect(() => { localStorage.setItem('studio.useDbTraining',    useDbTraining    ? '1' : '0') }, [useDbTraining])
+  useEffect(() => { localStorage.setItem('studio.showTrainingTools', showTrainingTools ? '1' : '0') }, [showTrainingTools])
+
+  const templates = useTemplates({ useDbTraining })
 
   // persist drawer collapsed/height (Item 7)
   useEffect(() => { localStorage.setItem(DRAWER_C_KEY, collapsed ? '1' : '0') }, [collapsed])
@@ -529,7 +546,7 @@ export default function StudioPage() {
         if (!sym) continue
         const role = g.role === 'core' ? 'sigil' : 'sign'
         const points = groupToTemplate(g, g.match.name, role).points
-        await addSample({ symbol_id: sym.id, points, role, source: 'confirmed', app_version: 'studio' })
+        await addSample({ symbol_id: sym.id, points, role, source: 'web', app_version: 'studio' })
         saved++
       } catch { /* skip */ }
     }
@@ -585,6 +602,14 @@ export default function StudioPage() {
       <header className="studio-header">
         <h1 className="studio-title">Spell Studio</h1>
         <div className="studio-theme-slot"><ThemeSwitcher /></div>
+        <button
+          className="cfg-gear-btn"
+          onClick={() => setConfigOpen(true)}
+          title="Settings"
+          aria-label="Open settings"
+        >
+          ⚙
+        </button>
       </header>
 
       <div className="studio-main">
@@ -728,8 +753,10 @@ export default function StudioPage() {
                   onClick={() => setTab('flow')} disabled={!hasFlow} title="Why the spell is steered this way (vector flow)">Flow</button>
                 <button className={`srt-tab${tab === 'analysis' ? ' active' : ''}`} role="tab" aria-selected={tab === 'analysis'}
                   onClick={() => setTab('analysis')} disabled={phase !== 'analyzed'}>Analysis</button>
-                <button className={`srt-tab${tab === 'ai' ? ' active' : ''}`} role="tab" aria-selected={tab === 'ai'}
-                  onClick={() => setTab('ai')} disabled={phase !== 'analyzed'}>AI Report</button>
+                {aiEnabled && (
+                  <button className={`srt-tab${tab === 'ai' ? ' active' : ''}`} role="tab" aria-selected={tab === 'ai'}
+                    onClick={() => setTab('ai')} disabled={phase !== 'analyzed'}>AI Report</button>
+                )}
               </div>
 
               <div className="studio-results-inner">
@@ -745,7 +772,7 @@ export default function StudioPage() {
                     </div>
                     <IdentifiedPanel placed={detection.placed} groups={detection.recGroups} onRelabel={handleCorrect} onMerge={handleMerge}
                       onBeautify={(g) => handleBeautifyGroups([g])} onBeautifyAll={(gs) => handleBeautifyGroups(gs)}
-                      onHover={setHovered} onErase={handleEraseRow} />
+                      onHover={setHovered} onErase={handleEraseRow} trainingEnabled={showTrainingTools} />
                     {canContribute && (
                       <div className="contribute-box">
                         <p className="detect-hint">This matches <strong>{result.similar.match.name}</strong> — its symbols are confirmed and can seed the training set.</p>
@@ -760,8 +787,10 @@ export default function StudioPage() {
                   <FlowPanel signs={signVectors.signs} flow={signVectors.flow} ringRadius={signVectors.ringRadius} />
                 )}
                 {tab === 'analysis' && phase === 'analyzed' && result && <ResultPanel result={result} />}
-                {tab === 'ai' && phase === 'analyzed' && result && (
-                  <AIReportPanel composition={composition} engineResult={result} bridgeUrl={BRIDGE_URL} />
+                {aiEnabled && AIReportPanel && tab === 'ai' && phase === 'analyzed' && result && (
+                  <Suspense fallback={<div className="ai-loading">Loading AI…</div>}>
+                    <AIReportPanel composition={composition} engineResult={result} bridgeUrl={BRIDGE_URL} />
+                  </Suspense>
                 )}
               </div>
             </>
@@ -770,6 +799,15 @@ export default function StudioPage() {
       )}
 
       {flash && <div className="studio-toast">{flash}</div>}
+
+      <ConfigPanel
+        open={configOpen}
+        onClose={() => setConfigOpen(false)}
+        useDbTraining={useDbTraining}
+        onToggleDbTraining={() => setUseDbTraining((v) => !v)}
+        showTrainingTools={showTrainingTools}
+        onToggleTrainingTools={() => setShowTrainingTools((v) => !v)}
+      />
     </div>
   )
 }

@@ -78,6 +78,17 @@ Bring the static-build machinery from `spell-studio-web` (it's not on the featur
 - **Done when:** a sample submitted by an invited user is inert until verified, then (a) shows in the DB
   overlay for opted-in users and (b) can be baked into the next static seed for everyone.
 
+#### Seed refresh loop (the admin training cycle)
+
+Once an admin verifies samples in the Review panel, those rows immediately become available via the DB
+overlay for logged-in users who have *Use database training* enabled. To promote them into the **static
+seed** (used by all anonymous visitors), run `npm run seed:refresh` — this convenience script chains
+`seed:training` (dumps verified DB rows into `supabase/seed.sql`) followed by `build:seed` (compiles
+`seed.sql` → `data/training-seed.json`). Commit the updated `data/training-seed.json` and push; the next
+GitHub Pages deploy bakes the freshly verified samples into the public baseline so every anonymous visitor
+benefits without any login or DB call. **Never run this script against the hosted project without first
+confirming Supabase is reachable** — it reads from the DB (requires `SUPABASE_SECRET` in the env).
+
 ### Wave 6 — Ship
 - Merge/fast-forward `feat/web-unified` → `spell-studio-web`; push → workflow builds & deploys.
 - Run the launch checklist below against the live URL.

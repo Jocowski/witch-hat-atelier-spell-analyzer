@@ -21,15 +21,18 @@ const VERIFIED_MULTIPLIER_DEFAULT = 1.3
  *   }
  *
  * @param {object} [weightCfg]  Optional weight config injected by the caller (from rules.json).
- *   { sampleWeights: { corrected, drawn, confirmed }, verifiedMultiplier }
- *   Defaults to { sampleWeights: { corrected:1.5, drawn:1.0, confirmed:0.6 }, verifiedMultiplier:1.0 }
+ *   { sampleWeights: { corrected, drawn, confirmed, web }, verifiedMultiplier }
+ *   Defaults to { sampleWeights: { corrected:1.5, drawn:1.0, confirmed:0.6, web:0 }, verifiedMultiplier:1.0 }
  *   so the function degrades gracefully when the caller doesn't pass config (no verify bump = neutral).
+ * @param {{ verifiedOnly?: boolean }} [opts]
+ *   verifiedOnly — when true, only rows with verified=true are returned (for the seed ⊕ DB overlay path).
+ *   Default false (returns all active rows, legacy behaviour).
  * @returns {Promise<Array<{ name: string, role: string, points: any, source: string, verified: boolean, weight: number }>>}
  */
-export async function activeTemplates(weightCfg) {
+export async function activeTemplates(weightCfg, { verifiedOnly = false } = {}) {
   if (!hasSupabase()) return []
   const {
-    sampleWeights      = { corrected: 1.5, drawn: 1.0, confirmed: 0.6 },
+    sampleWeights      = { corrected: 1.5, drawn: 1.0, confirmed: 0.6, web: 0 },
     verifiedMultiplier = VERIFIED_MULTIPLIER_DEFAULT,
   } = weightCfg ?? {}
   // NOTE: select `*` (not an explicit `verified` column) so this still works BEFORE the
@@ -37,10 +40,12 @@ export async function activeTemplates(weightCfg) {
   // missing column, activeTemplates throws, the Studio falls back to empty templates, and Detect
   // silently recognizes nothing. `row.verified` is simply undefined (→ treated as unverified)
   // until the migration lands; the weight bump then activates automatically.
-  const { data, error } = await supabase
+  let query = supabase
     .from('training_samples')
     .select('*, symbols(engine_id, name, kind)')
     .is('deleted_at', null)
+  if (verifiedOnly) query = query.eq('verified', true)
+  const { data, error } = await query
   if (error) throw new Error(error.message)
   return data.map((row) => {
     const src    = row.source || 'drawn'
@@ -60,19 +65,39 @@ export async function activeTemplates(weightCfg) {
 /**
  * Set or clear the verified flag on a training sample (admin only — enforced by RLS).
  * Stamps verified_by = current user and verified_at = now() when setting; clears both when unsetting.
+ *
+ * Web→drawn re-tier on verify: `source = 'web'` has weight 0 (rules.json recognition.sampleWeights),
+ * so verifying a web sample without changing its source keeps it permanently inert (0 × multiplier = 0).
+ * To make it count, we promote source to 'drawn' (weight 1) in the same update.
+ * When unverifying, source is NOT reverted — the admin decision stands; a re-tier is permanent.
+ *
  * @param {string}  id        UUID of the training_samples row.
- * @param {boolean} verified  true to verify, false to unverify.
+ * @param {boolean} verified  true to verify (+ re-tier web→drawn), false to unverify (source unchanged).
  * @returns {Promise<object|null>} The updated row, or null when Supabase is absent.
  */
 export async function setVerified(id, verified) {
   if (!hasSupabase()) return null
-  const patch = verified
-    ? {
-        verified:    true,
-        verified_by: (await supabase.auth.getUser()).data.user?.id ?? null,
-        verified_at: new Date().toISOString(),
-      }
-    : { verified: false, verified_by: null, verified_at: null }
+  let patch
+  if (verified) {
+    // Fetch the current source so we know whether to re-tier it.
+    const { data: row, error: fetchErr } = await supabase
+      .from('training_samples')
+      .select('source')
+      .eq('id', id)
+      .single()
+    if (fetchErr) throw new Error(fetchErr.message)
+    // Re-tier web→drawn: web weight is 0, so without this the verified multiplier still yields 0.
+    const sourcePatch = row?.source === 'web' ? { source: 'drawn' } : {}
+    patch = {
+      ...sourcePatch,
+      verified:    true,
+      verified_by: (await supabase.auth.getUser()).data.user?.id ?? null,
+      verified_at: new Date().toISOString(),
+    }
+  } else {
+    // Unverify: clear the verify fields only; do NOT revert source (re-tier is permanent).
+    patch = { verified: false, verified_by: null, verified_at: null }
+  }
   const { data, error } = await supabase
     .from('training_samples')
     .update(patch)
