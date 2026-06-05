@@ -108,6 +108,7 @@ function spellDurationMs(spellIR) {
 }
 
 function spellEmission(spellIR, timestamp) {
+  if (spellIR?.sustain) return 1  // practice trial: keep emitting (continuous stream, no end-fade)
   const durationMs = spellDurationMs(spellIR)
   if (durationMs <= 0) return 1  // no duration info → always emitting
 
@@ -192,11 +193,8 @@ export class SpellEffectRenderer {
     ctx.globalCompositeOperation = 'lighter'
     drawEffect(ctx, this.state, renderSpellIR, ring, dt, this.config)
     ctx.restore()
-
-    // Partial failure overlay: degraded flicker at half alpha
-    if (isPartialFailure(spellIR, this.config)) {
-      this.drawFailedFlicker(ring, timestamp, 0.5)
-    }
+    // NOTE: the partial-failure flicker ring was removed — for a valid but low-stability spell it drew
+    // a distracting pulsing red circle over a working cast. True failures still flicker (failed state).
   }
 
   drawRingGlow(ring, isPrepared) {

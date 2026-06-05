@@ -21,9 +21,27 @@ import {
   spellLifetimeFrames,
   steadyParticleAlpha,
 } from '../effectUtils.js'
+import { drawToonLiquid } from '../toonLiquid.js'
 
 const DEPTH_SCALE = 0.58
 const WATER_ALPHA_SCALE = 0.58
+
+// Cel-shaded ("anime ink") water palette + tuning. Derived from ring size + spell params so the
+// silhouette/outline scale with the spell. Used when config.renderer.style === 'toon'.
+function toonWaterOptions(ring, spellIR) {
+  const r = ring.radius
+  return {
+    cell: clamp(r / 20, 6, 13),
+    threshold: 0.95,
+    innerThreshold: 2.6,
+    influence: 2.4,
+    baseColor: '#2f8fd6',                 // mid blue body
+    innerColor: '#7cc4f2',                // lighter blue interior (2nd tone)
+    outlineColor: '#0a2238',              // near-black ink outline
+    outlineWidth: Math.max(2.2, r * 0.018) * (0.9 + (spellIR.force ?? 0.5) * 0.3),
+    highlightColor: 'rgba(236, 248, 255, 0.95)',
+  }
+}
 
 function waterFlowConfig(spellIR, ring, portal, frame) {
   const scale = effectScale(spellIR)
@@ -57,8 +75,10 @@ function waterFlowConfig(spellIR, ring, portal, frame) {
     convergenceProgress,
     sourceRadiusX: portal.radiusX * sourceScale,
     sourceRadiusY: portal.radiusY * sourceScale,
-    horizontalSpeed: pressure * (0.08 + (0.22 + horizontalShare * 0.86) * travelFactor),
-    verticalSpeed: pressure * (0.16 + (0.62 + verticalShare * 0.52) * travelFactor),
+    // Speed split is DIRECTION-DRIVEN (einlair): a horizontal jet (z≈0) barely rises, a balanced
+    // column (z≈1) shoots up. The old fixed 0.62 vertical base made every spell go up regardless.
+    horizontalSpeed: pressure * (0.1 + (0.16 + horizontalShare * 0.95) * travelFactor),
+    verticalSpeed: pressure * (0.06 + (0.12 + verticalShare * 1.05) * travelFactor),
     gravityForce:
       (0.052 + spellIR.force * 0.038 + (1 - spellIR.stability) * 0.018) *
       gravity *
@@ -311,6 +331,19 @@ export function drawWaterEffect(ctx, state, spellIR, ring, dt, config) {
     updateWaterParticle(particle, flow, dt)
     const visible = visibleWaterParticle(particle, flow, spellIR)
     if (visible) visibleParticles.push({ particle, ...visible })
+  }
+
+  // Toon mode: reuse the same projected particles as metaball blobs → cel-shaded ink water.
+  if (config.renderer?.style === 'toon') {
+    const blobs = visibleParticles.map(({ particle, projected }) => ({
+      x: projected.x,
+      y: projected.y,
+      r: particle.radius,
+      hl: Math.sin(particle.phase * 1.7) > 0.32, // sparse highlights (mirrors the glow gate)
+    }))
+    drawToonLiquid(ctx, blobs, toonWaterOptions(ring, spellIR))
+    pruneParticles(state)
+    return
   }
 
   ctx.save()

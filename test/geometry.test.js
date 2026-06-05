@@ -1,8 +1,79 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, computeOrientationAim, classifyZone, anchorToXY, xyToAnchor, CANVAS_RADIUS } from '../src/engine/geometry.js'
+import { toPolar, toCartesian, computeSymmetry, computeDirectionalBias, computeSpin, inwardRotation, classifyRegion, computeRegionCoverage, computeOrientationAim, computeSignVectors, computeColumnFlow, directedAxisFacing, classifyZone, anchorToXY, xyToAnchor, CANVAS_RADIUS } from '../src/engine/geometry.js'
 
 const directional = () => 'directional'
+
+// ---------- directedAxisFacing (Phase 1: facing from drawn geometry) ----------
+
+test('directedAxisFacing: a "|-" column (crossbar left, stem right) points EAST (~90°)', () => {
+  const pts = [
+    // crossbar: a vertical bar on the LEFT (the wide tail)
+    { x: -10, y: -12 }, { x: -10, y: -6 }, { x: -10, y: 0 }, { x: -10, y: 6 }, { x: -10, y: 12 },
+    // stem: a horizontal line running RIGHT (the narrow head)
+    { x: -10, y: 0 }, { x: 0, y: 0 }, { x: 10, y: 0 }, { x: 20, y: 0 }, { x: 30, y: 0 },
+  ]
+  const f = directedAxisFacing(pts, { x: 0, y: 0 })
+  assert.ok(f > 70 && f < 110, `expected ~east (90°), got ${f}`)
+})
+
+test('directedAxisFacing: returns null for too few points', () => {
+  assert.equal(directedAxisFacing([{ x: 0, y: 0 }]), null)
+})
+
+// ---------- computeColumnFlow (Phase 2: einlair radial/upward flow) ----------
+
+test('computeColumnFlow: a single inward column → all flow exits radially, no upward', () => {
+  // Column on the LEFT facing east (inward, toward centre).
+  const comps = [{ role: 'sign', type: 'column', x: -100, y: 0, rotation: 90, scale: 1 }]
+  const flow = computeColumnFlow(comps, directional)
+  assert.ok(Math.abs(flow.netFrac - 1) < 1e-9, `netFrac ${flow.netFrac}`)
+  assert.ok(flow.upFrac < 1e-9, `upFrac ${flow.upFrac}`)
+  assert.ok(Math.abs(flow.netAngle - 90) < 1e-6, `netAngle ${flow.netAngle}`) // east
+  assert.equal(flow.inverted, false)
+})
+
+test('computeColumnFlow: two equal opposing inward columns (the "T") → all flow goes UP', () => {
+  const comps = [
+    { role: 'sign', type: 'column', x: -100, y: 0, rotation: 90, scale: 1 },  // faces east (inward)
+    { role: 'sign', type: 'column', x: 100, y: 0, rotation: 270, scale: 1 },  // faces west (inward)
+  ]
+  const flow = computeColumnFlow(comps, directional)
+  assert.ok(flow.netFrac < 1e-9, `netFrac ${flow.netFrac}`)   // radial cancels
+  assert.ok(Math.abs(flow.upFrac - 1) < 1e-9, `upFrac ${flow.upFrac}`) // all upward
+  assert.equal(flow.inverted, false)
+})
+
+test('computeColumnFlow: outward-facing columns are inverted (Φ<0) → radial spread, no upward', () => {
+  const comps = [
+    { role: 'sign', type: 'column', x: -100, y: 0, rotation: 270, scale: 1 }, // faces west (outward)
+    { role: 'sign', type: 'column', x: 100, y: 0, rotation: 90, scale: 1 },   // faces east (outward)
+  ]
+  const flow = computeColumnFlow(comps, directional)
+  assert.equal(flow.inverted, true)
+  assert.ok(flow.upFrac < 1e-9, `upFrac ${flow.upFrac}`)
+})
+
+test('computeSignVectors: per-sign facing+force and the net resultant', () => {
+  const components = [
+    { role: 'sigil', type: 'water', x: 0, y: 0 },                    // ignored (not a sign)
+    { role: 'sign', type: 'column', x: 0, y: -100, rotation: 0, scale: 1 },   // faces north
+    { role: 'sign', type: 'column', x: 60, y: 0, rotation: 90, scale: 2 },    // faces east, 2× force
+    { role: 'sign', type: 'fixate', x: -60, y: 0, scale: 1.5 },               // non-directional → no facing
+  ]
+  const familyOf = (t) => (t === 'fixate' ? 'non-directional' : 'directional')
+  const { signs, net } = computeSignVectors(components, familyOf)
+  assert.equal(signs.length, 3, 'only signs, not the sigil')
+  assert.equal(signs[0].angle, 0)            // north-facing
+  assert.equal(signs[0].magnitude, 1)
+  assert.equal(signs[1].angle, 90)           // east-facing
+  assert.equal(signs[1].magnitude, 2)        // force = scale
+  assert.equal(signs[2].angle, null)         // non-directional → force only, no steer
+  assert.equal(signs[2].magnitude, 1.5)
+  // Net leans east (the 2× east sign outweighs the 1× north sign).
+  assert.ok(net.aimed)
+  assert.ok(net.angle > 45 && net.angle < 90, `expected east-of-north, got ${net.angle}`)
+})
 
 test('computeOrientationAim: equal opposing signs cancel (the Column "T" balance)', () => {
   // One sign faces north (0°), an equal-size one faces south (180°) → net push cancels.

@@ -24,6 +24,9 @@ const DEFAULTS = {
   gapPreserveDeg: 16, // angular gap at/above which a circular stroke stays an OPEN arc (preserves an intentional ring gap)
   residBand: 0.16, // residual/diag that maps to confidence 0 (residual 0 ⇒ confidence 1)
   chaikinIters: 2, // smoothing passes for the fallback
+  maxEdgeBowFrac: 0.08, // a polygon edge whose drawn points bow more than this fraction of its length
+  //                       is really a CURVE, not a straight edge → reject the polygon snap. Keeps a
+  //                       teardrop/leaf (smooth belly + sharp tip) from being faceted into a triangle.
 }
 
 // ---------- small geometry helpers ----------
@@ -164,6 +167,42 @@ export function filterCornersByAngle(corners, closed, minTurnDeg = 25) {
     if (cos < minCos) kept.push(corners[i]) // keep only genuine (sharp-enough) vertices
   }
   return kept.length >= (closed ? 3 : 2) ? kept : corners.slice()
+}
+
+/**
+ * Are the polygon edges through `corners` actually STRAIGHT (vs. a faceted smooth curve)?
+ *
+ * For each edge corner[i]→corner[i+1], measure how far the ORIGINAL drawn points between those
+ * two corners bow away from the straight edge, relative to the edge length. A real triangle/rect
+ * has near-straight edges (~3-5% from hand jitter); a teardrop/leaf's curved belly bows much more
+ * (~15%), so it should NOT snap to a straight-edged polygon. Returns false on the first too-bowed
+ * edge. `corners` are references drawn from `pts` (rdp/filterCornersByAngle preserve identity).
+ */
+export function edgesAreStraight(pts, corners, closed, maxBowFrac) {
+  const m = corners.length
+  if (m < 2) return true
+  const idx = corners.map((c) => pts.indexOf(c))
+  if (idx.some((i) => i < 0)) return true // can't locate a corner → don't block the snap
+  const edgeCount = closed ? m : m - 1
+  for (let e = 0; e < edgeCount; e++) {
+    const a = corners[e]
+    const b = corners[(e + 1) % m]
+    const edgeLen = dist(a, b)
+    if (edgeLen < 1e-6) continue
+    const ia = idx[e]
+    const ib = idx[(e + 1) % m]
+    let maxDev = 0
+    const scan = (lo, hi) => {
+      for (let i = lo; i < hi; i++) {
+        const d = perpDist(pts[i], a, b)
+        if (d > maxDev) maxDev = d
+      }
+    }
+    if (ib > ia) scan(ia + 1, ib)
+    else { scan(ia + 1, pts.length); scan(0, ib) } // wrap edge on a closed loop
+    if (maxDev / edgeLen > maxBowFrac) return false
+  }
+  return true
 }
 
 // ---------- Kåsa least-squares circle fit (inline; ref: circle-fit) ----------
@@ -356,7 +395,10 @@ export function beautifyStroke(points, opts = {}) {
   }
 
   // 2) Polygon: a closed loop with a few dominant corners → straight edges through them.
-  if (!result && simple && closed && cornersN >= 3 && cornersN <= 6) {
+  //    Only when the edges are GENUINELY straight; a curved belly (teardrop/leaf) bows too much
+  //    to be faceted into a triangle/quad and falls through to smoothing (manual) or stays raw (auto).
+  if (!result && simple && closed && cornersN >= 3 && cornersN <= 6 &&
+      edgesAreStraight(pts, corners, true, o.maxEdgeBowFrac)) {
     const kind = cornersN === 3 ? 'triangle' : cornersN === 4 ? 'rect' : 'polygon'
     result = accept({ kind, poly: polylineThrough(corners, step, true) })
   }

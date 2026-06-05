@@ -67,3 +67,19 @@ docs/app/          # app dev docs: APP-PLAN, SPEC, TEST-PLAN, IMPROVEMENTS, …
 
 > The SVG glyph shapes are consistent stylizations (not exact manga copies), sufficient for rendering
 > and recognition. See [docs/app/APP-PLAN.md](docs/app/APP-PLAN.md) for the full architecture and roadmap.
+
+## Disclaimer
+
+This is an unofficial fan-made project for learning, experimentation, and appreciation. It is not
+affiliated with, endorsed by, or sponsored by the official creators, publishers, licensors, or
+production partners of Witch Hat Atelier.
+
+Witch Hat Atelier and related names, artwork, symbols, and trademarks belong to their respective
+rights holders. The sigils, signs, spell terminology, and visual effects in this project are partial
+fan references and interactive interpretations, not official assets or canonical rules.
+
+## License
+
+Released under the [MIT License](LICENSE). The MIT License covers the original source code in this
+repository only; it does **not** grant any rights to Witch Hat Atelier intellectual property (see the
+Disclaimer above).
