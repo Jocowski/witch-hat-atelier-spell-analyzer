@@ -150,6 +150,7 @@
 
   "recognition": {
     "note": "Recognizer ($P) tuning. sampleWeights weights a template by where it came from (a user CORRECTION is the most trustworthy training signal, a CONFIRMED catalog harvest the least, a WEB submission weight 0 — inert until an admin verifies and re-tiers it). Applied as adjDist = dist / weight before ranking. confidenceMinPct gates a detection: below it, the symbol is shown as 'unknown?' and kept OUT of the engine input so a wrong guess doesn't poison the deduction.",
+    "engine": "p",
     "sampleWeights": { "corrected": 1.5, "drawn": 1.0, "confirmed": 0.6, "web": 0 },
     "confidenceMinPct": 30,
 
@@ -167,7 +168,7 @@
     "cvThreshold": 0.3,
     "cvThresholdRelaxed": 0.45,
     "minRingRadius": 40,
-    "rotationSteps": 24,
+    "rotationSteps": 36,
     "prefilterK": 15,
     "prefilterCoarsePoints": 8,
     "floodFill": true,

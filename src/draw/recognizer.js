@@ -725,7 +725,7 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
  * @param {Array}  ringGroups  [{ ring:{cx,cy,r,closed,id}, groups:[…] }]
  * @param {Array}  relations   nest/link relation objects
  */
-function buildMultiRingComposition(ringGroups, relations) {
+export function buildMultiRingComposition(ringGroups, relations) {
   const circles = ringGroups.map(({ ring, groups }) => {
     // Center for this circle in world coords
     const cx = ring.cx, cy = ring.cy
