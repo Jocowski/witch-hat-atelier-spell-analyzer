@@ -336,3 +336,76 @@
   text-align: center;
   min-width: 34px;
 }
+
+/* The collapse toggle is desktop-hidden; it only appears in the mobile top-bar. */
+.ds-dock-toggle { display: none; }
+
+/* ── Mobile: the vertical left rail becomes a single-row, horizontally-scrolling top bar ──
+   (SPEC-responsive-mobile P2 / L3). One compact strip (~48px) instead of a multi-row block,
+   plus a collapse toggle so the canvas can take the whole screen. */
+@media (max-width: 640px) {
+  .ds-surface { flex-direction: column; }
+
+  .ds-dock {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;            /* single row — scroll horizontally instead of stacking rows */
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 5px 8px;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .ds-dock::-webkit-scrollbar { display: none; }
+
+  /* Collapse toggle — sticky at the start so it stays reachable while the strip scrolls. */
+  .ds-dock-toggle {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 0 10px;
+    min-height: 40px;
+    font-size: 0.74rem;
+    white-space: nowrap;
+  }
+
+  .ds-dock .ds-tool-group,
+  .ds-dock .ds-palette-group,
+  .ds-dock .ds-size-group,
+  .ds-dock .ds-zoom-group,
+  .ds-dock .ds-assist-group { width: auto; flex-shrink: 0; flex-direction: row; align-items: center; }
+  .ds-dock .ds-group-label,
+  .ds-dock .ds-section-label { display: none; }
+  .ds-dock .ds-tool-row { display: flex; flex-direction: row; width: auto; gap: 3px; }
+  .ds-dock .ds-palette { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 5px; }
+  .ds-dock .ds-sep { width: 1px; height: 30px; margin: 0 2px; flex-shrink: 0; }
+  .ds-dock .ds-size-wrap { flex-direction: row; }
+  /* Same dimensions as the established compact slider, so brush sizing feels identical to before. */
+  .ds-dock .ds-size-slider { writing-mode: horizontal-tb; direction: ltr; width: 80px; height: 6px; }
+  .ds-dock .ds-zoom-wrap { flex-direction: row; }
+
+  /* Collapsed: only the toggle remains, so the canvas gets the full height. */
+  .ds-dock.ds-dock-collapsed > *:not(.ds-dock-toggle) { display: none; }
+}
+
+/* Coarse-pointer hit targets for the dock controls (SPEC P0.3 / E1/E2). */
+@media (pointer: coarse) {
+  .ds-tool-btn { min-height: 44px; min-width: 40px; }
+  .ds-swatch   { width: 32px; height: 32px; }
+  .ds-zoom-btn { width: 40px; height: 38px; }
+  /* NOTE: the brush-size slider is intentionally left at its original sizing — enlarging it
+     made the brush width hard to set low (strokes came out too thick). */
+}
