@@ -1,0 +1,26 @@
+[project]
+# Dev-only ML toolchain for SPEC-ml-recognizer.md (M3 encoder bake). NEVER imported
+# by the app, tests, or CI — `npm install` / `npm run build` must succeed with no Python.
+name = "wha-ml"
+version = "0.1.0"
+description = "Siamese glyph encoder bake for the Witch Hat Atelier spell recognizer (M3)."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch>=2.5",
+    "torchvision>=0.20",   # provides datasets.Omniglot (auto-download) for the base metric training
+    "numpy>=1.26",
+    "pillow>=10.0",        # raster I/O for the training images produced by the JS rasterizer
+    "onnx>=1.16",          # ONNX export
+    "onnxruntime>=1.18",   # torch<->onnx parity verification before commit
+]
+
+# Pull torch/torchvision from the CUDA (cu121) wheel index so the RTX 2060 SUPER is used.
+# CPU fallback: drop the [tool.uv.sources] block (or switch the index url to .../whl/cpu).
+[tool.uv.sources]
+torch = { index = "pytorch-cu121" }
+torchvision = { index = "pytorch-cu121" }
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true

@@ -9,7 +9,7 @@ import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 
 export default [
-  { ignores: ['dist/**', 'node_modules/**', 'assets/**', 'supabase/**', '.claude/**', '**/*.json'] },
+  { ignores: ['dist/**', 'node_modules/**', 'assets/**', 'supabase/**', '.claude/**', '**/*.json', 'ml/.venv/**', 'ml/data/**'] },
 
   js.configs.recommended,
 
@@ -41,6 +41,13 @@ export default [
   // Node tooling — tools/*.mjs, *.cjs, *.mjs (Node scripts: ai-bridge, seed-admin, etc.)
   {
     files: ['tools/**/*.{mjs,cjs}', '*.cjs', '*.mjs'],
+    languageOptions: { sourceType: 'module', globals: { ...globals.node } },
+    rules: { 'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }] },
+  },
+
+  // ML tooling — ml/*.mjs (Node ESM scripts: render_dataset, etc.)
+  {
+    files: ['ml/**/*.mjs'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
     rules: { 'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }] },
   },

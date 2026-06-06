@@ -25,3 +25,10 @@ supabase/.temp/
 
 # Local-only prod DB connection string (never commit)
 supabase/.prod-conn
+
+# ML toolchain (dev-only; never imported by app/tests/CI)
+# Generated training images and model checkpoints are large and reproducible.
+ml/data/images/
+ml/data/labels.json
+ml/data/omniglot/
+ml/checkpoints/*.pt

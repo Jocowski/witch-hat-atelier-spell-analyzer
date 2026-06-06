@@ -1,0 +1,14 @@
+# Python env + ML artifacts — none of this is committed (the trained model.onnx
+# lives under src/draw/ml-assets/, committed from there, not here).
+.venv/
+__pycache__/
+*.pyc
+.uv/
+uv.lock
+# datasets + training scratch
+data/
+omniglot-py/
+checkpoints/
+*.pt
+*.png
+!**/fixtures/*.png
