@@ -1,5 +1,6 @@
 /**
  * recognizer-accuracy.mjs — B0/B1/B2/B3/B4 accuracy harness for the $P recognizer.
+ *                           M5: --engine=p|ml A/B comparison.
  *
  * Measures top-1 and top-3 classification accuracy on a dataset of labeled samples.
  *
@@ -19,9 +20,18 @@
  *
  * CLI flags (--key=value or --key value, or bare boolean --flag):
  *
+ * Engine selection (M5):
+ *   --engine    recognizer engine to score: "p" (default, $P) or "ml" (onnx learned).
+ *               "ml" loads the onnx session from Node using local wasm paths (no Vite).
+ *               If the onnx runtime is unavailable, no-ops with a clear message (like --source=db).
+ *               --engine=ml runs ONLY the ML engine and prints its B0/B1/B2 metrics.
+ *               To run the full A/B comparison, use --engine=ab (prints $P vs ML side-by-side,
+ *               evaluates the M5 win criterion, and prints a decision recommendation).
+ *
  * Source selection (B4):
  *   --source    dataset source: "seed" (default, B0–B3 synthetic), "fixture" (JSON file),
  *               or "db" (live Supabase pull via SUPABASE_URL + SUPABASE_SECRET env vars).
+ *               Note: --engine=ml and --engine=ab only operate on --source=seed.
  *   --file      path to fixture JSON when --source=fixture (required for that mode).
  *   --folds     number of folds for k-fold cross-validation (--source=fixture/db only).
  *               Default = leave-one-out (LOO): folds = sample count per label.
@@ -59,11 +69,15 @@
  *   node tools/recognizer-accuracy.mjs --source=fixture --file samples.json --folds=5
  *   node tools/recognizer-accuracy.mjs --source=db
  *   node tools/recognizer-accuracy.mjs --source=db --verified-only
+ *   node tools/recognizer-accuracy.mjs --engine=ml
+ *   node tools/recognizer-accuracy.mjs --engine=ab
+ *   node tools/recognizer-accuracy.mjs --engine=ab --seed=42 --perN=10
  */
 
 import { createRequire } from 'module'
 import { writeFileSync, readFileSync } from 'fs'
-import { pathToFileURL } from 'url'
+import { pathToFileURL, fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
 import {
   buildClouds,
   bestMatchOverRotations,
@@ -78,6 +92,10 @@ import {
 const require = createRequire(import.meta.url)
 const seedData = require('../data/training-seed.json')
 const rules = require('../data/rules.json')
+
+// ── __dirname equivalent (ESM) ────────────────────────────────────────────────────────────────────
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 // ── CLI argument parsing (--key=value or --key value) ────────────────────────────────────────────
 
@@ -99,6 +117,9 @@ function parseArgs(argv) {
 }
 
 const cliArgs = parseArgs(process.argv.slice(2))
+
+// M5: engine selector
+const ENGINE = typeof cliArgs.engine === 'string' ? cliArgs.engine : 'p'
 
 // B4: source selector
 const SOURCE        = typeof cliArgs.source === 'string' ? cliArgs.source : 'seed'
@@ -266,6 +287,141 @@ function buildTestItems() {
     }
   }
   return items
+}
+
+// ── M5: Node-side ML runtime loader ─────────────────────────────────────────────────────────────
+//
+// Loads model.onnx via readFileSync + local file:// wasm paths so the harness can run
+// the same rankWithMlRuntime scoring core the browser uses.  Only the *loader* differs;
+// the ranking math is the SAME code (imported from mlRecognizer.js).
+//
+// Loading is done once and the result is cached in `_mlRuntime`.
+// Returns null (and logs a message) if anything fails — mirrors --source=db graceful-skip.
+
+let _mlRuntime = null   // { ort, session, prototypes, meta } | null
+
+/**
+ * Load the ML runtime for use in Node.  Idempotent — safe to call multiple times.
+ *
+ * Node-side loading strategy (M4a proof + M5 implementation):
+ *   1. Import onnxruntime-web (works in Node; dynamic import used to avoid crashing if absent).
+ *   2. Set numThreads=1 (same trap as the browser path — wasm threads need shared memory).
+ *   3. Set wasmPaths to the local `file://` URL for the onnxruntime-web dist folder.
+ *      This is the key difference vs the browser (which uses a CDN or Vite's public URL).
+ *   4. Load model.onnx from disk via readFileSync and pass the ArrayBuffer to InferenceSession.
+ *   5. Load prototypes from the bundled prototypes.json (Supabase is not used by the harness).
+ *
+ * @returns {Promise<{ort, session, prototypes, meta} | null>}
+ *   null if the runtime cannot be loaded (onnx unavailable, model missing, etc.).
+ */
+async function loadMlRuntimeForNode() {
+  if (_mlRuntime !== null) return _mlRuntime
+
+  let ort
+  try {
+    ort = await import('onnxruntime-web')
+  } catch (err) {
+    console.log(`  [ML] onnxruntime-web not available in Node: ${err.message}`)
+    console.log('  [ML] Skipping ML engine — install onnxruntime-web to enable.')
+    return null
+  }
+
+  try {
+    // numThreads=1: wasm threads require SharedArrayBuffer + COOP/COEP which Node doesn't have
+    // in this context.  Single-thread is correct and mirrors the browser (M4 §trap).
+    ort.env.wasm.numThreads = 1
+
+    // Resolve the local onnxruntime-web wasm dist folder as a file:// URL.
+    // This is the only env-specific part: in the browser, wasm is served from the CDN or Vite
+    // public URL; in Node, we point directly to the installed package on disk.
+    const wasmDir = resolve(__dirname, '..', 'node_modules', 'onnxruntime-web', 'dist')
+    ort.env.wasm.wasmPaths = pathToFileURL(wasmDir + '/').href
+
+    // Load model.onnx from disk (the same committed binary Vite would serve via ?url).
+    const modelPath = resolve(__dirname, '..', 'src', 'draw', 'ml-assets', 'model.onnx')
+    const modelBuf = readFileSync(modelPath)
+    const arrayBuf = modelBuf.buffer.slice(modelBuf.byteOffset, modelBuf.byteOffset + modelBuf.byteLength)
+
+    const session = await ort.InferenceSession.create(arrayBuf, {
+      executionProviders: ['wasm'],
+    })
+
+    // Load model meta (version, inputSize, embeddingDim).
+    const metaPath = resolve(__dirname, '..', 'src', 'draw', 'ml-assets', 'model.meta.json')
+    const metaData = JSON.parse(readFileSync(metaPath, 'utf8'))
+    const modelVersion = String(metaData.version ?? '1')
+
+    // Load prototypes from the bundled prototypes.json (offline fallback — no Supabase in harness).
+    const protoPath = resolve(__dirname, '..', 'src', 'draw', 'ml-assets', 'prototypes.json')
+    const protoData = JSON.parse(readFileSync(protoPath, 'utf8'))
+    const prototypes = Object.values(protoData.symbols).map((sym) => ({
+      name:      sym.name,
+      role:      sym.role,
+      embedding: l2NormalizeHarness(new Float32Array(sym.embedding)),
+    }))
+
+    const meta = {
+      modelVersion,
+      inputSize:    metaData.inputSize ?? 32,
+      embeddingDim: prototypes[0]?.embedding.length ?? 64,
+    }
+
+    _mlRuntime = { ort, session, prototypes, meta }
+    return _mlRuntime
+  } catch (err) {
+    console.log(`  [ML] Failed to load ML runtime: ${err.message}`)
+    console.log('  [ML] Skipping ML engine.')
+    return null
+  }
+}
+
+/**
+ * L2-normalize a Float32Array (local copy for the harness; does NOT import from mlRecognizer.js
+ * to avoid pulling in the full mlRecognizer module at harness load time — this tiny utility is
+ * the only thing needed before the runtime is loaded).
+ */
+function l2NormalizeHarness(arr) {
+  let norm = 0
+  for (let i = 0; i < arr.length; i++) norm += arr[i] * arr[i]
+  norm = Math.sqrt(norm)
+  if (norm < 1e-10) return arr
+  const out = new Float32Array(arr.length)
+  for (let i = 0; i < arr.length; i++) out[i] = arr[i] / norm
+  return out
+}
+
+/**
+ * Classify one test item using the ML engine.
+ * Returns { ranked: [{name, role, score, cosine}] } — same shape as classifyItem for scoring.
+ *
+ * Uses rankWithMlRuntime from mlRecognizer.js — the SHARED scoring core (cosine/softmax/rotation).
+ * The confidence for calibration = linear map of best cosine → [0, 100] (same as relabelGroups).
+ *
+ * Points are converted to stroke format: one stroke, {X,Y} → {x,y}.
+ *
+ * @param {{ trueName: string, trueRole: string, points: Array<{X,Y,ID}> }} item
+ * @param {{ ort, session, prototypes, meta }} runtime  pre-loaded ML runtime
+ * @returns {Promise<{ ranked: Array<{name, role, score, cosine}>, mlConfidence: number }>}
+ */
+async function classifyItemWithMl(item, runtime) {
+  // Import the SHARED ranking core from mlRecognizer.js (not a copy — the same code).
+  const { rankWithMlRuntime } = await import('../src/draw/mlRecognizer.js')
+
+  // Convert {X,Y,ID} points → one stroke of {x,y} points (the rasterizer accepts this).
+  const stroke = item.points.map((p) => ({ x: p.X, y: p.Y }))
+  const strokes = [stroke]
+
+  // role for rotation sweep selection (same logic as relabelGroups in mlRecognizer.js)
+  const role = item.trueRole === 'sigil' ? 'sigil' : 'sign'
+
+  const ranked = await rankWithMlRuntime(runtime, strokes, { role })
+
+  // ML confidence for calibration: best cosine → [0,100] (same linear map as relabelGroups).
+  const mlConfidence = ranked.length > 0
+    ? Math.round(((ranked[0].cosine + 1) / 2) * 100)
+    : 0
+
+  return { ranked, mlConfidence }
 }
 
 // ── Classification ───────────────────────────────────────────────────────────────────────────────
@@ -1162,6 +1318,300 @@ function runKFold(samples, sourceLabel) {
   printCalibration({ calibrationData })
 }
 
+// ── M5: ML accuracy runner ────────────────────────────────────────────────────────────────────────
+
+/**
+ * Run the ML engine over the synthetic test items (same dataset as runAccuracy).
+ * Uses the SAME testItems so the A/B comparison is apples-to-apples.
+ *
+ * Only supports --source=seed (synthetic dataset).
+ * Returns null if the ML runtime could not be loaded.
+ *
+ * @param {Array} testItems  the same perturbed items buildTestItems() produces
+ * @returns {Promise<{tally, confusion, calibrationData, symTotals} | null>}
+ */
+async function runAccuracyMl(testItems) {
+  const runtime = await loadMlRuntimeForNode()
+  if (!runtime) return null
+
+  const protoNames = new Set(runtime.prototypes.map((p) => p.name))
+  const testNames  = new Set(testItems.map((it) => it.trueName))
+  const missing    = [...testNames].filter((n) => !protoNames.has(n))
+  if (missing.length > 0) {
+    console.log()
+    console.log(`  [ML] Coverage gap: ${missing.length} test symbol(s) have no prototype → ranked last.`)
+    console.log(`  [ML] Missing: ${missing.join(', ')}`)
+  }
+
+  const tally = {
+    sign:    { items: 0, top1: 0, top3: 0 },
+    sigil:   { items: 0, top1: 0, top3: 0 },
+    overall: { items: 0, top1: 0, top3: 0 },
+  }
+  const confusion = {}
+  const symTotals = {}
+  const calibrationData = []
+
+  for (const item of testItems) {
+    const { ranked, mlConfidence } = await classifyItemWithMl(item, runtime)
+    const role = item.trueRole
+
+    const bucket = tally[role] ?? tally.sign
+    bucket.items++
+    tally.overall.items++
+
+    const isTop1 = ranked.length > 0 && ranked[0].name === item.trueName
+    if (isTop1) { bucket.top1++; tally.overall.top1++ }
+
+    const top3Names = ranked.slice(0, 3).map((r) => r.name)
+    const isTop3 = top3Names.includes(item.trueName)
+    if (isTop3) { bucket.top3++; tally.overall.top3++ }
+
+    const { trueName } = item
+    if (!symTotals[trueName]) symTotals[trueName] = { total: 0, correct: 0, role }
+    symTotals[trueName].total++
+    if (isTop1) symTotals[trueName].correct++
+
+    if (!isTop1 && ranked.length > 0) {
+      const predName = ranked[0].name ?? '(none)'
+      if (!confusion[trueName]) confusion[trueName] = {}
+      confusion[trueName][predName] = (confusion[trueName][predName] ?? 0) + 1
+    }
+
+    // ML confidence for calibration = linear cosine map [−1,1] → [0,100].
+    calibrationData.push({ confidence: mlConfidence, correct: isTop1 })
+  }
+
+  return { tally, confusion, calibrationData, symTotals }
+}
+
+/**
+ * Run both engines and print a side-by-side A/B comparison (M5 main output).
+ * Evaluates the win criterion and prints a decision recommendation.
+ * Does NOT modify rules.json — the decision is reported for human review.
+ *
+ * M0 frozen baseline (must beat for ML adoption):
+ *   sign top-1 97.8%  · sigil top-1 96.2%  · overall top-1 97.1%
+ */
+async function runABComparison() {
+  // ── Frozen M0 baseline (from SPEC-ml-recognizer.md §Phase log §M0) ──────────────────────────
+  // These are the tuned-$P numbers ML must beat, no role regressing, to be adopted as default.
+  const BASELINE = {
+    sign:    { top1: 0.978 },
+    sigil:   { top1: 0.962 },
+    overall: { top1: 0.971 },
+  }
+
+  console.log()
+  console.log('══════════════════════════════════════════════════════════════════════════════')
+  console.log('  M5 A/B Comparison — $P vs ML recognizer')
+  console.log(`  synthetic dataset: seed=${SEED}, perN=${PER_N}`)
+  console.log('══════════════════════════════════════════════════════════════════════════════')
+  console.log()
+  console.log('  ⚠  SYNTHETIC-OVERSTATEMENT CAVEAT (both engines):')
+  console.log('     Test items are perturbed copies of the SAME seed templates used to build')
+  console.log('     the $P cloud AND the ML prototypes.  Both engines over-state real accuracy.')
+  console.log('     This A/B is RELATIVE — it shows which engine is stronger on this dataset.')
+  console.log('     Real validation = M2 dual-guess on real messy drawings from admin Training.')
+  console.log('     Do NOT treat the absolute numbers as a ground-truth claim.')
+  console.log()
+
+  // ── Run $P ─────────────────────────────────────────────────────────────────────────────────
+  const testItems = buildTestItems()
+
+  console.log('  Running $P engine...')
+  const pTally     = { sign: { items: 0, top1: 0, top3: 0 }, sigil: { items: 0, top1: 0, top3: 0 }, overall: { items: 0, top1: 0, top3: 0 } }
+  const pConfusion = {}
+  const pCalibData = []
+
+  for (const item of testItems) {
+    const { ranked } = classifyItem(item)
+    const role = item.trueRole
+    const bucket = pTally[role] ?? pTally.sign
+    bucket.items++; pTally.overall.items++
+
+    const isTop1 = ranked.length > 0 && ranked[0].name === item.trueName
+    if (isTop1) { bucket.top1++; pTally.overall.top1++ }
+
+    const top3Names = ranked.slice(0, 3).map((r) => r.name)
+    if (top3Names.includes(item.trueName)) { bucket.top3++; pTally.overall.top3++ }
+
+    if (!isTop1 && ranked.length > 0) {
+      const pred = ranked[0].name ?? '(none)'
+      if (!pConfusion[item.trueName]) pConfusion[item.trueName] = {}
+      pConfusion[item.trueName][pred] = (pConfusion[item.trueName][pred] ?? 0) + 1
+    }
+    if (ranked.length > 0) {
+      pCalibData.push({ confidence: confidencePct(ranked[0].dist), correct: isTop1 })
+    }
+  }
+
+  // ── Run ML ─────────────────────────────────────────────────────────────────────────────────
+  console.log('  Running ML engine (loading model)...')
+  const mlResult = await runAccuracyMl(testItems)
+
+  if (!mlResult) {
+    console.log()
+    console.log('  ML runtime unavailable — cannot run A/B comparison.')
+    console.log('  Install onnxruntime-web and ensure model.onnx is present.')
+    console.log()
+    // Still print $P results
+    console.log('  $P results (engine="p"):')
+    printAccuracyTable({ tally: pTally })
+    console.log()
+    return
+  }
+
+  const { tally: mlTally, confusion: mlConfusion, calibrationData: mlCalibData } = mlResult
+
+  // ── Side-by-side accuracy table ──────────────────────────────────────────────────────────────
+  console.log()
+  console.log('  Accuracy (top-1 / top-3):')
+  console.log()
+  const hdr = `  ${'role'.padEnd(10)} ${'items'.padStart(6)}  |  ${'$P top-1'.padStart(8)}  ${'$P top-3'.padStart(8)}  |  ${'ML top-1'.padStart(8)}  ${'ML top-3'.padStart(8)}  |  ${'delta top-1'.padStart(11)}`
+  console.log(hdr)
+  console.log(`  ${'-'.repeat(80)}`)
+
+  const roles = ['sign', 'sigil', 'overall']
+  for (const role of roles) {
+    const p  = pTally[role]
+    const ml = mlTally[role]
+    const pTop1Str   = pct(p.top1, p.items)
+    const pTop3Str   = pct(p.top3, p.items)
+    const mlTop1Str  = pct(ml.top1, ml.items)
+    const mlTop3Str  = pct(ml.top3, ml.items)
+    const deltaTop1  = p.items > 0 && ml.items > 0
+      ? (ml.top1 / ml.items - p.top1 / p.items) * 100
+      : null
+    const deltaStr   = deltaTop1 !== null
+      ? (deltaTop1 >= 0 ? '+' : '') + deltaTop1.toFixed(1) + 'pp'
+      : '  N/A'
+    console.log(
+      `  ${role.padEnd(10)} ${String(p.items).padStart(6)}  |  ${pTop1Str.padStart(8)}  ${pTop3Str.padStart(8)}  |  ${mlTop1Str.padStart(8)}  ${mlTop3Str.padStart(8)}  |  ${deltaStr.padStart(11)}`
+    )
+  }
+  console.log()
+
+  // ── Frozen M0 baseline vs ML ─────────────────────────────────────────────────────────────────
+  console.log('  Win criterion: ML top-1 >= M0 baseline for every role (no regression):')
+  console.log()
+  console.log(`  ${'role'.padEnd(10)}  ${'M0 baseline'.padStart(12)}  ${'ML top-1'.padStart(10)}  ${'result'.padStart(8)}`)
+  console.log(`  ${'-'.repeat(50)}`)
+  let mlWins = true
+  for (const role of roles) {
+    const base = BASELINE[role]?.top1 ?? 0
+    const ml   = mlTally[role]
+    const mlFrac = ml.items > 0 ? ml.top1 / ml.items : 0
+    const pass = mlFrac >= base
+    if (!pass) mlWins = false
+    const resultStr = pass ? 'PASS' : 'FAIL'
+    console.log(
+      `  ${role.padEnd(10)}  ${pct(Math.round(base * ml.items), ml.items).padStart(12)}  ${pct(ml.top1, ml.items).padStart(10)}  ${resultStr.padStart(8)}`
+    )
+  }
+  console.log()
+
+  // ── Top confusions — both engines ────────────────────────────────────────────────────────────
+  console.log('  Top confusions — $P:')
+  printConfusion(pConfusion)
+  console.log('  Top confusions — ML:')
+  printConfusion(mlConfusion)
+
+  // ── Calibration curves ────────────────────────────────────────────────────────────────────────
+  console.log('  Calibration — $P (confidence = $P geometric dist map, same as live gate):')
+  printCalibration({ calibrationData: pCalibData })
+  console.log('  Calibration — ML (confidence = cosine linear map → [0,100]):')
+  printCalibration({ calibrationData: mlCalibData })
+
+  // ── Decision ──────────────────────────────────────────────────────────────────────────────────
+  console.log('══════════════════════════════════════════════════════════════════════════════')
+  console.log('  M5 DECISION')
+  console.log('══════════════════════════════════════════════════════════════════════════════')
+  console.log()
+
+  const currentEngine = rules.recognition?.engine ?? 'p'
+  console.log(`  Current rules.json engine = "${currentEngine}"`)
+  console.log()
+
+  if (mlWins) {
+    console.log('  Result: ML PASSES the win criterion (top-1 >= M0 baseline for all roles,')
+    console.log('          no role regressing).')
+    console.log()
+    console.log('  RECOMMENDATION: flip recognition.engine to "ml" in data/rules.json.')
+    console.log()
+    console.log('  NOTE: This script does NOT auto-apply the flip (Opus makes the final call).')
+    console.log('  To apply: edit data/rules.json — change "engine": "p" → "engine": "ml".')
+    console.log()
+    console.log('  REMINDER: Synthetic accuracy over-states real accuracy for BOTH engines.')
+    console.log('  Before committing, validate on real drawings via M2 dual-guess in admin Training.')
+  } else {
+    console.log('  Result: ML does NOT pass the win criterion.')
+    console.log()
+    console.log('  RECOMMENDATION: keep recognition.engine = "p". ML stays opt-in.')
+    console.log()
+    // Print which roles failed
+    for (const role of roles) {
+      const base   = BASELINE[role]?.top1 ?? 0
+      const ml     = mlTally[role]
+      const mlFrac = ml.items > 0 ? ml.top1 / ml.items : 0
+      if (mlFrac < base) {
+        console.log(`  FAIL — ${role}: ML ${(mlFrac * 100).toFixed(1)}% < baseline ${(base * 100).toFixed(1)}%`)
+      }
+    }
+    console.log()
+    console.log('  To investigate: check the ML confusion table for systematic errors.')
+    console.log('  Consider re-baking the model (M3) with more augmentation or more fine-tune steps.')
+  }
+  console.log()
+}
+
+/**
+ * Run ML-only accuracy (--engine=ml mode): same synthetic dataset + B0/B1/B2 metrics.
+ * No-ops gracefully if the ML runtime is unavailable.
+ */
+async function runAccuracyMlOnly() {
+  const testItems = buildTestItems()
+
+  console.log()
+  console.log(`ML recognizer accuracy — synthetic (seed=${SEED}, perN=${PER_N})`)
+  console.log(`  rotation half-range: sign ±${SIGN_ROT}°, sigil ±${SIGIL_ROT}° · scale ${SCALE_LO}–${SCALE_HI} · jitter ±${JITTER}px`)
+
+  const mlResult = await runAccuracyMl(testItems)
+  if (!mlResult) {
+    console.log()
+    console.log('  ML runtime unavailable — cannot measure ML accuracy.')
+    console.log('  Ensure onnxruntime-web is installed and src/draw/ml-assets/model.onnx exists.')
+    console.log()
+    return
+  }
+
+  const { tally, confusion, calibrationData, symTotals } = mlResult
+
+  printAccuracyTable({ tally })
+  console.log()
+  console.log(
+    '  Note: synthetic accuracy over-states real accuracy — test items are perturbed'
+  )
+  console.log(
+    '  copies of the seed templates, which are also the ML training source. ML A/B is'
+  )
+  console.log(
+    '  RELATIVE; real validation = M2 dual-guess on real drawings in admin Training.'
+  )
+  console.log()
+
+  // ML confidence for calibration uses cosine linear map (not $P dist).
+  // Document this mapping clearly alongside the B2 output.
+  console.log('  Note: ML confidence = (bestCosine + 1) / 2 * 100 (linear cosine map).')
+  console.log('  This is NOT the same scale as $P\'s geometric-dist confidence.')
+  console.log()
+
+  printConfusion(confusion)
+  printWeakest(symTotals)
+  if (DUMP_MATRIX) printMatrix({ symTotals, confusion })
+  printCalibration({ calibrationData })
+}
+
 // ── B5: Pure exported scoring function (no console, deterministic, self-contained PRNG) ──────────
 
 /**
@@ -1171,22 +1621,31 @@ function runKFold(samples, sourceLabel) {
  * on the module-level `rng` or CLI-derived consts. The module-level `clouds` (built from the
  * unperturbed seed) are reused — they are CLI-independent and deterministic given the seed data.
  *
- * @param {object} [opts]
- * @param {number} [opts.seed=1]       PRNG seed — same seed → bit-identical results
- * @param {number} [opts.perN=5]       perturbations per template
- * @param {number} [opts.signRot=180]  sign rotation half-range in deg (full circle)
- * @param {number} [opts.sigilRot=15]  sigil rotation half-range in deg (upright wobble)
- * @param {number} [opts.scaleLo=0.8]  minimum scale factor
- * @param {number} [opts.scaleHi=1.25] maximum scale factor
- * @param {number} [opts.jitter=2]     per-point ±jitter in px
- * @returns {{
+ * Supports engine="p" (default, $P — synchronous) and engine="ml" (ML — async, returns a Promise).
+ * When engine="ml":
+ *   - Loads the ML runtime via loadMlRuntimeForNode().
+ *   - If the runtime is unavailable, returns null (no-op, no crash).
+ *   - Uses rankWithMlRuntime (the shared scoring core) for each test item.
+ *
+ * @param {object} [params]
+ * @param {number} [params.seed=1]       PRNG seed — same seed → bit-identical results
+ * @param {number} [params.perN=5]       perturbations per template
+ * @param {number} [params.signRot=180]  sign rotation half-range in deg (full circle)
+ * @param {number} [params.sigilRot=15]  sigil rotation half-range in deg (upright wobble)
+ * @param {number} [params.scaleLo=0.8]  minimum scale factor
+ * @param {number} [params.scaleHi=1.25] maximum scale factor
+ * @param {number} [params.jitter=2]     per-point ±jitter in px
+ * @param {string} [params.engine='p']   'p' ($P, default) or 'ml' (onnx ML)
+ * @returns {Promise<{
  *   overall: { top1: number, top3: number, items: number },
  *   byRole:  { sign: { top1: number, top3: number, items: number },
  *              sigil: { top1: number, top3: number, items: number } }
- * }}
+ * } | null>}
  *   top1/top3 are FRACTIONS in [0,1]. NO console output is produced.
+ *   Returns null when engine='ml' and the ML runtime is unavailable.
+ *   Returns a resolved Promise for engine='p' (always succeeds).
  */
-export function runSyntheticAccuracy({
+export async function runSyntheticAccuracy({
   seed     = 1,
   perN     = 5,
   signRot  = 180,
@@ -1194,9 +1653,20 @@ export function runSyntheticAccuracy({
   scaleLo  = 0.8,
   scaleHi  = 1.25,
   jitter   = 2,
+  engine   = 'p',
 } = {}) {
   // Own seeded PRNG — independent of the module-level `rng` (which is CLI-derived).
   const localRng = mulberry32(seed)
+
+  // For ML engine: load the runtime once before the loop.
+  let mlRuntime = null
+  let rankWithMlRuntimeFn = null
+  if (engine === 'ml') {
+    mlRuntime = await loadMlRuntimeForNode()
+    if (!mlRuntime) return null   // ML unavailable — no-op
+    const mlMod = await import('../src/draw/mlRecognizer.js')
+    rankWithMlRuntimeFn = mlMod.rankWithMlRuntime
+  }
 
   // Accumulate tally per role + overall
   const tally = {
@@ -1212,7 +1682,18 @@ export function runSyntheticAccuracy({
         tmpl.points, rotHalfRange, localRng, scaleLo, scaleHi, jitter
       )
       const item = { trueName: tmpl.name, trueRole: tmpl.role, points: perturbedPoints }
-      const { ranked } = classifyItem(item)
+
+      let ranked
+      if (engine === 'ml') {
+        // ML path: convert points → stroke, call shared scoring core.
+        const stroke  = item.points.map((p) => ({ x: p.X, y: p.Y }))
+        const strokes = [stroke]
+        const role    = item.trueRole === 'sigil' ? 'sigil' : 'sign'
+        ranked = await rankWithMlRuntimeFn(mlRuntime, strokes, { role })
+      } else {
+        // $P path: existing synchronous classifyItem.
+        ;({ ranked } = classifyItem(item))
+      }
 
       const role = tmpl.role
       const bucket = tally[role] ?? tally.sign
@@ -1248,6 +1729,31 @@ export function runSyntheticAccuracy({
 // ── Entry point ───────────────────────────────────────────────────────────────────────────────────
 
 async function main() {
+  // M5: engine routing — ml/ab modes only support --source=seed
+  if (ENGINE === 'ml') {
+    if (SOURCE !== 'seed') {
+      console.error('--engine=ml only supports --source=seed (synthetic dataset).')
+      process.exit(1)
+    }
+    await runAccuracyMlOnly()
+    return
+  }
+
+  if (ENGINE === 'ab') {
+    if (SOURCE !== 'seed') {
+      console.error('--engine=ab only supports --source=seed (synthetic dataset).')
+      process.exit(1)
+    }
+    await runABComparison()
+    return
+  }
+
+  if (ENGINE !== 'p') {
+    console.error(`Unknown --engine value: "${ENGINE}". Use "p" (default), "ml", or "ab".`)
+    process.exit(1)
+  }
+
+  // engine="p": original $P path (unchanged behavior)
   if (SOURCE === 'seed') {
     runAccuracy()
   } else if (SOURCE === 'fixture') {
