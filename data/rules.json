@@ -261,7 +261,14 @@
     "gravityLevitationDivisor":  3,
 
     "forceTiltMaxDeg":   76,
-    "minSurfaceDirectionMagnitude": 0.001
+    "minSurfaceDirectionMagnitude": 0.001,
+
+    "radialIntensityDivisor": 4,
+    "radialArchBase":         0.12,
+    "radialArchForce":        0.18,
+
+    "columnBalanceFloor":     0.12,
+    "columnSaturateKnee":     0.34
   },
 
   "renderer": {

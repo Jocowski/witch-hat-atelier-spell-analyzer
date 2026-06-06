@@ -1,0 +1,74 @@
+{
+  "format": "wha-spell@2",
+  "name": "Inverted Column Ward",
+  "circles": [
+    {
+      "id": "k0",
+      "name": "",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": null,
+      "ring": {
+        "closed": true,
+        "doubled": false,
+        "size": "medium"
+      },
+      "core": {
+        "id": "c1",
+        "type": "water",
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "scale": 1,
+        "inverted": false
+      },
+      "components": [
+        {
+          "id": "c2",
+          "type": "column",
+          "role": "sign",
+          "x": 0,
+          "y": -90,
+          "rotation": 180,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c3",
+          "type": "column",
+          "role": "sign",
+          "x": 90,
+          "y": 0,
+          "rotation": 270,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c4",
+          "type": "column",
+          "role": "sign",
+          "x": 0,
+          "y": 90,
+          "rotation": 0,
+          "scale": 1,
+          "inverted": true
+        },
+        {
+          "id": "c5",
+          "type": "column",
+          "role": "sign",
+          "x": -90,
+          "y": 0,
+          "rotation": 90,
+          "scale": 1,
+          "inverted": true
+        }
+      ],
+      "dyes": [],
+      "inkColor": null
+    }
+  ],
+  "relations": []
+}

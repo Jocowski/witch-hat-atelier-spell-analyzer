@@ -82,6 +82,12 @@ export function buildSpellIRShim(result, ringClosed, activatedAt, opts = {}) {
     fillRate: base.fillRate,
     capacity: power > 1 && base.capacity != null ? base.capacity * BLOOD_ORB_GROWTH : base.capacity,
 
+    // Inverted-column radial spread — forwarded straight from the engine IR so the renderer's
+    // radial-fountain branch (SPEC-inverted-column.md §L4) runs. Without this the inverted seal
+    // falls through to the normal water stream and reads as a weak blob instead of spreading
+    // outward around the seal. Present only when the engine flagged flow.inverted (Φ<0).
+    radialSpread: base.radialSpread,
+
     // Quality (used for partial-failure threshold)
     quality: base.quality ?? 1.0,
 

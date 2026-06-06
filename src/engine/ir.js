@@ -11,7 +11,7 @@
 //
 // `assembleSpellIR(facts, cfg)` — main export.
 // `directionFromSurfaceVector(sv, force, cfg)` — exported for unit tests.
-import { clamp, canSteer, CANVAS_RADIUS, computeContainment } from './geometry.js'
+import { clamp, canSteer, CANVAS_RADIUS, computeContainment, pressureLateralShare } from './geometry.js'
 
 // ---------- 3D direction with tilt (SPEC §1.5) ----------
 // Adapted from the sibling project's directionFromSurfaceVector() in spellDirection.js.
@@ -55,7 +55,7 @@ export function directionFromSurfaceVector(sv, force, cfg) {
 //   }
 // `cfg` — rules.json irTuning block
 export function assembleSpellIR(facts, cfg) {
-  const { valid, analysis, circle, signComps, types, aim, familyOf, grammarOps } = facts
+  const { valid, analysis, circle, signComps, types, aim, familyOf, grammarOps, flow } = facts
 
   if (!valid) {
     return {
@@ -162,6 +162,26 @@ export function assembleSpellIR(facts, cfg) {
       containRadius: containment.radiusFrac,
       fillRate: containment.fillFrac,
       capacity: containment.capacity,
+    }
+  }
+
+  // --- inverted-column override (SPEC-inverted-column.md §L2) ---
+  // Outward/inverted column flow (einlair Φ<0) spreads the substance radially AROUND the seal with
+  // NO upward jet. Emit a radialSpread block for the renderer and force the direction in-plane
+  // (kill the upward z the cancelled aim would otherwise imply).
+  if (flow?.inverted) {
+    const tangential = (flow.parts || []).reduce((sum, p) => sum + (p.b ?? 0), 0)
+    const swirl = flow.T > 0 ? clamp(tangential / flow.T, -1, 1) : 0
+    direction = { x: 0, y: 0, z: 0, xTiltDeg: 0, yTiltDeg: 0, tiltFromZDeg: 90 }
+    return {
+      force, spread, focus, range, duration, stability, gravity, dirCoherence, direction,
+      radialSpread: {
+        intensity:    clamp(flow.T / (cfg.radialIntensityDivisor ?? 4)), // → particle count / reach
+        biasAngle:    flow.netAngle,        // 0 = north, clockwise (engine convention)
+        biasStrength: pressureLateralShare(flow.netFrac, cfg), // 0 = uniform ring, 1 = one-sided (canon pressure curve)
+        swirl,                              // signed tangential share (−1..1)
+        archHeight:   clamp((cfg.radialArchBase ?? 0.12) + force * (cfg.radialArchForce ?? 0.18)),
+      },
     }
   }
 

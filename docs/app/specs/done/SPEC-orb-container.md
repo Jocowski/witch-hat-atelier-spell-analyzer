@@ -1,6 +1,7 @@
 # SPEC — Orb as a Container (the "fill a sphere" operator)
 
-> Status: **implemented** (L0–L6) · L5 renderer pending manual visual QA (`npm run dev`).
+> Status: **implemented & shipped** (L0–L6). L5 renderer QA'd and fixed in commit `bcbee7c`
+> ("water orb fills gradually, reads as a round ball, grows with blood dye").
 > Precedent: the Column/einlair flow feature
 > (`docs/theories/einlair-vector-analisys/`, `computeColumnFlow`).
 >

@@ -6,7 +6,7 @@ import { RULES, SPELLS, DYE_MAP, getComponentDef } from './data.js'
 import { getSnapshot } from './symbolStore.js'
 import { buildSignature as _buildSignature, buildCombinedSignature as _buildCombinedSignature, matchSpell as _matchSpell } from './match.js'
 import { toComposition, analyzeCircleWith, composeWith, reclassifyCorelessCircles } from './compose.js'
-import { computeOrientationAim } from './geometry.js'
+import { computeOrientationAim, computeColumnFlow } from './geometry.js'
 import { assembleSpellIR } from './ir.js'
 
 // Build the engine deps from the CURRENT symbol snapshot (baseline ⊕ DB overlay), so re-analysis
@@ -99,6 +99,7 @@ function buildIRFacts(circleResult, circle, grammar, signMap) {
     aim,
     familyOf,
     grammarOps: grammar.operators,
+    flow: computeColumnFlow(inside, familyOf),
   }
 }
 

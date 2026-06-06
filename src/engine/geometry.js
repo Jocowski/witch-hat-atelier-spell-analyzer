@@ -263,6 +263,22 @@ export function magnitudeOf(c) {
   return typeof m === 'number' && m > 0 ? m : (c?.scale ?? 1)
 }
 
+// Canon "pressure" response (Rising Platform of Water: "one sign longer than the rest → too much
+// pressure → the water spurts sideways"). Maps the raw radial imbalance netFrac (R/T) to the share
+// of the spell that exits laterally. A deadzone below `columnBalanceFloor` keeps near-equal columns
+// (hand-drawn wobble) balanced → no false lean; past it the lateral share ramps steeply (smoothstep)
+// and saturates at `columnSaturateKnee`, so one clearly-longer column quickly throws the spell
+// sideways. cfg is the rules.json irTuning block (params injected — this module stays JSON-free).
+export function pressureLateralShare(netFrac, cfg = {}) {
+  const floor = cfg.columnBalanceFloor ?? 0.12
+  const knee = cfg.columnSaturateKnee ?? 0.34
+  const nf = typeof netFrac === 'number' ? netFrac : 0
+  if (nf <= floor) return 0
+  if (nf >= knee) return 1
+  const t = (nf - floor) / (knee - floor)
+  return t * t * (3 - 2 * t) // smoothstep
+}
+
 // einlair flow model (docs/theories/einlair-vector-analysis). Treats each directional sign as a
 // flow vector cᵢ = magnitude · facing-unit. The flow that exits the seal RADIALLY is R = |Σ cᵢ|;
 // the total flow in is T = Σ|cᵢ|; the part that cancels radially is forced OUT OF PLANE (upward),

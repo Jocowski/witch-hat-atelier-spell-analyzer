@@ -2,7 +2,10 @@
 
 **Branch:** `feat/web-unified` (off `feat/spell-studio-experiments`, the most-updated feature branch) →
 later fast-forwarded onto `spell-studio-web` for deploy.
-**Status:** planned (no code yet — this is the design + change map).
+**Status:** **implemented & shipped** — merged to `main` and deployed (commits `dfcd523` "bring web-unified
+(unified gated Pages build) into main", `d101378` "deploy from main (unified gated build)"). All four gates
+(`src/app/capabilities.js`), `useTemplates`, `ConfigPanel`/`AdminOverlay`, the `web_submissions` migration,
+and `recognition.sampleWeights.web = 0` are in place.
 **Supersedes:** the deletion-fork model of [SPEC-web-prototype.md](../SPEC-web-prototype.md). That branch
 shipped a static build by *physically removing* the backend; this spec keeps **one codebase** and reveals
 features at **runtime** via independent gates. Once this ships, `spell-studio-web` becomes a deploy target,
