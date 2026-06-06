@@ -170,7 +170,7 @@
     "column": {
       "kind": "form",
       "verb": "is projected as a tight column or beam",
-      "invertedVerb": "is driven inward and erupts rather than projecting out",
+      "invertedVerb": "is driven inward and erupts rather than projecting out, spreading around the seal",
       "directional": true,
       "defaultDirection": "up"
     },
@@ -508,6 +508,17 @@
         ]
       },
       "text": "The columns drive the substance upward to fill the orb's sphere — pump and vessel."
+    },
+    {
+      "id": "column-dispersion",
+      "type": "note",
+      "when": {
+        "has": [
+          "column",
+          "dispersion"
+        ]
+      },
+      "text": "Inverted Columns and Dispersion both spread the substance outward around the seal; the Columns keep a directional bias (one side reaches farther) while Dispersion leaks uniformly — together they compound into a broad, even spread."
     },
     {
       "id": "orb-rigid-earth",

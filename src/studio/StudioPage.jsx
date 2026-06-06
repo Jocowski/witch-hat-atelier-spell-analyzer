@@ -20,7 +20,7 @@ import ConfigPanel     from './ConfigPanel.jsx'
 import ResultPanel from '../components/ResultPanel.jsx'
 import { analyze } from '../engine/analyze.js'
 import { isSigilType, getComponentDef } from '../engine/data.js'
-import { computeSignVectors, computeColumnFlow } from '../engine/geometry.js'
+import { computeSignVectors, computeColumnFlow, pressureLateralShare } from '../engine/geometry.js'
 import { useSymbolData } from '../engine/useSymbolData.js'
 import { loadDbSymbols } from '../engine/symbolLoader.js'
 import { toComposition, recognizedToPlaced } from './drawingModel.js'
@@ -117,10 +117,11 @@ function einlairDirection(comp) {
   const flow = computeColumnFlow(comps, familyOf)
   if (!flow) return { x: 0, y: 0, z: 1 } // nothing steers it → gentle upward spout
   const rad = (flow.netAngle * Math.PI) / 180
+  const lateral = pressureLateralShare(flow.netFrac, rules.irTuning)
   return {
-    x: Math.sin(rad) * flow.netFrac,
-    y: -Math.cos(rad) * flow.netFrac,
-    z: flow.inverted ? 0 : flow.upFrac,
+    x: Math.sin(rad) * lateral,
+    y: -Math.cos(rad) * lateral,
+    z: flow.inverted ? 0 : (1 - lateral),
   }
 }
 

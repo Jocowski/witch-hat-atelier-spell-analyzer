@@ -7,7 +7,8 @@
  * then totals R, T, U, Φ and a plain-English verdict). Pure presentation — all numbers come from
  * computeSignVectors()/computeColumnFlow() in the engine.
  */
-import { directionLabel } from '../engine/geometry.js'
+import { directionLabel, pressureLateralShare } from '../engine/geometry.js'
+import rules from '../../data/rules.json'
 
 // Match the canvas overlay colors so the schematic reads the same as the on-seal arrows.
 const C_SIGN = '#3aa0e8'
@@ -133,14 +134,15 @@ export default function FlowPanel({ signs = [], flow, ringRadius = 180 }) {
 }
 
 function verdict(flow) {
+  const lateral = pressureLateralShare(flow.netFrac, rules.irTuning)
+  const dir = directionLabel(flow.netAngle)
   if (flow.inverted) {
-    const bias = flow.netFrac > 0.15 ? ` biased ${directionLabel(flow.netAngle)}` : ''
+    const bias = lateral > 0.15 ? ` biased ${dir}` : ''
     return `Inverted (Φ<0): the magic spreads radially outward${bias}.`
   }
-  const dir = `${directionLabel(flow.netAngle)} (${Math.round(flow.netAngle)}°)`
-  const up = Math.round(flow.upFrac * 100)
-  const rad = Math.round(flow.netFrac * 100)
-  if (flow.upFrac > 0.6) return `Columns cancel radially → the spell erupts straight UP (≈${up}% upward).`
-  if (flow.netFrac > 0.6) return `Directed ${dir} — ≈${rad}% of the flow exits that way.`
-  return `Mixed: ≈${rad}% exits ${dir}, ≈${up}% goes upward.`
+  const latPct = Math.round(lateral * 100)
+  const upPct = Math.round((1 - lateral) * 100)
+  if (lateral < 0.12) return `Columns balanced → the spell rises straight UP.`
+  if (lateral > 0.85) return `One column dominates → the spell spurts ${dir} (≈${latPct}%, almost horizontal).`
+  return `Mixed: ≈${latPct}% spurts ${dir}, ≈${upPct}% rises up.`
 }

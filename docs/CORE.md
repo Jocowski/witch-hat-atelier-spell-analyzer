@@ -174,7 +174,11 @@ Geometry is how a drawn seal passes arguments to its operators. Six knobs:
   beam/lift — **not** compass north; only a genuine lateral imbalance earns a compass label.
 - **Position (where signs sit).** A one-sided cluster of region signs biases the manifestation
   toward that arc even when each faces inward (Rising Wave). Position imbalance of form signs
-  skews the beam (the Watershot lesson: a longer/larger column leans the jet its way).
+  skews the beam (the Watershot lesson: a longer/larger column leans the jet its way). The size→steer
+  response is **non-linear** (canon "pressure": a ~2× column already spurts the spell sideways) and
+  **outward** columns spread the substance *around* the seal instead of jetting up — both modelled in
+  [docs/app/specs/done/SPEC-inverted-column.md](app/specs/done/SPEC-inverted-column.md) (the einlair
+  flow model + `pressureLateralShare`).
 - **Quantity & size.** More or larger signs on one side win the direction; size sets *strength*
   for semi-directional signs and, for levitation, the weight it can hold. Bigger seal = more
   powerful overall.

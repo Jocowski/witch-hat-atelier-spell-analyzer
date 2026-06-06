@@ -9,6 +9,7 @@ import { drawWaterEffect } from './effects/waterEffect.js'
 import { drawWindEffect } from './effects/windEffect.js'
 import { drawEarthEffect } from './effects/earthEffect.js'
 import { drawLightEffect } from './effects/lightEffect.js'
+import { drawRadialSpreadEffect } from './effects/radialSpread.js'
 import { resetParticleState, clamp } from './effectUtils.js'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -191,7 +192,11 @@ export class SpellEffectRenderer {
 
     ctx.save()
     ctx.globalCompositeOperation = 'lighter'
-    drawEffect(ctx, this.state, renderSpellIR, ring, dt, this.config)
+    if (renderSpellIR.radialSpread) {
+      drawRadialSpreadEffect(ctx, this.state, renderSpellIR, ring, dt, this.config)
+    } else {
+      drawEffect(ctx, this.state, renderSpellIR, ring, dt, this.config)
+    }
     ctx.restore()
     // NOTE: the partial-failure flicker ring was removed — for a valid but low-stability spell it drew
     // a distracting pulsing red circle over a working cast. True failures still flicker (failed state).
