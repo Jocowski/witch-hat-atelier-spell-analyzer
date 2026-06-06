@@ -23,12 +23,14 @@
     "ai": "node tools/ai-bridge.mjs",
     "seed:training": "node tools/seed-training.mjs",
     "build:seed": "node tools/build-training-seed.mjs",
-    "seed:refresh": "npm run seed:training && npm run build:seed"
+    "seed:refresh": "npm run seed:training && npm run build:seed",
+    "bench:accuracy": "node tools/recognizer-accuracy.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",
     "imagetracerjs": "^1.2.6",
     "konva": "^9.3.22",
+    "onnxruntime-web": "^1.26.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-konva": "^18.2.16",

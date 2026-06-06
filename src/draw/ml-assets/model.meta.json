@@ -1,0 +1,18 @@
+{
+  "version": "1",
+  "arch": "SiamNet",
+  "inputSize": 32,
+  "inputChannels": 1,
+  "embeddingDim": 64,
+  "opset": 17,
+  "normalization": {
+    "description": "pixel values divided by 255, background=0, ink=1",
+    "inputRange": [
+      0.0,
+      1.0
+    ]
+  },
+  "parityMaxAbsDiff": 1.1920928955078125e-07,
+  "createdAt": "2026-06-06T20:19:00.594347Z",
+  "sourceCheckpoint": "finetuned.pt"
+}

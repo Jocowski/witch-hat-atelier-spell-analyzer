@@ -19,6 +19,7 @@
 
 import { useRef, useEffect, useCallback } from 'react'
 import { analyzeStrokes, buildClouds } from '../draw/recognizer.js'
+import { recognizeWithEngine } from '../draw/recognizerEngine.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -110,6 +111,20 @@ export function useRecognizerWorker(templates, clouds) {
   const recognizeAsync = useCallback((strokes, opts = {}) => {
     const reqId = ++reqIdRef.current
     latestReqIdRef.current = reqId
+
+    // ── ML engine branch: route through the dispatcher ────────────────────
+    // For engine:"ml" the dispatcher is the authority; the worker is $P-only.
+    // The dispatcher currently throws "not built yet (Phase M4)" — surface that
+    // as a rejected Promise without touching the $P worker path.
+    const engine = (opts && opts.engine) ? opts.engine : 'p'
+    if (engine !== 'p') {
+      return recognizeWithEngine({
+        strokes,
+        opts,
+        // runP is provided as a fallback contract but the ml branch never calls it.
+        runP: () => analyzeStrokes(strokes, null, { ...opts, clouds: clouds ?? buildClouds([]) }),
+      })
+    }
 
     // ── Fallback: no worker available → synchronous path ──────────────────
     if (!workerOkRef.current || !workerRef.current) {

@@ -275,6 +275,51 @@
   border-radius: 6px;
 }
 
+/* ─── A/B live-guess two-column layout (M2, SPEC-ml-recognizer.md) ──────── */
+/* Sits inside .admin-live-guess; the $P column is unchanged, the ML column  */
+/* degrades to a calm placeholder until M4 ships the real engine.             */
+.admin-ab-columns {
+  display: flex;
+  gap: 0;
+  margin-top: 8px;
+}
+.admin-ab-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.admin-ab-col-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  margin-bottom: 2px;
+}
+.admin-ab-divider {
+  width: 1px;
+  background: var(--line);
+  margin: 0 14px;
+  flex-shrink: 0;
+}
+/* Pending state — subtle, not alarming */
+.admin-ab-pending {
+  font-style: italic;
+  opacity: 0.7;
+}
+/* Unavailable placeholder — calm, not an error color */
+.admin-ab-unavailable {
+  color: var(--ink-dim);
+  font-style: italic;
+}
+/* Stack columns on narrow widths (< 320 px effective) */
+@media (max-width: 400px) {
+  .admin-ab-columns { flex-direction: column; }
+  .admin-ab-divider  { width: auto; height: 1px; margin: 10px 0; }
+}
+
 /* Reference image of the symbol being trained (its SVG). */
 .admin-symbol-preview {
   margin-top: 8px;

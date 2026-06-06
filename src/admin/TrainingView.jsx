@@ -7,6 +7,10 @@ import { getComponentDef } from '../engine/data.js'
 import { listSymbols, addSymbol } from '../data-services/symbols.js'
 import { addSample, listSamples } from '../data-services/samples.js'
 import rules from '../../data/rules.json'
+import modelMeta from '../draw/ml-assets/model.meta.json'
+
+// M4b: model version string for Supabase prototype keying (from model.meta.json).
+const MODEL_VERSION = String(modelMeta.version ?? '1')
 
 const EMPTY_FORM = { kind: 'sign', name: '', label: '', status: 'canon', operator_kind: '' }
 
@@ -129,12 +133,29 @@ export default function TrainingView() {
   const [addLoading, setAddLoading] = useState(false)
 
   const [liveGuess, setLiveGuess] = useState(null)
+  // M2 (SPEC-ml-recognizer.md): ML column state.
+  //   mlGuess  — ranked [{name, score/confidence}] when M4 ships, null when not yet drawn
+  //   mlStatus — 'idle' | 'pending' | 'unavailable' | 'ready'
+  //   mlNote   — human-readable status text derived from the caught error message
+  //
+  // M4-readiness contract: when mlRecognizer.js ships, recognizeWithEngine({…, engine:'ml'})
+  // resolves to an array of { name: string, score: number, confidence?: number } ranked best-first.
+  // The ML column maps that to <GuessRow> exactly as the $P column does — no further UI change needed.
+  const [mlGuess, setMlGuess]   = useState(null)
+  const [mlStatus, setMlStatus] = useState('idle')   // 'idle'|'pending'|'unavailable'|'ready'
+  const [mlNote, setMlNote]     = useState('')
+  // monotonic request-id: guarantees stale async ML results are dropped (mirrors useRecognizerWorker).
+  const mlReqId   = useRef(0)
+  // debounce timer handle for the ML attempt.
+  const mlTimer   = useRef(null)
   const [clouds, setClouds] = useState([])
   const [counts, setCounts] = useState({ bySymbol: {}, total: 0 })
 
   const [saveMsg, setSaveMsg] = useState(null)
   const [saveErr, setSaveErr] = useState(null)
   const [saving, setSaving] = useState(false)
+  // M4b flywheel: prototype rebuild status (best-effort, never blocks the save flow).
+  const [protoStatus, setProtoStatus] = useState(null)  // null | 'updating' | 'updated' | 'skipped'
 
   const loadSymbols = useCallback(async () => {
     setSymbolsErr(null)
@@ -184,13 +205,58 @@ export default function TrainingView() {
     return () => { cancelled = true }
   }, [symbols, saveMsg])
 
-  // live guess on each drawing change
+  // live guess on each drawing change — two columns: $P (sync, instant) + ML (async, debounced).
   const handleChange = useCallback(() => {
-    if (!clouds.length || !canvasRef.current) return
+    if (!canvasRef.current) return
     const arrays = toPointArrays(canvasRef.current.getStrokes())
-    if (!arrays.length) { setLiveGuess(null); return }
-    const pts = arrays.flatMap((s, id) => s.map((p) => ({ X: p.x, Y: p.y, ID: id })))
-    setLiveGuess(rankOverRotations(pts, clouds))
+
+    if (!arrays.length) {
+      // Canvas cleared — reset both columns.
+      setLiveGuess(null)
+      setMlGuess(null)
+      setMlStatus('idle')
+      setMlNote('')
+      return
+    }
+
+    // ── $P column (synchronous, unchanged behavior) ───────────────────────────
+    if (clouds.length) {
+      const pts = arrays.flatMap((s, id) => s.map((p) => ({ X: p.x, Y: p.y, ID: id })))
+      setLiveGuess(rankOverRotations(pts, clouds))
+    }
+
+    // ── ML column (async, debounced, stale-dropped) ───────────────────────────
+    // The admin ML column calls rankWithMl directly (single-symbol ranker) — not
+    // the full recognizeWithMl pipeline.  Lazy dynamic import keeps onnxruntime-web
+    // out of the "engine:p" bundle path (invariant: engine:"p" never downloads onnx).
+    if (mlTimer.current) clearTimeout(mlTimer.current)
+    mlTimer.current = setTimeout(async () => {
+      // Capture the request id BEFORE the await so stale results can be detected.
+      const myId = ++mlReqId.current
+      setMlStatus('pending')
+
+      try {
+        // Lazy import — onnxruntime-web is only pulled in on first use.
+        const { rankWithMl } = await import('../draw/mlRecognizer.js')
+        // The drawn strokes represent a single symbol; role is unknown here,
+        // so the full-circle sweep is used (rankWithMl handles that when role is absent).
+        const ranked = await rankWithMl(arrays, {})
+        // Drop stale: a newer call has already run if myId !== mlReqId.current.
+        if (myId !== mlReqId.current) return
+        // ranked is [{name, role, score, cosine}] best-first.
+        setMlGuess(ranked.slice(0, 3))
+        setMlStatus('ready')
+        setMlNote('')
+      } catch (err) {
+        if (myId !== mlReqId.current) return
+        // Graceful placeholder — extract useful text from the error without alarming the user.
+        const msg = err?.message ?? String(err)
+        setMlGuess(null)
+        setMlStatus('unavailable')
+        // Keep the note informative but calm (no "Error:", no red).
+        setMlNote(msg.includes('M4') ? 'ML engine ships in M4' : 'ML engine not available')
+      }
+    }, 200) // 200 ms debounce — enough to skip mid-stroke flicker, short enough to feel live
   }, [clouds])
 
   async function handleSave() {
@@ -205,7 +271,31 @@ export default function TrainingView() {
     try {
       await addSample({ symbol_id: selectedId, points: tmpl.points, role, source: 'drawn', app_version: 'studio' })
       setSaveMsg('Sample saved.')
-      canvasRef.current?.clear(); setLiveGuess(null)
+      canvasRef.current?.clear()
+      setLiveGuess(null)
+      setMlGuess(null); setMlStatus('idle'); setMlNote('')
+
+      // ── M4b: Flywheel — rebuild the prototype for this symbol (best-effort, non-blocking).
+      // We lazy-import both modules so onnxruntime-web is only pulled in when the ML column
+      // has already loaded it (i.e. engine:"p" users never download onnx from this path).
+      // Wrap in a fire-and-forget async to never stall the save response.
+      setProtoStatus('updating')
+      ;(async () => {
+        try {
+          const [{ rebuildPrototypeForSymbol }, { embedStrokes }] = await Promise.all([
+            import('../data-services/prototypes.js'),
+            import('../draw/mlRecognizer.js'),
+          ])
+          const result = await rebuildPrototypeForSymbol(selectedId, {
+            embedFn:      embedStrokes,
+            modelVersion: MODEL_VERSION,
+          })
+          setProtoStatus(result ? 'updated' : 'skipped')
+        } catch {
+          // Best-effort: a failure here must never surface as an error to the user.
+          setProtoStatus('skipped')
+        }
+      })()
     } catch (err) { setSaveErr(err.message || 'Save failed.') } finally { setSaving(false) }
   }
 
@@ -240,7 +330,7 @@ export default function TrainingView() {
           <DrawingSurface ref={canvasRef} palette="bw" enableSymbols={false} compact onChange={handleChange}
             traceSvg={showTrace ? tracePath : null} />
           <div className="admin-train-actions">
-            <button className="admin-btn" onClick={() => { canvasRef.current?.clear(); setLiveGuess(null); setSaveMsg(null); setSaveErr(null) }}>Clear</button>
+            <button className="admin-btn" onClick={() => { canvasRef.current?.clear(); setLiveGuess(null); setMlGuess(null); setMlStatus('idle'); setMlNote(''); setSaveMsg(null); setSaveErr(null); setProtoStatus(null) }}>Clear</button>
             <button className="admin-btn admin-btn-primary" onClick={handleSave} disabled={saving || !selectedId}>
               {saving ? 'Saving…' : 'Save sample'}
             </button>
@@ -252,6 +342,10 @@ export default function TrainingView() {
           </div>
           {saveMsg && <p className="admin-ok">{saveMsg}</p>}
           {saveErr && <p className="admin-error">{saveErr}</p>}
+          {/* M4b flywheel status — calm, dim; never alarming */}
+          {protoStatus === 'updating' && <p className="admin-hint" style={{ marginTop: 2 }}>Updating ML prototype…</p>}
+          {protoStatus === 'updated'  && <p className="admin-hint" style={{ marginTop: 2 }}>ML prototype updated.</p>}
+          {protoStatus === 'skipped'  && <p className="admin-hint" style={{ marginTop: 2 }}>Prototype update skipped (no Supabase or no samples).</p>}
         </div>
 
         <div className="admin-train-right">
@@ -317,14 +411,57 @@ export default function TrainingView() {
             </form>
           )}
 
-          <div className="admin-live-guess">
+          {/* ── Live guess — two-column A/B lab (M4, SPEC-ml-recognizer.md) ─────────
+               $P column: synchronous, always instant, unchanged from pre-M2.
+               ML column: async, debounced 200 ms, stale-dropped via mlReqId.
+               M4: rankWithMl returns [{name, role, score, cosine}] — rendered below
+               with r.score as the displayed confidence.  Degrades to a calm placeholder
+               if onnx fails to load (unavailable state). */}
+          <div className="admin-live-guess admin-live-guess-ab">
             <h4 className="admin-subsection">Live guess</h4>
-            {liveGuess
-              ? <>
-                  <div className="admin-guess-top">{liveGuess[0]?.name || '—'}</div>
-                  <div className="admin-hint">{liveGuess.map((r) => `${r.name} (${r.dist.toFixed(2)})`).join(' · ')}</div>
-                </>
-              : <div className="admin-hint">Draw something to see a guess…</div>}
+            <div className="admin-ab-columns">
+              {/* $P column — behavior identical to pre-M2 */}
+              <div className="admin-ab-col">
+                <div className="admin-ab-col-label">$P</div>
+                {liveGuess
+                  ? <>
+                      <div className="admin-guess-top">{liveGuess[0]?.name || '—'}</div>
+                      <div className="admin-hint">
+                        {liveGuess.map((r) => `${r.name} (${r.dist.toFixed(2)})`).join(' · ')}
+                      </div>
+                    </>
+                  : <div className="admin-hint">Draw something…</div>}
+              </div>
+
+              <div className="admin-ab-divider" aria-hidden="true" />
+
+              {/* ML column — async, gracefully degrades until M4 */}
+              <div className="admin-ab-col">
+                <div className="admin-ab-col-label">ML</div>
+                {mlStatus === 'idle' && (
+                  <div className="admin-hint">Draw something…</div>
+                )}
+                {mlStatus === 'pending' && (
+                  <div className="admin-hint admin-ab-pending">Thinking…</div>
+                )}
+                {mlStatus === 'ready' && mlGuess && (
+                  <>
+                    <div className="admin-guess-top">{mlGuess[0]?.name || '—'}</div>
+                    <div className="admin-hint">
+                      {mlGuess.map((r) => {
+                        const score = r.confidence != null ? r.confidence.toFixed(2) : r.score?.toFixed(2) ?? '?'
+                        return `${r.name} (${score})`
+                      }).join(' · ')}
+                    </div>
+                  </>
+                )}
+                {mlStatus === 'unavailable' && (
+                  <div className="admin-hint admin-ab-unavailable">
+                    {mlNote || 'ML engine not available'}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <CoveragePanel symbols={symbols} counts={counts} onPick={(id) => { setSelectedId(id); setSaveMsg(null); setSaveErr(null) }} />

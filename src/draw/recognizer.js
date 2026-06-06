@@ -58,7 +58,7 @@ export function makeCloud(name, points, weight = 1) {
 
 // P3 internal helper: same normalization as makeCloud but for an arbitrary n-point cloud.
 // Used to build coarse descriptors at a configurable resolution without touching makeCloud's API.
-function makeCloudN(name, points, n, weight = 1) {
+export function makeCloudN(name, points, n, weight = 1) {
   let p = resample(points.map((q) => P(q.X, q.Y, q.ID)), n)
   p = scaleToSquare(p); p = translateToOrigin(p)
   return { name, points: p, weight: weight > 0 ? weight : 1 }
@@ -66,7 +66,7 @@ function makeCloudN(name, points, n, weight = 1) {
 
 // P3 internal helper: rotate a set of P-points ({X,Y,ID}) around the origin by deg degrees.
 // Used to build the coarse input cloud at multiple coarse angles for rotation-tolerant pre-filter.
-function rotateCloudPoints(points, deg) {
+export function rotateCloudPoints(points, deg) {
   const rad = (deg * Math.PI) / 180
   const co = Math.cos(rad), si = Math.sin(rad)
   return points.map((p) => ({ X: p.X * co - p.Y * si, Y: p.X * si + p.Y * co, ID: p.ID }))
@@ -725,7 +725,7 @@ export function analyzeStrokes(strokes, templates, opts = {}) {
  * @param {Array}  ringGroups  [{ ring:{cx,cy,r,closed,id}, groups:[…] }]
  * @param {Array}  relations   nest/link relation objects
  */
-function buildMultiRingComposition(ringGroups, relations) {
+export function buildMultiRingComposition(ringGroups, relations) {
   const circles = ringGroups.map(({ ring, groups }) => {
     // Center for this circle in world coords
     const cx = ring.cx, cy = ring.cy

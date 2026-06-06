@@ -171,6 +171,16 @@ export default function StudioPage() {
     return () => { window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh) }
   }, [isAuthed])
 
+  // M4b: Pre-warm the ML runtime on Studio mount when engine:'ml' is configured.
+  // This pays the one-time model + prototype load cost early so the first Detect is not stalled.
+  // Lazy dynamic import keeps onnxruntime-web out of the engine:'p' bundle path (the import()
+  // inside warmupMl is gated by the singleton so it never loads unless engine === 'ml').
+  useEffect(() => {
+    if (rules.recognition?.engine !== 'ml') return
+    // Best-effort, non-blocking — failures are swallowed (warmupMl returns false on failure).
+    import('../draw/mlRecognizer.js').then(({ warmupMl }) => warmupMl()).catch(() => {})
+  }, [])  // run once on mount
+
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
 
