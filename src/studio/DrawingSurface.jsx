@@ -300,6 +300,8 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   const historyRef  = useRef({ past: [], future: [] })  // undo/redo snapshot stacks
   const pendingSnapRef = useRef(false)                  // a gesture began → snapshot on first mutation
   const [panning, setPanning] = useState(false)         // right/space drag in progress (cursor only)
+  const pinchRef    = useRef(null)                      // { dist, cx, cy } two-finger pinch (screen px) | null
+  const [dockCollapsed, setDockCollapsed] = useState(false)  // mobile: collapse the toolbar to reclaim canvas
 
   // ── world ↔ screen ──────────────────────────────────────────────────────────
   // screen = world*zoom + (pan + centre);  world = (screen - pan - centre) / zoom
@@ -654,7 +656,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   // ── keyboard: space-to-pan · undo/redo · tool shortcuts (Items 2 + 3) ─────────
   useEffect(() => {
     // Tool letters. `t` would collide with rotate's mnemonic, so triangle uses `g`.
-    const TOOL_KEYS = { b: 'brush', l: 'line', r: 'rect', g: 'triangle', c: 'circle', a: 'arrow', f: 'fill', v: 'select', m: 'move', t: 'rotate' }
+    const TOOL_KEYS = { b: 'brush', l: 'line', r: 'rect', g: 'triangle', c: 'circle', a: 'arrow', f: 'fill', v: 'select', m: 'move', t: 'rotate', h: 'pan' }
     const isTyping = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
     const down = (e) => {
       if (e.code === 'Space') { spaceRef.current = true; return }
@@ -839,6 +841,68 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     fireChange(next, ds)
   }
 
+  // ── touch gestures: 1 finger = draw/tool · 2 fingers = pinch-zoom + pan ────────
+  // (SPEC-responsive-mobile Phase 1). Multi-touch is intercepted here BEFORE it reaches the
+  // single-pointer draw handlers, which are unaware of touch count. Coords are stage-local px.
+  function touchPoints(touches) {
+    const rect = stageRef.current?.container()?.getBoundingClientRect()
+    const out = []
+    for (let i = 0; i < touches.length; i++) {
+      const t = touches[i]
+      out.push({ x: t.clientX - (rect?.left || 0), y: t.clientY - (rect?.top || 0) })
+    }
+    return out
+  }
+
+  // Abandon any in-progress single-pointer gesture without committing (e.g. a second finger
+  // landed mid-stroke → that stroke must not be drawn).
+  function abortDrawing() {
+    drawingRef.current = false
+    livePtsRef.current = []
+    startRef.current = null
+    setPreview(null)
+    setMarquee(null)
+  }
+
+  function onStageTouchStart(e) {
+    const touches = e.evt.touches
+    if (touches && touches.length >= 2) {
+      abortDrawing()
+      const [a, b] = touchPoints(touches)
+      pinchRef.current = { dist: Math.hypot(a.x - b.x, a.y - b.y), cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 }
+      return
+    }
+    onStageMouseDown(e)
+  }
+
+  function onStageTouchMove(e) {
+    const touches = e.evt.touches
+    if (pinchRef.current && touches && touches.length >= 2) {
+      e.evt.preventDefault()
+      const [a, b] = touchPoints(touches)
+      const dist = Math.hypot(a.x - b.x, a.y - b.y)
+      const ncx = (a.x + b.x) / 2, ncy = (a.y + b.y) / 2
+      const prev = pinchRef.current
+      if (prev.dist > 0) applyZoom(zoom * (dist / prev.dist), ncx, ncy)  // zoom anchored on the pinch centre
+      setPan((p) => ({ x: p.x + (ncx - prev.cx), y: p.y + (ncy - prev.cy) }))  // pan by centroid drift
+      pinchRef.current = { dist, cx: ncx, cy: ncy }
+      return
+    }
+    onStageMouseMove(e)
+  }
+
+  function onStageTouchEnd(e) {
+    if (pinchRef.current) {
+      // Keep pinching until fewer than 2 fingers remain. When a finger lifts, don't let the
+      // remaining one resume drawing from a stale gesture — require a fresh touch.
+      if (e.evt.touches && e.evt.touches.length >= 2) return
+      pinchRef.current = null
+      drawingRef.current = false
+      return
+    }
+    onStageMouseUp(e)
+  }
+
   // ── pointer / gesture handlers (on Stage) ────────────────────────────────────
   function onStageMouseDown(e) {
     const stage = stageRef.current
@@ -847,7 +911,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
     // react-konva doesn't wire DOM capture-phase handlers (onMouseDownCapture maps to a non-existent
     // 'mousedowncapture' Konva event that never fires), so the drag must be kicked off from this
     // handler. Konva.dragButtons (set at module load) allows the right button.
-    if (evt.button === 2 || spaceRef.current) {
+    if (evt.button === 2 || spaceRef.current || tool === 'pan') {
       if (stage) { stage.draggable(true); stage.startDrag(); setPanning(true) }
       return
     }
@@ -973,7 +1037,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
   // ── per-node interaction (click to select; eraserStroke click) ───────────────
   function onNodeMouseDown(e, id) {
     const evt = e.evt
-    if (evt.button === 2 || spaceRef.current) return
+    if (evt.button === 2 || spaceRef.current || tool === 'pan') return
     if (tool === 'eraserStroke') {
       e.cancelBubble = true
       snapshot()
@@ -1044,7 +1108,7 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
 
   const cursor = useMemo(() => {
     if (panning) return 'grabbing'
-    if (spaceRef.current) return 'grab'
+    if (spaceRef.current || tool === 'pan') return 'grab'
     return cursorForTool(tool)
   }, [tool, panning])
 
@@ -1080,6 +1144,8 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
         brushSize={brushSize} setBrushSize={setBrushSize}
         palette={palette}
         compact={compact}
+        collapsed={dockCollapsed}
+        onToggleCollapse={compact ? undefined : () => setDockCollapsed((c) => !c)}
         zoom={zoom}
         onZoomIn={() => zoomAtCenter(ZOOM_STEP)}
         onZoomOut={() => zoomAtCenter(-ZOOM_STEP)}
@@ -1107,9 +1173,9 @@ const DrawingSurface = forwardRef(function DrawingSurface(props, ref) {
           onMouseDown={onStageMouseDown}
           onMouseMove={onStageMouseMove}
           onMouseUp={onStageMouseUp}
-          onTouchStart={onStageMouseDown}
-          onTouchMove={onStageMouseMove}
-          onTouchEnd={onStageMouseUp}
+          onTouchStart={onStageTouchStart}
+          onTouchMove={onStageTouchMove}
+          onTouchEnd={onStageTouchEnd}
           onWheel={onWheel}
           onContextMenu={(e) => e.evt.preventDefault()}
           onDragEnd={(e) => {

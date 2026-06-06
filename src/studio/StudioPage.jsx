@@ -33,6 +33,7 @@ import { useTemplates } from './useTemplates.js'
 import { buildSpellIRShim } from './render/spellIRShim.js'
 import rules from '../../data/rules.json'
 import { aiEnabled, useCapabilities } from '../app/capabilities.js'
+import { useViewport } from '../app/useViewport.js'
 
 // AI Report panel — dynamically imported only when aiEnabled (build-time constant).
 // When aiEnabled is false (the published build), Rollup/Vite eliminates the dynamic import()
@@ -70,7 +71,10 @@ const DRAWER_C_KEY = 'studio.drawer.collapsed'
 const DRAWER_MIN = 160
 const readDrawerHeight = () => {
   const v = Number(localStorage.getItem(DRAWER_H_KEY))
-  return Number.isFinite(v) && v >= DRAWER_MIN ? v : Math.round(window.innerHeight * 0.45)
+  if (Number.isFinite(v) && v >= DRAWER_MIN) return v
+  // Smaller default share on phones so the canvas keeps usable height.
+  const isSmall = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 640px)').matches
+  return Math.round(window.innerHeight * (isSmall ? 0.38 : 0.45))
 }
 const readDrawerCollapsed = () => localStorage.getItem(DRAWER_C_KEY) === '1'
 
@@ -150,6 +154,12 @@ export default function StudioPage() {
   useSymbolData()
 
   const { isAuthed } = useCapabilities()
+
+  // Responsive layout (SPEC-responsive-mobile). On narrow screens the right palette is hidden
+  // (CSS) and replaced by a bottom-sheet; on mobile the post-Analyze split becomes a Draw⇄Cast toggle.
+  const { isMobile, isDesktop } = useViewport()
+  const [paletteSheetOpen, setPaletteSheetOpen] = useState(false)
+  const [mobileView, setMobileView] = useState('draw') // mobile only: 'draw' | 'cast'
 
   // Re-pull the overlay when the tab regains focus — authed sessions only.
   // Anonymous visitors must never trigger a Supabase call; skip entirely when not signed in.
@@ -287,7 +297,12 @@ export default function StudioPage() {
 
   function toast(msg) { setFlash(msg); clearTimeout(toast._t); toast._t = setTimeout(() => setFlash(null), 2200) }
 
-  function handleSymbolSelect(sym) { canvasRef.current?.placeSymbol(sym.type, sym.kind) }
+  function handleSymbolSelect(sym) {
+    canvasRef.current?.placeSymbol(sym.type, sym.kind)
+    // On mobile the palette is a bottom-sheet covering the canvas — close it so the placed
+    // symbol is visible and can be moved.
+    setPaletteSheetOpen(false)
+  }
 
   // A2: only confident detections feed the engine (low-confidence ones stay visible as "unknown?").
   // Multi-ring path: when we have >1 detected rings, pass rings/relations/ringAssignments so
@@ -466,6 +481,7 @@ export default function StudioPage() {
     setResult(res); setPhase('analyzed'); setTrialStale(false)
     if (!silent) {
       setTab('analysis')
+      setMobileView('cast') // mobile: reveal the cast pane after an explicit Analyze
       const corrections = correctionsRef.current.length ? { items: [...correctionsRef.current] } : null
       logAnalysis({ composition: comp, engine_result: res, corrections }).catch(() => {})
     }
@@ -616,6 +632,10 @@ export default function StudioPage() {
   // rebuild its renderer + flush particles on every unrelated StudioPage re-render — e.g. hover).
   const trialRenderer = useMemo(() => ({ ...RENDERER_CFG, preparedActiveGating }), [preparedActiveGating])
 
+  // Desktop/tablet: draw + cast sit side-by-side (resizable). Mobile: the cast is a full-cover
+  // overlay switched by the Draw⇄Cast toggle, so the canvas stays mounted/measured underneath.
+  const showSplit = trialReady && !isMobile
+
   return (
     <div className="studio-page">
       <header className="studio-header">
@@ -633,11 +653,22 @@ export default function StudioPage() {
 
       <div className="studio-main">
         <div className="studio-centre">
-          <div className={`studio-work${trialReady ? ' split' : ''}`} ref={workRef}>
-            {/* Drawing pane — takes the full width until Analyze splits it in half. */}
+          <div className={`studio-work${showSplit ? ' split' : ''}`} ref={workRef}>
+            {/* Mobile: Draw ⇄ Cast segmented toggle (the desktop side-by-side split is unusable
+                at phone widths, so the cast pane becomes a full-cover overlay instead). */}
+            {trialReady && isMobile && (
+              <div className="studio-mobile-viewtabs" role="tablist">
+                <button className={`smv-tab${mobileView === 'draw' ? ' active' : ''}`} role="tab"
+                  aria-selected={mobileView === 'draw'} onClick={() => setMobileView('draw')}>✎ Draw</button>
+                <button className={`smv-tab${mobileView === 'cast' ? ' active' : ''}`} role="tab"
+                  aria-selected={mobileView === 'cast'} onClick={() => setMobileView('cast')}>✦ Cast</button>
+              </div>
+            )}
+
+            {/* Drawing pane — takes the full width until Analyze splits it (desktop only). */}
             <div
               className="studio-draw-pane"
-              style={trialReady ? { flexBasis: `${splitFrac * 100}%` } : undefined}
+              style={showSplit ? { flexBasis: `${splitFrac * 100}%` } : undefined}
             >
               <div className="studio-canvas-wrap">
                 <DrawingSurface
@@ -674,6 +705,9 @@ export default function StudioPage() {
                     <option value={4000}>4s</option>
                   </select>
                 )}
+                {!isDesktop && (
+                  <button className="secondary palette-open-btn" onClick={() => setPaletteSheetOpen(true)} title="Add a sigil or sign">＋ Symbol</button>
+                )}
                 <span className="action-spacer" />
                 <button className="secondary" onClick={handleCopyImage} title="Copy the drawing as an image">⧉ Copy image</button>
                 <button className="secondary" onClick={handleExport} title="Export the drawing as JSON">↓ Export</button>
@@ -682,8 +716,8 @@ export default function StudioPage() {
               </div>
             </div>
 
-            {/* Render pane — the live spell trial, beside the drawing. */}
-            {trialReady && (
+            {/* Render pane — the live spell trial, beside the drawing (desktop/tablet). */}
+            {showSplit && (
               <>
                 <div className="studio-split-divider" onPointerDown={startSplitResize} title="Drag to resize" />
                 <SpellTrial
@@ -699,12 +733,48 @@ export default function StudioPage() {
                 />
               </>
             )}
+
+            {/* Mobile: the cast pane overlays the canvas (canvas stays mounted underneath). */}
+            {trialReady && isMobile && mobileView === 'cast' && (
+              <div className="studio-mobile-cast">
+                <SpellTrial
+                  spellIR={spellIRShim}
+                  ringFound={ringGeom?.found}
+                  background={trialBg}
+                  glow={trialGlow}
+                  rulesRenderer={trialRenderer}
+                  spellName={result?.similar?.match?.name || result?.name}
+                  stale={trialStale}
+                  onReanalyze={handleAnalyze}
+                  onClose={() => setMobileView('draw')}
+                />
+              </div>
+            )}
           </div>
         </div>
 
-        <aside className="studio-sidebar-right">
-          <SymbolPalette onSelect={handleSymbolSelect} pendingType={null} />
-        </aside>
+        {/* Symbol palette — fixed right rail on desktop; a bottom-sheet (opened by a FAB) on
+            narrow screens so symbol placement stays available (SPEC-responsive-mobile P2.3). */}
+        {isDesktop ? (
+          <aside className="studio-sidebar-right">
+            <SymbolPalette onSelect={handleSymbolSelect} pendingType={null} />
+          </aside>
+        ) : (
+          paletteSheetOpen && (
+            <div className="studio-sheet-backdrop" onClick={() => setPaletteSheetOpen(false)}>
+              <div className="studio-sheet" onClick={(e) => e.stopPropagation()}>
+                <div className="studio-sheet-handle" />
+                <div className="studio-sheet-head">
+                  <span className="studio-sheet-title">Symbols</span>
+                  <button className="studio-sheet-close" onClick={() => setPaletteSheetOpen(false)} aria-label="Close">✕</button>
+                </div>
+                <div className="studio-sheet-body">
+                  <SymbolPalette onSelect={handleSymbolSelect} pendingType={null} />
+                </div>
+              </div>
+            </div>
+          )
+        )}
       </div>
 
       {phase !== 'idle' && (

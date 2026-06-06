@@ -64,12 +64,20 @@ const TOOL_GROUPS = [
       { id: 'rotate', label: 'Rotate', icon: '↻' },
     ],
   },
+  {
+    label: 'View',
+    tools: [
+      // Pan tool — single-finger / single-drag pan. On touch this is the primary way to move
+      // the canvas (two-finger pan also works); on desktop it surfaces the right-drag/space path.
+      { id: 'pan', label: 'Pan', icon: '✋' },
+    ],
+  },
 ]
 
 // Keyboard shortcuts (mirror DrawingSurface's keydown map) shown in tooltips for discoverability.
 const HOTKEYS = {
   brush: 'B', fill: 'F', line: 'L', rect: 'R', triangle: 'G', circle: 'C', arrow: 'A',
-  eraserStroke: 'E', eraserPixel: 'Shift+E', select: 'V', move: 'M', rotate: 'T',
+  eraserStroke: 'E', eraserPixel: 'Shift+E', select: 'V', move: 'M', rotate: 'T', pan: 'H',
 }
 
 const BW_COLORS = [
@@ -86,6 +94,8 @@ export default function ToolDock({
   brushSize,   setBrushSize,
   palette      = 'dyes',
   compact      = false,
+  collapsed    = false,            // mobile: hide everything but the active tool + toggle
+  onToggleCollapse,                // provided → render the collapse toggle (mobile only via CSS)
   zoom         = 1,
   onZoomIn, onZoomOut, onZoomReset, onRecenter,
   // ── Assist (stroke beautify, SPEC-stroke-beautify.md) — optional; omit to hide the section ──
@@ -102,8 +112,23 @@ export default function ToolDock({
     setDyeId(c.id === 'black' || c.id === 'white' ? null : c.id)
   }
 
+  const activeLabel = TOOL_GROUPS.flatMap((g) => g.tools).find((t) => t.id === tool)
+
   return (
-    <div className={`ds-dock${compact ? ' ds-dock-compact' : ''}`}>
+    <div className={`ds-dock${compact ? ' ds-dock-compact' : ''}${collapsed ? ' ds-dock-collapsed' : ''}`}>
+      {/* ── Collapse toggle (mobile) — reclaim the canvas; shown via CSS only on small screens ── */}
+      {onToggleCollapse && (
+        <button
+          className="ds-dock-toggle"
+          onClick={onToggleCollapse}
+          title={collapsed ? 'Show tools' : 'Hide tools'}
+          aria-label={collapsed ? 'Show tools' : 'Hide tools'}
+          aria-expanded={!collapsed}
+        >
+          <span className="ds-tool-icon">{collapsed ? `${activeLabel?.icon ?? '⋯'} ▾` : '▴ Tools'}</span>
+        </button>
+      )}
+
       {/* ── Tool groups ───────────────────────────────────────── */}
       {TOOL_GROUPS.map((group) => (
         <div key={group.label} className="ds-tool-group">

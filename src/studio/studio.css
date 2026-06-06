@@ -9,7 +9,8 @@
 .studio-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh;          /* fallback for browsers without dvh */
+  height: 100dvh;         /* mobile: excludes URL-bar chrome so nothing hides under it */
   overflow: hidden;
   background: var(--bg);
   color: var(--ink);
@@ -89,10 +90,47 @@
 .studio-work {
   flex: 1;
   min-height: 0;
+  position: relative;   /* anchor for the mobile cast overlay */
   display: flex;
   flex-direction: column;
 }
 .studio-work.split { flex-direction: row; }
+
+/* ── Mobile: Draw ⇄ Cast toggle + full-cover cast overlay ───────── */
+.studio-mobile-viewtabs {
+  flex-shrink: 0;
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 3;
+}
+.smv-tab {
+  flex: 1;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 7px 7px 0 0;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 9px 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+.smv-tab.active { color: var(--accent); border-color: var(--accent); background: var(--panel); }
+
+/* Cast goes fullscreen on mobile so the (often directional) effect has room and isn't clipped
+   by a short pane or the results drawer underneath. SpellTrial's own ✕ returns to Draw. */
+.studio-mobile-cast {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: flex;
+  background: var(--bg);
+}
+.studio-mobile-cast .spell-trial { border-left: none; }
 
 /* Drawing pane — column of canvas + action bar. Full width until the split, then a sized share. */
 .studio-draw-pane {
@@ -293,6 +331,7 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 8px 12px;
   background: var(--panel);
@@ -391,6 +430,48 @@
   display: flex; flex-direction: column; gap: 6px;
 }
 .contribute-msg { font-size: 0.78rem; color: var(--ok); }
+
+/* ── Mobile symbol bottom-sheet (SPEC-responsive-mobile P2.3) ─── */
+/* "＋ Symbol" trigger in the action bar (mobile) — accent-tinted so it reads as the way to add symbols. */
+.palette-open-btn { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+.studio-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+}
+.studio-sheet {
+  width: 100%;
+  max-height: 75dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.5);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: studio-sheet-up 0.18s ease-out;
+}
+@keyframes studio-sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.studio-sheet-handle {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: var(--line); margin: 8px auto 4px;
+  flex-shrink: 0;
+}
+.studio-sheet-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 14px 8px; flex-shrink: 0;
+}
+.studio-sheet-title { font-size: 0.86rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
+.studio-sheet-close {
+  background: transparent; border: 1px solid var(--line); border-radius: 6px;
+  color: var(--ink-dim); cursor: pointer; min-width: 40px; min-height: 40px; font-size: 0.9rem;
+}
+.studio-sheet-body { flex: 1; min-height: 0; overflow: hidden; display: flex; }
+.studio-sheet-body .symbol-palette { height: 100%; width: 100%; }
 
 /* transient toast */
 .studio-toast {
@@ -1176,17 +1257,45 @@
 }
 .note.warn { background: rgba(224,179,65,0.15); color: var(--warn); border: 1px solid rgba(224,179,65,0.3); }
 
-/* ── Responsive collapse ────────────────────────────────────── */
+/* ── Responsive layer (SPEC-responsive-mobile.md) ───────────────
+   Breakpoints: mobile <640 · tablet 640–1024 · desktop >1024.
+   JSX-driven decisions (split→toggle, palette→sheet) live in StudioPage via
+   useViewport; this stylesheet handles pure layout/sizing. */
 
-@media (max-width: 860px) {
+/* Tablet: the fixed right palette becomes an opt-in drawer (StudioPage toggles
+   .palette-open); hidden by default to give the canvas room. */
+@media (max-width: 1024px) {
   .studio-sidebar-right { display: none; }
-  .studio-sidebar-left  { width: 56px; }
 }
 
-@media (max-width: 600px) {
-  .studio-sidebar-left { display: none; }
-  .studio-results-inner { flex-direction: column; }
-  .studio-results-inner .panel.result { max-width: none; }
+/* Mobile: single column. The right palette is replaced by a bottom-sheet (P2.3),
+   and the post-Analyze split collapses to a Draw⇄Cast toggle (handled in JSX). */
+@media (max-width: 640px) {
+  .studio-results-inner .panel.result { columns: auto; max-width: none; padding: 12px 14px; }
+  /* The analysis columns collapse to a single readable column on a phone. */
+  .identified-list { grid-template-columns: 1fr; }
+  /* Drawer never eats the whole screen on a short viewport. */
+  .studio-results { max-height: 70dvh; }
+}
+
+/* ── Touch ergonomics — coarse pointers get larger hit targets ──
+   (SPEC-responsive-mobile P0.3 / E1). Applies on phones, tablets, pen displays. */
+@media (pointer: coarse) {
+  .srh-btn,
+  .srt-tab,
+  .identified-icon,
+  .identified-edit,
+  .identified-confirm,
+  .identified-cancel,
+  .identified-erase { min-height: 40px; min-width: 40px; }
+
+  .srt-tab { padding: 9px 14px; }
+
+  .dye-swatch { width: 34px; height: 34px; }
+
+  /* Fatter drag handles so they can be grabbed with a finger. */
+  .studio-results-resize { height: 14px; margin-bottom: -14px; }
+  .studio-split-divider  { flex-basis: 16px; }
 }
 
 /* ── Gear / config button in the header ─────────────────────── */
@@ -1221,6 +1330,7 @@
   width: 320px;
   max-width: 90vw;
   height: 100vh;
+  height: 100dvh;
   background: var(--panel);
   border-left: 1px solid var(--line);
   display: flex;
