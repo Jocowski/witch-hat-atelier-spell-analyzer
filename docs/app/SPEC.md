@@ -92,6 +92,8 @@ AI is a single blocking call rendered as plain text.
 
 ## 3. Target architecture (new layout)
 
+> **Note (superseded):** `router.jsx` and the `/login` / `/admin/*` browser routes described here were never implemented as browser routes. The shipped app has no `router.jsx`; `main.jsx` renders `StudioPage` directly, and admin is a capability-gated overlay (`ConfigPanel → AdminOverlay → MemoryRouter → AdminPage`), not a route. See [docs/specs/current-architecture-spec.md](../specs/current-architecture-spec.md) for the live architecture.
+
 ```
 src/
   main.jsx                 mount <AppRouter/>

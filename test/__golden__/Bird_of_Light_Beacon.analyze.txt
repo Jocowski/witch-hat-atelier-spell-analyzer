@@ -1,0 +1,228 @@
+{
+  "name": "Bird of Light Beacon",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [],
+  "sigils": [
+    {
+      "id": "light",
+      "name": "Light",
+      "role": "core",
+      "family": "fire",
+      "element": "light",
+      "description": "Fire variant that manifests magic as light."
+    },
+    {
+      "id": "bird_a",
+      "name": "Bird A",
+      "role": "sigil",
+      "family": "decorative",
+      "element": "decorative",
+      "description": "Creates a flying bird-like projection of the seal’s magic."
+    }
+  ],
+  "signs": [
+    {
+      "id": "dispersion",
+      "name": "Dispersion",
+      "category": "directional",
+      "effect": "Makes the magic 'leak'/disperse out on all sides, like an overflowing bucket. It is essentially a column that leaks instead of firing.",
+      "count": 1,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "light",
+      "substance": "light"
+    },
+    "summary": "The light and the spell's magic leaks out and spreads on every side, spreading outward.",
+    "breakdown": [
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Provides the substance: light (shines outward)."
+      },
+      {
+        "part": "bird_a",
+        "role": "core",
+        "label": "Bird A",
+        "text": "Also provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+      },
+      {
+        "part": "dispersion",
+        "role": "form",
+        "label": "Dispersion",
+        "text": "The light and the spell's magic leaks out and spreads on every side."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "valid but potentially unstable (asymmetric)",
+    "power": "ordinary intensity",
+    "direction": "outward"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Bird of Light Beacon",
+      "score": 0.855,
+      "effect": "Forms a bird made of light that flies around for a while — to entertain, signal/call for help, or distract.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "asymmetric",
+    "stability": "valid but potentially unstable (asymmetric)",
+    "balance": "balanced",
+    "aim": "undirected",
+    "power": 2.42,
+    "powerLabel": "amplified by large or linked drawing",
+    "tilted": false,
+    "inverted": false,
+    "decorative": true,
+    "sigilCount": 2,
+    "signCount": 1,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k9",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [],
+      "sigils": [
+        {
+          "id": "light",
+          "name": "Light",
+          "role": "core",
+          "family": "fire",
+          "element": "light",
+          "description": "Fire variant that manifests magic as light."
+        },
+        {
+          "id": "bird_a",
+          "name": "Bird A",
+          "role": "sigil",
+          "family": "decorative",
+          "element": "decorative",
+          "description": "Creates a flying bird-like projection of the seal’s magic."
+        }
+      ],
+      "signs": [
+        {
+          "id": "dispersion",
+          "name": "Dispersion",
+          "category": "directional",
+          "effect": "Makes the magic 'leak'/disperse out on all sides, like an overflowing bucket. It is essentially a column that leaks instead of firing.",
+          "count": 1,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "light",
+          "substance": "light"
+        },
+        "summary": "The light and the spell's magic leaks out and spreads on every side, spreading outward.",
+        "breakdown": [
+          {
+            "part": "light",
+            "role": "core",
+            "label": "Light",
+            "text": "Provides the substance: light (shines outward)."
+          },
+          {
+            "part": "bird_a",
+            "role": "core",
+            "label": "Bird A",
+            "text": "Also provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+          },
+          {
+            "part": "dispersion",
+            "role": "form",
+            "label": "Dispersion",
+            "text": "The light and the spell's magic leaks out and spreads on every side."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "valid but potentially unstable (asymmetric)",
+        "power": "ordinary intensity",
+        "direction": "outward"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "asymmetric",
+        "stability": "valid but potentially unstable (asymmetric)",
+        "balance": "balanced",
+        "aim": "undirected",
+        "power": 2.42,
+        "powerLabel": "amplified by large or linked drawing",
+        "tilted": false,
+        "inverted": false,
+        "decorative": true,
+        "sigilCount": 2,
+        "signCount": 1,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 2.42,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "light",
+      "substance": "light"
+    },
+    "summary": "The light and the spell's magic leaks out and spreads on every side, spreading outward.",
+    "breakdown": [
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Provides the substance: light (shines outward)."
+      },
+      {
+        "part": "bird_a",
+        "role": "core",
+        "label": "Bird A",
+        "text": "Also provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+      },
+      {
+        "part": "dispersion",
+        "role": "form",
+        "label": "Dispersion",
+        "text": "The light and the spell's magic leaks out and spreads on every side."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "valid but potentially unstable (asymmetric)",
+    "power": "ordinary intensity",
+    "direction": "outward"
+  },
+  "catalogEmpty": false
+}

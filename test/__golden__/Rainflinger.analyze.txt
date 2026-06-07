@@ -1,0 +1,272 @@
+{
+  "name": "Rainflinger",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "core",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    },
+    {
+      "id": "fire",
+      "name": "Fire",
+      "role": "sigil",
+      "family": "fire",
+      "element": "fire",
+      "description": "Creates and manipulates flame and heat. One of the four primary tetrad."
+    },
+    {
+      "id": "fire",
+      "name": "Fire",
+      "role": "sigil",
+      "family": "fire",
+      "element": "fire",
+      "description": "Creates and manipulates flame and heat. One of the four primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "crosshair",
+      "name": "Crosshair",
+      "category": "non-directional",
+      "effect": "A component of the rainflinger glyph. Likely functions: making things of the same magic aspect disappear, or confining the manifestation to an area of effect.",
+      "count": 2,
+      "inverted": false,
+      "invertible": false
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "water",
+      "substance": "water"
+    },
+    "summary": "The water and flame pours and flows outward. It is confined within an area of effect.",
+    "breakdown": [
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "fire",
+        "role": "core",
+        "label": "Fire",
+        "text": "Also provides the substance: flame (burns, giving off heat and light)."
+      },
+      {
+        "part": "fire",
+        "role": "core",
+        "label": "Fire",
+        "text": "Also provides the substance: flame (burns, giving off heat and light)."
+      },
+      {
+        "part": "crosshair",
+        "role": "target",
+        "label": "Crosshair ×2",
+        "text": "The water and flame is confined within an area of effect."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Rainflinger",
+      "score": 0.855,
+      "effect": "Creates a water-repellent bubble around the seal, keeping its radius dry — by repelling and/or drying off the water (mechanism unconfirmed). Qifrey used it for a picnic in the rain and to dry off Brushbuddy.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "undirected",
+    "power": 0.9,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 3,
+    "signCount": 2,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k0",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "core",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        },
+        {
+          "id": "fire",
+          "name": "Fire",
+          "role": "sigil",
+          "family": "fire",
+          "element": "fire",
+          "description": "Creates and manipulates flame and heat. One of the four primary tetrad."
+        },
+        {
+          "id": "fire",
+          "name": "Fire",
+          "role": "sigil",
+          "family": "fire",
+          "element": "fire",
+          "description": "Creates and manipulates flame and heat. One of the four primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "crosshair",
+          "name": "Crosshair",
+          "category": "non-directional",
+          "effect": "A component of the rainflinger glyph. Likely functions: making things of the same magic aspect disappear, or confining the manifestation to an area of effect.",
+          "count": 2,
+          "inverted": false,
+          "invertible": false
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "water",
+          "substance": "water"
+        },
+        "summary": "The water and flame pours and flows outward. It is confined within an area of effect.",
+        "breakdown": [
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "fire",
+            "role": "core",
+            "label": "Fire",
+            "text": "Also provides the substance: flame (burns, giving off heat and light)."
+          },
+          {
+            "part": "fire",
+            "role": "core",
+            "label": "Fire",
+            "text": "Also provides the substance: flame (burns, giving off heat and light)."
+          },
+          {
+            "part": "crosshair",
+            "role": "target",
+            "label": "Crosshair ×2",
+            "text": "The water and flame is confined within an area of effect."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "undirected",
+        "power": 0.9,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 3,
+        "signCount": 2,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.9,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "water",
+      "substance": "water"
+    },
+    "summary": "The water and flame pours and flows outward. It is confined within an area of effect.",
+    "breakdown": [
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "fire",
+        "role": "core",
+        "label": "Fire",
+        "text": "Also provides the substance: flame (burns, giving off heat and light)."
+      },
+      {
+        "part": "fire",
+        "role": "core",
+        "label": "Fire",
+        "text": "Also provides the substance: flame (burns, giving off heat and light)."
+      },
+      {
+        "part": "crosshair",
+        "role": "target",
+        "label": "Crosshair ×2",
+        "text": "The water and flame is confined within an area of effect."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "catalogEmpty": false
+}

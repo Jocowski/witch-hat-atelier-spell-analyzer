@@ -1,0 +1,355 @@
+{
+  "name": "Sand Bridge",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Sand Bridge",
+        "score": 0.505
+      },
+      {
+        "name": "Serpent's Bed of Sand",
+        "score": 0.394
+      },
+      {
+        "name": "Sand Cage",
+        "score": 0.369
+      }
+    ]
+  },
+  "perCircle": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "similar": {
+        "catalogEmpty": false,
+        "match": null,
+        "nearest": [
+          {
+            "name": "Sand Bridge",
+            "score": 0.234
+          },
+          {
+            "name": "Rising Wave",
+            "score": 0.225
+          },
+          {
+            "name": "Vapor Bubble Spell",
+            "score": 0.225
+          }
+        ]
+      }
+    },
+    {
+      "id": "k3",
+      "name": "Circle 2",
+      "similar": {
+        "catalogEmpty": false,
+        "match": null,
+        "nearest": [
+          {
+            "name": "Boulder Stretch Rope",
+            "score": 0.35
+          },
+          {
+            "name": "Integration",
+            "score": 0.35
+          },
+          {
+            "name": "Wall Breaker Seal",
+            "score": 0.35
+          }
+        ]
+      }
+    }
+  ],
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": false,
+      "centerPromoted": false,
+      "active": false,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Modifier ring: a coreless ring that shapes the seal(s) it encloses or links to, rather than carrying its own substance."
+        },
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 6,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "unknown_05",
+          "name": "unknown_05",
+          "category": "other",
+          "effect": "",
+          "count": 4,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "unknown_09",
+          "name": "unknown_09",
+          "category": "other",
+          "effect": "",
+          "count": 4,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "unknown_11",
+          "name": "unknown_11",
+          "category": "other",
+          "effect": "",
+          "count": 2,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "radial",
+          "name": "Radial",
+          "category": "semi-directional",
+          "effect": "Decreases the spell's power — converts intense energy into a milder form (e.g. fire into heat).",
+          "count": 2,
+          "inverted": true,
+          "invertible": true
+        },
+        {
+          "id": "strengthen",
+          "name": "Strengthen",
+          "category": "semi-directional",
+          "effect": "Presumably makes objects stronger and more durable. Most likely semi-directional; never seen inverted.",
+          "count": 4,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "unknown_10",
+          "name": "unknown_10",
+          "category": "other",
+          "effect": "",
+          "count": 4,
+          "inverted": false,
+          "invertible": false
+        }
+      ],
+      "deduction": null,
+      "dyes": [],
+      "analysis": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1.28,
+        "powerLabel": "weakened on purpose (Radial) — a gentle version of the element",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 0,
+        "signCount": 26,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.8369,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.654
+        }
+      },
+      "contextRole": "modifier"
+    },
+    {
+      "id": "k3",
+      "name": "Circle 2",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "sand_bridge",
+          "name": "Sand Bridge Sigil",
+          "role": "core",
+          "family": "misc",
+          "element": "earth",
+          "description": "Unidentified central sigil of the niche Sand Bridge spell. Functions as the earth/sand substance (the spell shapes sand into a bridge). Glyph: a vertical stroke with a top curve opening left and a bottom curve opening right (an 'S'/'$'-like form)."
+        }
+      ],
+      "signs": [
+        {
+          "id": "unknown_06",
+          "name": "unknown_06",
+          "category": "other",
+          "effect": "",
+          "count": 2,
+          "inverted": false,
+          "invertible": false
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "earth",
+          "substance": "earth, stone, and sand"
+        },
+        "summary": "The earth, stone, and sand rises up as rock and sand.",
+        "breakdown": [
+          {
+            "part": "sand_bridge",
+            "role": "core",
+            "label": "Sand Bridge Sigil",
+            "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "undirected",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 2,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1.175,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.5
+        }
+      }
+    }
+  ],
+  "relations": [
+    {
+      "type": "nest",
+      "outer": "k2",
+      "inner": "k3"
+    }
+  ],
+  "combined": {
+    "ok": true,
+    "summary": "(no defined effect), and nested within it Circle 2: The earth, stone, and sand rises up as rock and sand.",
+    "roots": [
+      "k2"
+    ],
+    "nesting": [
+      {
+        "type": "nest",
+        "outer": "k2",
+        "inner": "k3"
+      }
+    ],
+    "links": [],
+    "notes": []
+  },
+  "catalogEmpty": false,
+  "unknownIds": [
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_11"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_11"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_06"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_06"
+    }
+  ]
+}

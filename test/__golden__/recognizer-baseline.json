@@ -1,0 +1,12 @@
+{
+  "_comment": "Recognizer accuracy baseline captured on main before the architecture refactor (refactor-plan-spec §6.2). Re-run `npm run bench:accuracy` after any phase that touches src/domain/recognizer or src/services/recognizer and confirm top-1 accuracy has NOT regressed below this number. Deterministic synthetic eval (seeded).",
+  "capturedFrom": "tools/recognizer-accuracy.mjs (no args)",
+  "date": "2026-06-06",
+  "poolSizes": { "sign": 36, "sigil": 26 },
+  "top1AccuracyPct": 97.1,
+  "coveragePct": 100.0,
+  "recommendedConfidenceMinPct": 0,
+  "currentRulesConfidenceMinPct": 30,
+  "prefilterK": 15,
+  "note": "Accuracy is a manual regression gate (the bench is too slow for the node --test suite). The recognizer pure modules move with export-* shims (Phase 2/3), so accuracy MUST stay 97.1% across those phases — same code, new path."
+}

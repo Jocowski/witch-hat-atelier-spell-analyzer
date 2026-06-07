@@ -1,0 +1,248 @@
+{
+  "name": "Sylph Shoes Seal",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "wind_underfoot",
+      "name": "Wind Underfoot",
+      "role": "core",
+      "family": "air",
+      "element": "air",
+      "description": "Helps support solid objects suspended in air, like an air platform. Function unclear."
+    }
+  ],
+  "signs": [
+    {
+      "id": "convergence",
+      "name": "Convergence",
+      "category": "semi-directional",
+      "effect": "Focuses/concentrates the magic into a single point. Also stiffens and compacts loose particles (e.g. hardened sand). One point of the triangle faces inward.",
+      "count": 8,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "levitation",
+      "name": "Levitation",
+      "category": "directional",
+      "effect": "Makes the magic (or the object it's drawn on) float above the glyph. If it moves an object, the direction follows where the signs point. The arrow tip usually faces inward.",
+      "count": 8,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate. The effect is focused down to a single point.",
+    "breakdown": [
+      {
+        "part": "wind_underfoot",
+        "role": "core",
+        "label": "Wind Underfoot",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "levitation",
+        "role": "motion",
+        "label": "Levitation ×8",
+        "text": "The air is lifted and made to levitate."
+      },
+      {
+        "part": "convergence",
+        "role": "power",
+        "label": "Convergence ×8",
+        "text": "The air is focused down to a single point."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "concentrated to a point (Convergence) — narrower but more intense",
+    "direction": "above the seal"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Sylph Shoes Seal",
+      "score": 0.855,
+      "effect": "Lets the wearer float above the ground and fly. Drawn on a pair of shoes as a bisected seal — one half on each sole — that completes and activates when the two shoes are touched together.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 16,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k12",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "wind_underfoot",
+          "name": "Wind Underfoot",
+          "role": "core",
+          "family": "air",
+          "element": "air",
+          "description": "Helps support solid objects suspended in air, like an air platform. Function unclear."
+        }
+      ],
+      "signs": [
+        {
+          "id": "convergence",
+          "name": "Convergence",
+          "category": "semi-directional",
+          "effect": "Focuses/concentrates the magic into a single point. Also stiffens and compacts loose particles (e.g. hardened sand). One point of the triangle faces inward.",
+          "count": 8,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "levitation",
+          "name": "Levitation",
+          "category": "directional",
+          "effect": "Makes the magic (or the object it's drawn on) float above the glyph. If it moves an object, the direction follows where the signs point. The arrow tip usually faces inward.",
+          "count": 8,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "air",
+          "substance": "air"
+        },
+        "summary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate. The effect is focused down to a single point.",
+        "breakdown": [
+          {
+            "part": "wind_underfoot",
+            "role": "core",
+            "label": "Wind Underfoot",
+            "text": "Provides the substance: air (stirs into moving wind)."
+          },
+          {
+            "part": "levitation",
+            "role": "motion",
+            "label": "Levitation ×8",
+            "text": "The air is lifted and made to levitate."
+          },
+          {
+            "part": "convergence",
+            "role": "power",
+            "label": "Convergence ×8",
+            "text": "The air is focused down to a single point."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "concentrated to a point (Convergence) — narrower but more intense",
+        "direction": "above the seal"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 16,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate. The effect is focused down to a single point.",
+    "breakdown": [
+      {
+        "part": "wind_underfoot",
+        "role": "core",
+        "label": "Wind Underfoot",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "levitation",
+        "role": "motion",
+        "label": "Levitation ×8",
+        "text": "The air is lifted and made to levitate."
+      },
+      {
+        "part": "convergence",
+        "role": "power",
+        "label": "Convergence ×8",
+        "text": "The air is focused down to a single point."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "concentrated to a point (Convergence) — narrower but more intense",
+    "direction": "above the seal"
+  },
+  "catalogEmpty": false
+}

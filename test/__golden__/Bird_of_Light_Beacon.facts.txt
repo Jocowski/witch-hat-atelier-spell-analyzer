@@ -1,0 +1,100 @@
+{
+  "name": "Bird of Light Beacon",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k9",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "light",
+        "name": "Light",
+        "element": "light",
+        "family": "fire"
+      },
+      "extraSigils": [
+        {
+          "id": "bird_a",
+          "name": "Bird A",
+          "element": "decorative"
+        }
+      ],
+      "signs": [
+        {
+          "id": "dispersion",
+          "name": "Dispersion",
+          "category": "directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "dispersion"
+        ]
+      },
+      "geometry": {
+        "symmetry": "asymmetric",
+        "stability": "valid but potentially unstable (asymmetric)",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 2.42,
+        "powerLabel": "amplified by large or linked drawing",
+        "spin": false,
+        "signCount": 1,
+        "sigilCount": 2,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 1,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": true
+      },
+      "dyes": [],
+      "issues": [],
+      "heuristicSummary": "The light and the spell's magic leaks out and spreads on every side, spreading outward.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "dispersion-equals-inverted-column",
+          "note": "Dispersion's outward leak is canonically indistinguishable from an inverted Column. Note the spread is the same and flag the uncertainty; whether it is directional or semi-directional is also unresolved in canon.",
+          "source": "docs/signs.md:45"
+        },
+        {
+          "id": "lone-sign-false-asymmetry",
+          "note": "A single sign read slightly off-origin can false-flag `asymmetric`/unstable. With one sign, treat the symmetry/stability flag as unreliable.",
+          "source": "docs/CORE.md §4"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The light and the spell's magic leaks out and spreads on every side, spreading outward.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Bird of Light Beacon",
+      "score": 0.855,
+      "effect": "Forms a bird made of light that flies around for a while — to entertain, signal/call for help, or distract.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

@@ -1,0 +1,158 @@
+{
+  "name": "Water Pen",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "water",
+        "name": "Water",
+        "element": "water",
+        "family": "water"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "unknown_04",
+          "name": "unknown_04",
+          "category": "other",
+          "count": 2,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "unknown_03",
+          "name": "unknown_03",
+          "category": "other",
+          "count": 1,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "dispersion",
+          "name": "Dispersion",
+          "category": "directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "unknown": [
+          "unknown_04",
+          "unknown_03"
+        ],
+        "form": [
+          "column",
+          "dispersion"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "up",
+        "balance": "skewed up",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": true,
+        "signCount": 6,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 6,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": true,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Unbalanced projection signs: the beam skews up (bigger/more column signs pull it that way)."
+        },
+        {
+          "severity": "info",
+          "message": "Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach)."
+        }
+      ],
+      "heuristicSummary": "The water is projected as a tight column or beam, skewed toward up (unbalanced signs).",
+      "heuristicNotes": [
+        "Inverted Columns and Dispersion both spread the substance outward around the seal; the Columns keep a directional bias (one side reaches farther) while Dispersion leaks uniformly — together they compound into a broad, even spread."
+      ],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "dispersion-equals-inverted-column",
+          "note": "Dispersion's outward leak is canonically indistinguishable from an inverted Column. Note the spread is the same and flag the uncertainty; whether it is directional or semi-directional is also unresolved in canon.",
+          "source": "docs/signs.md:45"
+        },
+        {
+          "id": "unknown-signs-incomplete",
+          "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+          "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The water is projected as a tight column or beam, skewed toward up (unbalanced signs).",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Water Pen",
+        "score": 0.675
+      },
+      {
+        "name": "Rising Wave",
+        "score": 0.6
+      },
+      {
+        "name": "Vapor Bubble Spell",
+        "score": 0.6
+      }
+    ]
+  },
+  "unknownIds": [
+    {
+      "where": "sign@k2",
+      "type": "unknown_04"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_04"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_03"
+    }
+  ],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

@@ -1,0 +1,112 @@
+{
+  "name": "Earth Orb",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k0",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "orb",
+          "name": "Orb",
+          "category": "non-directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "form"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "orb",
+          "column"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 6,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 6,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand gathers into a sphere held above the glyph, filling bottom-to-top.",
+      "heuristicNotes": [
+        "The columns drive the substance upward to fill the orb's sphere — pump and vessel.",
+        "Earth, stone, and sand pools cleanly as it fills the sphere.",
+        "The orb is only a vessel — it needs a real source of earth, stone, and sand to fill (this element cannot create its own)."
+      ],
+      "heuristicWarnings": [
+        "Earth is rigid and only manipulable — the orb needs a real earth source, and a Convergence sign to compact the grains, or it jams instead of pooling."
+      ],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The earth, stone, and sand gathers into a sphere held above the glyph, filling bottom-to-top.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Wall Breaker Seal",
+        "score": 0.65
+      },
+      {
+        "name": "Water Orb",
+        "score": 0.55
+      },
+      {
+        "name": "Boulder Stretch Rope",
+        "score": 0.55
+      }
+    ]
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

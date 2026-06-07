@@ -1,0 +1,89 @@
+{
+  "name": "Crystal Ribbon",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k1",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "crystal",
+        "name": "Crystal",
+        "element": "crystal",
+        "family": "misc"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "weave",
+          "name": "Weave",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        }
+      ],
+      "operatorsByKind": {
+        "transmute": [
+          "weave"
+        ]
+      },
+      "geometry": {
+        "symmetry": "asymmetric",
+        "stability": "valid but potentially unstable (asymmetric)",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 2.35,
+        "powerLabel": "amplified by large or linked drawing",
+        "spin": false,
+        "signCount": 1,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 1,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [],
+      "heuristicSummary": "The crystal is woven into a long, flexible ribbon.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "lone-sign-false-asymmetry",
+          "note": "A single sign read slightly off-origin can false-flag `asymmetric`/unstable. With one sign, treat the symmetry/stability flag as unreliable.",
+          "source": "docs/CORE.md §4"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The crystal is woven into a long, flexible ribbon.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Crystal Ribbon",
+      "score": 0.855,
+      "effect": "Conjures hard crystal and weaves it into a long, flexible crystalline ribbon -- a rigid material made supple. A shaping/utility spell, not an attack.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

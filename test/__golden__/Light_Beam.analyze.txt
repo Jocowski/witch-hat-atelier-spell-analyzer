@@ -1,0 +1,212 @@
+{
+  "name": "Light Beam",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "light",
+      "name": "Light",
+      "role": "core",
+      "family": "fire",
+      "element": "light",
+      "description": "Fire variant that manifests magic as light."
+    }
+  ],
+  "signs": [
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 4,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "light",
+      "substance": "light"
+    },
+    "summary": "The light is projected as a tight column or beam, above the seal.",
+    "breakdown": [
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Provides the substance: light (shines outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×4",
+        "text": "The light is projected as a tight column or beam."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Light Beam",
+      "score": 0.95,
+      "effect": "Projects a steady column/beam of light straight up from the seal; the more precisely the glyph is drawn, the steadier the beam.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 4,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k4",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "light",
+          "name": "Light",
+          "role": "core",
+          "family": "fire",
+          "element": "light",
+          "description": "Fire variant that manifests magic as light."
+        }
+      ],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 4,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "light",
+          "substance": "light"
+        },
+        "summary": "The light is projected as a tight column or beam, above the seal.",
+        "breakdown": [
+          {
+            "part": "light",
+            "role": "core",
+            "label": "Light",
+            "text": "Provides the substance: light (shines outward)."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column ×4",
+            "text": "The light is projected as a tight column or beam."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "above the seal"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 4,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "light",
+      "substance": "light"
+    },
+    "summary": "The light is projected as a tight column or beam, above the seal.",
+    "breakdown": [
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Provides the substance: light (shines outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×4",
+        "text": "The light is projected as a tight column or beam."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "catalogEmpty": false
+}

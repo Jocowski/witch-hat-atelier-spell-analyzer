@@ -1,0 +1,352 @@
+{
+  "name": "Floating Drops",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: bilateral symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests along the ring (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "wind",
+      "name": "Wind",
+      "role": "core",
+      "family": "air",
+      "element": "air",
+      "description": "Moves and manipulates (not creates) air. The sigil of levitation; primary tetrad."
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "sigil",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "sigil",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 2,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "direction",
+      "name": "Region",
+      "category": "directional",
+      "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+      "count": 8,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "direction",
+      "name": "Region",
+      "category": "directional",
+      "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+      "count": 8,
+      "inverted": true,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air and water is projected as a tight column or beam, emerging only along the ring.",
+    "breakdown": [
+      {
+        "part": "wind",
+        "role": "core",
+        "label": "Wind",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×2",
+        "text": "The air and water is projected as a tight column or beam."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region ×8",
+        "text": "The air and water is aimed."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region (inverted) ×8",
+        "text": "The air and water is aimed."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "on the ring"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Floating Drops",
+      "score": 0.95,
+      "effect": "Generates water droplets that hover in the air, forming along the seal's outer ring; counteracting Region pairs pin the drops to the ring rather than letting them fall or fly off.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "bilateral",
+    "stability": "stable (bilateral symmetry)",
+    "balance": "balanced",
+    "aim": "along the ring",
+    "power": 0.98,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": true,
+    "decorative": false,
+    "sigilCount": 3,
+    "signCount": 18,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k7",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests along the ring (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "wind",
+          "name": "Wind",
+          "role": "core",
+          "family": "air",
+          "element": "air",
+          "description": "Moves and manipulates (not creates) air. The sigil of levitation; primary tetrad."
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "sigil",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "sigil",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 2,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+          "count": 8,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+          "count": 8,
+          "inverted": true,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "air",
+          "substance": "air"
+        },
+        "summary": "The air and water is projected as a tight column or beam, emerging only along the ring.",
+        "breakdown": [
+          {
+            "part": "wind",
+            "role": "core",
+            "label": "Wind",
+            "text": "Provides the substance: air (stirs into moving wind)."
+          },
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Also provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Also provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column ×2",
+            "text": "The air and water is projected as a tight column or beam."
+          },
+          {
+            "part": "direction",
+            "role": "direction",
+            "label": "Region ×8",
+            "text": "The air and water is aimed."
+          },
+          {
+            "part": "direction",
+            "role": "direction",
+            "label": "Region (inverted) ×8",
+            "text": "The air and water is aimed."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (bilateral symmetry)",
+        "power": "ordinary intensity",
+        "direction": "on the ring"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "balance": "balanced",
+        "aim": "along the ring",
+        "power": 0.98,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 3,
+        "signCount": 18,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.98,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air and water is projected as a tight column or beam, emerging only along the ring.",
+    "breakdown": [
+      {
+        "part": "wind",
+        "role": "core",
+        "label": "Wind",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×2",
+        "text": "The air and water is projected as a tight column or beam."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region ×8",
+        "text": "The air and water is aimed."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region (inverted) ×8",
+        "text": "The air and water is aimed."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "on the ring"
+  },
+  "catalogEmpty": false
+}

@@ -1,0 +1,125 @@
+{
+  "name": "Gathering Shadows",
+  "valid": false,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k0",
+      "name": null,
+      "valid": false,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "vision_sigil",
+        "name": "vision_sigil",
+        "element": null,
+        "family": null
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "eye",
+          "name": "Eye",
+          "category": "non-directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "special"
+        },
+        {
+          "id": "bend",
+          "name": "bend",
+          "category": "other",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        }
+      ],
+      "operatorsByKind": {
+        "special": [
+          "eye"
+        ],
+        "unknown": [
+          "bend"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 8,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 8,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "blocking",
+          "message": "No core: place a sigil (or a sign that can occupy the center) so the seal has a substance."
+        },
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "heuristicSummary": null,
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": null,
+  "catalog": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Gathering Shadows",
+        "score": 0.255
+      },
+      {
+        "name": "Cloak Spell",
+        "score": 0.225
+      }
+    ]
+  },
+  "unknownIds": [
+    {
+      "where": "core@k0",
+      "type": "vision_sigil"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    }
+  ],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

@@ -1,0 +1,163 @@
+{
+  "name": "Sand Cage",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k3",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 6,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "count": 8,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "direction"
+        },
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "count": 2,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "transmute"
+        },
+        {
+          "id": "unknown_05",
+          "name": "unknown_05",
+          "category": "other",
+          "count": 2,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column!inv",
+          "column"
+        ],
+        "direction": [
+          "direction"
+        ],
+        "transmute": [
+          "crush!inv"
+        ],
+        "unknown": [
+          "unknown_05"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "contained within the ring",
+        "balance": "balanced",
+        "power": 1.03,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 20,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 20,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": true,
+        "inverted": true,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests contained within the ring (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is reassembled from dust.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        },
+        {
+          "id": "inverted-column-equals-dispersion",
+          "note": "An inverted Column's spread closely matches Dispersion's; canon cannot distinguish the two. Read it as omnidirectional eruption and FLAG the uncertainty rather than inventing a difference from Dispersion.",
+          "source": "docs/signs.md:34, docs/signs.md:45 (Snugstone)"
+        },
+        {
+          "id": "unknown-signs-incomplete",
+          "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+          "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The earth, stone, and sand is reassembled from dust.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Sand Cage",
+      "score": 0.819,
+      "effect": "Builds a rigid cage of sand around a target to trap it; the rigid counterpart of the Serpent's Bed of Sand ('if sand can be made soft as a bed, it can also be made rigid as a cage').",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 0.9,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [
+    {
+      "where": "sign@k3",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_05"
+    }
+  ],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

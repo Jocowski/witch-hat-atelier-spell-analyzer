@@ -1,0 +1,204 @@
+{
+  "name": "Skysoaring Seal",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "wind",
+      "name": "Wind",
+      "role": "core",
+      "family": "air",
+      "element": "air",
+      "description": "Moves and manipulates (not creates) air. The sigil of levitation; primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "levitation",
+      "name": "Levitation",
+      "category": "directional",
+      "effect": "Makes the magic (or the object it's drawn on) float above the glyph. If it moves an object, the direction follows where the signs point. The arrow tip usually faces inward.",
+      "count": 1,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate.",
+    "breakdown": [
+      {
+        "part": "wind",
+        "role": "core",
+        "label": "Wind",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "levitation",
+        "role": "motion",
+        "label": "Levitation",
+        "text": "The air is lifted and made to levitate."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "valid but potentially unstable (asymmetric)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Skysoaring Seal",
+      "score": 0.95,
+      "effect": "Produces directional thrust in the direction its Levitation keystone points; drawn large on something like a sail, it lifts and flies the object.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "asymmetric",
+    "stability": "valid but potentially unstable (asymmetric)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 2.4,
+    "powerLabel": "amplified by large or linked drawing",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 1,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k3",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "wind",
+          "name": "Wind",
+          "role": "core",
+          "family": "air",
+          "element": "air",
+          "description": "Moves and manipulates (not creates) air. The sigil of levitation; primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "levitation",
+          "name": "Levitation",
+          "category": "directional",
+          "effect": "Makes the magic (or the object it's drawn on) float above the glyph. If it moves an object, the direction follows where the signs point. The arrow tip usually faces inward.",
+          "count": 1,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "air",
+          "substance": "air"
+        },
+        "summary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate.",
+        "breakdown": [
+          {
+            "part": "wind",
+            "role": "core",
+            "label": "Wind",
+            "text": "Provides the substance: air (stirs into moving wind)."
+          },
+          {
+            "part": "levitation",
+            "role": "motion",
+            "label": "Levitation",
+            "text": "The air is lifted and made to levitate."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "valid but potentially unstable (asymmetric)",
+        "power": "ordinary intensity",
+        "direction": "above the seal"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "asymmetric",
+        "stability": "valid but potentially unstable (asymmetric)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 2.4,
+        "powerLabel": "amplified by large or linked drawing",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 1,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1.92,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate.",
+    "breakdown": [
+      {
+        "part": "wind",
+        "role": "core",
+        "label": "Wind",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "levitation",
+        "role": "motion",
+        "label": "Levitation",
+        "text": "The air is lifted and made to levitate."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "valid but potentially unstable (asymmetric)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "catalogEmpty": false
+}

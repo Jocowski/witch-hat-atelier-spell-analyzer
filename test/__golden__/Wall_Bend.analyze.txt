@@ -1,0 +1,376 @@
+{
+  "name": "Wall Bend (reconstruction)",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: bilateral symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests up (from the directional signs)."
+    },
+    {
+      "severity": "info",
+      "message": "Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "earth",
+      "name": "Earth",
+      "role": "core",
+      "family": "earth",
+      "element": "earth",
+      "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "unknown_02",
+      "name": "unknown_02",
+      "category": "other",
+      "effect": "",
+      "count": 1,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "pull",
+      "name": "Pull",
+      "category": "directional",
+      "effect": "Pulls whatever shares its element (water, air, fire...) toward the glyph when the arrow points inward. Angled signs create a vortex/twist. Inverted = pushes.",
+      "count": 2,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "weave",
+      "name": "Weave",
+      "category": "semi-directional",
+      "effect": "Turns solid objects into long, flexible ribbons on contact. Invented by Richeh. Must encircle the central sigil.",
+      "count": 1,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "bend",
+      "name": "bend",
+      "category": "other",
+      "effect": "",
+      "count": 2,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "bind",
+      "name": "Bind",
+      "category": "semi-directional",
+      "effect": "Likely adheres like glue to the surface it touches, or holds an object together so it does not break apart.",
+      "count": 1,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "unknown_05",
+      "name": "unknown_05",
+      "category": "other",
+      "effect": "",
+      "count": 1,
+      "inverted": false,
+      "invertible": false
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is woven into a long, flexible ribbon; it binds fast to the surface it touches.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "weave",
+        "role": "transmute",
+        "label": "Weave",
+        "text": "The earth, stone, and sand is woven into a long, flexible ribbon."
+      },
+      {
+        "part": "pull",
+        "role": "direction",
+        "label": "Pull ×2",
+        "text": "The earth, stone, and sand draws matter of the same element inward toward the glyph."
+      },
+      {
+        "part": "bind",
+        "role": "special",
+        "label": "Bind",
+        "text": "The earth, stone, and sand binds fast to the surface it touches."
+      }
+    ],
+    "notes": [
+      "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+    ],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Serpent's Bed of Sand",
+        "score": 0.55
+      },
+      {
+        "name": "Boulder Stretch Rope",
+        "score": 0.5
+      },
+      {
+        "name": "Sand Cage",
+        "score": 0.495
+      }
+    ]
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "bilateral",
+    "stability": "stable (bilateral symmetry)",
+    "balance": "balanced",
+    "aim": "up",
+    "power": 1.36,
+    "powerLabel": "amplified by large or linked drawing",
+    "tilted": true,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 8,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k4",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests up (from the directional signs)."
+        },
+        {
+          "severity": "info",
+          "message": "Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "earth",
+          "name": "Earth",
+          "role": "core",
+          "family": "earth",
+          "element": "earth",
+          "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "unknown_02",
+          "name": "unknown_02",
+          "category": "other",
+          "effect": "",
+          "count": 1,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "pull",
+          "name": "Pull",
+          "category": "directional",
+          "effect": "Pulls whatever shares its element (water, air, fire...) toward the glyph when the arrow points inward. Angled signs create a vortex/twist. Inverted = pushes.",
+          "count": 2,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "weave",
+          "name": "Weave",
+          "category": "semi-directional",
+          "effect": "Turns solid objects into long, flexible ribbons on contact. Invented by Richeh. Must encircle the central sigil.",
+          "count": 1,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "bend",
+          "name": "bend",
+          "category": "other",
+          "effect": "",
+          "count": 2,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "bind",
+          "name": "Bind",
+          "category": "semi-directional",
+          "effect": "Likely adheres like glue to the surface it touches, or holds an object together so it does not break apart.",
+          "count": 1,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "unknown_05",
+          "name": "unknown_05",
+          "category": "other",
+          "effect": "",
+          "count": 1,
+          "inverted": false,
+          "invertible": false
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "earth",
+          "substance": "earth, stone, and sand"
+        },
+        "summary": "The earth, stone, and sand is woven into a long, flexible ribbon; it binds fast to the surface it touches.",
+        "breakdown": [
+          {
+            "part": "earth",
+            "role": "core",
+            "label": "Earth",
+            "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+          },
+          {
+            "part": "weave",
+            "role": "transmute",
+            "label": "Weave",
+            "text": "The earth, stone, and sand is woven into a long, flexible ribbon."
+          },
+          {
+            "part": "pull",
+            "role": "direction",
+            "label": "Pull ×2",
+            "text": "The earth, stone, and sand draws matter of the same element inward toward the glyph."
+          },
+          {
+            "part": "bind",
+            "role": "special",
+            "label": "Bind",
+            "text": "The earth, stone, and sand binds fast to the surface it touches."
+          }
+        ],
+        "notes": [
+          "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+        ],
+        "warnings": [],
+        "stability": "stable (bilateral symmetry)",
+        "power": "ordinary intensity",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "balance": "balanced",
+        "aim": "up",
+        "power": 1.36,
+        "powerLabel": "amplified by large or linked drawing",
+        "tilted": true,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 8,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.68,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.5
+        }
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is woven into a long, flexible ribbon; it binds fast to the surface it touches.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "weave",
+        "role": "transmute",
+        "label": "Weave",
+        "text": "The earth, stone, and sand is woven into a long, flexible ribbon."
+      },
+      {
+        "part": "pull",
+        "role": "direction",
+        "label": "Pull ×2",
+        "text": "The earth, stone, and sand draws matter of the same element inward toward the glyph."
+      },
+      {
+        "part": "bind",
+        "role": "special",
+        "label": "Bind",
+        "text": "The earth, stone, and sand binds fast to the surface it touches."
+      }
+    ],
+    "notes": [
+      "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+    ],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "catalogEmpty": false,
+  "unknownIds": [
+    {
+      "where": "sign@k4",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k4",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k4",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k4",
+      "type": "unknown_05"
+    }
+  ]
+}

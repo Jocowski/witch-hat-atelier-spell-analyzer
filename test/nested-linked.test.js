@@ -9,7 +9,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { analyzeStrokes } from '../src/draw/recognizer.js'
-import { toComposition, buildMultiComposition } from '../src/studio/drawingModel.js'
+import { toComposition, buildMultiComposition } from '../src/features/studio/drawingModel.js'
 import { toComposition as engineToComposition } from '../src/engine/compose.js'
 
 // ---------- helpers ----------

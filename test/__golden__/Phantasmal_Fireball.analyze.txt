@@ -1,0 +1,428 @@
+{
+  "name": "Phantasmal Fireball (reconstruction)",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: bilateral symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests along the ring (from the directional signs)."
+    },
+    {
+      "severity": "info",
+      "message": "3 external marks outside the ring — framing only; they don't steer the spell."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "unburning_flame",
+      "name": "Unburning Flames",
+      "role": "core",
+      "family": "fire",
+      "element": "unburning_flame",
+      "description": "Involved in producing heatless flame (phantasmal fireball). Exact function unclear."
+    }
+  ],
+  "signs": [
+    {
+      "id": "convergence",
+      "name": "Convergence",
+      "category": "semi-directional",
+      "effect": "Focuses/concentrates the magic into a single point. Also stiffens and compacts loose particles (e.g. hardened sand). One point of the triangle faces inward.",
+      "count": 1,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "unknown_08",
+      "name": "unknown_08",
+      "category": "other",
+      "effect": "",
+      "count": 3,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "direction",
+      "name": "Region",
+      "category": "directional",
+      "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+      "count": 6,
+      "inverted": true,
+      "invertible": true
+    },
+    {
+      "id": "direction",
+      "name": "Region",
+      "category": "directional",
+      "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+      "count": 3,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "unknown_07",
+      "name": "unknown_07",
+      "category": "other",
+      "effect": "",
+      "count": 6,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "unknown_02",
+      "name": "unknown_02",
+      "category": "other",
+      "effect": "",
+      "count": 6,
+      "inverted": false,
+      "invertible": false
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "unburning_flame",
+      "substance": "heatless flame"
+    },
+    "summary": "The heatless flame burns as flame that gives off no heat, emerging only along the ring. The effect is focused down to a single point. Outside the ring sit external marks (unknown_08 ×3) that frame the seal rather than shape the core effect.",
+    "breakdown": [
+      {
+        "part": "unburning_flame",
+        "role": "core",
+        "label": "Unburning Flames",
+        "text": "Provides the substance: heatless flame (burns as flame that gives off no heat)."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region (inverted) ×6",
+        "text": "The heatless flame is aimed."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region ×3",
+        "text": "The heatless flame is aimed."
+      },
+      {
+        "part": "convergence",
+        "role": "power",
+        "label": "Convergence",
+        "text": "The heatless flame is focused down to a single point."
+      },
+      {
+        "part": "unknown_08",
+        "role": "external",
+        "label": "unknown_08 ×3 (outside ring)",
+        "text": "An external mark outside the activation ring — it frames the seal but does not shape the core effect."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "concentrated to a point (Convergence) — narrower but more intense",
+    "direction": "on the ring"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Phantasmal Fireball",
+        "score": 0.421
+      },
+      {
+        "name": "Floating Drops",
+        "score": 0.256
+      }
+    ]
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "bilateral",
+    "stability": "stable (bilateral symmetry)",
+    "balance": "balanced",
+    "aim": "along the ring",
+    "power": 0.9,
+    "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+    "tilted": false,
+    "inverted": true,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 25,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k3",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests along the ring (from the directional signs)."
+        },
+        {
+          "severity": "info",
+          "message": "3 external marks outside the ring — framing only; they don't steer the spell."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "unburning_flame",
+          "name": "Unburning Flames",
+          "role": "core",
+          "family": "fire",
+          "element": "unburning_flame",
+          "description": "Involved in producing heatless flame (phantasmal fireball). Exact function unclear."
+        }
+      ],
+      "signs": [
+        {
+          "id": "convergence",
+          "name": "Convergence",
+          "category": "semi-directional",
+          "effect": "Focuses/concentrates the magic into a single point. Also stiffens and compacts loose particles (e.g. hardened sand). One point of the triangle faces inward.",
+          "count": 1,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "unknown_08",
+          "name": "unknown_08",
+          "category": "other",
+          "effect": "",
+          "count": 3,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+          "count": 6,
+          "inverted": true,
+          "invertible": true
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+          "count": 3,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "unknown_07",
+          "name": "unknown_07",
+          "category": "other",
+          "effect": "",
+          "count": 6,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "unknown_02",
+          "name": "unknown_02",
+          "category": "other",
+          "effect": "",
+          "count": 6,
+          "inverted": false,
+          "invertible": false
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "unburning_flame",
+          "substance": "heatless flame"
+        },
+        "summary": "The heatless flame burns as flame that gives off no heat, emerging only along the ring. The effect is focused down to a single point. Outside the ring sit external marks (unknown_08 ×3) that frame the seal rather than shape the core effect.",
+        "breakdown": [
+          {
+            "part": "unburning_flame",
+            "role": "core",
+            "label": "Unburning Flames",
+            "text": "Provides the substance: heatless flame (burns as flame that gives off no heat)."
+          },
+          {
+            "part": "direction",
+            "role": "direction",
+            "label": "Region (inverted) ×6",
+            "text": "The heatless flame is aimed."
+          },
+          {
+            "part": "direction",
+            "role": "direction",
+            "label": "Region ×3",
+            "text": "The heatless flame is aimed."
+          },
+          {
+            "part": "convergence",
+            "role": "power",
+            "label": "Convergence",
+            "text": "The heatless flame is focused down to a single point."
+          },
+          {
+            "part": "unknown_08",
+            "role": "external",
+            "label": "unknown_08 ×3 (outside ring)",
+            "text": "An external mark outside the activation ring — it frames the seal but does not shape the core effect."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (bilateral symmetry)",
+        "power": "concentrated to a point (Convergence) — narrower but more intense",
+        "direction": "on the ring"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "balance": "balanced",
+        "aim": "along the ring",
+        "power": 0.9,
+        "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 25,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.45,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.5
+        }
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "unburning_flame",
+      "substance": "heatless flame"
+    },
+    "summary": "The heatless flame burns as flame that gives off no heat, emerging only along the ring. The effect is focused down to a single point. Outside the ring sit external marks (unknown_08 ×3) that frame the seal rather than shape the core effect.",
+    "breakdown": [
+      {
+        "part": "unburning_flame",
+        "role": "core",
+        "label": "Unburning Flames",
+        "text": "Provides the substance: heatless flame (burns as flame that gives off no heat)."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region (inverted) ×6",
+        "text": "The heatless flame is aimed."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region ×3",
+        "text": "The heatless flame is aimed."
+      },
+      {
+        "part": "convergence",
+        "role": "power",
+        "label": "Convergence",
+        "text": "The heatless flame is focused down to a single point."
+      },
+      {
+        "part": "unknown_08",
+        "role": "external",
+        "label": "unknown_08 ×3 (outside ring)",
+        "text": "An external mark outside the activation ring — it frames the seal but does not shape the core effect."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "concentrated to a point (Convergence) — narrower but more intense",
+    "direction": "on the ring"
+  },
+  "catalogEmpty": false,
+  "unknownIds": [
+    {
+      "where": "sign@k3",
+      "type": "unknown_08"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_08"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_08"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    }
+  ]
+}

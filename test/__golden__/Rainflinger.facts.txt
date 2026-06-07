@@ -1,0 +1,99 @@
+{
+  "name": "Rainflinger",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k0",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "water",
+        "name": "Water",
+        "element": "water",
+        "family": "water"
+      },
+      "extraSigils": [
+        {
+          "id": "fire",
+          "name": "Fire",
+          "element": "fire"
+        },
+        {
+          "id": "fire",
+          "name": "Fire",
+          "element": "fire"
+        }
+      ],
+      "signs": [
+        {
+          "id": "crosshair",
+          "name": "Crosshair",
+          "category": "non-directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "target"
+        }
+      ],
+      "operatorsByKind": {
+        "target": [
+          "crosshair"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 0.9,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 2,
+        "sigilCount": 3,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 2,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "heuristicSummary": "The water and flame pours and flows outward. It is confined within an area of effect.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The water and flame pours and flows outward. It is confined within an area of effect.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Rainflinger",
+      "score": 0.855,
+      "effect": "Creates a water-repellent bubble around the seal, keeping its radius dry — by repelling and/or drying off the water (mechanism unconfirmed). Qifrey used it for a picnic in the rain and to dry off Brushbuddy.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

@@ -1,0 +1,633 @@
+{
+  "name": "Serpent's Bed of Sand",
+  "valid": true,
+  "circleCount": 7,
+  "circles": [
+    {
+      "id": "k1",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": "boundary",
+      "centerPromoted": false,
+      "core": null,
+      "extraSigils": [],
+      "signs": [],
+      "operatorsByKind": {},
+      "geometry": {
+        "symmetry": "none",
+        "stability": "no signs to balance",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 0,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 0,
+        "sigilCount": 0,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 0,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Boundary ring: an empty enclosing ring that contains the nested seal(s) — a chamber wall, not a discharge."
+        }
+      ],
+      "heuristicSummary": null,
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    },
+    {
+      "id": "k2",
+      "name": "Circle 2",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": true,
+      "core": {
+        "id": "billowing",
+        "name": "Billow",
+        "element": "transmutation",
+        "family": "non-directional"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "billowing",
+          "name": "Billow",
+          "category": "non-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "transmute"
+        },
+        {
+          "id": "collection",
+          "name": "Collection",
+          "category": "directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "support"
+        }
+      ],
+      "operatorsByKind": {
+        "transmute": [
+          "billowing"
+        ],
+        "support": [
+          "collection"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 1.09,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 5,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 5,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        }
+      ],
+      "heuristicSummary": "The affected matter is converted into a soft, fluffy cloud; it gathers surrounding material to feed the spell.",
+      "heuristicNotes": [
+        "Collection gathers the material that Billowing then converts into a cloud."
+      ],
+      "heuristicWarnings": [],
+      "caveats": []
+    },
+    {
+      "id": "k4",
+      "name": "Circle 3",
+      "valid": true,
+      "contextRole": "modifier",
+      "centerPromoted": false,
+      "core": null,
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "convergence",
+          "name": "Convergence",
+          "category": "semi-directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "power"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 8,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "repetition",
+          "name": "Repetition",
+          "category": "non-directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "special"
+        }
+      ],
+      "operatorsByKind": {
+        "power": [
+          "convergence"
+        ],
+        "form": [
+          "column"
+        ],
+        "special": [
+          "repetition"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1.27,
+        "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+        "spin": true,
+        "signCount": 16,
+        "sigilCount": 0,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 2,
+        "ring": 14,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Modifier ring: a coreless ring that shapes the seal(s) it encloses or links to, rather than carrying its own substance."
+        },
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        },
+        {
+          "severity": "info",
+          "message": "Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach)."
+        }
+      ],
+      "heuristicSummary": null,
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        }
+      ]
+    },
+    {
+      "id": "k5",
+      "name": "Circle 4",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column"
+        ],
+        "transmute": [
+          "crush"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 3,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 3,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is pulverized into dust.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    },
+    {
+      "id": "k6",
+      "name": "Circle 5",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column"
+        ],
+        "transmute": [
+          "crush"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 3,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 3,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is pulverized into dust.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    },
+    {
+      "id": "k7",
+      "name": "Circle 6",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "transmute": [
+          "crush"
+        ],
+        "form": [
+          "column"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 3,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 3,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is pulverized into dust.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    },
+    {
+      "id": "k8",
+      "name": "Circle 7",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "transmute": [
+          "crush"
+        ],
+        "form": [
+          "column"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 3,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 3,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is pulverized into dust.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k2"
+    },
+    {
+      "type": "nest",
+      "outer": "k4",
+      "inner": "k1"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k5"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k6"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k7"
+    },
+    {
+      "type": "nest",
+      "outer": "k1",
+      "inner": "k8"
+    },
+    {
+      "type": "link",
+      "a": "k7",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k6",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k5",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k8",
+      "b": "k2"
+    },
+    {
+      "type": "link",
+      "a": "k8",
+      "b": "k1"
+    },
+    {
+      "type": "link",
+      "a": "k5",
+      "b": "k1"
+    },
+    {
+      "type": "link",
+      "a": "k6",
+      "b": "k1"
+    },
+    {
+      "type": "link",
+      "a": "k7",
+      "b": "k1"
+    }
+  ],
+  "combinedHeuristicSummary": "(no defined effect), and nested within it Circle 1: (no defined effect), and nested within it Circle 2, Circle 4, Circle 5, Circle 6, Circle 7: The affected matter is converted into a soft, fluffy cloud; it gathers surrounding material to feed the spell.; and The earth, stone, and sand is pulverized into dust.; and The earth, stone, and sand is pulverized into dust.; and The earth, stone, and sand is pulverized into dust.; and The earth, stone, and sand is pulverized into dust.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Serpent's Bed of Sand",
+      "score": 0.95,
+      "effect": "Mills real stone into fine sand, billows it into a huge fluffy cloud, and continually resets the cloud so it stays soft yet firm enough to hold a dragon (regaining shape once weight is removed). The soft, self-restoring sibling of the Sand Cage.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

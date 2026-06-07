@@ -84,5 +84,31 @@ export default [
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
   },
 
+  // ── Layer boundaries (refactor-plan-spec §3.3) ─────────────────────────────────────────────
+  // ENFORCED (error) for domain/ + services/ — these layers are fully migrated and clean.
+  // domain/ must stay PURE (invariant I1): no React/JSON/DOM/Supabase/onnx, no upward layer imports.
+  {
+    files: ['src/domain/**/*.{js,jsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['react', 'react-dom', '@supabase/*', 'onnxruntime-web', '*.css', '**/*.css', '*.json', '**/*.json', '#services/*', '#shared/*', '#features/*'],
+            message: 'domain/ is the PURE layer (invariant I1): no React/JSON/CSS/Supabase/onnx and no imports from services/shared/features.' },
+        ],
+      }],
+    },
+  },
+  // services/ may import domain only — never up into shared/features.
+  {
+    files: ['src/services/**/*.{js,jsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['#shared/*', '#features/*'], message: 'services/ may import domain only — not shared/ or features/.' },
+        ],
+      }],
+    },
+  },
+
   prettier, // must be last: disables rules that conflict with Prettier
 ]

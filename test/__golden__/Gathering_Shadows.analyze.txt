@@ -1,0 +1,174 @@
+{
+  "name": "Gathering Shadows",
+  "valid": false,
+  "status": {
+    "text": "Invalid — no core"
+  },
+  "issues": [
+    {
+      "severity": "blocking",
+      "message": "No core: place a sigil (or a sign that can occupy the center) so the seal has a substance."
+    },
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "vision_sigil",
+      "name": "vision_sigil",
+      "role": "core",
+      "family": null,
+      "element": null,
+      "description": ""
+    }
+  ],
+  "signs": [
+    {
+      "id": "eye",
+      "name": "Eye",
+      "category": "non-directional",
+      "effect": "Light/shadow manipulation. With vision and bend, it melds the object (and what it covers) into the shadows. Currently indistinguishable from bend.",
+      "count": 4,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "bend",
+      "name": "bend",
+      "category": "other",
+      "effect": "",
+      "count": 4,
+      "inverted": false,
+      "invertible": false
+    }
+  ],
+  "deduction": null,
+  "similar": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Gathering Shadows",
+        "score": 0.255
+      },
+      {
+        "name": "Cloak Spell",
+        "score": 0.225
+      }
+    ]
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "undirected",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 8,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k0",
+      "name": "",
+      "valid": false,
+      "hasCore": false,
+      "centerPromoted": false,
+      "active": false,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "blocking",
+          "message": "No core: place a sigil (or a sign that can occupy the center) so the seal has a substance."
+        },
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "vision_sigil",
+          "name": "vision_sigil",
+          "role": "core",
+          "family": null,
+          "element": null,
+          "description": ""
+        }
+      ],
+      "signs": [
+        {
+          "id": "eye",
+          "name": "Eye",
+          "category": "non-directional",
+          "effect": "Light/shadow manipulation. With vision and bend, it melds the object (and what it covers) into the shadows. Currently indistinguishable from bend.",
+          "count": 4,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "bend",
+          "name": "bend",
+          "category": "other",
+          "effect": "",
+          "count": 4,
+          "inverted": false,
+          "invertible": false
+        }
+      ],
+      "deduction": null,
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "undirected",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 8,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": null,
+  "catalogEmpty": false,
+  "unknownIds": [
+    {
+      "where": "core@k0",
+      "type": "vision_sigil"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k0",
+      "type": "bend"
+    }
+  ]
+}

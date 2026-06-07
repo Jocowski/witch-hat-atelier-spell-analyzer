@@ -1,0 +1,212 @@
+{
+  "name": "Integration",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "earth",
+      "name": "Earth",
+      "role": "core",
+      "family": "earth",
+      "element": "earth",
+      "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "crush",
+      "name": "Crush",
+      "category": "semi-directional",
+      "effect": "Disintegrates objects into dust (with an earth sigil). Inverted, it reassembles/reintegrates (temporarily).",
+      "count": 6,
+      "inverted": true,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is reassembled from dust.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "crush",
+        "role": "transmute",
+        "label": "Crush (inverted) ×6",
+        "text": "The earth, stone, and sand is reassembled from dust."
+      }
+    ],
+    "notes": [
+      "Crush pulverizes on contact, but without a Column to drive it the break has little reach."
+    ],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Integration",
+      "score": 0.95,
+      "effect": "Temporarily reassembles a powdered/smashed substance back into the shape of the object it originally came from — used to identify an unknown powder.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "undirected",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": true,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 6,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "earth",
+          "name": "Earth",
+          "role": "core",
+          "family": "earth",
+          "element": "earth",
+          "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "effect": "Disintegrates objects into dust (with an earth sigil). Inverted, it reassembles/reintegrates (temporarily).",
+          "count": 6,
+          "inverted": true,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "earth",
+          "substance": "earth, stone, and sand"
+        },
+        "summary": "The earth, stone, and sand is reassembled from dust.",
+        "breakdown": [
+          {
+            "part": "earth",
+            "role": "core",
+            "label": "Earth",
+            "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+          },
+          {
+            "part": "crush",
+            "role": "transmute",
+            "label": "Crush (inverted) ×6",
+            "text": "The earth, stone, and sand is reassembled from dust."
+          }
+        ],
+        "notes": [
+          "Crush pulverizes on contact, but without a Column to drive it the break has little reach."
+        ],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "undirected",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 6,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.5,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.5
+        }
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is reassembled from dust.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "crush",
+        "role": "transmute",
+        "label": "Crush (inverted) ×6",
+        "text": "The earth, stone, and sand is reassembled from dust."
+      }
+    ],
+    "notes": [
+      "Crush pulverizes on contact, but without a Column to drive it the break has little reach."
+    ],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "catalogEmpty": false
+}

@@ -1,0 +1,218 @@
+{
+  "name": "Grasping Wind",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests contained within the ring (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "wind",
+      "name": "Wind",
+      "role": "core",
+      "family": "air",
+      "element": "air",
+      "description": "Moves and manipulates (not creates) air. The sigil of levitation; primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "pull",
+      "name": "Pull",
+      "category": "directional",
+      "effect": "Pulls whatever shares its element (water, air, fire...) toward the glyph when the arrow points inward. Angled signs create a vortex/twist. Inverted = pushes.",
+      "count": 4,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air stirs into moving wind, contained within the ring.",
+    "breakdown": [
+      {
+        "part": "wind",
+        "role": "core",
+        "label": "Wind",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "pull",
+        "role": "direction",
+        "label": "Pull ×4",
+        "text": "The air draws matter of the same element inward toward the glyph."
+      }
+    ],
+    "notes": [
+      "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+    ],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "contained"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Grasping Wind",
+      "score": 0.95,
+      "effect": "Pulls a strong wind current in toward the glyph, dragging lighter objects with it; slanting the Pull signs twists the inflow into a vortex.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "contained within the ring",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 4,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k2",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests contained within the ring (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "wind",
+          "name": "Wind",
+          "role": "core",
+          "family": "air",
+          "element": "air",
+          "description": "Moves and manipulates (not creates) air. The sigil of levitation; primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "pull",
+          "name": "Pull",
+          "category": "directional",
+          "effect": "Pulls whatever shares its element (water, air, fire...) toward the glyph when the arrow points inward. Angled signs create a vortex/twist. Inverted = pushes.",
+          "count": 4,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "air",
+          "substance": "air"
+        },
+        "summary": "The air stirs into moving wind, contained within the ring.",
+        "breakdown": [
+          {
+            "part": "wind",
+            "role": "core",
+            "label": "Wind",
+            "text": "Provides the substance: air (stirs into moving wind)."
+          },
+          {
+            "part": "pull",
+            "role": "direction",
+            "label": "Pull ×4",
+            "text": "The air draws matter of the same element inward toward the glyph."
+          }
+        ],
+        "notes": [
+          "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+        ],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "contained"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "contained within the ring",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 4,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "air",
+      "substance": "air"
+    },
+    "summary": "The air stirs into moving wind, contained within the ring.",
+    "breakdown": [
+      {
+        "part": "wind",
+        "role": "core",
+        "label": "Wind",
+        "text": "Provides the substance: air (stirs into moving wind)."
+      },
+      {
+        "part": "pull",
+        "role": "direction",
+        "label": "Pull ×4",
+        "text": "The air draws matter of the same element inward toward the glyph."
+      }
+    ],
+    "notes": [
+      "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+    ],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "contained"
+  },
+  "catalogEmpty": false
+}

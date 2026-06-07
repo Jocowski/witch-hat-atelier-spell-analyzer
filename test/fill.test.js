@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isClosedStroke, pointInPolygon, polygonArea, findFillTarget } from '../src/studio/tools/fill.js'
+import { isClosedStroke, pointInPolygon, polygonArea, findFillTarget } from '../src/features/studio/tools/fill.js'
 
 // A 100×100 square (closed: last point == first).
 const square = [

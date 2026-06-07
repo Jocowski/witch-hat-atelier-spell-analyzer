@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toComposition, recognizedToPlaced } from '../src/studio/drawingModel.js'
+import { toComposition, recognizedToPlaced } from '../src/features/studio/drawingModel.js'
 
 // Fake isSigil: treat 'fire', 'water', 'earth' as sigils; everything else as a sign.
 const SIGIL_TYPES = new Set(['fire', 'water', 'earth', 'air', 'time'])

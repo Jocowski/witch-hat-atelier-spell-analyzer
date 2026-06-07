@@ -1,0 +1,104 @@
+{
+  "name": "Sylph Shoes Seal",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k12",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "wind_underfoot",
+        "name": "Wind Underfoot",
+        "element": "air",
+        "family": "air"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "convergence",
+          "name": "Convergence",
+          "category": "semi-directional",
+          "count": 8,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "power"
+        },
+        {
+          "id": "levitation",
+          "name": "Levitation",
+          "category": "directional",
+          "count": 8,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "motion"
+        }
+      ],
+      "operatorsByKind": {
+        "power": [
+          "convergence"
+        ],
+        "motion": [
+          "levitation"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+        "spin": false,
+        "signCount": 16,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 16,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate. The effect is focused down to a single point.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate. The effect is focused down to a single point.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Sylph Shoes Seal",
+      "score": 0.855,
+      "effect": "Lets the wearer float above the ground and fly. Drawn on a pair of shoes as a bisected seal — one half on each sole — that completes and activates when the two shoes are touched together.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

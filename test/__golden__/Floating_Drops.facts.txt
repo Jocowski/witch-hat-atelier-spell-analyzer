@@ -1,0 +1,125 @@
+{
+  "name": "Floating Drops",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k7",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "wind",
+        "name": "Wind",
+        "element": "air",
+        "family": "air"
+      },
+      "extraSigils": [
+        {
+          "id": "water",
+          "name": "Water",
+          "element": "water"
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "element": "water"
+        }
+      ],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "count": 8,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "direction"
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "count": 8,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "direction"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column"
+        ],
+        "direction": [
+          "direction",
+          "direction!inv"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "along the ring",
+        "balance": "balanced",
+        "power": 0.98,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 18,
+        "sigilCount": 3,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 18,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": true,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests along the ring (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The air and water is projected as a tight column or beam, emerging only along the ring.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The air and water is projected as a tight column or beam, emerging only along the ring.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Floating Drops",
+      "score": 0.95,
+      "effect": "Generates water droplets that hover in the air, forming along the seal's outer ring; counteracting Region pairs pin the drops to the ring rather than letting them fall or fly off.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

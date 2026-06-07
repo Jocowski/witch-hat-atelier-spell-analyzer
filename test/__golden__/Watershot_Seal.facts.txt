@@ -1,0 +1,98 @@
+{
+  "name": "Watershot Seal",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k0",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "water",
+        "name": "Water",
+        "element": "water",
+        "family": "water"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 8,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1.17,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 8,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 8,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The water is projected as a tight column or beam, above the seal.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The water is projected as a tight column or beam, above the seal.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Watershot Seal",
+      "score": 0.95,
+      "effect": "Projects a jet of water out of the seal — straight up when the Column ring is balanced, leaning toward whichever column is drawn longer (Coco's first spell; the misfire that soaked Agott).",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

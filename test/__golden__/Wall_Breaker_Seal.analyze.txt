@@ -1,0 +1,250 @@
+{
+  "name": "Wall Breaker Seal",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "earth",
+      "name": "Earth",
+      "role": "core",
+      "family": "earth",
+      "element": "earth",
+      "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 2,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "crush",
+      "name": "Crush",
+      "category": "semi-directional",
+      "effect": "Disintegrates objects into dust (with an earth sigil). Inverted, it reassembles/reintegrates (temporarily).",
+      "count": 2,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is pulverized into dust.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "crush",
+        "role": "transmute",
+        "label": "Crush ×2",
+        "text": "The earth, stone, and sand is pulverized into dust."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×2",
+        "text": "The earth, stone, and sand is projected as a tight column or beam."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Wall Breaker Seal",
+      "score": 0.95,
+      "effect": "Drawn on a solid object, breaks through it and reduces the material to dust. Earth's destruction seal; the non-inverted-Crush counterpart of Integration and the destructive foil of Wall Bend.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 4,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k7",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": false,
+      "ringClosed": false,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "earth",
+          "name": "Earth",
+          "role": "core",
+          "family": "earth",
+          "element": "earth",
+          "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 2,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "effect": "Disintegrates objects into dust (with an earth sigil). Inverted, it reassembles/reintegrates (temporarily).",
+          "count": 2,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "earth",
+          "substance": "earth, stone, and sand"
+        },
+        "summary": "The earth, stone, and sand is pulverized into dust.",
+        "breakdown": [
+          {
+            "part": "earth",
+            "role": "core",
+            "label": "Earth",
+            "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+          },
+          {
+            "part": "crush",
+            "role": "transmute",
+            "label": "Crush ×2",
+            "text": "The earth, stone, and sand is pulverized into dust."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column ×2",
+            "text": "The earth, stone, and sand is projected as a tight column or beam."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 4,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.5,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.5
+        }
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is pulverized into dust.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "crush",
+        "role": "transmute",
+        "label": "Crush ×2",
+        "text": "The earth, stone, and sand is pulverized into dust."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×2",
+        "text": "The earth, stone, and sand is projected as a tight column or beam."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "catalogEmpty": false
+}

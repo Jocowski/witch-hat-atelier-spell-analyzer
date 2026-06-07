@@ -1,0 +1,454 @@
+{
+  "name": "",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: bilateral symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "dragon",
+      "name": "Dragon",
+      "role": "core",
+      "family": "decorative",
+      "element": "decorative",
+      "description": "Manifests magic in the shape of a dragon."
+    },
+    {
+      "id": "flower_water",
+      "name": "Water Flower",
+      "role": "sigil",
+      "family": "decorative",
+      "element": "decorative",
+      "description": "A flower seal whose petal-arches are swapped for water droplets — shapes gathered water into a lily as it settles."
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "sigil",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "sigil",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "sigil",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "sigil",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "enlarge",
+      "name": "Enlarge",
+      "category": "semi-directional",
+      "effect": "Grows (corners pointing outward) or shrinks (corners pointing inward) objects. Combines with diamond (nearby object) or window (the object itself). Sits at the center if used alone.",
+      "count": 1,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "convergence",
+      "name": "Convergence",
+      "category": "semi-directional",
+      "effect": "Focuses/concentrates the magic into a single point. Also stiffens and compacts loose particles (e.g. hardened sand). One point of the triangle faces inward.",
+      "count": 4,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 8,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "decorative",
+      "substance": "the spell's magic"
+    },
+    "summary": "The spell's magic and water grows far beyond its normal size. The effect is focused down to a single point.",
+    "breakdown": [
+      {
+        "part": "dragon",
+        "role": "core",
+        "label": "Dragon",
+        "text": "Provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+      },
+      {
+        "part": "flower_water",
+        "role": "core",
+        "label": "Water Flower",
+        "text": "Also provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "enlarge",
+        "role": "transmute",
+        "label": "Enlarge",
+        "text": "The spell's magic and water grows far beyond its normal size."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×8",
+        "text": "The spell's magic and water is projected as a tight column or beam."
+      },
+      {
+        "part": "convergence",
+        "role": "power",
+        "label": "Convergence ×4",
+        "text": "The spell's magic and water is focused down to a single point."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "concentrated to a point (Convergence) — narrower but more intense",
+    "direction": "balanced"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Qifrey's Water Dragon",
+      "score": 0.95,
+      "effect": "Draws water from nearby clouds (and likely bodies of water) and shapes it into a giant dragon, which settles into a water lily before the spell ends. Qifrey uses it to subdue the dragon attacking Coco in the Illusory Labyrinth.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "bilateral",
+    "stability": "stable (bilateral symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 0.73,
+    "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+    "tilted": false,
+    "inverted": false,
+    "decorative": true,
+    "sigilCount": 6,
+    "signCount": 13,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k4",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "dragon",
+          "name": "Dragon",
+          "role": "core",
+          "family": "decorative",
+          "element": "decorative",
+          "description": "Manifests magic in the shape of a dragon."
+        },
+        {
+          "id": "flower_water",
+          "name": "Water Flower",
+          "role": "sigil",
+          "family": "decorative",
+          "element": "decorative",
+          "description": "A flower seal whose petal-arches are swapped for water droplets — shapes gathered water into a lily as it settles."
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "sigil",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "sigil",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "sigil",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "sigil",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "enlarge",
+          "name": "Enlarge",
+          "category": "semi-directional",
+          "effect": "Grows (corners pointing outward) or shrinks (corners pointing inward) objects. Combines with diamond (nearby object) or window (the object itself). Sits at the center if used alone.",
+          "count": 1,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "convergence",
+          "name": "Convergence",
+          "category": "semi-directional",
+          "effect": "Focuses/concentrates the magic into a single point. Also stiffens and compacts loose particles (e.g. hardened sand). One point of the triangle faces inward.",
+          "count": 4,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 8,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "decorative",
+          "substance": "the spell's magic"
+        },
+        "summary": "The spell's magic and water grows far beyond its normal size. The effect is focused down to a single point.",
+        "breakdown": [
+          {
+            "part": "dragon",
+            "role": "core",
+            "label": "Dragon",
+            "text": "Provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+          },
+          {
+            "part": "flower_water",
+            "role": "core",
+            "label": "Water Flower",
+            "text": "Also provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+          },
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Also provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Also provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Also provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Also provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "enlarge",
+            "role": "transmute",
+            "label": "Enlarge",
+            "text": "The spell's magic and water grows far beyond its normal size."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column ×8",
+            "text": "The spell's magic and water is projected as a tight column or beam."
+          },
+          {
+            "part": "convergence",
+            "role": "power",
+            "label": "Convergence ×4",
+            "text": "The spell's magic and water is focused down to a single point."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (bilateral symmetry)",
+        "power": "concentrated to a point (Convergence) — narrower but more intense",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 0.73,
+        "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+        "tilted": false,
+        "inverted": false,
+        "decorative": true,
+        "sigilCount": 6,
+        "signCount": 13,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.365,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "decorative",
+      "substance": "the spell's magic"
+    },
+    "summary": "The spell's magic and water grows far beyond its normal size. The effect is focused down to a single point.",
+    "breakdown": [
+      {
+        "part": "dragon",
+        "role": "core",
+        "label": "Dragon",
+        "text": "Provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+      },
+      {
+        "part": "flower_water",
+        "role": "core",
+        "label": "Water Flower",
+        "text": "Also provides the substance: the spell's magic (takes the shape of the living thing it depicts)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Also provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "enlarge",
+        "role": "transmute",
+        "label": "Enlarge",
+        "text": "The spell's magic and water grows far beyond its normal size."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×8",
+        "text": "The spell's magic and water is projected as a tight column or beam."
+      },
+      {
+        "part": "convergence",
+        "role": "power",
+        "label": "Convergence ×4",
+        "text": "The spell's magic and water is focused down to a single point."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "concentrated to a point (Convergence) — narrower but more intense",
+    "direction": "balanced"
+  },
+  "catalogEmpty": false
+}

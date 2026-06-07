@@ -1,0 +1,312 @@
+{
+  "name": "Sand Bridge",
+  "valid": true,
+  "circleCount": 2,
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": "modifier",
+      "centerPromoted": false,
+      "core": null,
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 6,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "unknown_05",
+          "name": "unknown_05",
+          "category": "other",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "unknown_09",
+          "name": "unknown_09",
+          "category": "other",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "unknown_11",
+          "name": "unknown_11",
+          "category": "other",
+          "count": 2,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "radial",
+          "name": "Radial",
+          "category": "semi-directional",
+          "count": 2,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "power"
+        },
+        {
+          "id": "strengthen",
+          "name": "Strengthen",
+          "category": "semi-directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "special"
+        },
+        {
+          "id": "unknown_10",
+          "name": "unknown_10",
+          "category": "other",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column"
+        ],
+        "unknown": [
+          "unknown_05",
+          "unknown_09",
+          "unknown_11",
+          "unknown_10"
+        ],
+        "power": [
+          "radial!inv"
+        ],
+        "special": [
+          "strengthen"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1.28,
+        "powerLabel": "weakened on purpose (Radial) — a gentle version of the element",
+        "spin": false,
+        "signCount": 26,
+        "sigilCount": 0,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 22,
+        "ring": 4,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": true,
+        "inverted": true,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Modifier ring: a coreless ring that shapes the seal(s) it encloses or links to, rather than carrying its own substance."
+        },
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": null,
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        },
+        {
+          "id": "unknown-signs-incomplete",
+          "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+          "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+        }
+      ]
+    },
+    {
+      "id": "k3",
+      "name": "Circle 2",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "sand_bridge",
+        "name": "Sand Bridge Sigil",
+        "element": "earth",
+        "family": "misc"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "unknown_06",
+          "name": "unknown_06",
+          "category": "other",
+          "count": 2,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        }
+      ],
+      "operatorsByKind": {
+        "unknown": [
+          "unknown_06"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 2,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 2,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": true,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand rises up as rock and sand.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "unknown-signs-incomplete",
+          "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+          "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "type": "nest",
+      "outer": "k2",
+      "inner": "k3"
+    }
+  ],
+  "combinedHeuristicSummary": "(no defined effect), and nested within it Circle 2: The earth, stone, and sand rises up as rock and sand.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Sand Bridge",
+        "score": 0.505
+      },
+      {
+        "name": "Serpent's Bed of Sand",
+        "score": 0.394
+      },
+      {
+        "name": "Sand Cage",
+        "score": 0.369
+      }
+    ]
+  },
+  "unknownIds": [
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_09"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_11"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_11"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_10"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_06"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_06"
+    }
+  ],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

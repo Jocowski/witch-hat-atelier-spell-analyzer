@@ -1,0 +1,148 @@
+{
+  "name": null,
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k4",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "dragon",
+        "name": "Dragon",
+        "element": "decorative",
+        "family": "decorative"
+      },
+      "extraSigils": [
+        {
+          "id": "flower_water",
+          "name": "Water Flower",
+          "element": "decorative"
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "element": "water"
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "element": "water"
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "element": "water"
+        },
+        {
+          "id": "water",
+          "name": "Water",
+          "element": "water"
+        }
+      ],
+      "signs": [
+        {
+          "id": "enlarge",
+          "name": "Enlarge",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        },
+        {
+          "id": "convergence",
+          "name": "Convergence",
+          "category": "semi-directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "power"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 8,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "transmute": [
+          "enlarge"
+        ],
+        "power": [
+          "convergence"
+        ],
+        "form": [
+          "column"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 0.73,
+        "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+        "spin": false,
+        "signCount": 13,
+        "sigilCount": 6,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 13,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": true
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The spell's magic and water grows far beyond its normal size. The effect is focused down to a single point.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The spell's magic and water grows far beyond its normal size. The effect is focused down to a single point.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Qifrey's Water Dragon",
+      "score": 0.95,
+      "effect": "Draws water from nearby clouds (and likely bodies of water) and shapes it into a giant dragon, which settles into a water lily before the spell ends. Qifrey uses it to subdue the dragon attacking Coco in the Illusory Labyrinth.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

@@ -1,0 +1,270 @@
+{
+  "name": "Earth Orb",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "earth",
+      "name": "Earth",
+      "role": "core",
+      "family": "earth",
+      "element": "earth",
+      "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "orb",
+      "name": "Orb",
+      "category": "non-directional",
+      "effect": "Creates a spherical space above the glyph in which controlled material collects, filling bottom-to-top.",
+      "count": 4,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 2,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand gathers into a sphere held above the glyph, filling bottom-to-top.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "orb",
+        "role": "form",
+        "label": "Orb ×4",
+        "text": "The earth, stone, and sand gathers into a sphere held above the glyph."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×2",
+        "text": "The earth, stone, and sand is projected as a tight column or beam."
+      }
+    ],
+    "notes": [
+      "The columns drive the substance upward to fill the orb's sphere — pump and vessel.",
+      "Earth, stone, and sand pools cleanly as it fills the sphere.",
+      "The orb is only a vessel — it needs a real source of earth, stone, and sand to fill (this element cannot create its own)."
+    ],
+    "warnings": [
+      "Earth is rigid and only manipulable — the orb needs a real earth source, and a Convergence sign to compact the grains, or it jams instead of pooling."
+    ],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "contained sphere"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Wall Breaker Seal",
+        "score": 0.65
+      },
+      {
+        "name": "Water Orb",
+        "score": 0.55
+      },
+      {
+        "name": "Boulder Stretch Rope",
+        "score": 0.55
+      }
+    ]
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 6,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k0",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "earth",
+          "name": "Earth",
+          "role": "core",
+          "family": "earth",
+          "element": "earth",
+          "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "orb",
+          "name": "Orb",
+          "category": "non-directional",
+          "effect": "Creates a spherical space above the glyph in which controlled material collects, filling bottom-to-top.",
+          "count": 4,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 2,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "earth",
+          "substance": "earth, stone, and sand"
+        },
+        "summary": "The earth, stone, and sand gathers into a sphere held above the glyph, filling bottom-to-top.",
+        "breakdown": [
+          {
+            "part": "earth",
+            "role": "core",
+            "label": "Earth",
+            "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+          },
+          {
+            "part": "orb",
+            "role": "form",
+            "label": "Orb ×4",
+            "text": "The earth, stone, and sand gathers into a sphere held above the glyph."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column ×2",
+            "text": "The earth, stone, and sand is projected as a tight column or beam."
+          }
+        ],
+        "notes": [
+          "The columns drive the substance upward to fill the orb's sphere — pump and vessel.",
+          "Earth, stone, and sand pools cleanly as it fills the sphere.",
+          "The orb is only a vessel — it needs a real source of earth, stone, and sand to fill (this element cannot create its own)."
+        ],
+        "warnings": [
+          "Earth is rigid and only manipulable — the orb needs a real earth source, and a Convergence sign to compact the grains, or it jams instead of pooling."
+        ],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "contained sphere"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 6,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand gathers into a sphere held above the glyph, filling bottom-to-top.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "orb",
+        "role": "form",
+        "label": "Orb ×4",
+        "text": "The earth, stone, and sand gathers into a sphere held above the glyph."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×2",
+        "text": "The earth, stone, and sand is projected as a tight column or beam."
+      }
+    ],
+    "notes": [
+      "The columns drive the substance upward to fill the orb's sphere — pump and vessel.",
+      "Earth, stone, and sand pools cleanly as it fills the sphere.",
+      "The orb is only a vessel — it needs a real source of earth, stone, and sand to fill (this element cannot create its own)."
+    ],
+    "warnings": [
+      "Earth is rigid and only manipulable — the orb needs a real earth source, and a Convergence sign to compact the grains, or it jams instead of pooling."
+    ],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "contained sphere"
+  },
+  "catalogEmpty": false
+}

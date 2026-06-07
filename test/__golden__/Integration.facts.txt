@@ -1,0 +1,90 @@
+{
+  "name": "Integration",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "count": 6,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "transmute"
+        }
+      ],
+      "operatorsByKind": {
+        "transmute": [
+          "crush!inv"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "undirected",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 6,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 6,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": true,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is reassembled from dust.",
+      "heuristicNotes": [
+        "Crush pulverizes on contact, but without a Column to drive it the break has little reach."
+      ],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The earth, stone, and sand is reassembled from dust.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Integration",
+      "score": 0.95,
+      "effect": "Temporarily reassembles a powdered/smashed substance back into the shape of the object it originally came from — used to identify an unknown powder.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

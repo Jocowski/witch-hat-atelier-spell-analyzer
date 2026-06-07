@@ -5,6 +5,12 @@
   "type": "module",
   "license": "MIT",
   "description": "Simulador do sistema mágico de Witch Hat Atelier — compõe glyphs por arrasto e reconhece/valida spells.",
+  "imports": {
+    "#domain/*": "./src/domain/*",
+    "#services/*": "./src/services/*",
+    "#shared/*": "./src/shared/*",
+    "#features/*": "./src/features/*"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -1,0 +1,216 @@
+{
+  "name": "Inverted Column Ward",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "water",
+      "name": "Water",
+      "role": "core",
+      "family": "water",
+      "element": "water",
+      "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 4,
+      "inverted": true,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "water",
+      "substance": "water"
+    },
+    "summary": "The water is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+    "breakdown": [
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×4",
+        "text": "The water is driven inward and erupts rather than projecting out, spreading around the seal."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Purify",
+        "score": 0.55
+      },
+      {
+        "name": "Water Orb",
+        "score": 0.55
+      },
+      {
+        "name": "Rainbringer Seal",
+        "score": 0.55
+      }
+    ]
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": true,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 4,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k0",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "water",
+          "name": "Water",
+          "role": "core",
+          "family": "water",
+          "element": "water",
+          "description": "Manipulates, collects, and creates water. One of the four primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 4,
+          "inverted": true,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "water",
+          "substance": "water"
+        },
+        "summary": "The water is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+        "breakdown": [
+          {
+            "part": "water",
+            "role": "core",
+            "label": "Water",
+            "text": "Provides the substance: water (pours and flows outward)."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column (inverted) ×4",
+            "text": "The water is driven inward and erupts rather than projecting out, spreading around the seal."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "above the seal"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 4,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "water",
+      "substance": "water"
+    },
+    "summary": "The water is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+    "breakdown": [
+      {
+        "part": "water",
+        "role": "core",
+        "label": "Water",
+        "text": "Provides the substance: water (pours and flows outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×4",
+        "text": "The water is driven inward and erupts rather than projecting out, spreading around the seal."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "catalogEmpty": false
+}

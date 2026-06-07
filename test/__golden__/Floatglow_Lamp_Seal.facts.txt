@@ -1,0 +1,110 @@
+{
+  "name": "Floatglow Lamp Seal",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k0",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "light",
+        "name": "Light",
+        "element": "light",
+        "family": "fire"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "float",
+          "name": "Float",
+          "category": "non-directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "motion"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 4,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "motion": [
+          "float"
+        ],
+        "form": [
+          "column"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 8,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 8,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The light is projected as a tight column or beam, above the seal; it floats free of gravity.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The light is projected as a tight column or beam, above the seal; it floats free of gravity.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Floatglow Lamp Seal",
+      "score": 0.855,
+      "effect": "Creates a floating ball/beam of light held free of gravity — a flameless lamp. (Free-floating version; a wall-anchored variant also exists.)",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

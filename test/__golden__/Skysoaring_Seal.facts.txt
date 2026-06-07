@@ -1,0 +1,94 @@
+{
+  "name": "Skysoaring Seal",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k3",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "wind",
+        "name": "Wind",
+        "element": "air",
+        "family": "air"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "levitation",
+          "name": "Levitation",
+          "category": "directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "motion"
+        }
+      ],
+      "operatorsByKind": {
+        "motion": [
+          "levitation"
+        ]
+      },
+      "geometry": {
+        "symmetry": "asymmetric",
+        "stability": "valid but potentially unstable (asymmetric)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 2.4,
+        "powerLabel": "amplified by large or linked drawing",
+        "spin": false,
+        "signCount": 1,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 1,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "lone-sign-false-asymmetry",
+          "note": "A single sign read slightly off-origin can false-flag `asymmetric`/unstable. With one sign, treat the symmetry/stability flag as unreliable.",
+          "source": "docs/CORE.md §4"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The air stirs into moving wind, centered above the seal; it is lifted and made to levitate.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Skysoaring Seal",
+      "score": 0.95,
+      "effect": "Produces directional thrust in the direction its Levitation keystone points; drawn large on something like a sail, it lifts and flies the object.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

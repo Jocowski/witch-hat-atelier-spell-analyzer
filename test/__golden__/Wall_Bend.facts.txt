@@ -1,0 +1,181 @@
+{
+  "name": "Wall Bend (reconstruction)",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k4",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "unknown_02",
+          "name": "unknown_02",
+          "category": "other",
+          "count": 1,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "pull",
+          "name": "Pull",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "direction"
+        },
+        {
+          "id": "weave",
+          "name": "Weave",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        },
+        {
+          "id": "bend",
+          "name": "bend",
+          "category": "other",
+          "count": 2,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "bind",
+          "name": "Bind",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "special"
+        },
+        {
+          "id": "unknown_05",
+          "name": "unknown_05",
+          "category": "other",
+          "count": 1,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        }
+      ],
+      "operatorsByKind": {
+        "unknown": [
+          "unknown_02",
+          "bend",
+          "unknown_05"
+        ],
+        "direction": [
+          "pull"
+        ],
+        "transmute": [
+          "weave"
+        ],
+        "special": [
+          "bind"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "up",
+        "balance": "balanced",
+        "power": 1.36,
+        "powerLabel": "amplified by large or linked drawing",
+        "spin": true,
+        "signCount": 8,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 8,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": true,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests up (from the directional signs)."
+        },
+        {
+          "severity": "info",
+          "message": "Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is woven into a long, flexible ribbon; it binds fast to the surface it touches.",
+      "heuristicNotes": [
+        "Angle the Pull signs and the inflow twists into a vortex, spinning whatever it drags in."
+      ],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "unknown-signs-incomplete",
+          "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+          "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The earth, stone, and sand is woven into a long, flexible ribbon; it binds fast to the surface it touches.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Serpent's Bed of Sand",
+        "score": 0.55
+      },
+      {
+        "name": "Boulder Stretch Rope",
+        "score": 0.5
+      },
+      {
+        "name": "Sand Cage",
+        "score": 0.495
+      }
+    ]
+  },
+  "unknownIds": [
+    {
+      "where": "sign@k4",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k4",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k4",
+      "type": "bend"
+    },
+    {
+      "where": "sign@k4",
+      "type": "unknown_05"
+    }
+  ],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

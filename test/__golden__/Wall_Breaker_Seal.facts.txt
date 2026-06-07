@@ -1,0 +1,104 @@
+{
+  "name": "Wall Breaker Seal",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k7",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "earth",
+        "name": "Earth",
+        "element": "earth",
+        "family": "earth"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "count": 2,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "transmute"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column"
+        ],
+        "transmute": [
+          "crush"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 4,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 4,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The earth, stone, and sand is pulverized into dust.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The earth, stone, and sand is pulverized into dust.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Wall Breaker Seal",
+      "score": 0.95,
+      "effect": "Drawn on a solid object, breaks through it and reduces the material to dust. Earth's destruction seal; the non-inverted-Crush counterpart of Integration and the destructive foil of Wall Bend.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

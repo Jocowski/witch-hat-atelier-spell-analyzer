@@ -1,0 +1,144 @@
+{
+  "name": "Beast Warding",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "warding_pillar",
+        "name": "Warding Pillar (Beast-Ward Staff)",
+        "element": "unknown",
+        "family": "misc"
+      },
+      "extraSigils": [
+        {
+          "id": "light",
+          "name": "Light",
+          "element": "light"
+        },
+        {
+          "id": "light",
+          "name": "Light",
+          "element": "light"
+        }
+      ],
+      "signs": [
+        {
+          "id": "unknown_12",
+          "name": "unknown_12",
+          "category": "other",
+          "count": 2,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 4,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "unknown": [
+          "unknown_12"
+        ],
+        "form": [
+          "column!inv"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 6,
+        "sigilCount": 3,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 6,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": true,
+        "inverted": true,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        },
+        {
+          "id": "inverted-column-equals-dispersion",
+          "note": "An inverted Column's spread closely matches Dispersion's; canon cannot distinguish the two. Read it as omnidirectional eruption and FLAG the uncertainty rather than inventing a difference from Dispersion.",
+          "source": "docs/signs.md:34, docs/signs.md:45 (Snugstone)"
+        },
+        {
+          "id": "unknown-signs-incomplete",
+          "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+          "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Beast Warding",
+        "score": 0.572
+      },
+      {
+        "name": "Crystal Shard",
+        "score": 0.317
+      },
+      {
+        "name": "Wind Wall",
+        "score": 0.231
+      }
+    ]
+  },
+  "unknownIds": [
+    {
+      "where": "sign@k2",
+      "type": "unknown_12"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_12"
+    }
+  ],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

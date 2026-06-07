@@ -12,7 +12,7 @@ import {
   resolveRendererState,
   isFailedCast,
   isPartialFailure,
-} from '../src/studio/render/SpellEffectRenderer.js'
+} from '../src/features/studio/render/SpellEffectRenderer.js'
 
 import {
   clamp,
@@ -30,9 +30,9 @@ import {
   portalOutDirection,
   scaledParticleCount,
   resetParticleState,
-} from '../src/studio/render/effectUtils.js'
+} from '../src/features/studio/render/effectUtils.js'
 
-import { fireFlowConfig } from '../src/studio/render/effects/fireEffect.js'
+import { fireFlowConfig } from '../src/features/studio/render/effects/fireEffect.js'
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 

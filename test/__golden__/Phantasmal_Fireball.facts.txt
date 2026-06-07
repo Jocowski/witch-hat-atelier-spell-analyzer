@@ -1,0 +1,217 @@
+{
+  "name": "Phantasmal Fireball (reconstruction)",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k3",
+      "name": "Circle 1",
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "unburning_flame",
+        "name": "Unburning Flames",
+        "element": "unburning_flame",
+        "family": "fire"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "convergence",
+          "name": "Convergence",
+          "category": "semi-directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "power"
+        },
+        {
+          "id": "unknown_08",
+          "name": "unknown_08",
+          "category": "other",
+          "count": 3,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "count": 6,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "direction"
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "count": 3,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "direction"
+        },
+        {
+          "id": "unknown_07",
+          "name": "unknown_07",
+          "category": "other",
+          "count": 6,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        },
+        {
+          "id": "unknown_02",
+          "name": "unknown_02",
+          "category": "other",
+          "count": 6,
+          "inverted": false,
+          "invertible": false,
+          "operatorKind": "unknown"
+        }
+      ],
+      "operatorsByKind": {
+        "power": [
+          "convergence"
+        ],
+        "unknown": [
+          "unknown_08",
+          "unknown_07",
+          "unknown_02"
+        ],
+        "direction": [
+          "direction!inv",
+          "direction"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "along the ring",
+        "balance": "balanced",
+        "power": 0.9,
+        "powerLabel": "concentrated to a point (Convergence) — narrower but more intense",
+        "spin": false,
+        "signCount": 25,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 22,
+        "ring": 0,
+        "outside": 3
+      },
+      "flags": {
+        "hasUnknownSigns": true,
+        "inverted": true,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests along the ring (from the directional signs)."
+        },
+        {
+          "severity": "info",
+          "message": "3 external marks outside the ring — framing only; they don't steer the spell."
+        }
+      ],
+      "heuristicSummary": "The heatless flame burns as flame that gives off no heat, emerging only along the ring. The effect is focused down to a single point. Outside the ring sit external marks (unknown_08 ×3) that frame the seal rather than shape the core effect.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "unknown-signs-incomplete",
+          "note": "This circle contains an unidentified (`unknown_*`) sign. Any deduction is necessarily INCOMPLETE — say so, reason its likely role from its drawing geometry, and do not assert a confident effect.",
+          "source": "docs/CORE.md §6; docs/signs.md (Unknown / Unidentified Signs)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The heatless flame burns as flame that gives off no heat, emerging only along the ring. The effect is focused down to a single point. Outside the ring sit external marks (unknown_08 ×3) that frame the seal rather than shape the core effect.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Phantasmal Fireball",
+        "score": 0.421
+      },
+      {
+        "name": "Floating Drops",
+        "score": 0.256
+      }
+    ]
+  },
+  "unknownIds": [
+    {
+      "where": "sign@k3",
+      "type": "unknown_08"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_08"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_08"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_07"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_02"
+    }
+  ],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

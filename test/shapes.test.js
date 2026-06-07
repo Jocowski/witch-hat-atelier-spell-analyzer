@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { line, rect, triangle, ellipse, circle, brush, eraserHitTest } from '../src/studio/tools/shapes.js'
+import { line, rect, triangle, ellipse, circle, brush, eraserHitTest } from '../src/features/studio/tools/shapes.js'
 
 // ---------- line ----------
 

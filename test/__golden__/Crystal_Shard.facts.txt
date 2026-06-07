@@ -1,0 +1,103 @@
+{
+  "name": "Crystal Shard",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k5",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "crystal",
+        "name": "Crystal",
+        "element": "crystal",
+        "family": "misc"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 4,
+          "inverted": true,
+          "invertible": true,
+          "operatorKind": "form"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column!inv"
+        ]
+      },
+      "geometry": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "aim": "above the seal",
+        "balance": "balanced",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "spin": false,
+        "signCount": 4,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 4,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": true,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "heuristicSummary": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": [
+        {
+          "id": "balanced-columns-aim-artifact",
+          "note": "4+ balanced Columns: the engine's `aim`/'above the seal' label is a KNOWN ARTIFACT. Balanced Columns confine/shape the flow (and spread omnidirectionally if inverted) — they do NOT beam in a compass direction. Read the aim as out-of-plane (up) or as containment, per substance.",
+          "source": "docs/lexicon/signs-directional.md (Vapor Bubble, Beast Warding findings)"
+        },
+        {
+          "id": "inverted-column-equals-dispersion",
+          "note": "An inverted Column's spread closely matches Dispersion's; canon cannot distinguish the two. Read it as omnidirectional eruption and FLAG the uncertainty rather than inventing a difference from Dispersion.",
+          "source": "docs/signs.md:34, docs/signs.md:45 (Snugstone)"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Crystal Shard",
+      "score": 0.95,
+      "effect": "Erupts several large, shard-like crystals suddenly out of the glyph.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

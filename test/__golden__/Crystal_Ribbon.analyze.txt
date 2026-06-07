@@ -1,0 +1,196 @@
+{
+  "name": "Crystal Ribbon",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [],
+  "sigils": [
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "role": "core",
+      "family": "misc",
+      "element": "crystal",
+      "description": "Creates and manipulates crystalline objects."
+    }
+  ],
+  "signs": [
+    {
+      "id": "weave",
+      "name": "Weave",
+      "category": "semi-directional",
+      "effect": "Turns solid objects into long, flexible ribbons on contact. Invented by Richeh. Must encircle the central sigil.",
+      "count": 1,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "crystal",
+      "substance": "crystal"
+    },
+    "summary": "The crystal is woven into a long, flexible ribbon.",
+    "breakdown": [
+      {
+        "part": "crystal",
+        "role": "core",
+        "label": "Crystal",
+        "text": "Provides the substance: crystal (forms into hard crystal)."
+      },
+      {
+        "part": "weave",
+        "role": "transmute",
+        "label": "Weave",
+        "text": "The crystal is woven into a long, flexible ribbon."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "valid but potentially unstable (asymmetric)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Crystal Ribbon",
+      "score": 0.855,
+      "effect": "Conjures hard crystal and weaves it into a long, flexible crystalline ribbon -- a rigid material made supple. A shaping/utility spell, not an attack.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "asymmetric",
+    "stability": "valid but potentially unstable (asymmetric)",
+    "balance": "balanced",
+    "aim": "undirected",
+    "power": 2.35,
+    "powerLabel": "amplified by large or linked drawing",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 1,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k1",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [],
+      "sigils": [
+        {
+          "id": "crystal",
+          "name": "Crystal",
+          "role": "core",
+          "family": "misc",
+          "element": "crystal",
+          "description": "Creates and manipulates crystalline objects."
+        }
+      ],
+      "signs": [
+        {
+          "id": "weave",
+          "name": "Weave",
+          "category": "semi-directional",
+          "effect": "Turns solid objects into long, flexible ribbons on contact. Invented by Richeh. Must encircle the central sigil.",
+          "count": 1,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "crystal",
+          "substance": "crystal"
+        },
+        "summary": "The crystal is woven into a long, flexible ribbon.",
+        "breakdown": [
+          {
+            "part": "crystal",
+            "role": "core",
+            "label": "Crystal",
+            "text": "Provides the substance: crystal (forms into hard crystal)."
+          },
+          {
+            "part": "weave",
+            "role": "transmute",
+            "label": "Weave",
+            "text": "The crystal is woven into a long, flexible ribbon."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "valid but potentially unstable (asymmetric)",
+        "power": "ordinary intensity",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "asymmetric",
+        "stability": "valid but potentially unstable (asymmetric)",
+        "balance": "balanced",
+        "aim": "undirected",
+        "power": 2.35,
+        "powerLabel": "amplified by large or linked drawing",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 1,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1.5365,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.654
+        }
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "crystal",
+      "substance": "crystal"
+    },
+    "summary": "The crystal is woven into a long, flexible ribbon.",
+    "breakdown": [
+      {
+        "part": "crystal",
+        "role": "core",
+        "label": "Crystal",
+        "text": "Provides the substance: crystal (forms into hard crystal)."
+      },
+      {
+        "part": "weave",
+        "role": "transmute",
+        "label": "Weave",
+        "text": "The crystal is woven into a long, flexible ribbon."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "valid but potentially unstable (asymmetric)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "catalogEmpty": false
+}

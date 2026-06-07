@@ -1,0 +1,248 @@
+{
+  "name": "Floatglow Lamp Seal",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "light",
+      "name": "Light",
+      "role": "core",
+      "family": "fire",
+      "element": "light",
+      "description": "Fire variant that manifests magic as light."
+    }
+  ],
+  "signs": [
+    {
+      "id": "float",
+      "name": "Float",
+      "category": "non-directional",
+      "effect": "Makes the object it's drawn on float in midair, regardless of gravity. More limited function than levitation after the retcon.",
+      "count": 4,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 4,
+      "inverted": false,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "light",
+      "substance": "light"
+    },
+    "summary": "The light is projected as a tight column or beam, above the seal; it floats free of gravity.",
+    "breakdown": [
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Provides the substance: light (shines outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×4",
+        "text": "The light is projected as a tight column or beam."
+      },
+      {
+        "part": "float",
+        "role": "motion",
+        "label": "Float ×4",
+        "text": "The light floats free of gravity."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Floatglow Lamp Seal",
+      "score": 0.855,
+      "effect": "Creates a floating ball/beam of light held free of gravity — a flameless lamp. (Free-floating version; a wall-anchored variant also exists.)",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": false,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 8,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k0",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "light",
+          "name": "Light",
+          "role": "core",
+          "family": "fire",
+          "element": "light",
+          "description": "Fire variant that manifests magic as light."
+        }
+      ],
+      "signs": [
+        {
+          "id": "float",
+          "name": "Float",
+          "category": "non-directional",
+          "effect": "Makes the object it's drawn on float in midair, regardless of gravity. More limited function than levitation after the retcon.",
+          "count": 4,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 4,
+          "inverted": false,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "light",
+          "substance": "light"
+        },
+        "summary": "The light is projected as a tight column or beam, above the seal; it floats free of gravity.",
+        "breakdown": [
+          {
+            "part": "light",
+            "role": "core",
+            "label": "Light",
+            "text": "Provides the substance: light (shines outward)."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column ×4",
+            "text": "The light is projected as a tight column or beam."
+          },
+          {
+            "part": "float",
+            "role": "motion",
+            "label": "Float ×4",
+            "text": "The light floats free of gravity."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "above the seal"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": false,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 8,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "light",
+      "substance": "light"
+    },
+    "summary": "The light is projected as a tight column or beam, above the seal; it floats free of gravity.",
+    "breakdown": [
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Provides the substance: light (shines outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×4",
+        "text": "The light is projected as a tight column or beam."
+      },
+      {
+        "part": "float",
+        "role": "motion",
+        "label": "Float ×4",
+        "text": "The light floats free of gravity."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "catalogEmpty": false
+}

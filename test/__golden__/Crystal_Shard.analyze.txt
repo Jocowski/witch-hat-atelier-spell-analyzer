@@ -1,0 +1,212 @@
+{
+  "name": "Crystal Shard",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: radial symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "role": "core",
+      "family": "misc",
+      "element": "crystal",
+      "description": "Creates and manipulates crystalline objects."
+    }
+  ],
+  "signs": [
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 4,
+      "inverted": true,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "crystal",
+      "substance": "crystal"
+    },
+    "summary": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+    "breakdown": [
+      {
+        "part": "crystal",
+        "role": "core",
+        "label": "Crystal",
+        "text": "Provides the substance: crystal (forms into hard crystal)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×4",
+        "text": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Crystal Shard",
+      "score": 0.95,
+      "effect": "Erupts several large, shard-like crystals suddenly out of the glyph.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "radial",
+    "stability": "stable (radial symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": true,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 4,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k5",
+      "name": "",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: radial symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "crystal",
+          "name": "Crystal",
+          "role": "core",
+          "family": "misc",
+          "element": "crystal",
+          "description": "Creates and manipulates crystalline objects."
+        }
+      ],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 4,
+          "inverted": true,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "crystal",
+          "substance": "crystal"
+        },
+        "summary": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+        "breakdown": [
+          {
+            "part": "crystal",
+            "role": "core",
+            "label": "Crystal",
+            "text": "Provides the substance: crystal (forms into hard crystal)."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column (inverted) ×4",
+            "text": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (radial symmetry)",
+        "power": "ordinary intensity",
+        "direction": "above the seal"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "radial",
+        "stability": "stable (radial symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 4,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 1,
+        "duration": 1,
+        "params": {}
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "crystal",
+      "substance": "crystal"
+    },
+    "summary": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+    "breakdown": [
+      {
+        "part": "crystal",
+        "role": "core",
+        "label": "Crystal",
+        "text": "Provides the substance: crystal (forms into hard crystal)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×4",
+        "text": "The crystal is driven inward and erupts rather than projecting out, spreading around the seal."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (radial symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "catalogEmpty": false
+}

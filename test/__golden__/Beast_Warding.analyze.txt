@@ -1,0 +1,314 @@
+{
+  "name": "Beast Warding",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: bilateral symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests above the seal (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "warding_pillar",
+      "name": "Warding Pillar (Beast-Ward Staff)",
+      "role": "core",
+      "family": "misc",
+      "element": "unknown",
+      "description": "Unidentified central sigil of the Beast Repellent (Beast Warding) seal. A vertical staff capped by an upward arrowhead, flanked by bracket 'arms' near its top and bottom — a totem/'keep-out post'. Element unidentified, so its substance and capability are unknown; deductions built on it are necessarily incomplete."
+    },
+    {
+      "id": "light",
+      "name": "Light",
+      "role": "sigil",
+      "family": "fire",
+      "element": "light",
+      "description": "Fire variant that manifests magic as light."
+    },
+    {
+      "id": "light",
+      "name": "Light",
+      "role": "sigil",
+      "family": "fire",
+      "element": "light",
+      "description": "Fire variant that manifests magic as light."
+    }
+  ],
+  "signs": [
+    {
+      "id": "unknown_12",
+      "name": "unknown_12",
+      "category": "other",
+      "effect": "",
+      "count": 2,
+      "inverted": false,
+      "invertible": false
+    },
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 4,
+      "inverted": true,
+      "invertible": true
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "unknown",
+      "substance": "an unknown force"
+    },
+    "summary": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+    "breakdown": [
+      {
+        "part": "warding_pillar",
+        "role": "core",
+        "label": "Warding Pillar (Beast-Ward Staff)",
+        "text": "Provides the substance: an unknown force (manifests in an unclear way)."
+      },
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Also provides the substance: light (shines outward)."
+      },
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Also provides the substance: light (shines outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×4",
+        "text": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": null,
+    "nearest": [
+      {
+        "name": "Beast Warding",
+        "score": 0.572
+      },
+      {
+        "name": "Crystal Shard",
+        "score": 0.317
+      },
+      {
+        "name": "Wind Wall",
+        "score": 0.231
+      }
+    ]
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "bilateral",
+    "stability": "stable (bilateral symmetry)",
+    "balance": "balanced",
+    "aim": "above the seal",
+    "power": 1,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": true,
+    "decorative": false,
+    "sigilCount": 3,
+    "signCount": 6,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k2",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": true,
+      "ringClosed": true,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests above the seal (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "warding_pillar",
+          "name": "Warding Pillar (Beast-Ward Staff)",
+          "role": "core",
+          "family": "misc",
+          "element": "unknown",
+          "description": "Unidentified central sigil of the Beast Repellent (Beast Warding) seal. A vertical staff capped by an upward arrowhead, flanked by bracket 'arms' near its top and bottom — a totem/'keep-out post'. Element unidentified, so its substance and capability are unknown; deductions built on it are necessarily incomplete."
+        },
+        {
+          "id": "light",
+          "name": "Light",
+          "role": "sigil",
+          "family": "fire",
+          "element": "light",
+          "description": "Fire variant that manifests magic as light."
+        },
+        {
+          "id": "light",
+          "name": "Light",
+          "role": "sigil",
+          "family": "fire",
+          "element": "light",
+          "description": "Fire variant that manifests magic as light."
+        }
+      ],
+      "signs": [
+        {
+          "id": "unknown_12",
+          "name": "unknown_12",
+          "category": "other",
+          "effect": "",
+          "count": 2,
+          "inverted": false,
+          "invertible": false
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 4,
+          "inverted": true,
+          "invertible": true
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "unknown",
+          "substance": "an unknown force"
+        },
+        "summary": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+        "breakdown": [
+          {
+            "part": "warding_pillar",
+            "role": "core",
+            "label": "Warding Pillar (Beast-Ward Staff)",
+            "text": "Provides the substance: an unknown force (manifests in an unclear way)."
+          },
+          {
+            "part": "light",
+            "role": "core",
+            "label": "Light",
+            "text": "Also provides the substance: light (shines outward)."
+          },
+          {
+            "part": "light",
+            "role": "core",
+            "label": "Light",
+            "text": "Also provides the substance: light (shines outward)."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column (inverted) ×4",
+            "text": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (bilateral symmetry)",
+        "power": "ordinary intensity",
+        "direction": "above the seal"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "balance": "balanced",
+        "aim": "above the seal",
+        "power": 1,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 3,
+        "signCount": 6,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.6538,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.654
+        }
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "unknown",
+      "substance": "an unknown force"
+    },
+    "summary": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal, above the seal.",
+    "breakdown": [
+      {
+        "part": "warding_pillar",
+        "role": "core",
+        "label": "Warding Pillar (Beast-Ward Staff)",
+        "text": "Provides the substance: an unknown force (manifests in an unclear way)."
+      },
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Also provides the substance: light (shines outward)."
+      },
+      {
+        "part": "light",
+        "role": "core",
+        "label": "Light",
+        "text": "Also provides the substance: light (shines outward)."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×4",
+        "text": "An unknown force and light is driven inward and erupts rather than projecting out, spreading around the seal."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "above the seal"
+  },
+  "catalogEmpty": false,
+  "unknownIds": [
+    {
+      "where": "sign@k2",
+      "type": "unknown_12"
+    },
+    {
+      "where": "sign@k2",
+      "type": "unknown_12"
+    }
+  ]
+}

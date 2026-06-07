@@ -1,0 +1,108 @@
+{
+  "name": "Flame Shot Seal",
+  "valid": true,
+  "circleCount": 1,
+  "circles": [
+    {
+      "id": "k0",
+      "name": null,
+      "valid": true,
+      "contextRole": null,
+      "centerPromoted": false,
+      "core": {
+        "id": "fire",
+        "name": "Fire",
+        "element": "fire",
+        "family": "fire"
+      },
+      "extraSigils": [],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "count": 1,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "form"
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "count": 10,
+          "inverted": false,
+          "invertible": true,
+          "operatorKind": "direction"
+        }
+      ],
+      "operatorsByKind": {
+        "form": [
+          "column"
+        ],
+        "direction": [
+          "direction"
+        ]
+      },
+      "geometry": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "aim": "up",
+        "balance": "balanced",
+        "power": 1.14,
+        "powerLabel": "ordinary intensity",
+        "spin": true,
+        "signCount": 11,
+        "sigilCount": 1,
+        "linkCount": 0
+      },
+      "zones": {
+        "inside": 11,
+        "ring": 0,
+        "outside": 0
+      },
+      "flags": {
+        "hasUnknownSigns": false,
+        "inverted": false,
+        "decorative": false
+      },
+      "dyes": [],
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests up (from the directional signs)."
+        },
+        {
+          "severity": "info",
+          "message": "Some signs are tilted — tilting signs makes the spell spin (more tilt = more spin, but less reach)."
+        }
+      ],
+      "heuristicSummary": "The flame is projected as a tight column or beam, fired up.",
+      "heuristicNotes": [],
+      "heuristicWarnings": [],
+      "caveats": []
+    }
+  ],
+  "relations": [],
+  "combinedHeuristicSummary": "The flame is projected as a tight column or beam, fired up.",
+  "catalog": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Flame Shot Seal",
+      "score": 0.95,
+      "effect": "Throws a directed column of flame forward; flanking Region signs confine the magic to the space ahead so it reaches farther.",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 1,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "unknownIds": [],
+  "note": "FACTS are engine-observable only. Deduce the actual effect from docs/CORE.md + docs/lexicon/ using these facts; *heuristicSummary fields are a non-authoritative scaffold, not ground truth."
+}

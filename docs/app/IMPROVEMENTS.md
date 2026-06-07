@@ -72,7 +72,7 @@
 ## B. AI training (the recognizer & flywheel)
 *Detailed in [SPEC-recognizer-analysis.md](specs/SPEC-recognizer-analysis.md) Part A (source-weighting,
 confidence gate, active-learning + ML-readiness progress, rotation, segmentation, verify flag, ML).*
-- **P1 — Seed templates from canon SVGs.** Generate `$P` templates from the 33 sigil + 52 sign
+- **P1 — Seed templates from canon SVGs.** Generate `$P` templates from the 26 sigil + 36 sign
   `svgPath`s so recognition works on day one without manual training (APP-PLAN Phase H / "seed").
 - ~~**P1 — Wire `logAnalysis`.**~~ **Done (2026-06-04)** — `StudioPage.handleAnalyze` logs
   composition + engine result + corrections (A0).
@@ -150,7 +150,7 @@ finds one ring). Closing this gap unlocks contraptions and nested seals from a d
   `ResultPanel.jsx` actually uses (verified against surviving JSX); all removed-editor rules dropped.
 - ~~**Lazy-load the Admin route**~~ — **done (2026-06-04).** `router.jsx` `React.lazy`-loads `AdminPage`
   + `LoginPage` behind `<Suspense>`; build emits separate `AdminPage`/`LoginPage` chunks, out of the
-  Studio's initial bundle.
+  Studio's initial bundle. (Superseded: the app root has no router; admin is a capability-gated overlay — see [docs/specs/current-architecture-spec.md](../specs/current-architecture-spec.md).)
 - **Onboarding / empty states** — the recognizer starts empty; a first-run flow (or seed-from-SVG)
   that explains training avoids a confusing "nothing recognized" first impression. *(Still open.)*
 - **Confidence gate** — *moved to [SPEC-recognizer-analysis.md](specs/SPEC-recognizer-analysis.md) A2* (a

@@ -1,0 +1,350 @@
+{
+  "name": "Sand Cage",
+  "valid": true,
+  "status": {
+    "text": "Valid"
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "message": "Stable: bilateral symmetry."
+    },
+    {
+      "severity": "info",
+      "message": "Aim: the effect manifests contained within the ring (from the directional signs)."
+    }
+  ],
+  "sigils": [
+    {
+      "id": "earth",
+      "name": "Earth",
+      "role": "core",
+      "family": "earth",
+      "element": "earth",
+      "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+    }
+  ],
+  "signs": [
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 2,
+      "inverted": true,
+      "invertible": true
+    },
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "directional",
+      "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+      "count": 6,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "direction",
+      "name": "Region",
+      "category": "directional",
+      "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+      "count": 8,
+      "inverted": false,
+      "invertible": true
+    },
+    {
+      "id": "crush",
+      "name": "Crush",
+      "category": "semi-directional",
+      "effect": "Disintegrates objects into dust (with an earth sigil). Inverted, it reassembles/reintegrates (temporarily).",
+      "count": 2,
+      "inverted": true,
+      "invertible": true
+    },
+    {
+      "id": "unknown_05",
+      "name": "unknown_05",
+      "category": "other",
+      "effect": "",
+      "count": 2,
+      "inverted": false,
+      "invertible": false
+    }
+  ],
+  "deduction": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is reassembled from dust.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "crush",
+        "role": "transmute",
+        "label": "Crush (inverted) ×2",
+        "text": "The earth, stone, and sand is reassembled from dust."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×2",
+        "text": "The earth, stone, and sand is driven inward and erupts rather than projecting out, spreading around the seal."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×6",
+        "text": "The earth, stone, and sand is projected as a tight column or beam."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region ×8",
+        "text": "The earth, stone, and sand is aimed."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "similar": {
+    "catalogEmpty": false,
+    "match": {
+      "name": "Sand Cage",
+      "score": 0.819,
+      "effect": "Builds a rigid cage of sand around a target to trap it; the rigid counterpart of the Serpent's Bed of Sand ('if sand can be made soft as a bed, it can also be made rigid as a cage').",
+      "parts": {
+        "sigilMatch": 1,
+        "signSetMatch": 0.9,
+        "symmetryMatch": 1
+      }
+    },
+    "nearest": []
+  },
+  "dyes": [],
+  "analysis": {
+    "symmetry": "bilateral",
+    "stability": "stable (bilateral symmetry)",
+    "balance": "balanced",
+    "aim": "contained within the ring",
+    "power": 1.03,
+    "powerLabel": "ordinary intensity",
+    "tilted": false,
+    "inverted": true,
+    "decorative": false,
+    "sigilCount": 1,
+    "signCount": 20,
+    "linkCount": 0
+  },
+  "circles": [
+    {
+      "id": "k3",
+      "name": "Circle 1",
+      "valid": true,
+      "hasCore": true,
+      "centerPromoted": false,
+      "active": false,
+      "ringClosed": false,
+      "issues": [
+        {
+          "severity": "info",
+          "message": "Stable: bilateral symmetry."
+        },
+        {
+          "severity": "info",
+          "message": "Aim: the effect manifests contained within the ring (from the directional signs)."
+        }
+      ],
+      "sigils": [
+        {
+          "id": "earth",
+          "name": "Earth",
+          "role": "core",
+          "family": "earth",
+          "element": "earth",
+          "description": "Manipulates (not creates) wood, stone, sand, and soil. The sigil of might; primary tetrad."
+        }
+      ],
+      "signs": [
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 2,
+          "inverted": true,
+          "invertible": true
+        },
+        {
+          "id": "column",
+          "name": "Column",
+          "category": "directional",
+          "effect": "Makes the magic manifest as a column/beam above the glyph. If signs are unbalanced, it manifests toward the side with more/larger signs. The shorter line usually faces outward.",
+          "count": 6,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "direction",
+          "name": "Region",
+          "category": "directional",
+          "effect": "Controls the direction of the effect. All forward => fires forward; all inward => fires up; all outward => spreads out. Opposed pairs (pointing at each other) => magic only emerges from the space between them.",
+          "count": 8,
+          "inverted": false,
+          "invertible": true
+        },
+        {
+          "id": "crush",
+          "name": "Crush",
+          "category": "semi-directional",
+          "effect": "Disintegrates objects into dust (with an earth sigil). Inverted, it reassembles/reintegrates (temporarily).",
+          "count": 2,
+          "inverted": true,
+          "invertible": true
+        },
+        {
+          "id": "unknown_05",
+          "name": "unknown_05",
+          "category": "other",
+          "effect": "",
+          "count": 2,
+          "inverted": false,
+          "invertible": false
+        }
+      ],
+      "deduction": {
+        "ok": true,
+        "element": {
+          "id": "earth",
+          "substance": "earth, stone, and sand"
+        },
+        "summary": "The earth, stone, and sand is reassembled from dust.",
+        "breakdown": [
+          {
+            "part": "earth",
+            "role": "core",
+            "label": "Earth",
+            "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+          },
+          {
+            "part": "crush",
+            "role": "transmute",
+            "label": "Crush (inverted) ×2",
+            "text": "The earth, stone, and sand is reassembled from dust."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column (inverted) ×2",
+            "text": "The earth, stone, and sand is driven inward and erupts rather than projecting out, spreading around the seal."
+          },
+          {
+            "part": "column",
+            "role": "form",
+            "label": "Column ×6",
+            "text": "The earth, stone, and sand is projected as a tight column or beam."
+          },
+          {
+            "part": "direction",
+            "role": "direction",
+            "label": "Region ×8",
+            "text": "The earth, stone, and sand is aimed."
+          }
+        ],
+        "notes": [],
+        "warnings": [],
+        "stability": "stable (bilateral symmetry)",
+        "power": "ordinary intensity",
+        "direction": "balanced"
+      },
+      "dyes": [],
+      "analysis": {
+        "symmetry": "bilateral",
+        "stability": "stable (bilateral symmetry)",
+        "balance": "balanced",
+        "aim": "contained within the ring",
+        "power": 1.03,
+        "powerLabel": "ordinary intensity",
+        "tilted": false,
+        "inverted": true,
+        "decorative": false,
+        "sigilCount": 1,
+        "signCount": 20,
+        "linkCount": 0
+      },
+      "accumulator": {
+        "power": 0.6735,
+        "duration": 1,
+        "params": {
+          "ringMultiplier": 0.654
+        }
+      }
+    }
+  ],
+  "relations": [],
+  "combined": {
+    "ok": true,
+    "element": {
+      "id": "earth",
+      "substance": "earth, stone, and sand"
+    },
+    "summary": "The earth, stone, and sand is reassembled from dust.",
+    "breakdown": [
+      {
+        "part": "earth",
+        "role": "core",
+        "label": "Earth",
+        "text": "Provides the substance: earth, stone, and sand (rises up as rock and sand)."
+      },
+      {
+        "part": "crush",
+        "role": "transmute",
+        "label": "Crush (inverted) ×2",
+        "text": "The earth, stone, and sand is reassembled from dust."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column (inverted) ×2",
+        "text": "The earth, stone, and sand is driven inward and erupts rather than projecting out, spreading around the seal."
+      },
+      {
+        "part": "column",
+        "role": "form",
+        "label": "Column ×6",
+        "text": "The earth, stone, and sand is projected as a tight column or beam."
+      },
+      {
+        "part": "direction",
+        "role": "direction",
+        "label": "Region ×8",
+        "text": "The earth, stone, and sand is aimed."
+      }
+    ],
+    "notes": [],
+    "warnings": [],
+    "stability": "stable (bilateral symmetry)",
+    "power": "ordinary intensity",
+    "direction": "balanced"
+  },
+  "catalogEmpty": false,
+  "unknownIds": [
+    {
+      "where": "sign@k3",
+      "type": "unknown_05"
+    },
+    {
+      "where": "sign@k3",
+      "type": "unknown_05"
+    }
+  ]
+}

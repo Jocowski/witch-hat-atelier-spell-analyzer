@@ -1,7 +1,7 @@
 // beautify.test.js — pure-module tests for stroke beautification (no JSON/DOM).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { beautifyStroke, rdp, fitCircle, chaikin, weldsRingGap, selfIntersects, edgesAreStraight } from '../src/studio/tools/beautify.js'
+import { beautifyStroke, rdp, fitCircle, chaikin, weldsRingGap, selfIntersects, edgesAreStraight } from '../src/features/studio/tools/beautify.js'
 
 // ---------- helpers: synthesize hand-drawn-ish strokes ----------
 
